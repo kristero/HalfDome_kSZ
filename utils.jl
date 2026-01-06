@@ -162,3 +162,35 @@ function mix_radial_profiles(θ::AbstractVector,
     end
     return prof_mix
 end
+
+"""
+Read a Sehgal+ (2010) LAMBDA halo binary file (halo_nbody.binary or halo_low_mass.binary).
+
+Returns:
+  z    :: Vector{Float32}
+  pos  :: Matrix{Float32}  (N×3) columns: x,y,z  [comoving Mpc]
+  vel  :: Matrix{Float32}  (N×3) columns: vx,vy,vz [km/s]
+  m200 :: Vector{Float32}  (catalog "M200" field) [Msolar]
+"""
+function read_lambda_halo_binary(path::AbstractString)
+    # Each halo: 20 Float32 = 80 bytes
+    bytes = filesize(path)
+    rec_bytes = 20 * sizeof(Float32)
+    @assert bytes % rec_bytes == 0 "File size not divisible by 20*Float32; wrong file or corrupted?"
+    N = Int(bytes ÷ rec_bytes)
+
+    data = Vector{Float32}(undef, 20N)
+    open(path, "r") do io
+        read!(io, data)
+    end
+
+    # Reshape to (20, N) as in the README
+    halo = reshape(data, 20, N)
+
+    z    = vec(halo[1, :])                 # redshift
+    pos  = permutedims(halo[4:6, :])       # N×3: comoving position [Mpc]
+    vel  = permutedims(halo[7:9, :])       # N×3: proper peculiar velocity [km/s]
+    m200 = vec(halo[13, :])                # "M200" [Msolar]
+
+    return z, pos[:,1], pos[:,2], pos[:,3], vel[:,1], vel[:,2], vel[:,3], m200
+end

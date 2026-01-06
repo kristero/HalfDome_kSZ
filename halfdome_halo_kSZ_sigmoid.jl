@@ -8,7 +8,7 @@ h5 = h5open("lightcone_100.hdf5", "r")
 
 pos = read(h5["Position"])
 
-halo_mass = read(h5["halo_mass_m200c"])*h_value # Correction for just Msol units for websky comparison 
+halo_mass = read(h5["halo_mass_m200m"])*h_value # Correction for just Msol units for websky comparison 
 
 halo_vel = read(h5["Velocity"])
 
@@ -18,7 +18,7 @@ redshift = read(h5["redshift"])
 # Hard cut-off for mass 
 
 selection = true
-add_str_end = "13Msol_cutoff_FIELD"
+add_str_end = "13Msol_cutoff_HALO"
 mass_min = 1e13        # Msun, WebSky threshold
 sel = halo_mass .>= mass_min
 
@@ -28,8 +28,6 @@ if selection == true
 	halo_vel = halo_vel[:, sel]
 	redshift = redshift[sel]
 	end
-
-b = 10.0 .^ (11:0.25:17)
 
 x = pos[1,:]
 y = pos[2,:]
@@ -72,7 +70,7 @@ proj_v_over_c = proj_v_over_c[perm]
 model = SigmoidBattagliaTauProfile(Omega_c=0.2603, Omega_b=0.0486,  h=h_value)
 
 # y_model_interp = XGPaint.load_precomputed_battaglia_tau()
-y_model_interp = build_interpolator(model, cache_file="cached2_model_sigmoid_Ntheta512_pad256_integral_reduced_acc.jld2", overwrite=false)
+y_model_interp = build_interpolator(model, cache_file="cached_model_sigmoid_Ntheta512_pad256_integral_reduced_acc.jld2", overwrite=false)
 
 # y_model_interp = build_interpolator(model, cache_file="cached_test_no_sigmoid.jld2", overwrite=true)
 
@@ -84,8 +82,5 @@ print("Initiating the HealPix with NSide: $nside \n")
 w = XGPaint.HealpixRingProfileWorkspace{Float64}(res)
 
 @time paint!(m_hp, w, y_model_interp, halo_mass, redshift, ra, dec, proj_v_over_c)
-Healpix.saveToFITS(m_hp, "!y_tSZ_nside4096_sigmoid_m1e13_corr_units.fits", typechar="D")  
-
-plot(m_hp)
-savefig("kSZ_HalfDome_y100_sigmoid_m1e13.png")
+Healpix.saveToFITS(m_hp, "!Tcmb_tSZ_nside4096_sigmoid_$(add_str_end)_m200m.fits", typechar="D")  
 print("Finished Healpix kSZ total with sigmoid \n")

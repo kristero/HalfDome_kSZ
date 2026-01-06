@@ -8,7 +8,7 @@ print("Starting the model build_interpolator: fast version \n")
 #model_interp = XGPaint.load_precomputed_battaglia_tau()
 @time y_small = build_interpolator(
     model;
-    cache_file = "cached_model_sigmoid_Ntheta512_pad256_integral_reduced_acc.jld2",
+    cache_file = "cached_model_sigmoid_Ntheta512_pad256_integral_increased_acc.jld2",
     N_logθ     = 512,
     pad        = 256,
     overwrite  = true,

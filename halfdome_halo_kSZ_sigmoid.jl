@@ -8,15 +8,13 @@ h5 = h5open("lightcone_100.hdf5", "r")
 
 pos = read(h5["Position"])
 
-halo_mass = read(h5["halo_mass_m200m"])*h_value # Correction for just Msol units for websky comparison 
+halo_mass = read(h5["halo_mass_m200c"]) / h_value # Correction for just Msol units for websky comparison 
 
 halo_vel = read(h5["Velocity"])
 
 redshift = read(h5["redshift"])
 
-
 # Hard cut-off for mass 
-
 selection = true
 add_str_end = "13Msol_cutoff_HALO"
 mass_min = 1e13        # Msun, WebSky threshold
@@ -37,22 +35,16 @@ vx = halo_vel[1, :]
 vy = halo_vel[2, :]
 vz = halo_vel[3, :]
 
-### For projected velocity
-N = length(x)
-proj_v_over_c = Array{eltype(x)}(undef, N)
+a = @. 1 / (1 + redshift)
 
-for i in 1:N
-    r = sqrt(x[i]^2 + y[i]^2 + z[i]^2)
-    nx, ny, nz = x[i]/r, y[i]/r, z[i]/r            # LOS unit vector
-    v_los = vx[i]*nx + vy[i]*ny + vz[i]*nz        # projected velocity along LOS
-    proj_v_over_c[i] = v_los / c_kms
-end
 
+# projected v/c (vectorized)
+r = sqrt.(x .* x .+ y .* y .+ z .* z 
+proj_v_over_c = (x .* vx .+ y .* vy .+ z .* vz) ./ r ./ c_kms
+
+#proj_v_over_c = @. proj_v_over_c / a   # include scale factor
+print("Finished calculating projected velocities with scale factor \n")
 ra, dec = xyz_to_ra_dec(x, y, z)
-
-# radians to degrees
-ra_deg  = rad2deg.(ra)
-dec_deg = rad2deg.(dec)
 
 # sorting all the arrays by dec 
 perm = sortperm(dec)  # sortperm(dec, alg=ThreadsX.MergeSort)
@@ -70,8 +62,9 @@ proj_v_over_c = proj_v_over_c[perm]
 model = SigmoidBattagliaTauProfile(Omega_c=0.2603, Omega_b=0.0486,  h=h_value)
 
 # y_model_interp = XGPaint.load_precomputed_battaglia_tau()
-y_model_interp = build_interpolator(model, cache_file="cached_model_sigmoid_Ntheta512_pad256_integral_reduced_acc.jld2", overwrite=false)
-
+# Sigmoid file name: cached_model_sigmoid_r0_3_Ntheta512_pad256_integral_increased_acc
+# Battaglia model:cached_model_Ntheta512_pad256_integral_increased_acc
+y_model_interp = build_interpolator(model, cache_file="cached_model_sigmoid_r0_3_Ntheta512_pad256_integral_increased_acc.jld2", overwrite=false)
 # y_model_interp = build_interpolator(model, cache_file="cached_test_no_sigmoid.jld2", overwrite=true)
 
 nside = 4096
@@ -82,5 +75,5 @@ print("Initiating the HealPix with NSide: $nside \n")
 w = XGPaint.HealpixRingProfileWorkspace{Float64}(res)
 
 @time paint!(m_hp, w, y_model_interp, halo_mass, redshift, ra, dec, proj_v_over_c)
-Healpix.saveToFITS(m_hp, "!Tcmb_tSZ_nside4096_sigmoid_$(add_str_end)_m200m.fits", typechar="D")  
+Healpix.saveToFITS(m_hp, "!HalfDome_kSZ_nside4096_sigmoid_r0_3_position_hcorr_$(add_str_end).fits", typechar="D")  
 print("Finished Healpix kSZ total with sigmoid \n")

@@ -1,5 +1,8 @@
 using XGPaint, Healpix, Interpolations
 include("utils.jl")  # xyz_to_ra_dec
+include("SOConvertNFW.jl")
+
+using .M200Convert
 
 const c_kms = 299_792.458
 const h_value = 0.6774
@@ -113,8 +116,8 @@ open(path, "r") do io
         # chi and redshift
         chi = sqrt.(Float64.(x).^2 .+ Float64.(y).^2 .+ Float64.(z).^2)
         redshift = itp_z_of_chi.(chi)
-        halo_mass  .= halo_mass ./ ratio_m200m_over_m200c.(redshift)  # M200m to M200c
-
+        # halo_mass  .= halo_mass ./ ratio_m200m_over_m200c.(redshift)  # M200m to M200c
+        halo_mass = M200Convert.m200m_to_m200c_arrays(halo_mass, redshift)
         # OPTIONAL: if your mass is actually M200c and you want to convert to M200m:
         # halo_mass .= halo_mass .* ratio_m200m_over_m200c.(redshift)
 
@@ -184,7 +187,7 @@ end
 
 Healpix.saveToFITS(
     m_hp,
-    "!batched_data/websky_kSZ_nside4096_sigmoid_$(add_str_end)_m200c_BATCHED.fits",
+    "!batched_data/websky_kSZ_nside4096_sigmoid_$(add_str_end)_m200c_an_BATCHED.fits",
     typechar="D"
 )
 println("Finished Healpix kSZ total with sigmoid (BATCHED)")

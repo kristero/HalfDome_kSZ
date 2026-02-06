@@ -4,24 +4,30 @@ include("SOConvertNFW.jl")
 
 using .M200Convert
 
-function cartesian_to_sky_coords(x, y, z)
-    ra = atan(y, x)  # RA is the arctangent of y/x
-    dec = asin(z / sqrt(x^2 + y^2 + z^2))  # Dec is arcsine of z / magnitude
-    return ra, dec
-end 
-
 const h_value = 0.68
 const c_kms = 299_792.458
-model_exists = true  # set to false to (re)build the model interpolator
+
+# -------------------------
+# options
+# -------------------------
+model_exists = true         # set to false to (re)build the model interpolator
+save_healpix_map = false    # save Healpix map FITS
+save_cl = true              # compute and save power spectrum
+apply_mass_cut = true       # apply mass cut
+
+path = "other_sims/sims/halos.pksc"
+nside = 4096
+chunkN = 2_000_000          # tune to your RAM
+
+add_str_end = "13Msol_cutoff_HALO"
+mass_min = 1.0e+13
+
 using LinearAlgebra
 
 # -------------------------
 # (optional) ratio approximation m200m(z)/m200c(z)
 # y = a0 + a1 z + a2 z^2 + a3 z^3 + a4 z^4
 # -------------------------
-path = "other_sims/sims/halos.pksc"
-
-
 const a0 = 1.3595873806301997
 const a1 = -0.49815455039058704
 const a2 = 0.3014644154503205
@@ -65,12 +71,7 @@ itp_z_of_chi = make_z_of_chi_itp(omegam=omegam, h_value=h_value)
 # density + selection
 # -------------------------
 ρ = 2.775e11 * omegam * h^2  # Msun / Mpc^3
-
-
-
-selection = true
-add_str_end = "13Msol_cutoff_HALO"
-mass_min = 1.0e+13
+selection = apply_mass_cut
 
 # -------------------------
 # model + map init
@@ -94,7 +95,6 @@ else
 )
 end
 
-nside = 4096
 m_hp = HealpixMap{Float64,RingOrder}(nside)
 res  = Healpix.Resolution(nside)
 w    = XGPaint.HealpixRingProfileWorkspace{Float64}(res)
@@ -113,7 +113,6 @@ open(path, "r") do io
     redshiftbox = read(io, Float32)
     @show N RTHmax redshiftbox
 
-    chunkN = 2_000_000                     # tune to your RAM
     buf = Matrix{Float32}(undef, 10, chunkN)
 
     nleft = N
@@ -173,15 +172,7 @@ open(path, "r") do io
             ms  = halo_mass[sel]
             zsft = redshift[sel]
 
-            # ra, dec = xyz_to_ra_dec(xs, ys, zs)
-            ra = Float64[]
-            dec = Float64[]
-
-            for i in 1:length(xs)
-                _ra, _dec = cartesian_to_sky_coords(xs[i], ys[i], zs[i])
-                push!(ra, _ra)
-                push!(dec, _dec)
-            end
+            ra, dec = xyz_to_ra_dec(xs, ys, zs)
 
 
             # sort by dec (like your original)
@@ -203,13 +194,7 @@ open(path, "r") do io
             zsft = redshift
 
 
-            ra = Float64[]
-            dec = Float64[]
-            for i in 1:length(xs)
-                _ra, _dec = cartesian_to_sky_coords(xs[i], ys[i], zs[i])
-                push!(ra, _ra)
-                push!(dec, _dec)
-            end
+            ra, dec = xyz_to_ra_dec(xs, ys, zs)
     
             perm = sortperm(dec)
             ra  = ra[perm]
@@ -231,17 +216,20 @@ open(path, "r") do io
     end
 end
 
-# Healpix.saveToFITS(
-#     m_hp,
-#     "!batched_data/websky_tSZ_nside4096_$(add_str_end)_m200m_no_mlimits.fits",
-#     typechar="D"
-# )
-
-cl = anafast(m_hp, niter=0)
-
 isdir("batched_data") || mkpath("batched_data")
 
-writeClToFITS("batched_data/websky_tSZ_cl_m200c_xyz_div_h.fits", collect(cl); overwrite=true)
+if save_healpix_map
+    Healpix.saveToFITS(
+        m_hp,
+        "!batched_data/websky_tSZ_nside4096_$(add_str_end)_m200m.fits",
+        typechar="D"
+    )
+end
+
+if save_cl
+    cl = anafast(m_hp, niter=0)
+    writeClToFITS("batched_data/websky_tSZ_cl_m200c.fits", collect(cl); overwrite=true)
+end
 
 
-println("Finished Healpix kSZ total with sigmoid (BATCHED)")
+println("Finished Healpix tSZ total (BATCHED)")

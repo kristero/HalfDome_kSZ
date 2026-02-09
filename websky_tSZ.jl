@@ -22,6 +22,33 @@ chunkN = 2_000_000          # tune to your RAM
 add_str_end = "13Msol_cutoff_HALO"
 mass_min = 1.0e+13
 
+# output file names (set these to whatever you want)
+fits_output_path = "batched_data/websky_tSZ_nside4096_$(add_str_end)_m200m.fits"
+cl_output_path = "batched_data/websky_tSZ_cl_m200c_test_phys_param.fits"
+
+# -------------------------
+# Battaglia16 model parameters (editable)
+# -------------------------
+battaglia_P0_amp = 18.1
+battaglia_P0_alpha_m = 0.154
+battaglia_P0_alpha_z = -0.758
+
+battaglia_x_c_amp = 0.497
+battaglia_x_c_alpha_m = -0.00865
+battaglia_x_c_alpha_z = 0.731
+
+battaglia_beta_amp = 4.35
+battaglia_beta_alpha_m = 0.0393
+battaglia_beta_alpha_z = 0.415
+
+battaglia_alpha_amp = 1.0
+battaglia_alpha_alpha_m = 0.0
+battaglia_alpha_alpha_z = 0.0
+
+battaglia_gamma_amp = -0.3
+battaglia_gamma_alpha_m = 0.0
+battaglia_gamma_alpha_z = 0.0
+
 using LinearAlgebra
 
 # -------------------------
@@ -76,7 +103,14 @@ selection = apply_mass_cut
 # -------------------------
 # model + map init
 # -------------------------
-model = Battaglia16ThermalSZProfile(Omega_c=omegac, Omega_b=omegab, h=h_value)
+model = Battaglia16ThermalSZProfile(Omega_c=omegac, Omega_b=omegab, h=h_value,
+P0_amp=battaglia_P0_amp, P0_alpha_m=battaglia_P0_alpha_m, P0_alpha_z=battaglia_P0_alpha_z,
+    x_c_amp=battaglia_x_c_amp, x_c_alpha_m=battaglia_x_c_alpha_m, x_c_alpha_z=battaglia_x_c_alpha_z,
+    beta_amp=battaglia_beta_amp, beta_alpha_m=battaglia_beta_alpha_m, beta_alpha_z=battaglia_beta_alpha_z,
+    alpha_amp=battaglia_alpha_amp, alpha_alpha_m=battaglia_alpha_alpha_m, alpha_alpha_z=battaglia_alpha_alpha_z,
+    gamma_amp=battaglia_gamma_amp, gamma_alpha_m=battaglia_gamma_alpha_m, gamma_alpha_z=battaglia_gamma_alpha_z
+)
+
 if model_exists
     y_model_interp = build_interpolator(
         model,
@@ -221,14 +255,14 @@ isdir("batched_data") || mkpath("batched_data")
 if save_healpix_map
     Healpix.saveToFITS(
         m_hp,
-        "!batched_data/websky_tSZ_nside4096_$(add_str_end)_m200m.fits",
+        "!" * fits_output_path,
         typechar="D"
     )
 end
 
 if save_cl
     cl = anafast(m_hp, niter=0)
-    writeClToFITS("batched_data/websky_tSZ_cl_m200c.fits", collect(cl); overwrite=true)
+    writeClToFITS(cl_output_path, collect(cl); overwrite=true)
 end
 
 

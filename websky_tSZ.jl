@@ -10,7 +10,7 @@ const c_kms = 299_792.458
 # -------------------------
 # options
 # -------------------------
-model_exists = true         # set to false to (re)build the model interpolator
+model_exists = false         # set to false to (re)build the model interpolator
 save_healpix_map = false    # save Healpix map FITS
 save_cl = true              # compute and save power spectrum
 apply_mass_cut = true       # apply mass cut
@@ -29,25 +29,48 @@ cl_output_path = "batched_data/websky_tSZ_cl_m200c_test_phys_param.fits"
 # -------------------------
 # Battaglia16 model parameters (editable)
 # -------------------------
-battaglia_P0_amp = 18.1
-battaglia_P0_alpha_m = 0.154
-battaglia_P0_alpha_z = -0.758
+function get_float_arg(key, default; env=nothing)
+    if env !== nothing && haskey(ENV, env)
+        return parse(Float64, ENV[env])
+    end
+    prefix1 = "--" * key * "="
+    prefix2 = key * "="
+    for a in ARGS
+        if startswith(a, prefix1)
+            return parse(Float64, split(a, "=", limit=2)[2])
+        elseif startswith(a, prefix2)
+            return parse(Float64, split(a, "=", limit=2)[2])
+        end
+    end
+    return default
+end
 
-battaglia_x_c_amp = 0.497
-battaglia_x_c_alpha_m = -0.00865
-battaglia_x_c_alpha_z = 0.731
+battaglia_P0_amp = get_float_arg("battaglia_P0_amp", 18.1; env="BATTAGLIA_P0_AMP")
+battaglia_P0_alpha_m = get_float_arg("battaglia_P0_alpha_m", 0.154; env="BATTAGLIA_P0_ALPHA_M")
+battaglia_P0_alpha_z = get_float_arg("battaglia_P0_alpha_z", -0.758; env="BATTAGLIA_P0_ALPHA_Z")
 
-battaglia_beta_amp = 4.35
-battaglia_beta_alpha_m = 0.0393
-battaglia_beta_alpha_z = 0.415
+battaglia_x_c_amp = get_float_arg("battaglia_x_c_amp", 0.497; env="BATTAGLIA_X_C_AMP")
+battaglia_x_c_alpha_m = get_float_arg("battaglia_x_c_alpha_m", -0.00865; env="BATTAGLIA_X_C_ALPHA_M")
+battaglia_x_c_alpha_z = get_float_arg("battaglia_x_c_alpha_z", 0.731; env="BATTAGLIA_X_C_ALPHA_Z")
 
-battaglia_alpha_amp = 1.0
-battaglia_alpha_alpha_m = 0.0
-battaglia_alpha_alpha_z = 0.0
+battaglia_beta_amp = get_float_arg("battaglia_beta_amp", 4.35; env="BATTAGLIA_BETA_AMP")
+battaglia_beta_alpha_m = get_float_arg("battaglia_beta_alpha_m", 0.0393; env="BATTAGLIA_BETA_ALPHA_M")
+battaglia_beta_alpha_z = get_float_arg("battaglia_beta_alpha_z", 0.415; env="BATTAGLIA_BETA_ALPHA_Z")
 
-battaglia_gamma_amp = -0.3
-battaglia_gamma_alpha_m = 0.0
-battaglia_gamma_alpha_z = 0.0
+battaglia_alpha_amp = get_float_arg("battaglia_alpha_amp", 1.0; env="BATTAGLIA_ALPHA_AMP")
+battaglia_alpha_alpha_m = get_float_arg("battaglia_alpha_alpha_m", 0.0; env="BATTAGLIA_ALPHA_ALPHA_M")
+battaglia_alpha_alpha_z = get_float_arg("battaglia_alpha_alpha_z", 0.0; env="BATTAGLIA_ALPHA_ALPHA_Z")
+
+battaglia_gamma_amp = get_float_arg("battaglia_gamma_amp", -0.3; env="BATTAGLIA_GAMMA_AMP")
+battaglia_gamma_alpha_m = get_float_arg("battaglia_gamma_alpha_m", 0.0; env="BATTAGLIA_GAMMA_ALPHA_M")
+battaglia_gamma_alpha_z = get_float_arg("battaglia_gamma_alpha_z", 0.0; env="BATTAGLIA_GAMMA_ALPHA_Z")
+
+println("Battaglia16 physical parameters:")
+println("  P0_amp=$(battaglia_P0_amp), P0_alpha_m=$(battaglia_P0_alpha_m), P0_alpha_z=$(battaglia_P0_alpha_z)")
+println("  x_c_amp=$(battaglia_x_c_amp), x_c_alpha_m=$(battaglia_x_c_alpha_m), x_c_alpha_z=$(battaglia_x_c_alpha_z)")
+println("  beta_amp=$(battaglia_beta_amp), beta_alpha_m=$(battaglia_beta_alpha_m), beta_alpha_z=$(battaglia_beta_alpha_z)")
+println("  alpha_amp=$(battaglia_alpha_amp), alpha_alpha_m=$(battaglia_alpha_alpha_m), alpha_alpha_z=$(battaglia_alpha_alpha_z)")
+println("  gamma_amp=$(battaglia_gamma_amp), gamma_alpha_m=$(battaglia_gamma_alpha_m), gamma_alpha_z=$(battaglia_gamma_alpha_z)")
 
 using LinearAlgebra
 

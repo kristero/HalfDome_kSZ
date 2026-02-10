@@ -15,6 +15,8 @@ save_healpix_map = false    # save Healpix map FITS
 save_cl = true              # compute and save power spectrum
 apply_mass_cut = true       # apply mass cut
 
+t0 = time()
+
 path = "other_sims/sims/halos.pksc"
 nside = 4096
 chunkN = 2_000_000          # tune to your RAM
@@ -45,25 +47,105 @@ function get_float_arg(key, default; env=nothing)
     return default
 end
 
-battaglia_P0_amp = get_float_arg("battaglia_P0_amp", 18.1; env="BATTAGLIA_P0_AMP")
-battaglia_P0_alpha_m = get_float_arg("battaglia_P0_alpha_m", 0.154; env="BATTAGLIA_P0_ALPHA_M")
-battaglia_P0_alpha_z = get_float_arg("battaglia_P0_alpha_z", -0.758; env="BATTAGLIA_P0_ALPHA_Z")
+const BATTAGLIA_P0_AMP_DEFAULT = 18.1
+const BATTAGLIA_P0_ALPHA_M_DEFAULT = 0.154
+const BATTAGLIA_P0_ALPHA_Z_DEFAULT = -0.758
+const BATTAGLIA_X_C_AMP_DEFAULT = 0.497
+const BATTAGLIA_X_C_ALPHA_M_DEFAULT = -0.00865
+const BATTAGLIA_X_C_ALPHA_Z_DEFAULT = 0.731
+const BATTAGLIA_BETA_AMP_DEFAULT = 4.35
+const BATTAGLIA_BETA_ALPHA_M_DEFAULT = 0.0393
+const BATTAGLIA_BETA_ALPHA_Z_DEFAULT = 0.415
+const BATTAGLIA_ALPHA_AMP_DEFAULT = 1.0
+const BATTAGLIA_ALPHA_ALPHA_M_DEFAULT = 0.0
+const BATTAGLIA_ALPHA_ALPHA_Z_DEFAULT = 0.0
+const BATTAGLIA_GAMMA_AMP_DEFAULT = -0.3
+const BATTAGLIA_GAMMA_ALPHA_M_DEFAULT = 0.0
+const BATTAGLIA_GAMMA_ALPHA_Z_DEFAULT = 0.0
 
-battaglia_x_c_amp = get_float_arg("battaglia_x_c_amp", 0.497; env="BATTAGLIA_X_C_AMP")
-battaglia_x_c_alpha_m = get_float_arg("battaglia_x_c_alpha_m", -0.00865; env="BATTAGLIA_X_C_ALPHA_M")
-battaglia_x_c_alpha_z = get_float_arg("battaglia_x_c_alpha_z", 0.731; env="BATTAGLIA_X_C_ALPHA_Z")
+battaglia_P0_amp = get_float_arg("battaglia_P0_amp", BATTAGLIA_P0_AMP_DEFAULT; env="BATTAGLIA_P0_AMP")
+battaglia_P0_alpha_m = get_float_arg("battaglia_P0_alpha_m", BATTAGLIA_P0_ALPHA_M_DEFAULT; env="BATTAGLIA_P0_ALPHA_M")
+battaglia_P0_alpha_z = get_float_arg("battaglia_P0_alpha_z", BATTAGLIA_P0_ALPHA_Z_DEFAULT; env="BATTAGLIA_P0_ALPHA_Z")
 
-battaglia_beta_amp = get_float_arg("battaglia_beta_amp", 4.35; env="BATTAGLIA_BETA_AMP")
-battaglia_beta_alpha_m = get_float_arg("battaglia_beta_alpha_m", 0.0393; env="BATTAGLIA_BETA_ALPHA_M")
-battaglia_beta_alpha_z = get_float_arg("battaglia_beta_alpha_z", 0.415; env="BATTAGLIA_BETA_ALPHA_Z")
+battaglia_x_c_amp = get_float_arg("battaglia_x_c_amp", BATTAGLIA_X_C_AMP_DEFAULT; env="BATTAGLIA_X_C_AMP")
+battaglia_x_c_alpha_m = get_float_arg("battaglia_x_c_alpha_m", BATTAGLIA_X_C_ALPHA_M_DEFAULT; env="BATTAGLIA_X_C_ALPHA_M")
+battaglia_x_c_alpha_z = get_float_arg("battaglia_x_c_alpha_z", BATTAGLIA_X_C_ALPHA_Z_DEFAULT; env="BATTAGLIA_X_C_ALPHA_Z")
 
-battaglia_alpha_amp = get_float_arg("battaglia_alpha_amp", 1.0; env="BATTAGLIA_ALPHA_AMP")
-battaglia_alpha_alpha_m = get_float_arg("battaglia_alpha_alpha_m", 0.0; env="BATTAGLIA_ALPHA_ALPHA_M")
-battaglia_alpha_alpha_z = get_float_arg("battaglia_alpha_alpha_z", 0.0; env="BATTAGLIA_ALPHA_ALPHA_Z")
+battaglia_beta_amp = get_float_arg("battaglia_beta_amp", BATTAGLIA_BETA_AMP_DEFAULT; env="BATTAGLIA_BETA_AMP")
+battaglia_beta_alpha_m = get_float_arg("battaglia_beta_alpha_m", BATTAGLIA_BETA_ALPHA_M_DEFAULT; env="BATTAGLIA_BETA_ALPHA_M")
+battaglia_beta_alpha_z = get_float_arg("battaglia_beta_alpha_z", BATTAGLIA_BETA_ALPHA_Z_DEFAULT; env="BATTAGLIA_BETA_ALPHA_Z")
 
-battaglia_gamma_amp = get_float_arg("battaglia_gamma_amp", -0.3; env="BATTAGLIA_GAMMA_AMP")
-battaglia_gamma_alpha_m = get_float_arg("battaglia_gamma_alpha_m", 0.0; env="BATTAGLIA_GAMMA_ALPHA_M")
-battaglia_gamma_alpha_z = get_float_arg("battaglia_gamma_alpha_z", 0.0; env="BATTAGLIA_GAMMA_ALPHA_Z")
+battaglia_alpha_amp = get_float_arg("battaglia_alpha_amp", BATTAGLIA_ALPHA_AMP_DEFAULT; env="BATTAGLIA_ALPHA_AMP")
+battaglia_alpha_alpha_m = get_float_arg("battaglia_alpha_alpha_m", BATTAGLIA_ALPHA_ALPHA_M_DEFAULT; env="BATTAGLIA_ALPHA_ALPHA_M")
+battaglia_alpha_alpha_z = get_float_arg("battaglia_alpha_alpha_z", BATTAGLIA_ALPHA_ALPHA_Z_DEFAULT; env="BATTAGLIA_ALPHA_ALPHA_Z")
+
+battaglia_gamma_amp = get_float_arg("battaglia_gamma_amp", BATTAGLIA_GAMMA_AMP_DEFAULT; env="BATTAGLIA_GAMMA_AMP")
+battaglia_gamma_alpha_m = get_float_arg("battaglia_gamma_alpha_m", BATTAGLIA_GAMMA_ALPHA_M_DEFAULT; env="BATTAGLIA_GAMMA_ALPHA_M")
+battaglia_gamma_alpha_z = get_float_arg("battaglia_gamma_alpha_z", BATTAGLIA_GAMMA_ALPHA_Z_DEFAULT; env="BATTAGLIA_GAMMA_ALPHA_Z")
+
+function fmt_param_value(x)
+    s = string(x)
+    s = replace(s, "-" => "m")
+    s = replace(s, "." => "p")
+    s = replace(s, "+" => "")
+    return s
+end
+
+function build_param_tag()
+    parts = String[]
+    if battaglia_P0_amp != BATTAGLIA_P0_AMP_DEFAULT
+        push!(parts, "battaglia_P0_amp_" * fmt_param_value(battaglia_P0_amp))
+    end
+    if battaglia_P0_alpha_m != BATTAGLIA_P0_ALPHA_M_DEFAULT
+        push!(parts, "battaglia_P0_alpha_m_" * fmt_param_value(battaglia_P0_alpha_m))
+    end
+    if battaglia_P0_alpha_z != BATTAGLIA_P0_ALPHA_Z_DEFAULT
+        push!(parts, "battaglia_P0_alpha_z_" * fmt_param_value(battaglia_P0_alpha_z))
+    end
+    if battaglia_x_c_amp != BATTAGLIA_X_C_AMP_DEFAULT
+        push!(parts, "battaglia_x_c_amp_" * fmt_param_value(battaglia_x_c_amp))
+    end
+    if battaglia_x_c_alpha_m != BATTAGLIA_X_C_ALPHA_M_DEFAULT
+        push!(parts, "battaglia_x_c_alpha_m_" * fmt_param_value(battaglia_x_c_alpha_m))
+    end
+    if battaglia_x_c_alpha_z != BATTAGLIA_X_C_ALPHA_Z_DEFAULT
+        push!(parts, "battaglia_x_c_alpha_z_" * fmt_param_value(battaglia_x_c_alpha_z))
+    end
+    if battaglia_beta_amp != BATTAGLIA_BETA_AMP_DEFAULT
+        push!(parts, "battaglia_beta_amp_" * fmt_param_value(battaglia_beta_amp))
+    end
+    if battaglia_beta_alpha_m != BATTAGLIA_BETA_ALPHA_M_DEFAULT
+        push!(parts, "battaglia_beta_alpha_m_" * fmt_param_value(battaglia_beta_alpha_m))
+    end
+    if battaglia_beta_alpha_z != BATTAGLIA_BETA_ALPHA_Z_DEFAULT
+        push!(parts, "battaglia_beta_alpha_z_" * fmt_param_value(battaglia_beta_alpha_z))
+    end
+    if battaglia_alpha_amp != BATTAGLIA_ALPHA_AMP_DEFAULT
+        push!(parts, "battaglia_alpha_amp_" * fmt_param_value(battaglia_alpha_amp))
+    end
+    if battaglia_alpha_alpha_m != BATTAGLIA_ALPHA_ALPHA_M_DEFAULT
+        push!(parts, "battaglia_alpha_alpha_m_" * fmt_param_value(battaglia_alpha_alpha_m))
+    end
+    if battaglia_alpha_alpha_z != BATTAGLIA_ALPHA_ALPHA_Z_DEFAULT
+        push!(parts, "battaglia_alpha_alpha_z_" * fmt_param_value(battaglia_alpha_alpha_z))
+    end
+    if battaglia_gamma_amp != BATTAGLIA_GAMMA_AMP_DEFAULT
+        push!(parts, "battaglia_gamma_amp_" * fmt_param_value(battaglia_gamma_amp))
+    end
+    if battaglia_gamma_alpha_m != BATTAGLIA_GAMMA_ALPHA_M_DEFAULT
+        push!(parts, "battaglia_gamma_alpha_m_" * fmt_param_value(battaglia_gamma_alpha_m))
+    end
+    if battaglia_gamma_alpha_z != BATTAGLIA_GAMMA_ALPHA_Z_DEFAULT
+        push!(parts, "battaglia_gamma_alpha_z_" * fmt_param_value(battaglia_gamma_alpha_z))
+    end
+    if isempty(parts)
+        return "base"
+    end
+    return "base_plus_" * join(parts, "__")
+end
+
+param_tag = build_param_tag()
+add_str_end = add_str_end * "_" * param_tag
 
 println("Battaglia16 physical parameters:")
 println("  P0_amp=$(battaglia_P0_amp), P0_alpha_m=$(battaglia_P0_alpha_m), P0_alpha_z=$(battaglia_P0_alpha_z)")
@@ -290,3 +372,5 @@ end
 
 
 println("Finished Healpix tSZ total (BATCHED)")
+elapsed = time() - t0
+println("Elapsed time: $(round(elapsed; digits=2)) s")

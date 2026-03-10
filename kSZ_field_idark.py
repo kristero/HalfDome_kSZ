@@ -21,6 +21,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--seed', type=int, default=100)
 parser.add_argument('--res', type=int, default=1)   # 4 for 1/4 etc
 parser.add_argument('--save_raw_data', type=int, default=0)
+parser.add_argument('--test_stride', type=int, default=1,
+                    help='Keep only every Nth particle for fast test runs')
 parser.add_argument('--chunk_size', type=int, default=1_000_000,
                     help='Number of particles read per chunk on each MPI rank')
 parser.add_argument('--slice_batch_size', type=int, default=4,
@@ -35,11 +37,14 @@ args = parser.parse_args()
 seed = args.seed
 res = args.res
 save_raw_data = args.save_raw_data
+test_stride = args.test_stride
 chunk_size = args.chunk_size
 slice_batch_size = args.slice_batch_size
 input_root = os.path.abspath(args.input_root)
 output_dir = os.path.abspath(args.output_dir)
 
+if test_stride <= 0:
+    raise ValueError('--test_stride must be positive')
 if chunk_size <= 0:
     raise ValueError('--chunk_size must be positive')
 if slice_batch_size <= 0:
@@ -111,6 +116,24 @@ def iter_local_chunks(total_size, step):
         yield lo, hi
 
 
+def chunk_keep_mask(lo, hi, stride):
+    if stride == 1:
+        return None
+    row_idx = np.arange(lo, hi, dtype=np.int64)
+    return (row_idx % stride) == 0
+
+
+def sampled_count(start, stop, stride):
+    if stride == 1:
+        return max(0, stop - start)
+    if start >= stop:
+        return 0
+    first = ((start + stride - 1) // stride) * stride
+    if first >= stop:
+        return 0
+    return 1 + (stop - 1 - first) // stride
+
+
 def tau(z):
     H = H0 * np.sqrt(Om0*(1+z)**3 + 1 - Om0)
     c_div_H = c_km / H * cosmo.h   # this will be in Mpc/h, because H has units km/s/Mpc which will cancel with the km/s in c
@@ -179,12 +202,19 @@ for i in range(i_start, nslice):
 
 for lo, hi in iter_local_chunks(npart, chunk_size):
     pid_chunk = np.asarray(pid_block[lo:hi], dtype=np.int64)
+    keep = chunk_keep_mask(lo, hi, test_stride)
+    if keep is not None:
+        if not np.any(keep):
+            continue
+        pid_chunk = pid_chunk[keep]
     islice_chunk = pid_chunk // npix
     valid = islice_chunk >= i_start
     if not np.any(valid):
         continue
 
     mass_chunk = np.asarray(mass_block[lo:hi], dtype=np.float64) * 1e10
+    if keep is not None:
+        mass_chunk = mass_chunk[keep]
     Msum_slice += np.bincount(
         islice_chunk[valid],
         weights=mass_chunk[valid],
@@ -197,7 +227,7 @@ Mavg_slice = Msum_slice / npix
 # save some useful data for debugging and postprocessing
 if save_raw_data:
     os.makedirs(dir_data+'raw/', exist_ok=1)
-    local_count = local_stop - local_start
+    local_count = sampled_count(local_start, local_stop, test_stride)
     ipix_raw = np.lib.format.open_memmap(
         dir_data+'raw/ipix%s.%d.npy' % (suffix, rank),
         mode='w+',
@@ -236,9 +266,16 @@ local_total = np.zeros(npix, dtype=np.float32)
 raw_offset = 0
 for lo, hi in iter_local_chunks(npart, chunk_size):
     pid_chunk = np.asarray(pid_block[lo:hi], dtype=np.int64)
+    keep = chunk_keep_mask(lo, hi, test_stride)
+    if keep is not None:
+        if not np.any(keep):
+            continue
+        pid_chunk = pid_chunk[keep]
     islice_chunk = pid_chunk // npix
     ipix_chunk = pid_chunk % npix
     rmom_chunk = np.asarray(rmom_block[lo:hi], dtype=np.float64) * 1e10
+    if keep is not None:
+        rmom_chunk = rmom_chunk[keep]
     weight_chunk = compute_chunk_weight(islice_chunk, rmom_chunk, z_slice, dl_slice, tau_slice, Mavg_slice, i_start)
 
     valid = islice_chunk >= i_start
@@ -250,8 +287,10 @@ for lo, hi in iter_local_chunks(npart, chunk_size):
         ).astype(np.float32)
 
     if save_raw_data:
-        local_len = hi - lo
         mass_chunk = np.asarray(mass_block[lo:hi], dtype=np.float64) * 1e10
+        if keep is not None:
+            mass_chunk = mass_chunk[keep]
+        local_len = pid_chunk.size
         sl = slice(raw_offset, raw_offset + local_len)
         ipix_raw[sl] = ipix_chunk
         islice_raw[sl] = islice_chunk
@@ -273,6 +312,11 @@ for batch_start in range(0, active_slices.size, slice_batch_size):
 
     for lo, hi in iter_local_chunks(npart, chunk_size):
         pid_chunk = np.asarray(pid_block[lo:hi], dtype=np.int64)
+        keep = chunk_keep_mask(lo, hi, test_stride)
+        if keep is not None:
+            if not np.any(keep):
+                continue
+            pid_chunk = pid_chunk[keep]
         islice_full = pid_chunk // npix
         in_batch = (islice_full >= batch_slices[0]) & (islice_full <= batch_slices[-1])
         if not np.any(in_batch):
@@ -281,6 +325,8 @@ for batch_start in range(0, active_slices.size, slice_batch_size):
         ipix_chunk = pid_chunk[in_batch] % npix
         islice_chunk = islice_full[in_batch]
         rmom_chunk = np.asarray(rmom_block[lo:hi], dtype=np.float64) * 1e10
+        if keep is not None:
+            rmom_chunk = rmom_chunk[keep]
         weight_chunk = compute_chunk_weight(
             islice_chunk,
             rmom_chunk[in_batch],

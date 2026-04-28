@@ -32,12 +32,19 @@ function run_tsz_visual_fits()
         run_websky_visuals!(cfg, state, y_model_interp, itp_z_of_chi)
     end
 
+    output_y_map = state.m_hp
+    if cfg.save_healpix_map || cfg.save_cl
+        if cfg.apply_gaussian_beam
+            println("Applying Gaussian beam to final tSZ map with FWHM=$(cfg.gaussian_beam_fwhm_arcmin) arcmin.")
+        end
+        output_y_map = prepare_tsz_map_for_output(cfg, state.m_hp)
+    end
     if cfg.save_healpix_map
-        save_final_maps!(cfg, state.m_hp, state.mass_hp)
+        save_final_maps!(cfg, output_y_map, state.mass_hp)
     end
 
     if cfg.save_cl
-        cl = anafast(state.m_hp, niter=0)
+        cl = anafast(output_y_map, niter=0)
         write_cl_fits_overwrite(cfg.cl_output_path, cl)
     end
 

@@ -72,15 +72,15 @@ function load_single_profile_config()
 
     y_output_path = joinpath(
         base_cfg.output_dir,
-        "$(profile_tag)_tSZ_nside$(base_cfg.nside)_$(base_cfg.param_tag).fits"
+        "$(profile_tag)_tSZ_nside$(base_cfg.nside)_$(base_cfg.param_tag)_$(base_cfg.beam_tag).fits"
     )
     mass_output_path = joinpath(
         base_cfg.output_dir,
-        "$(profile_tag)_mass_nside$(base_cfg.nside)_$(base_cfg.param_tag).fits"
+        "$(profile_tag)_mass_nside$(base_cfg.nside)_$(base_cfg.param_tag)_$(base_cfg.beam_tag).fits"
     )
     cl_output_path = joinpath(
         base_cfg.output_dir,
-        "$(profile_tag)_tSZ_cl_nside$(base_cfg.nside)_$(base_cfg.param_tag).fits"
+        "$(profile_tag)_tSZ_cl_nside$(base_cfg.nside)_$(base_cfg.param_tag)_$(base_cfg.beam_tag).fits"
     )
 
     return SingleProfileConfig(
@@ -102,6 +102,7 @@ function print_single_profile_config(cfg::SingleProfileConfig)
     println("Running a single-halo tSZ profile with fiducial Battaglia defaults unless overridden.")
     println("Output directory: $(cfg.base_cfg.output_dir)")
     println("Battaglia parameter tag: $(cfg.base_cfg.param_tag)")
+    println("Gaussian beam: apply=$(cfg.base_cfg.apply_gaussian_beam), fwhm_arcmin=$(cfg.base_cfg.gaussian_beam_fwhm_arcmin)")
     println("NSIDE: $(cfg.base_cfg.nside)")
     println("Halo mass M200c [Msun]: $(cfg.mass_msun)")
     println("Halo redshift: $(cfg.redshift)")
@@ -138,9 +139,13 @@ function run_single_tsz_profile()
     paint!(state.m_hp, state.workspace, y_model_interp, [cfg.mass_msun], [cfg.redshift], [ra], [dec])
     build_halo_mass_map!(state.mass_hp, state.workspace, [ra], [dec], [cfg.mass_msun], [radius_rad])
 
-    save_single_profile_maps!(cfg, state)
+    if cfg.base_cfg.apply_gaussian_beam
+        println("Applying Gaussian beam to single-profile tSZ map with FWHM=$(cfg.base_cfg.gaussian_beam_fwhm_arcmin) arcmin.")
+    end
+    output_y_map = prepare_tsz_map_for_output(cfg.base_cfg, state.m_hp)
+    save_single_profile_maps!(cfg, (m_hp=output_y_map, mass_hp=state.mass_hp))
 
-    cl = anafast(state.m_hp, niter=0)
+    cl = anafast(output_y_map, niter=0)
     write_cl_fits_overwrite(cfg.cl_output_path, cl)
 
     elapsed = time() - t0

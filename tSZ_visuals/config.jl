@@ -1,5 +1,10 @@
 using DelimitedFiles
 
+const CLUSTER_HALFDOME_PATH_DEFAULT = "/lustre/work/Globus-lt/halfdome/full_res/halos"
+const CLUSTER_OUTPUT_DIR_DEFAULT = "/lustre/work/kristero10/tSZ_data"
+const CLUSTER_CACHE_DIR_DEFAULT = joinpath(CLUSTER_OUTPUT_DIR_DEFAULT, "cache")
+const CLUSTER_SOBOL_CSV_DEFAULT = "/home/kristero10/tSZ_data/battaglia_sobol_32.csv"
+
 const TSZ_H_VALUE = 0.68
 const TSZ_C_KMS = 299_792.458
 const TSZ_OMEGAB = 0.049
@@ -50,6 +55,8 @@ Base.@kwdef struct VisualConfig
     sobol_csv_path::String
     sobol_row::Int
     output_dir::String
+    cache_dir::String
+    run_instance_tag::String
     param_tag::String
     binning_tag::String
     bin_map_mode_tag::String
@@ -66,6 +73,43 @@ end
 
 function resolve_repo_path(path::AbstractString)
     return isabspath(path) ? String(path) : normpath(joinpath(repo_root(), path))
+end
+
+function resolve_halfdome_catalog_path(path::AbstractString)
+    resolved = resolve_repo_path(path)
+    isdir(resolved) || return resolved
+
+    entries = sort(readdir(resolved; join=true))
+    hdf5_candidates = filter(entries) do entry
+        isfile(entry) || return false
+        ext = lowercase(splitext(entry)[2])
+        return ext == ".h5" || ext == ".hdf5"
+    end
+
+    isempty(hdf5_candidates) && error(
+        "halfdome_path=$(repr(resolved)) is a directory, but no .h5 or .hdf5 files were found inside it."
+    )
+
+    preferred_basenames = (
+        "lightcone_100.hdf5",
+        "lightcone_100.h5",
+        "halos.hdf5",
+        "halos.h5"
+    )
+    for preferred_name in preferred_basenames
+        matches = filter(hdf5_candidates) do entry
+            lowercase(basename(entry)) == preferred_name
+        end
+        length(matches) == 1 && return only(matches)
+    end
+
+    length(hdf5_candidates) == 1 && return only(hdf5_candidates)
+
+    candidate_names = join(map(basename, hdf5_candidates), ", ")
+    error(
+        "halfdome_path=$(repr(resolved)) is a directory with multiple HDF5 files: $(candidate_names). " *
+        "Pass halfdome_path as the exact HDF5 file path."
+    )
 end
 
 function parse_bool_arg(value)
@@ -155,6 +199,36 @@ function safe_filename_tag(s::AbstractString)
     tag = replace(tag, r"[^A-Za-z0-9_+\-.]+" => "_")
     tag = replace(tag, r"_+" => "_")
     return isempty(tag) ? "simulation" : tag
+end
+
+function optional_filename_tag(s::AbstractString)
+    raw = strip(String(s))
+    isempty(raw) && return ""
+    tag = lowercase(raw)
+    tag = replace(tag, r"[^A-Za-z0-9_+\-.]+" => "_")
+    tag = replace(tag, r"_+" => "_")
+    return strip(tag, '_')
+end
+
+function default_slurm_run_instance_tag()
+    job_id = strip(get(ENV, "SLURM_JOB_ID", ""))
+    task_id = strip(get(ENV, "SLURM_ARRAY_TASK_ID", ""))
+
+    if !isempty(job_id) && !isempty(task_id)
+        return "slurm_job$(job_id)_task$(task_id)"
+    elseif !isempty(job_id)
+        return "slurm_job$(job_id)"
+    elseif !isempty(task_id)
+        return "slurm_task$(task_id)"
+    end
+
+    return ""
+end
+
+function default_sobol_row()
+    task_id = strip(get(ENV, "SLURM_ARRAY_TASK_ID", ""))
+    isempty(task_id) && return 0
+    return parse(Int, task_id)
 end
 
 function normalize_batching_mode(mode_raw::AbstractString)
@@ -382,7 +456,9 @@ function load_visual_config()
     catalog_source = lowercase(get_string_arg("catalog_source", "halfdome"; env="TSZ_CATALOG_SOURCE"))
     catalog_source in ("halfdome", "websky") || error("Unsupported catalog_source=$(repr(catalog_source)).")
 
-    halfdome_path = resolve_repo_path(get_string_arg("halfdome_path", "lightcone_100.hdf5"; env="HALFDOME_PATH"))
+    halfdome_path = resolve_halfdome_catalog_path(
+        get_string_arg("halfdome_path", CLUSTER_HALFDOME_PATH_DEFAULT; env="HALFDOME_PATH")
+    )
     websky_path = resolve_repo_path(get_string_arg("websky_path", "other_sims/sims/halos.pksc"; env="WEBSKY_PATH"))
     catalog_path = catalog_source == "halfdome" ? halfdome_path : websky_path
     simulation_name = get_string_arg("simulation_name", catalog_source; env="SIMULATION_NAME")
@@ -397,17 +473,17 @@ function load_visual_config()
     redshift_bin_width = get_float_arg("redshift_bin_width", 1.0; env="REDSHIFT_BIN_WIDTH")
     log_redshift_bin_width = get_float_arg("log_redshift_bin_width", 0.2; env="LOG_REDSHIFT_BIN_WIDTH")
     mass_bin_width_dex = get_float_arg("mass_bin_width_dex", 0.5; env="MASS_BIN_WIDTH_DEX")
-    sobol_csv_path_raw = strip(get_string_arg("sobol_csv_path", ""; env="BATTAGLIA_SOBOL_CSV"))
-    sobol_row = get_int_arg("sobol_row", 0; env="BATTAGLIA_SOBOL_ROW")
+    sobol_csv_path_raw = strip(get_string_arg("sobol_csv_path", CLUSTER_SOBOL_CSV_DEFAULT; env="BATTAGLIA_SOBOL_CSV"))
+    sobol_row = get_int_arg("sobol_row", default_sobol_row(); env="BATTAGLIA_SOBOL_ROW")
     sobol_csv_path = isempty(sobol_csv_path_raw) ? "" : resolve_repo_path(sobol_csv_path_raw)
+    run_instance_tag_raw = get_string_arg("run_instance_tag", default_slurm_run_instance_tag(); env="TSZ_RUN_INSTANCE_TAG")
+    run_instance_tag = optional_filename_tag(run_instance_tag_raw)
     redshift_bin_width > 0.0 || error("redshift_bin_width must be positive.")
     log_redshift_bin_width > 0.0 || error("log_redshift_bin_width must be positive.")
     mass_bin_width_dex > 0.0 || error("mass_bin_width_dex must be positive.")
     sobol_row >= 0 || error("sobol_row must be non-negative.")
     if sobol_row > 0
         isempty(sobol_csv_path) && error("sobol_row was set, but sobol_csv_path is empty.")
-    elseif !isempty(sobol_csv_path)
-        println("Sobol CSV path provided without sobol_row; using direct/manual Battaglia parameters.")
     end
 
     manual_battaglia_params = battaglia_params_from_args()
@@ -437,10 +513,13 @@ function load_visual_config()
     bin_map_mode_tag = build_bin_map_mode_tag(cumulative_bin_maps, save_bin_maps)
     run_tag = "$(add_str_end)_$(param_tag)_$(binning_tag)_$(bin_map_mode_tag)"
 
-    output_dir = abspath(get_string_arg("output_dir", joinpath(homedir(), "HalfDome_outputs", "visuals"); env="TSZ_VISUAL_OUTPUT_DIR"))
-    fits_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_nside$(nside)_$(run_tag)_m200c.fits")
-    mass_fits_output_path = joinpath(output_dir, "$(simulation_tag)_mass_nside$(nside)_$(run_tag)_m200c.fits")
-    cl_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_cl_m200c_$(param_tag)_nside$(nside)_$(binning_tag)_$(bin_map_mode_tag).fits")
+    output_dir = abspath(get_string_arg("output_dir", CLUSTER_OUTPUT_DIR_DEFAULT; env="TSZ_VISUAL_OUTPUT_DIR"))
+    cache_dir = abspath(get_string_arg("cache_dir", CLUSTER_CACHE_DIR_DEFAULT; env="TSZ_VISUAL_CACHE_DIR"))
+    output_run_tag = isempty(run_instance_tag) ? run_tag : "$(run_tag)__$(run_instance_tag)"
+    cl_run_tag = isempty(run_instance_tag) ? "$(binning_tag)_$(bin_map_mode_tag)" : "$(binning_tag)_$(bin_map_mode_tag)__$(run_instance_tag)"
+    fits_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_nside$(nside)_$(output_run_tag)_m200c.fits")
+    mass_fits_output_path = joinpath(output_dir, "$(simulation_tag)_mass_nside$(nside)_$(output_run_tag)_m200c.fits")
+    cl_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_cl_m200c_$(param_tag)_nside$(nside)_$(cl_run_tag).fits")
 
     return VisualConfig(
         model_exists=model_exists,
@@ -468,6 +547,8 @@ function load_visual_config()
         sobol_csv_path=sobol_csv_path,
         sobol_row=sobol_row,
         output_dir=output_dir,
+        cache_dir=cache_dir,
+        run_instance_tag=run_instance_tag,
         param_tag=param_tag,
         binning_tag=binning_tag,
         bin_map_mode_tag=bin_map_mode_tag,
@@ -480,10 +561,13 @@ function load_visual_config()
 end
 
 function print_visual_config(cfg::VisualConfig)
+    run_instance_tag_display = isempty(cfg.run_instance_tag) ? "<none>" : cfg.run_instance_tag
     println("Using output directory: $(cfg.output_dir)")
     println("Using catalog source: $(cfg.catalog_source)")
     println("Using simulation tag: $(cfg.simulation_tag)")
     println("Using catalog path: $(cfg.catalog_path)")
+    println("Using cache directory: $(cfg.cache_dir)")
+    println("Run instance tag: $(run_instance_tag_display)")
     println("Batching mode: $(cfg.batching_mode)")
     println("Bin map save mode: $(cfg.bin_map_mode_tag)")
     println("Save per-bin maps: $(cfg.save_bin_maps)")

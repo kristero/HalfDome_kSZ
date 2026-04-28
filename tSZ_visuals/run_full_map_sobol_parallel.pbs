@@ -1,0 +1,116 @@
+#PBS -N tSZ_sobol_parallel
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=35gb
+#PBS -l walltime=02:00:00
+#PBS -o /home/kristero10/logs/tSZ_baryon_run/
+#PBS -e /home/kristero10/logs/tSZ_baryon_run/
+
+set -euo pipefail
+
+cd "$PBS_O_WORKDIR"
+
+JULIA=/usr/local/bin/julia
+LOG_DIR=/home/kristero10/logs/tSZ_baryon_run
+SOBOL_CSV=/home/kristero10/tSZ_data/battaglia_sobol_4.csv
+HALFDOME_PATH=/lustre/work/Globus-lt/halfdome/full_res/halos
+OUTPUT_DIR=/lustre/work/kristero10/tSZ_data
+CACHE_DIR=/lustre/work/kristero10/tSZ_data/cache
+NSIDE=4096
+MAX_PARALLEL=4
+
+SCRIPT_CANDIDATE_1="${PBS_O_WORKDIR}/run_full_map.jl"
+SCRIPT_CANDIDATE_2="${PBS_O_WORKDIR}/tSZ_visuals/run_full_map.jl"
+if [[ -f "${SCRIPT_CANDIDATE_1}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_1}"
+elif [[ -f "${SCRIPT_CANDIDATE_2}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_2}"
+else
+  echo "Could not locate run_full_map.jl from PBS_O_WORKDIR=${PBS_O_WORKDIR}" >&2
+  exit 1
+fi
+
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${CACHE_DIR}"
+
+TOTAL_CPUS="${PBS_NP:-${PBS_NCPUS:-$(wc -l < "${PBS_NODEFILE}")}}"
+ROW_COUNT="$(awk 'END {print NR-1}' "${SOBOL_CSV}")"
+
+if [[ "${ROW_COUNT}" -lt 1 ]]; then
+  echo "Sobol CSV has no data rows: ${SOBOL_CSV}" >&2
+  exit 1
+fi
+
+if [[ "${ROW_COUNT}" -lt "${MAX_PARALLEL}" ]]; then
+  CONCURRENT_JOBS="${ROW_COUNT}"
+else
+  CONCURRENT_JOBS="${MAX_PARALLEL}"
+fi
+
+THREADS_PER_TASK=$(( TOTAL_CPUS / CONCURRENT_JOBS ))
+if [[ "${THREADS_PER_TASK}" -lt 1 ]]; then
+  THREADS_PER_TASK=1
+fi
+
+echo "======================================="
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Working directory: ${PBS_O_WORKDIR:-NA}"
+echo "Nodefile: ${PBS_NODEFILE:-NA}"
+echo "Julia script: ${SCRIPT}"
+echo "Sobol CSV: ${SOBOL_CSV}"
+echo "Sobol rows: ${ROW_COUNT}"
+echo "Total CPUs: ${TOTAL_CPUS}"
+echo "Concurrent Julia tasks: ${CONCURRENT_JOBS}"
+echo "Threads per Julia task: ${THREADS_PER_TASK}"
+echo "======================================="
+
+echo "Running full Sobol sequence"
+echo "halfdome_path=${HALFDOME_PATH}"
+echo "output_dir=${OUTPUT_DIR}"
+echo "cache_dir=${CACHE_DIR}"
+echo "apply_gaussian_beam=false"
+
+row=1
+while [[ "${row}" -le "${ROW_COUNT}" ]]; do
+  pids=()
+  batch_rows=()
+
+  for ((slot = 0; slot < CONCURRENT_JOBS && row <= ROW_COUNT; slot++)); do
+    row_tag="$(printf '%04d' "${row}")"
+    stdout_path="${LOG_DIR}/tSZ_sobol_row${row_tag}_${PBS_JOBID}.out"
+    stderr_path="${LOG_DIR}/tSZ_sobol_row${row_tag}_${PBS_JOBID}.err"
+
+    echo "Launching sobol_row=${row} with ${THREADS_PER_TASK} threads"
+    (
+      export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
+      "${JULIA}" "${SCRIPT}" \
+        catalog_source=halfdome \
+        batching_mode=full \
+        save_bin_maps=false \
+        save_mass_map=false \
+        save_cl=true \
+        nside="${NSIDE}" \
+        sobol_csv_path="${SOBOL_CSV}" \
+        sobol_row="${row}" \
+        apply_gaussian_beam=false \
+        halfdome_path="${HALFDOME_PATH}" \
+        output_dir="${OUTPUT_DIR}" \
+        cache_dir="${CACHE_DIR}" \
+        run_instance_tag="pbsjob${PBS_JOBID}" \
+        > "${stdout_path}" \
+        2> "${stderr_path}"
+    ) &
+
+    pids+=("$!")
+    batch_rows+=("${row}")
+    row=$((row + 1))
+  done
+
+  for idx in "${!pids[@]}"; do
+    if ! wait "${pids[$idx]}"; then
+      failed_row="${batch_rows[$idx]}"
+      echo "Sobol row ${failed_row} failed. Check ${LOG_DIR}/tSZ_sobol_row$(printf '%04d' "${failed_row}")_${PBS_JOBID}.err" >&2
+      exit 1
+    fi
+  done
+done
+
+echo "Job finished."

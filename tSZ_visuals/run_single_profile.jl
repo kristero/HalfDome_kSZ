@@ -2,6 +2,7 @@ using XGPaint, Healpix, Interpolations
 
 include(joinpath(@__DIR__, "config.jl"))
 include(joinpath(@__DIR__, "cosmology_helpers.jl"))
+include(joinpath(@__DIR__, "instrumentation.jl"))
 include(joinpath(@__DIR__, "output.jl"))
 include(joinpath(@__DIR__, "painting.jl"))
 include(joinpath(@__DIR__, "model.jl"))
@@ -57,7 +58,7 @@ function load_single_profile_config()
     isfinite(radius_comoving_mpc) && radius_comoving_mpc > 0.0 || error("radius_comoving_mpc must be positive.")
 
     if !(isfinite(radius_arcmin) && radius_arcmin > 0.0)
-        chi_of_z = make_chi_of_z_itp(omegam=TSZ_OMEGAM, h_value=TSZ_H_VALUE)
+        chi_of_z = make_chi_of_z_itp(omegam=base_cfg.cosmo_omegam, h_value=base_cfg.cosmo_h)
         chi_comoving_mpc = chi_of_z(redshift)
         radius_rad = radius_to_angular_extent(radius_comoving_mpc, chi_comoving_mpc)
         radius_arcmin = rad2deg(radius_rad) * 60.0
@@ -72,15 +73,15 @@ function load_single_profile_config()
 
     y_output_path = joinpath(
         base_cfg.output_dir,
-        "$(profile_tag)_tSZ_nside$(base_cfg.nside)_$(base_cfg.param_tag)_$(base_cfg.beam_tag).fits"
+        "$(profile_tag)_tSZ_nside$(base_cfg.nside)_$(base_cfg.param_tag)_$(base_cfg.cosmology_tag)_$(base_cfg.beam_tag).fits"
     )
     mass_output_path = joinpath(
         base_cfg.output_dir,
-        "$(profile_tag)_mass_nside$(base_cfg.nside)_$(base_cfg.param_tag)_$(base_cfg.beam_tag).fits"
+        "$(profile_tag)_mass_nside$(base_cfg.nside)_$(base_cfg.param_tag)_$(base_cfg.cosmology_tag)_$(base_cfg.beam_tag).fits"
     )
     cl_output_path = joinpath(
         base_cfg.output_dir,
-        "$(profile_tag)_tSZ_cl_nside$(base_cfg.nside)_$(base_cfg.param_tag)_$(base_cfg.beam_tag).fits"
+        "$(profile_tag)_tSZ_cl_nside$(base_cfg.nside)_$(base_cfg.param_tag)_$(base_cfg.cosmology_tag)_$(base_cfg.beam_tag).fits"
     )
 
     return SingleProfileConfig(
@@ -102,6 +103,8 @@ function print_single_profile_config(cfg::SingleProfileConfig)
     println("Running a single-halo tSZ profile with fiducial Battaglia defaults unless overridden.")
     println("Output directory: $(cfg.base_cfg.output_dir)")
     println("Battaglia parameter tag: $(cfg.base_cfg.param_tag)")
+    println("Cosmology tag: $(cfg.base_cfg.cosmology_tag)")
+    println("Cosmology: h=$(cfg.base_cfg.cosmo_h), Omega_b=$(cfg.base_cfg.cosmo_omegab), Omega_c=$(cfg.base_cfg.cosmo_omegac), Omega_m=$(cfg.base_cfg.cosmo_omegam)")
     println("Gaussian beam: apply=$(cfg.base_cfg.apply_gaussian_beam), fwhm_arcmin=$(cfg.base_cfg.gaussian_beam_fwhm_arcmin)")
     println("NSIDE: $(cfg.base_cfg.nside)")
     println("Halo mass M200c [Msun]: $(cfg.mass_msun)")
@@ -110,16 +113,20 @@ function print_single_profile_config(cfg::SingleProfileConfig)
     println("Mass-map radius [comoving Mpc]: $(cfg.radius_comoving_mpc)")
     println("Mass-map radius [arcmin]: $(cfg.radius_arcmin)")
     println("y-map output: $(abspath(cfg.y_output_path))")
-    println("mass-map output: $(abspath(cfg.mass_output_path))")
+    if cfg.base_cfg.save_mass_map
+        println("mass-map output: $(abspath(cfg.mass_output_path))")
+    end
     println("C_l output: $(abspath(cfg.cl_output_path))")
 end
 
 function save_single_profile_maps!(cfg::SingleProfileConfig, state)
     ensure_output_dir(cfg.base_cfg)
     Healpix.saveToFITS(state.m_hp, "!" * cfg.y_output_path, typechar="D")
-    Healpix.saveToFITS(state.mass_hp, "!" * cfg.mass_output_path, typechar="D")
     println("Saved tSZ map to $(abspath(cfg.y_output_path))")
-    println("Saved mass map to $(abspath(cfg.mass_output_path))")
+    if cfg.base_cfg.save_mass_map
+        Healpix.saveToFITS(state.mass_hp, "!" * cfg.mass_output_path, typechar="D")
+        println("Saved mass map to $(abspath(cfg.mass_output_path))")
+    end
     return nothing
 end
 
@@ -137,7 +144,9 @@ function run_single_tsz_profile()
     radius_rad = deg2rad(cfg.radius_arcmin / 60.0)
 
     paint!(state.m_hp, state.workspace, y_model_interp, [cfg.mass_msun], [cfg.redshift], [ra], [dec])
-    build_halo_mass_map!(state.mass_hp, state.workspace, [ra], [dec], [cfg.mass_msun], [radius_rad])
+    if state.mass_hp !== nothing
+        build_halo_mass_map!(state.mass_hp, state.workspace, [ra], [dec], [cfg.mass_msun], [radius_rad])
+    end
 
     if cfg.base_cfg.apply_gaussian_beam
         println("Applying Gaussian beam to single-profile tSZ map with FWHM=$(cfg.base_cfg.gaussian_beam_fwhm_arcmin) arcmin.")

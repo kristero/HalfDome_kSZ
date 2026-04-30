@@ -23,15 +23,22 @@ include(joinpath(@__DIR__, "run_tSZ_visuals.jl"))
 function run_sobol_full_maps()
     original_args = copy(ARGS)
 
-    sobol_csv_path_raw = get_string_arg("sobol_csv_path", "Sobol_tSZ/battaglia_sobol_256.csv"; env="BATTAGLIA_SOBOL_CSV")
+    sobol_csv_path_raw = get_string_arg("sobol_csv_path", CLUSTER_SOBOL_CSV_DEFAULT; env="BATTAGLIA_SOBOL_CSV")
     sobol_csv_path = resolve_repo_path(sobol_csv_path_raw)
     isfile(sobol_csv_path) || error("Sobol CSV file not found: $(sobol_csv_path)")
 
     raw_table, _ = readdlm(sobol_csv_path, ','; header=true)
     total_rows = size(raw_table, 1)
 
-    sobol_row_start = get_int_arg("sobol_row_start", 1; env="BATTAGLIA_SOBOL_ROW_START")
-    sobol_row_stop = get_int_arg("sobol_row_stop", total_rows; env="BATTAGLIA_SOBOL_ROW_STOP")
+    slurm_array_task_id = strip(get(ENV, "SLURM_ARRAY_TASK_ID", ""))
+    if !isempty(slurm_array_task_id)
+        slurm_row = parse(Int, slurm_array_task_id)
+        sobol_row_start = slurm_row
+        sobol_row_stop = slurm_row
+    else
+        sobol_row_start = get_int_arg("sobol_row_start", 1; env="BATTAGLIA_SOBOL_ROW_START")
+        sobol_row_stop = get_int_arg("sobol_row_stop", total_rows; env="BATTAGLIA_SOBOL_ROW_STOP")
+    end
     sobol_row_start >= 1 || error("sobol_row_start must be >= 1.")
     sobol_row_stop >= sobol_row_start || error("sobol_row_stop must be >= sobol_row_start.")
     sobol_row_stop <= total_rows || error("sobol_row_stop=$(sobol_row_stop) exceeds the CSV row count $(total_rows).")

@@ -36,14 +36,16 @@ function make_chi_of_z_itp(; omegam, h_value, z1=0.0, z2=6.0, nz=100_000)
     return linear_interpolation(za, chia; extrapolation_bc=Line())
 end
 
-@inline function m200m_to_m200c_scalar(m200m::Float64, z::Float64)
+@inline function m200m_to_m200c_scalar(m200m::Float64, z::Float64, omegam::Float64)
     one_plus_z = 1.0 + z
-    ez_num = TSZ_OMEGAM * one_plus_z^3
-    omegamz = ez_num / (ez_num + 1.0 - TSZ_OMEGAM)
+    ez_num = omegam * one_plus_z^3
+    omegamz = ez_num / (ez_num + 1.0 - omegam)
     return m200m * omegamz^0.35
 end
 
-function compute_redshift_and_mass(x, y, z, radius, itp_z_of_chi, rho_m)
+@inline m200m_to_m200c_scalar(m200m::Float64, z::Float64) = m200m_to_m200c_scalar(m200m, z, TSZ_OMEGAM)
+
+function compute_redshift_and_mass(x, y, z, radius, itp_z_of_chi, rho_m, omegam=TSZ_OMEGAM)
     n = length(x)
     redshift = Vector{Float64}(undef, n)
     halo_mass = Vector{Float64}(undef, n)
@@ -59,7 +61,7 @@ function compute_redshift_and_mass(x, y, z, radius, itp_z_of_chi, rho_m)
         zi_redshift = itp_z_of_chi(chi)
 
         redshift[i] = zi_redshift
-        halo_mass[i] = m200m_to_m200c_scalar(mass_prefactor * ri^3, zi_redshift)
+        halo_mass[i] = m200m_to_m200c_scalar(mass_prefactor * ri^3, zi_redshift, omegam)
     end
 
     return redshift, halo_mass

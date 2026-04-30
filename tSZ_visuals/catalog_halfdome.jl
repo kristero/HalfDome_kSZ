@@ -56,8 +56,11 @@ function paint_halfdome_indices!(
     redshift_batch::Vector{Float64}
 )
     pos = read_hdf5_columns(h5["Position"], 1:3, idx_batch)
-    rdisp_spatial = read_hdf5_columns(h5["Rdisp"], 1:3, idx_batch)
-    radius_batch = halfdome_radius_from_rdisp(rdisp_spatial)
+    radius_batch = nothing
+    if state.batch_mass_hp !== nothing
+        rdisp_spatial = read_hdf5_columns(h5["Rdisp"], 1:3, idx_batch)
+        radius_batch = halfdome_radius_from_rdisp(rdisp_spatial)
+    end
 
     return paint_visual_batch!(
         state,
@@ -156,7 +159,7 @@ function run_halfdome_initial_chunks!(cfg::VisualConfig, state, y_model_interp, 
     for chunk_start in 1:cfg.chunkN:total_halo_count
         chunk_stop = min(chunk_start + cfg.chunkN - 1, total_halo_count)
         idx_range = chunk_start:chunk_stop
-        mass = Float64.(mass_ds[idx_range]) ./ TSZ_H_VALUE
+        mass = Float64.(mass_ds[idx_range]) ./ cfg.cosmo_h
         redshift = Float64.(redshift_ds[idx_range])
         keep = isfinite.(mass) .& isfinite.(redshift) .& (redshift .>= 0.0)
         if cfg.apply_mass_cut
@@ -196,7 +199,7 @@ function run_halfdome_full_map!(cfg::VisualConfig, state, y_model_interp, h5)
     for chunk_start in 1:cfg.chunkN:total_halo_count
         chunk_stop = min(chunk_start + cfg.chunkN - 1, total_halo_count)
         idx_range = chunk_start:chunk_stop
-        mass = Float64.(mass_ds[idx_range]) ./ TSZ_H_VALUE
+        mass = Float64.(mass_ds[idx_range]) ./ cfg.cosmo_h
         redshift = Float64.(redshift_ds[idx_range])
         keep = isfinite.(mass) .& isfinite.(redshift) .& (redshift .>= 0.0)
         if cfg.apply_mass_cut
@@ -232,7 +235,7 @@ function run_halfdome_visuals!(cfg::VisualConfig, state, y_model_interp)
             return run_halfdome_initial_chunks!(cfg, state, y_model_interp, h5)
         end
 
-        halo_mass = Float64.(read(h5["halo_mass_m200c"])) ./ TSZ_H_VALUE
+        halo_mass = Float64.(read(h5["halo_mass_m200c"])) ./ cfg.cosmo_h
         redshift = Float64.(read(h5["redshift"]))
         sorted_idx, sorted_mass, sorted_redshift = halfdome_selected_order(halo_mass, redshift, cfg)
 

@@ -4,6 +4,7 @@ using Base.Threads
 include(joinpath(@__DIR__, "config.jl"))
 include(joinpath(@__DIR__, "binning.jl"))
 include(joinpath(@__DIR__, "cosmology_helpers.jl"))
+include(joinpath(@__DIR__, "instrumentation.jl"))
 include(joinpath(@__DIR__, "output.jl"))
 include(joinpath(@__DIR__, "painting.jl"))
 include(joinpath(@__DIR__, "model.jl"))
@@ -25,12 +26,14 @@ function run_tsz_visual_fits()
     map_label = cfg.save_mass_map ? "y and mass FITS maps" : "y FITS maps"
     println("Creating $(cfg.bin_map_mode_tag) $(map_label) with $(cfg.batching_mode) batching.")
 
+    paint_t0 = start_phase_timing()
     if cfg.catalog_source == "halfdome"
         run_halfdome_visuals!(cfg, state, y_model_interp)
     else
-        itp_z_of_chi = make_z_of_chi_itp(omegam=TSZ_OMEGAM, h_value=TSZ_H_VALUE)
+        itp_z_of_chi = make_z_of_chi_itp(omegam=cfg.cosmo_omegam, h_value=cfg.cosmo_h)
         run_websky_visuals!(cfg, state, y_model_interp, itp_z_of_chi)
     end
+    print_phase_usage("Painting", paint_t0)
 
     output_y_map = state.m_hp
     if cfg.save_healpix_map || cfg.save_cl

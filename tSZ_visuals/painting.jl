@@ -2,20 +2,32 @@ function init_visual_maps(cfg::VisualConfig)
     m_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
     fill!(m_hp.pixels, 0.0)
 
-    mass_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
-    fill!(mass_hp.pixels, 0.0)
+    mass_hp = nothing
+    if cfg.save_mass_map
+        mass_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
+        fill!(mass_hp.pixels, 0.0)
+    end
 
     tmp_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
     fill!(tmp_hp.pixels, 0.0)
 
-    batch_mass_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
-    fill!(batch_mass_hp.pixels, 0.0)
+    batch_mass_hp = nothing
+    if cfg.save_mass_map
+        batch_mass_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
+        fill!(batch_mass_hp.pixels, 0.0)
+    end
 
-    bin_y_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
-    fill!(bin_y_hp.pixels, 0.0)
+    bin_y_hp = nothing
+    if cfg.save_bin_maps && !cfg.cumulative_bin_maps
+        bin_y_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
+        fill!(bin_y_hp.pixels, 0.0)
+    end
 
-    bin_mass_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
-    fill!(bin_mass_hp.pixels, 0.0)
+    bin_mass_hp = nothing
+    if cfg.save_mass_map && cfg.save_bin_maps && !cfg.cumulative_bin_maps
+        bin_mass_hp = HealpixMap{Float64, RingOrder}(cfg.nside)
+        fill!(bin_mass_hp.pixels, 0.0)
+    end
 
     res = Healpix.Resolution(cfg.nside)
     workspace = XGPaint.HealpixRingProfileWorkspace{Float64}(res)
@@ -32,8 +44,12 @@ function init_visual_maps(cfg::VisualConfig)
 end
 
 function reset_bin_maps!(state)
-    fill!(state.bin_y_hp.pixels, 0.0)
-    fill!(state.bin_mass_hp.pixels, 0.0)
+    if state.bin_y_hp !== nothing
+        fill!(state.bin_y_hp.pixels, 0.0)
+    end
+    if state.bin_mass_hp !== nothing
+        fill!(state.bin_mass_hp.pixels, 0.0)
+    end
     return nothing
 end
 
@@ -117,7 +133,7 @@ function paint_visual_batch!(
     x_batch,
     y_batch,
     z_batch,
-    radius_batch::Vector{Float64},
+    radius_batch,
     mass_batch::Vector{Float64},
     redshift_batch::Vector{Float64}
 )
@@ -135,15 +151,21 @@ function paint_visual_batch!(
     dec = dec[perm]
     masses = mass_batch[perm]
     redshifts = redshift_batch[perm]
-    angular_radii = radius_to_angular_extent.(radius_batch[perm], chis[perm])
 
     fill!(state.tmp_hp.pixels, 0.0)
     paint!(state.tmp_hp, state.workspace, y_model_interp, masses, redshifts, ra, dec)
-    build_halo_mass_map!(state.batch_mass_hp, state.workspace, ra, dec, masses, angular_radii)
 
     state.m_hp.pixels .+= state.tmp_hp.pixels
-    state.mass_hp.pixels .+= state.batch_mass_hp.pixels
-    state.bin_y_hp.pixels .+= state.tmp_hp.pixels
-    state.bin_mass_hp.pixels .+= state.batch_mass_hp.pixels
+    if state.batch_mass_hp !== nothing
+        angular_radii = radius_to_angular_extent.(radius_batch[perm], chis[perm])
+        build_halo_mass_map!(state.batch_mass_hp, state.workspace, ra, dec, masses, angular_radii)
+        state.mass_hp.pixels .+= state.batch_mass_hp.pixels
+        if state.bin_mass_hp !== nothing
+            state.bin_mass_hp.pixels .+= state.batch_mass_hp.pixels
+        end
+    end
+    if state.bin_y_hp !== nothing
+        state.bin_y_hp.pixels .+= state.tmp_hp.pixels
+    end
     return length(redshifts)
 end

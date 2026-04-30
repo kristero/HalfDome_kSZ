@@ -21,7 +21,15 @@ function stream_websky_chunks(process_chunk!::F, cfg::VisualConfig, itp_z_of_chi
             y = @view cat[2, :]
             z = @view cat[3, :]
             radius = @view cat[7, :]
-            redshift, halo_mass = compute_redshift_and_mass(x, y, z, radius, itp_z_of_chi, TSZ_RHO_M)
+            redshift, halo_mass = compute_redshift_and_mass(
+                x,
+                y,
+                z,
+                radius,
+                itp_z_of_chi,
+                cfg.cosmo_rho_m,
+                cfg.cosmo_omegam
+            )
 
             process_chunk!(chunk_start, chunk_stop, x, y, z, radius, halo_mass, redshift)
 
@@ -90,7 +98,7 @@ function paint_websky_filtered!(
             x_batch = Float64.(x[keep])
             y_batch = Float64.(y[keep])
             z_batch = Float64.(z[keep])
-            radius_batch = Float64.(radius[keep])
+            radius_batch = state.batch_mass_hp === nothing ? nothing : Float64.(radius[keep])
             mass_batch = halo_mass[keep]
             redshift_batch = redshift[keep]
 
@@ -193,7 +201,7 @@ function run_websky_initial_chunks!(cfg::VisualConfig, state, y_model_interp, it
                 Float64.(x[keep]),
                 Float64.(y[keep]),
                 Float64.(z[keep]),
-                Float64.(radius[keep]),
+                state.batch_mass_hp === nothing ? nothing : Float64.(radius[keep]),
                 halo_mass[keep],
                 redshift[keep]
             )
@@ -226,7 +234,7 @@ function run_websky_full_map!(cfg::VisualConfig, state, y_model_interp, itp_z_of
                 Float64.(x[keep]),
                 Float64.(y[keep]),
                 Float64.(z[keep]),
-                Float64.(radius[keep]),
+                state.batch_mass_hp === nothing ? nothing : Float64.(radius[keep]),
                 halo_mass[keep],
                 redshift[keep]
             )

@@ -1,9 +1,9 @@
 function build_tsz_model(cfg::VisualConfig)
     p = cfg.battaglia_params
     return Battaglia16ThermalSZProfile(
-        Omega_c=TSZ_OMEGAC,
-        Omega_b=TSZ_OMEGAB,
-        h=TSZ_H_VALUE,
+        Omega_c=cfg.cosmo_omegac,
+        Omega_b=cfg.cosmo_omegab,
+        h=cfg.cosmo_h,
         P0_amp=p.P0_amp,
         P0_alpha_m=p.P0_alpha_m,
         P0_alpha_z=p.P0_alpha_z,
@@ -22,25 +22,121 @@ function build_tsz_model(cfg::VisualConfig)
     )
 end
 
+function visual_interpolator_cache_filename(cfg::VisualConfig)
+    cache_sim_tag = cfg.catalog_source == "halfdome" ? "HalfDome" : "Websky"
+    return "cached_tSZ_$(cache_sim_tag)_cosmo_$(cfg.param_tag)_$(cfg.cosmology_tag).jld2"
+end
+
+function legacy_visual_interpolator_cache_filename(cfg::VisualConfig)
+    cache_sim_tag = cfg.catalog_source == "halfdome" ? "HalfDome" : "Websky"
+    return "cached_tSZ_$(cache_sim_tag)_cosmo_$(cfg.param_tag).jld2"
+end
+
+function visual_interpolator_cache_paths(cfg::VisualConfig)
+    filename = visual_interpolator_cache_filename(cfg)
+    legacy_filename = legacy_visual_interpolator_cache_filename(cfg)
+    return (
+        primary=joinpath(cfg.cache_dir, filename),
+        primary_legacy_name=joinpath(cfg.cache_dir, legacy_filename),
+        legacy=joinpath(repo_root(), filename),
+        legacy_legacy_name=joinpath(repo_root(), legacy_filename)
+    )
+end
+
+function same_cache_path(path_a::AbstractString, path_b::AbstractString)
+    return normpath(String(path_a)) == normpath(String(path_b))
+end
+
+function unique_cache_paths(paths)
+    unique_paths = String[]
+    for path in paths
+        any(existing -> same_cache_path(existing, path), unique_paths) && continue
+        push!(unique_paths, String(path))
+    end
+    return unique_paths
+end
+
+function visual_interpolator_cache_candidates(cfg::VisualConfig)
+    paths = visual_interpolator_cache_paths(cfg)
+    return unique_cache_paths((
+        paths.primary,
+        paths.primary_legacy_name,
+        paths.legacy,
+        paths.legacy_legacy_name
+    ))
+end
+
+function existing_visual_interpolator_cache(cfg::VisualConfig)
+    paths = visual_interpolator_cache_paths(cfg)
+    candidates = visual_interpolator_cache_candidates(cfg)
+    for candidate in candidates
+        if isfile(candidate)
+            if !same_cache_path(candidate, paths.primary)
+                println("Primary interpolator cache not found at $(paths.primary)")
+                println("Using fallback interpolator cache: $(candidate)")
+            end
+            return candidate
+        end
+    end
+    return nothing
+end
+
+function missing_interpolator_cache_error(cfg::VisualConfig)
+    checked_paths = join(visual_interpolator_cache_candidates(cfg), ", ")
+    return (
+        "model_exists=true, but no tSZ interpolator cache was found. Checked $(checked_paths). " *
+        "The Battaglia interpolator build is expensive and was the part killed by SIGTERM in the cluster stack trace. " *
+        "Copy an existing cache to cache_dir=$(cfg.cache_dir), set cache_dir to the directory that already contains it, " *
+        "or rerun deliberately with model_exists=false using enough walltime/memory."
+    )
+end
+
 function build_visual_interpolator(cfg::VisualConfig)
     model = build_tsz_model(cfg)
-    cache_sim_tag = cfg.catalog_source == "halfdome" ? "HalfDome" : "Websky"
-    y_cache_file = joinpath(repo_root(), "cached_tSZ_$(cache_sim_tag)_cosmo_$(cfg.param_tag).jld2")
-
-    if cfg.model_exists
-        return build_interpolator(
-            model,
-            cache_file=y_cache_file,
-            overwrite=false
+    paths = visual_interpolator_cache_paths(cfg)
+    y_cache_file = if cfg.model_exists
+        existing_cache = existing_visual_interpolator_cache(cfg)
+        existing_cache === nothing && error(missing_interpolator_cache_error(cfg))
+        println("Loading tSZ interpolator cache: $(existing_cache)")
+        existing_cache
+    else
+        isdir(cfg.cache_dir) || mkpath(cfg.cache_dir)
+        println(
+            "Building tSZ interpolator cache: $(paths.primary) " *
+            "(pad=$(cfg.interpolator_pad), logM_max=$(cfg.interpolator_logM_max))"
         )
+        paths.primary
+    end
+    interp_t0 = start_phase_timing()
+    cleanup_env_key = "XGPAINT_CLEANUP_NONPOSITIVE"
+    previous_cleanup_env = get(ENV, cleanup_env_key, nothing)
+    ENV[cleanup_env_key] = cfg.cleanup_nonpositive_profile_values ? "true" : "false"
+
+    interpolator = try
+        if cfg.model_exists
+            build_interpolator(
+                model,
+                cache_file=y_cache_file,
+                overwrite=false
+            )
+        else
+            build_interpolator(
+                model;
+                cache_file=y_cache_file,
+                pad=cfg.interpolator_pad,
+                logM_max=cfg.interpolator_logM_max,
+                overwrite=true,
+                verbose=true
+            )
+        end
+    finally
+        if previous_cleanup_env === nothing
+            pop!(ENV, cleanup_env_key, nothing)
+        else
+            ENV[cleanup_env_key] = previous_cleanup_env
+        end
     end
 
-    return build_interpolator(
-        model;
-        cache_file=y_cache_file,
-        pad=256,
-        logM_max=15.7,
-        overwrite=true,
-        verbose=true
-    )
+    print_phase_usage("Interpolator", interp_t0)
+    return interpolator
 end

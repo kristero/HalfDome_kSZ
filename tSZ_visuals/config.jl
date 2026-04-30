@@ -48,8 +48,17 @@ Base.@kwdef struct VisualConfig
     chunkN::Int
     add_str_end::String
     mass_min::Float64
+    cosmo_h::Float64
+    cosmo_omegab::Float64
+    cosmo_omegac::Float64
+    cosmo_omegam::Float64
+    cosmo_h0::Float64
+    cosmo_rho_m::Float64
     apply_gaussian_beam::Bool
     gaussian_beam_fwhm_arcmin::Float64
+    cleanup_nonpositive_profile_values::Bool
+    interpolator_pad::Int
+    interpolator_logM_max::Float64
     batching_mode::String
     redshift_binning_mode::String
     redshift_bin_width::Float64
@@ -61,6 +70,7 @@ Base.@kwdef struct VisualConfig
     cache_dir::String
     run_instance_tag::String
     param_tag::String
+    cosmology_tag::String
     beam_tag::String
     binning_tag::String
     bin_map_mode_tag::String
@@ -454,6 +464,24 @@ function build_beam_tag(apply_gaussian_beam::Bool, gaussian_beam_fwhm_arcmin::Re
     return "gaussbeam_$(fmt_param_value(Float64(gaussian_beam_fwhm_arcmin)))arcmin"
 end
 
+function build_cosmology_tag(cosmo_h::Real, cosmo_omegab::Real, cosmo_omegac::Real)
+    if isapprox(Float64(cosmo_h), TSZ_H_VALUE; atol=0.0, rtol=1e-12) &&
+       isapprox(Float64(cosmo_omegab), TSZ_OMEGAB; atol=0.0, rtol=1e-12) &&
+       isapprox(Float64(cosmo_omegac), TSZ_OMEGAC; atol=0.0, rtol=1e-12)
+        return "cosmo_fid"
+    end
+
+    return join(
+        (
+            "cosmo",
+            "h$(fmt_param_value(Float64(cosmo_h)))",
+            "ob$(fmt_param_value(Float64(cosmo_omegab)))",
+            "oc$(fmt_param_value(Float64(cosmo_omegac)))"
+        ),
+        "_"
+    )
+end
+
 function load_visual_config()
     model_exists = get_bool_arg("model_exists", true; env="MODEL_EXISTS")
     save_healpix_map = get_bool_arg("save_healpix_map", true; env="SAVE_HEALPIX_MAP")
@@ -477,6 +505,9 @@ function load_visual_config()
     chunkN = get_int_arg("chunkN", 2_000_000; env="CHUNKN")
     add_str_end = get_string_arg("add_str_end", "13Msol_cutoff_HALO"; env="ADD_STR_END")
     mass_min = get_float_arg("mass_min", 1.0e12; env="MASS_MIN")
+    cosmo_h = get_float_arg("cosmo_h", TSZ_H_VALUE; env="TSZ_COSMO_H")
+    cosmo_omegab = get_float_arg("cosmo_omegab", TSZ_OMEGAB; env="TSZ_COSMO_OMEGAB")
+    cosmo_omegac = get_float_arg("cosmo_omegac", TSZ_OMEGAC; env="TSZ_COSMO_OMEGAC")
     gaussian_beam_fwhm_arcmin = get_float_arg(
         "gaussian_beam_fwhm_arcmin",
         TSZ_GAUSSIAN_BEAM_FWHM_ARCMIN_DEFAULT;
@@ -487,6 +518,13 @@ function load_visual_config()
         gaussian_beam_fwhm_arcmin > 0.0;
         env="APPLY_GAUSSIAN_BEAM"
     )
+    cleanup_nonpositive_profile_values = get_bool_arg(
+        "cleanup_nonpositive_profile_values",
+        true;
+        env="CLEANUP_NONPOSITIVE_PROFILE_VALUES"
+    )
+    interpolator_pad = get_int_arg("interpolator_pad", 256; env="INTERPOLATOR_PAD")
+    interpolator_logM_max = get_float_arg("interpolator_logM_max", 15.7; env="INTERPOLATOR_LOGM_MAX")
     batching_mode = normalize_batching_mode(get_string_arg("batching_mode", "redshift"; env="BATCHING_MODE"))
     redshift_binning_mode = normalize_redshift_binning_mode(get_string_arg("redshift_binning_mode", "linear"; env="REDSHIFT_BINNING_MODE"))
     redshift_bin_width = get_float_arg("redshift_bin_width", 1.0; env="REDSHIFT_BIN_WIDTH")
@@ -497,10 +535,20 @@ function load_visual_config()
     sobol_csv_path = isempty(sobol_csv_path_raw) ? "" : resolve_repo_path(sobol_csv_path_raw)
     run_instance_tag_raw = get_string_arg("run_instance_tag", default_slurm_run_instance_tag(); env="TSZ_RUN_INSTANCE_TAG")
     run_instance_tag = optional_filename_tag(run_instance_tag_raw)
+    cosmo_h > 0.0 || error("cosmo_h must be positive.")
+    cosmo_omegab > 0.0 || error("cosmo_omegab must be positive.")
+    cosmo_omegac > 0.0 || error("cosmo_omegac must be positive.")
+    cosmo_omegam = cosmo_omegab + cosmo_omegac
+    cosmo_omegam > 0.0 || error("cosmo_omegam must be positive.")
+    cosmo_omegam < 1.0 || error("cosmo_omegam must be smaller than 1.")
+    cosmo_h0 = 100.0 * cosmo_h
+    cosmo_rho_m = 2.775e11 * cosmo_omegam * cosmo_h^2
     gaussian_beam_fwhm_arcmin >= 0.0 || error("gaussian_beam_fwhm_arcmin must be nonnegative. Set it to 0 to disable the beam.")
     if apply_gaussian_beam
         gaussian_beam_fwhm_arcmin > 0.0 || error("apply_gaussian_beam=true requires gaussian_beam_fwhm_arcmin > 0.")
     end
+    interpolator_pad >= 0 || error("interpolator_pad must be nonnegative.")
+    interpolator_logM_max > 0.0 || error("interpolator_logM_max must be positive.")
     redshift_bin_width > 0.0 || error("redshift_bin_width must be positive.")
     log_redshift_bin_width > 0.0 || error("log_redshift_bin_width must be positive.")
     mass_bin_width_dex > 0.0 || error("mass_bin_width_dex must be positive.")
@@ -526,6 +574,7 @@ function load_visual_config()
         battaglia_params = manual_battaglia_params
         param_tag = build_param_tag(battaglia_params)
     end
+    cosmology_tag = build_cosmology_tag(cosmo_h, cosmo_omegab, cosmo_omegac)
     beam_tag = build_beam_tag(apply_gaussian_beam, gaussian_beam_fwhm_arcmin)
     binning_tag = build_binning_tag(
         batching_mode,
@@ -535,7 +584,7 @@ function load_visual_config()
         mass_bin_width_dex
     )
     bin_map_mode_tag = build_bin_map_mode_tag(cumulative_bin_maps, save_bin_maps)
-    run_tag = "$(add_str_end)_$(param_tag)_$(beam_tag)_$(binning_tag)_$(bin_map_mode_tag)"
+    run_tag = "$(add_str_end)_$(param_tag)_$(cosmology_tag)_$(beam_tag)_$(binning_tag)_$(bin_map_mode_tag)"
 
     output_dir = abspath(get_string_arg("output_dir", CLUSTER_OUTPUT_DIR_DEFAULT; env="TSZ_VISUAL_OUTPUT_DIR"))
     cache_dir = abspath(get_string_arg("cache_dir", CLUSTER_CACHE_DIR_DEFAULT; env="TSZ_VISUAL_CACHE_DIR"))
@@ -544,7 +593,7 @@ function load_visual_config()
     cl_run_tag = isempty(run_instance_tag) ? cl_tag_base : "$(cl_tag_base)__$(run_instance_tag)"
     fits_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_nside$(nside)_$(output_run_tag)_m200c.fits")
     mass_fits_output_path = joinpath(output_dir, "$(simulation_tag)_mass_nside$(nside)_$(output_run_tag)_m200c.fits")
-    cl_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_cl_m200c_$(param_tag)_nside$(nside)_$(cl_run_tag).fits")
+    cl_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_cl_m200c_$(param_tag)_$(cosmology_tag)_nside$(nside)_$(cl_run_tag).fits")
 
     return VisualConfig(
         model_exists=model_exists,
@@ -564,8 +613,17 @@ function load_visual_config()
         chunkN=chunkN,
         add_str_end=add_str_end,
         mass_min=mass_min,
+        cosmo_h=cosmo_h,
+        cosmo_omegab=cosmo_omegab,
+        cosmo_omegac=cosmo_omegac,
+        cosmo_omegam=cosmo_omegam,
+        cosmo_h0=cosmo_h0,
+        cosmo_rho_m=cosmo_rho_m,
         apply_gaussian_beam=apply_gaussian_beam,
         gaussian_beam_fwhm_arcmin=gaussian_beam_fwhm_arcmin,
+        cleanup_nonpositive_profile_values=cleanup_nonpositive_profile_values,
+        interpolator_pad=interpolator_pad,
+        interpolator_logM_max=interpolator_logM_max,
         batching_mode=batching_mode,
         redshift_binning_mode=redshift_binning_mode,
         redshift_bin_width=redshift_bin_width,
@@ -577,6 +635,7 @@ function load_visual_config()
         cache_dir=cache_dir,
         run_instance_tag=run_instance_tag,
         param_tag=param_tag,
+        cosmology_tag=cosmology_tag,
         beam_tag=beam_tag,
         binning_tag=binning_tag,
         bin_map_mode_tag=bin_map_mode_tag,
@@ -596,7 +655,11 @@ function print_visual_config(cfg::VisualConfig)
     println("Using catalog path: $(cfg.catalog_path)")
     println("Using cache directory: $(cfg.cache_dir)")
     println("Run instance tag: $(run_instance_tag_display)")
+    println("Cosmology tag: $(cfg.cosmology_tag)")
+    println("Cosmology: h=$(cfg.cosmo_h), Omega_b=$(cfg.cosmo_omegab), Omega_c=$(cfg.cosmo_omegac), Omega_m=$(cfg.cosmo_omegam)")
     println("Gaussian beam: apply=$(cfg.apply_gaussian_beam), fwhm_arcmin=$(cfg.gaussian_beam_fwhm_arcmin)")
+    println("Interpolator nonpositive cleanup: $(cfg.cleanup_nonpositive_profile_values)")
+    println("Interpolator cache mode: model_exists=$(cfg.model_exists), pad=$(cfg.interpolator_pad), logM_max=$(cfg.interpolator_logM_max)")
     println("Batching mode: $(cfg.batching_mode)")
     println("Bin map save mode: $(cfg.bin_map_mode_tag)")
     println("Save per-bin maps: $(cfg.save_bin_maps)")

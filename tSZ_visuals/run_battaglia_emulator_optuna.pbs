@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+#PBS -N tSZ_emulator_optuna
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=06:00:00
+#PBS -o /home/kristero10/logs/tSZ_baryon_run/
+#PBS -e /home/kristero10/logs/tSZ_baryon_run/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+cd "${PBS_O_WORKDIR:-$PWD}"
+
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+JOB_ID="${PBS_JOBID:-manual}"
+: "${LOG_DIR:=/home/kristero10/logs/tSZ_baryon_run}"
+
+: "${Y100_DIRS:=/lustre/work/kristero10/tSZ_data/y100:/lustre/work/kristero10/tSZ_data/y100_2}"
+: "${Y102_DIRS:=/lustre/work/kristero10/tSZ_data/y102}"
+: "${PROFILE_GLOBS:=*tSZ_cl*.fits}"
+: "${EMULATOR_OUTPUT_DIR:=/lustre/work/kristero10/tSZ_data/emulator_battaglia_y100_y102}"
+: "${ELL_MIN:=2}"
+: "${ELL_MAX:=}"
+: "${N_TRIALS:=150}"
+: "${CV_FOLDS:=5}"
+: "${MAX_PCA_COMPONENTS:=32}"
+: "${N_JOBS:=${PBS_NCPUS:-26}}"
+: "${RANDOM_SEED:=1234}"
+: "${TARGET_TRANSFORM:=log10}"
+: "${TARGET_FLOOR:=1e-40}"
+: "${REGRESSORS:=mlp,krr}"
+: "${INCLUDE_GPR:=false}"
+: "${OPTUNA_STORAGE:=}"
+: "${STUDY_NAME:=battaglia_tsz_emulator}"
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+
+if [[ -z "${SOBOL_CSVS:-}" ]]; then
+  SOBOL_CSVS=/home/kristero10/tSZ_data/battaglia_sobol_256.csv
+  [[ -f /home/kristero10/tSZ_data/battaglia_sobol_256_1.csv ]] && SOBOL_CSVS="${SOBOL_CSVS}:/home/kristero10/tSZ_data/battaglia_sobol_256_1.csv"
+  [[ -f /home/kristero10/tSZ_data/battaglia_sobol_256_2.csv ]] && SOBOL_CSVS="${SOBOL_CSVS}:/home/kristero10/tSZ_data/battaglia_sobol_256_2.csv"
+fi
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  echo "Running Python environment setup command."
+  eval "${PYTHON_ENV_SETUP}"
+fi
+
+SCRIPT_CANDIDATE_1="${PBS_O_WORKDIR}/build_battaglia_emulator.py"
+SCRIPT_CANDIDATE_2="${PBS_O_WORKDIR}/tSZ_visuals/build_battaglia_emulator.py"
+if [[ -f "${SCRIPT_CANDIDATE_1}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_1}"
+elif [[ -f "${SCRIPT_CANDIDATE_2}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_2}"
+else
+  echo "Could not locate build_battaglia_emulator.py from PBS_O_WORKDIR=${PBS_O_WORKDIR}" >&2
+  exit 1
+fi
+
+mkdir -p "${LOG_DIR}" "${EMULATOR_OUTPUT_DIR}"
+
+export OMP_NUM_THREADS
+export OPENBLAS_NUM_THREADS
+export MKL_NUM_THREADS
+export N_TRIALS
+
+EXTRA_ARGS=()
+if [[ -n "${ELL_MAX}" ]]; then
+  EXTRA_ARGS+=(--ell-max "${ELL_MAX}")
+fi
+if [[ "${INCLUDE_GPR}" == "true" || "${INCLUDE_GPR}" == "1" ]]; then
+  EXTRA_ARGS+=(--include-gpr)
+fi
+if [[ -n "${OPTUNA_STORAGE}" ]]; then
+  EXTRA_ARGS+=(--optuna-storage "${OPTUNA_STORAGE}" --study-name "${STUDY_NAME}" --load-if-exists)
+fi
+
+ALLOCATED_CPUS_HINT="${PBS_NCPUS:-${NCPUS:-unknown}}"
+PBS_NP_HINT="${PBS_NP:-unknown}"
+NODEFILE_SLOTS="unknown"
+if [[ -n "${PBS_NODEFILE:-}" && -f "${PBS_NODEFILE}" ]]; then
+  NODEFILE_SLOTS="$(wc -l < "${PBS_NODEFILE}")"
+fi
+
+echo "======================================="
+echo "PBS job id: ${JOB_ID}"
+echo "Working directory: ${PBS_O_WORKDIR:-NA}"
+echo "Nodefile: ${PBS_NODEFILE:-NA}"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Python script: ${SCRIPT}"
+echo "Python executable: ${PYTHON}"
+"${PYTHON}" --version
+echo "Y100 dirs: ${Y100_DIRS}"
+echo "Y102 dirs: ${Y102_DIRS}"
+echo "Sobol CSVs: ${SOBOL_CSVS}"
+echo "Profile globs: ${PROFILE_GLOBS}"
+echo "Output dir: ${EMULATOR_OUTPUT_DIR}"
+echo "ell range: ${ELL_MIN}:${ELL_MAX:-end}"
+echo "Optuna trials: ${N_TRIALS}"
+echo "CV folds: ${CV_FOLDS}"
+echo "Regressors: ${REGRESSORS}"
+echo "N_JOBS: ${N_JOBS}"
+echo "PBS_NP/nodefile slots are MPI slots on this cluster, not OpenMP thread count."
+echo "PBS_NP: ${PBS_NP_HINT}"
+echo "PBS_NCPUS/NCPUS: ${ALLOCATED_CPUS_HINT}"
+echo "PBS nodefile slots: ${NODEFILE_SLOTS}"
+echo "OMP_NUM_THREADS: ${OMP_NUM_THREADS}"
+echo "OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS}"
+echo "MKL_NUM_THREADS: ${MKL_NUM_THREADS}"
+if [[ -n "${PBS_NODEFILE:-}" && -f "${PBS_NODEFILE}" ]]; then
+  echo "PBS node allocation:"
+  sort "${PBS_NODEFILE}" | uniq -c
+fi
+command -v taskset >/dev/null 2>&1 && taskset -pc $$
+command -v lscpu >/dev/null 2>&1 && lscpu | egrep 'Model name|CPU\\(s\\)|Thread|Core|Socket|MHz|NUMA'
+echo "======================================="
+
+"${PYTHON}" - <<'PY'
+import importlib.util
+import os
+import sys
+
+required = ["numpy", "pandas", "sklearn", "joblib"]
+try:
+    n_trials = int(os.environ.get("N_TRIALS", "0"))
+except ValueError:
+    print("N_TRIALS must be an integer.", file=sys.stderr)
+    raise SystemExit(1)
+if n_trials > 0:
+    required.append("optuna")
+missing = [name for name in required if importlib.util.find_spec(name) is None]
+has_fits_reader = (
+    importlib.util.find_spec("astropy") is not None
+    or importlib.util.find_spec("fitsio") is not None
+)
+if not has_fits_reader:
+    missing.append("astropy or fitsio")
+if missing:
+    print("Missing Python packages: " + ", ".join(missing), file=sys.stderr)
+    print("Use a Python/conda environment containing numpy, pandas, scikit-learn, joblib, a FITS reader, and optuna for N_TRIALS>0.", file=sys.stderr)
+    raise SystemExit(1)
+PY
+
+"${PYTHON}" "${SCRIPT}" \
+  --y100-dirs "${Y100_DIRS}" \
+  --y102-dirs "${Y102_DIRS}" \
+  --sobol-csvs "${SOBOL_CSVS}" \
+  --profile-globs "${PROFILE_GLOBS}" \
+  --output-dir "${EMULATOR_OUTPUT_DIR}" \
+  --ell-min "${ELL_MIN}" \
+  --target-transform "${TARGET_TRANSFORM}" \
+  --target-floor "${TARGET_FLOOR}" \
+  --regressors "${REGRESSORS}" \
+  --n-trials "${N_TRIALS}" \
+  --cv-folds "${CV_FOLDS}" \
+  --max-pca-components "${MAX_PCA_COMPONENTS}" \
+  --random-seed "${RANDOM_SEED}" \
+  --n-jobs "${N_JOBS}" \
+  "${EXTRA_ARGS[@]}" \
+  > "${LOG_DIR}/tSZ_emulator_optuna_${JOB_ID}.out" \
+  2> "${LOG_DIR}/tSZ_emulator_optuna_${JOB_ID}.err"
+
+echo "Job finished."

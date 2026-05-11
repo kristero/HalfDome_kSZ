@@ -132,9 +132,18 @@ end
 
 function run_single_tsz_profile()
     t0 = time()
-    cfg = load_single_profile_config()
+    cfg = try
+        load_single_profile_config()
+    catch err
+        if err isa SkipVisualRun
+            println("Skipping single-halo tSZ profile run: $(err.message)")
+            return nothing
+        end
+        rethrow()
+    end
 
     print_single_profile_config(cfg)
+    print_runtime_environment()
 
     y_model_interp = build_visual_interpolator(cfg.base_cfg)
     state = init_visual_maps(cfg.base_cfg)

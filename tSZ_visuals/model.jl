@@ -24,7 +24,7 @@ end
 
 function visual_interpolator_cache_filename(cfg::VisualConfig)
     cache_sim_tag = cfg.catalog_source == "halfdome" ? "HalfDome" : "Websky"
-    return "cached_tSZ_$(cache_sim_tag)_cosmo_$(cfg.param_tag)_$(cfg.cosmology_tag).jld2"
+    return "cached_tSZ_$(cache_sim_tag)_cosmo_$(cfg.cache_param_tag)_$(cfg.cosmology_tag).jld2"
 end
 
 function legacy_visual_interpolator_cache_filename(cfg::VisualConfig)
@@ -32,13 +32,67 @@ function legacy_visual_interpolator_cache_filename(cfg::VisualConfig)
     return "cached_tSZ_$(cache_sim_tag)_cosmo_$(cfg.param_tag).jld2"
 end
 
+function row_tag_visual_interpolator_cache_filename(cfg::VisualConfig)
+    cache_sim_tag = cfg.catalog_source == "halfdome" ? "HalfDome" : "Websky"
+    return "cached_tSZ_$(cache_sim_tag)_cosmo_$(cfg.param_tag)_$(cfg.cosmology_tag).jld2"
+end
+
+function visual_interpolator_filename_for_param_tag(cfg::VisualConfig, param_tag::AbstractString; include_cosmology::Bool=true)
+    cache_sim_tag = cfg.catalog_source == "halfdome" ? "HalfDome" : "Websky"
+    if include_cosmology
+        return "cached_tSZ_$(cache_sim_tag)_cosmo_$(param_tag)_$(cfg.cosmology_tag).jld2"
+    end
+    return "cached_tSZ_$(cache_sim_tag)_cosmo_$(param_tag).jld2"
+end
+
+function split_sobol_cache_param_tag_aliases(cfg::VisualConfig)
+    cfg.sobol_row > 0 || return String[]
+    isempty(cfg.sobol_csv_path) && return String[]
+
+    aliases = String[]
+    csv_dir = dirname(cfg.sobol_csv_path)
+    csv_stem = splitext(basename(cfg.sobol_csv_path))[1]
+
+    split_match = match(r"^(.+)_([0-9]+)$", csv_stem)
+    if split_match !== nothing
+        full_stem = split_match.captures[1]
+        split_index = parse(Int, split_match.captures[2])
+        full_csv_path = joinpath(csv_dir, full_stem * ".csv")
+        if split_index >= 1 && isfile(full_csv_path)
+            split_rows = csv_data_row_count(cfg.sobol_csv_path)
+            global_row = (split_index - 1) * split_rows + cfg.sobol_row
+            if global_row >= 1
+                push!(aliases, build_sobol_param_tag(full_csv_path, global_row))
+            end
+        end
+    end
+
+    for split_index in (1, 2)
+        split_csv_path = joinpath(csv_dir, "$(csv_stem)_$(split_index).csv")
+        isfile(split_csv_path) || continue
+        split_rows = csv_data_row_count(split_csv_path)
+        split_rows > 0 || continue
+        split_start = (split_index - 1) * split_rows + 1
+        split_stop = split_index * split_rows
+        if split_start <= cfg.sobol_row <= split_stop
+            split_row = cfg.sobol_row - split_start + 1
+            push!(aliases, build_sobol_param_tag(split_csv_path, split_row))
+        end
+    end
+
+    return [tag for tag in unique(aliases) if tag != cfg.param_tag]
+end
+
 function visual_interpolator_cache_paths(cfg::VisualConfig)
     filename = visual_interpolator_cache_filename(cfg)
+    row_tag_filename = row_tag_visual_interpolator_cache_filename(cfg)
     legacy_filename = legacy_visual_interpolator_cache_filename(cfg)
     return (
         primary=joinpath(cfg.cache_dir, filename),
+        row_tag=joinpath(cfg.cache_dir, row_tag_filename),
         primary_legacy_name=joinpath(cfg.cache_dir, legacy_filename),
         legacy=joinpath(repo_root(), filename),
+        legacy_row_tag=joinpath(repo_root(), row_tag_filename),
         legacy_legacy_name=joinpath(repo_root(), legacy_filename)
     )
 end
@@ -58,12 +112,23 @@ end
 
 function visual_interpolator_cache_candidates(cfg::VisualConfig)
     paths = visual_interpolator_cache_paths(cfg)
-    return unique_cache_paths((
+    candidates = String[
         paths.primary,
+        paths.row_tag,
         paths.primary_legacy_name,
         paths.legacy,
+        paths.legacy_row_tag,
         paths.legacy_legacy_name
-    ))
+    ]
+    for alias_tag in split_sobol_cache_param_tag_aliases(cfg)
+        alias_filename = visual_interpolator_filename_for_param_tag(cfg, alias_tag; include_cosmology=true)
+        alias_legacy_filename = visual_interpolator_filename_for_param_tag(cfg, alias_tag; include_cosmology=false)
+        push!(candidates, joinpath(cfg.cache_dir, alias_filename))
+        push!(candidates, joinpath(cfg.cache_dir, alias_legacy_filename))
+        push!(candidates, joinpath(repo_root(), alias_filename))
+        push!(candidates, joinpath(repo_root(), alias_legacy_filename))
+    end
+    return unique_cache_paths(candidates)
 end
 
 function existing_visual_interpolator_cache(cfg::VisualConfig)

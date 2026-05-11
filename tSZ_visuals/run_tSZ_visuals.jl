@@ -13,10 +13,19 @@ include(joinpath(@__DIR__, "catalog_websky.jl"))
 
 function run_tsz_visual_fits()
     t0 = time()
-    cfg = load_visual_config()
+    cfg = try
+        load_visual_config()
+    catch err
+        if err isa SkipVisualRun
+            println("Skipping tSZ visual run: $(err.message)")
+            return nothing
+        end
+        rethrow()
+    end
 
     ensure_output_dir(cfg)
     print_visual_config(cfg)
+    print_runtime_environment()
 
     y_model_interp = build_visual_interpolator(cfg)
     state = init_visual_maps(cfg)

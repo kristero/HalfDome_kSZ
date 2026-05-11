@@ -1,4 +1,5 @@
 using DelimitedFiles
+using SHA
 
 const CLUSTER_HALFDOME_PATH_DEFAULT = "/lustre/work/Globus-lt/halfdome/full_res/halos"
 const CLUSTER_OUTPUT_DIR_DEFAULT = "/lustre/work/kristero10/tSZ_data"
@@ -30,6 +31,38 @@ const BATTAGLIA_GAMMA_AMP_DEFAULT = -0.3
 const BATTAGLIA_GAMMA_ALPHA_M_DEFAULT = 0.0
 const BATTAGLIA_GAMMA_ALPHA_Z_DEFAULT = 0.0
 
+const BATTAGLIA_CACHE_TAG_DIGITS = 16
+const BATTAGLIA_GUARD_LOGM_MIN_DEFAULT = 12.0
+const BATTAGLIA_GUARD_Z_MAX_DEFAULT = 3.0
+const BATTAGLIA_GUARD_DERIVED_X_C_MIN_DEFAULT = 0.08
+const BATTAGLIA_GUARD_DERIVED_X_C_MAX_DEFAULT = 2.5
+const BATTAGLIA_GUARD_BETA_OUTER_MIN_DEFAULT = 3.0
+const BATTAGLIA_GUARD_BETA_OUTER_MAX_DEFAULT = 14.0
+
+const BATTAGLIA_GUARD_PRIOR_BOUNDS = (
+    P0_amp=(2.0, 25.0),
+    x_c_amp=(0.12, 0.70),
+    beta_amp=(3.8, 5.2),
+    P0_alpha_m=(0.0, 0.30),
+    x_c_alpha_m=(-0.08, 0.08),
+    beta_alpha_m=(0.0, 0.08),
+    P0_alpha_z=(-1.10, -0.40),
+    x_c_alpha_z=(0.10, 0.90),
+    beta_alpha_z=(0.25, 0.55),
+    alpha_amp=(0.5, 2.0),
+    alpha_alpha_m=(-0.25, 0.25),
+    alpha_alpha_z=(-0.5, 0.5),
+    gamma_amp=(-0.6, -0.05),
+    gamma_alpha_m=(-0.25, 0.25),
+    gamma_alpha_z=(-0.5, 0.5)
+)
+
+struct SkipVisualRun <: Exception
+    message::String
+end
+
+Base.showerror(io::IO, err::SkipVisualRun) = print(io, err.message)
+
 Base.@kwdef struct VisualConfig
     model_exists::Bool
     save_healpix_map::Bool
@@ -57,6 +90,8 @@ Base.@kwdef struct VisualConfig
     apply_gaussian_beam::Bool
     gaussian_beam_fwhm_arcmin::Float64
     cleanup_nonpositive_profile_values::Bool
+    enforce_battaglia_guardrails::Bool
+    skip_invalid_battaglia_rows::Bool
     interpolator_pad::Int
     interpolator_logM_max::Float64
     batching_mode::String
@@ -70,6 +105,7 @@ Base.@kwdef struct VisualConfig
     cache_dir::String
     run_instance_tag::String
     param_tag::String
+    cache_param_tag::String
     cosmology_tag::String
     beam_tag::String
     binning_tag::String
@@ -416,6 +452,17 @@ function build_sobol_param_tag(csv_path::AbstractString, sobol_row::Integer)
     return "sobol_$(csv_tag)_row" * lpad(string(sobol_row), 4, '0')
 end
 
+function csv_data_row_count(csv_path::AbstractString)
+    isfile(csv_path) || return 0
+    row_count = 0
+    open(csv_path, "r") do io
+        for _ in eachline(io)
+            row_count += 1
+        end
+    end
+    return max(row_count - 1, 0)
+end
+
 function collect_param_tag_parts(p, reference_params=default_battaglia_params())
     parts = String[]
     p.P0_amp != reference_params.P0_amp && push!(parts, "battaglia_P0_amp_" * fmt_param_value(p.P0_amp))
@@ -439,6 +486,120 @@ end
 function build_param_tag(p)
     parts = collect_param_tag_parts(p)
     return isempty(parts) ? "base" : "base_plus_" * join(parts, "__")
+end
+
+function battaglia_cache_tag(p)
+    fields = (
+        :P0_amp,
+        :P0_alpha_m,
+        :P0_alpha_z,
+        :x_c_amp,
+        :x_c_alpha_m,
+        :x_c_alpha_z,
+        :beta_amp,
+        :beta_alpha_m,
+        :beta_alpha_z,
+        :alpha_amp,
+        :alpha_alpha_m,
+        :alpha_alpha_z,
+        :gamma_amp,
+        :gamma_alpha_m,
+        :gamma_alpha_z
+    )
+    payload = join((string(field, "=", repr(getproperty(p, field))) for field in fields), ";")
+    digest = bytes2hex(sha1(payload))[1:BATTAGLIA_CACHE_TAG_DIGITS]
+    return "battaglia_phys_" * digest
+end
+
+function battaglia_powerlaw_param(amp::Real, alpha_m::Real, alpha_z::Real, m14::Real, z1::Real)
+    return Float64(amp) * Float64(m14)^Float64(alpha_m) * Float64(z1)^Float64(alpha_z)
+end
+
+function battaglia_slice_params(p, mass_msun::Real, z::Real)
+    m14 = Float64(mass_msun) / 1.0e14
+    z1 = 1.0 + Float64(z)
+    P0 = battaglia_powerlaw_param(p.P0_amp, p.P0_alpha_m, p.P0_alpha_z, m14, z1)
+    x_c = battaglia_powerlaw_param(p.x_c_amp, p.x_c_alpha_m, p.x_c_alpha_z, m14, z1)
+    alpha = battaglia_powerlaw_param(p.alpha_amp, p.alpha_alpha_m, p.alpha_alpha_z, m14, z1)
+    beta_raw = battaglia_powerlaw_param(p.beta_amp, p.beta_alpha_m, p.beta_alpha_z, m14, z1)
+    gamma = battaglia_powerlaw_param(p.gamma_amp, p.gamma_alpha_m, p.gamma_alpha_z, m14, z1)
+    beta_outer = alpha * beta_raw - gamma
+    return (P0=P0, x_c=x_c, alpha=alpha, beta_raw=beta_raw, gamma=gamma, beta_outer=beta_outer)
+end
+
+function validate_battaglia_params(
+    p;
+    enforce_prior_bounds::Bool=true,
+    logM_min::Real=BATTAGLIA_GUARD_LOGM_MIN_DEFAULT,
+    logM_max::Real=15.7,
+    z_max::Real=BATTAGLIA_GUARD_Z_MAX_DEFAULT,
+    derived_x_c_min::Real=BATTAGLIA_GUARD_DERIVED_X_C_MIN_DEFAULT,
+    derived_x_c_max::Real=BATTAGLIA_GUARD_DERIVED_X_C_MAX_DEFAULT,
+    beta_outer_min::Real=BATTAGLIA_GUARD_BETA_OUTER_MIN_DEFAULT,
+    beta_outer_max::Real=BATTAGLIA_GUARD_BETA_OUTER_MAX_DEFAULT
+)
+    reasons = String[]
+
+    for (field, value) in pairs(p)
+        isfinite(value) || push!(reasons, "$(field) is not finite ($(value)).")
+    end
+
+    for field in (:P0_amp, :x_c_amp, :beta_amp, :alpha_amp)
+        value = getproperty(p, field)
+        value > 0.0 || push!(reasons, "$(field) must be positive, got $(value).")
+    end
+
+    if enforce_prior_bounds
+        for (field, bounds) in pairs(BATTAGLIA_GUARD_PRIOR_BOUNDS)
+            value = getproperty(p, field)
+            low, high = bounds
+            if !(low <= value <= high)
+                push!(reasons, "$(field)=$(value) is outside the guarded prior range [$(low), $(high)].")
+            end
+        end
+    end
+
+    if isempty(reasons)
+        logM_mid = 0.5 * (Float64(logM_min) + Float64(logM_max))
+        z_mid = 0.5 * Float64(z_max)
+        masses = 10.0 .^ unique(Float64[Float64(logM_min), logM_mid, Float64(logM_max)])
+        redshifts = unique(Float64[0.0, z_mid, Float64(z_max)])
+
+        for mass_msun in masses, z in redshifts
+            s = battaglia_slice_params(p, mass_msun, z)
+            if !(isfinite(s.P0) && s.P0 > 0.0)
+                push!(reasons, "derived P0=$(s.P0) is invalid at M=$(mass_msun), z=$(z).")
+            end
+            if !(isfinite(s.x_c) && derived_x_c_min <= s.x_c <= derived_x_c_max)
+                push!(
+                    reasons,
+                    "derived x_c=$(s.x_c) is outside [$(derived_x_c_min), $(derived_x_c_max)] at M=$(mass_msun), z=$(z)."
+                )
+            end
+            if !(isfinite(s.alpha) && s.alpha > 0.0)
+                push!(reasons, "derived alpha=$(s.alpha) is invalid at M=$(mass_msun), z=$(z).")
+            end
+            if !(isfinite(s.beta_raw) && s.beta_raw > 0.0)
+                push!(reasons, "derived beta_raw=$(s.beta_raw) is invalid at M=$(mass_msun), z=$(z).")
+            end
+            if !(isfinite(s.gamma) && s.gamma < 0.0)
+                push!(reasons, "derived gamma=$(s.gamma) must stay negative in this convention at M=$(mass_msun), z=$(z).")
+            end
+            if !(isfinite(s.beta_outer) && beta_outer_min <= s.beta_outer <= beta_outer_max)
+                push!(
+                    reasons,
+                    "derived beta_outer=$(s.beta_outer) is outside [$(beta_outer_min), $(beta_outer_max)] at M=$(mass_msun), z=$(z)."
+                )
+            end
+        end
+    end
+
+    return unique(reasons)
+end
+
+function battaglia_validation_message(reasons, sobol_csv_path::AbstractString, sobol_row::Integer)
+    source = sobol_row > 0 ? "Sobol row $(sobol_row) from $(sobol_csv_path)" : "direct Battaglia parameters"
+    return source * " failed Battaglia guardrails: " * join(reasons, " ")
 end
 
 function build_param_delta_tag(p, reference_params)
@@ -523,6 +684,16 @@ function load_visual_config()
         true;
         env="CLEANUP_NONPOSITIVE_PROFILE_VALUES"
     )
+    enforce_battaglia_guardrails = get_bool_arg(
+        "enforce_battaglia_guardrails",
+        true;
+        env="ENFORCE_BATTAGLIA_GUARDRAILS"
+    )
+    skip_invalid_battaglia_rows = get_bool_arg(
+        "skip_invalid_battaglia_rows",
+        true;
+        env="SKIP_INVALID_BATTAGLIA_ROWS"
+    )
     interpolator_pad = get_int_arg("interpolator_pad", 256; env="INTERPOLATOR_PAD")
     interpolator_logM_max = get_float_arg("interpolator_logM_max", 15.7; env="INTERPOLATOR_LOGM_MAX")
     batching_mode = normalize_batching_mode(get_string_arg("batching_mode", "redshift"; env="BATCHING_MODE"))
@@ -574,6 +745,19 @@ function load_visual_config()
         battaglia_params = manual_battaglia_params
         param_tag = build_param_tag(battaglia_params)
     end
+    validation_reasons = validate_battaglia_params(
+        battaglia_params;
+        enforce_prior_bounds=enforce_battaglia_guardrails,
+        logM_max=interpolator_logM_max
+    )
+    if !isempty(validation_reasons)
+        validation_message = battaglia_validation_message(validation_reasons, sobol_csv_path, sobol_row)
+        if sobol_row > 0 && skip_invalid_battaglia_rows
+            throw(SkipVisualRun(validation_message * " Skipping this row without writing outputs."))
+        end
+        error(validation_message)
+    end
+    cache_param_tag = battaglia_cache_tag(battaglia_params)
     cosmology_tag = build_cosmology_tag(cosmo_h, cosmo_omegab, cosmo_omegac)
     beam_tag = build_beam_tag(apply_gaussian_beam, gaussian_beam_fwhm_arcmin)
     binning_tag = build_binning_tag(
@@ -622,6 +806,8 @@ function load_visual_config()
         apply_gaussian_beam=apply_gaussian_beam,
         gaussian_beam_fwhm_arcmin=gaussian_beam_fwhm_arcmin,
         cleanup_nonpositive_profile_values=cleanup_nonpositive_profile_values,
+        enforce_battaglia_guardrails=enforce_battaglia_guardrails,
+        skip_invalid_battaglia_rows=skip_invalid_battaglia_rows,
         interpolator_pad=interpolator_pad,
         interpolator_logM_max=interpolator_logM_max,
         batching_mode=batching_mode,
@@ -635,6 +821,7 @@ function load_visual_config()
         cache_dir=cache_dir,
         run_instance_tag=run_instance_tag,
         param_tag=param_tag,
+        cache_param_tag=cache_param_tag,
         cosmology_tag=cosmology_tag,
         beam_tag=beam_tag,
         binning_tag=binning_tag,
@@ -659,7 +846,9 @@ function print_visual_config(cfg::VisualConfig)
     println("Cosmology: h=$(cfg.cosmo_h), Omega_b=$(cfg.cosmo_omegab), Omega_c=$(cfg.cosmo_omegac), Omega_m=$(cfg.cosmo_omegam)")
     println("Gaussian beam: apply=$(cfg.apply_gaussian_beam), fwhm_arcmin=$(cfg.gaussian_beam_fwhm_arcmin)")
     println("Interpolator nonpositive cleanup: $(cfg.cleanup_nonpositive_profile_values)")
+    println("Battaglia guardrails: enforce=$(cfg.enforce_battaglia_guardrails), skip_invalid_sobol_rows=$(cfg.skip_invalid_battaglia_rows)")
     println("Interpolator cache mode: model_exists=$(cfg.model_exists), pad=$(cfg.interpolator_pad), logM_max=$(cfg.interpolator_logM_max)")
+    println("Interpolator cache parameter tag: $(cfg.cache_param_tag)")
     println("Batching mode: $(cfg.batching_mode)")
     println("Bin map save mode: $(cfg.bin_map_mode_tag)")
     println("Save per-bin maps: $(cfg.save_bin_maps)")

@@ -11,6 +11,24 @@ include(joinpath(@__DIR__, "model.jl"))
 include(joinpath(@__DIR__, "catalog_halfdome.jl"))
 include(joinpath(@__DIR__, "catalog_websky.jl"))
 
+function safe_print_runtime_environment()
+    if !isdefined(@__MODULE__, :print_runtime_environment)
+        println("Runtime environment logging unavailable: print_runtime_environment is not defined.")
+        println("This usually means run_tSZ_visuals.jl was updated without the matching instrumentation.jl.")
+        println("Julia version: $(VERSION)")
+        println("Julia threads available: $(Base.Threads.nthreads())")
+        return nothing
+    end
+
+    try
+        getfield(@__MODULE__, :print_runtime_environment)()
+    catch err
+        println("Runtime environment logging failed ($(typeof(err))): $(err)")
+        println("Continuing because runtime logging is diagnostic only.")
+    end
+    return nothing
+end
+
 function run_tsz_visual_fits()
     t0 = time()
     cfg = try
@@ -25,7 +43,7 @@ function run_tsz_visual_fits()
 
     ensure_output_dir(cfg)
     print_visual_config(cfg)
-    print_runtime_environment()
+    safe_print_runtime_environment()
 
     y_model_interp = build_visual_interpolator(cfg)
     state = init_visual_maps(cfg)

@@ -7,6 +7,24 @@ include(joinpath(@__DIR__, "output.jl"))
 include(joinpath(@__DIR__, "painting.jl"))
 include(joinpath(@__DIR__, "model.jl"))
 
+function safe_print_runtime_environment()
+    if !isdefined(@__MODULE__, :print_runtime_environment)
+        println("Runtime environment logging unavailable: print_runtime_environment is not defined.")
+        println("This usually means run_single_profile.jl was updated without the matching instrumentation.jl.")
+        println("Julia version: $(VERSION)")
+        println("Julia threads available: $(Base.Threads.nthreads())")
+        return nothing
+    end
+
+    try
+        getfield(@__MODULE__, :print_runtime_environment)()
+    catch err
+        println("Runtime environment logging failed ($(typeof(err))): $(err)")
+        println("Continuing because runtime logging is diagnostic only.")
+    end
+    return nothing
+end
+
 Base.@kwdef struct SingleProfileConfig
     base_cfg::VisualConfig
     mass_msun::Float64
@@ -143,7 +161,7 @@ function run_single_tsz_profile()
     end
 
     print_single_profile_config(cfg)
-    print_runtime_environment()
+    safe_print_runtime_environment()
 
     y_model_interp = build_visual_interpolator(cfg.base_cfg)
     state = init_visual_maps(cfg.base_cfg)

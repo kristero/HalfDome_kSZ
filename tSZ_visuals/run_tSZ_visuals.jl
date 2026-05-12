@@ -11,6 +11,19 @@ include(joinpath(@__DIR__, "model.jl"))
 include(joinpath(@__DIR__, "catalog_halfdome.jl"))
 include(joinpath(@__DIR__, "catalog_websky.jl"))
 
+if !isdefined(@__MODULE__, :visual_outputs_complete)
+    function visual_outputs_complete(cfg::VisualConfig; allow_any_run_instance::Bool=false)
+        println("Output resume helpers are unavailable; continuing without skip-existing-output detection.")
+        return false
+    end
+end
+
+if !isdefined(@__MODULE__, :existing_completed_outputs)
+    function existing_completed_outputs(cfg::VisualConfig; allow_any_run_instance::Bool=false)
+        return String[]
+    end
+end
+
 function safe_print_runtime_environment()
     if !isdefined(@__MODULE__, :print_runtime_environment)
         println("Runtime environment logging unavailable: print_runtime_environment is not defined.")

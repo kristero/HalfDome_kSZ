@@ -541,6 +541,48 @@ def mean_cl_at_each_ell(records: list[ProfileRecord], label: str):
     return mean_arrays_at_each_ell([record.values for record in records], label)
 
 
+def record_source_label(record: ProfileRecord) -> str:
+    return f"{record.csv_path.name}:row{record.csv_row:04d}"
+
+
+def records_by_source(records_by_key: dict[tuple[str, ...], list[ProfileRecord]]) -> dict[tuple[str, int], ProfileRecord]:
+    by_source: dict[tuple[str, int], ProfileRecord] = {}
+    for records in records_by_key.values():
+        for record in records:
+            by_source[record.source_id] = record
+    return by_source
+
+
+def print_match_diagnostics(y100_by_key, y102_by_key, common_keys, limit: int = 20) -> None:
+    y100_only_keys = sorted(set(y100_by_key).difference(common_keys))
+    y102_only_keys = sorted(set(y102_by_key).difference(common_keys))
+    if y100_only_keys:
+        print(f"y100-only parameter points: {len(y100_only_keys)}", flush=True)
+        for key in y100_only_keys[:limit]:
+            sources = ", ".join(record_source_label(record) for record in y100_by_key[key])
+            print(f"  y100-only {sources} key={key}", flush=True)
+        if len(y100_only_keys) > limit:
+            print(f"  ... {len(y100_only_keys) - limit} more y100-only parameter points", flush=True)
+    if y102_only_keys:
+        print(f"y102-only parameter points: {len(y102_only_keys)}", flush=True)
+        for key in y102_only_keys[:limit]:
+            sources = ", ".join(record_source_label(record) for record in y102_by_key[key])
+            print(f"  y102-only {sources} key={key}", flush=True)
+        if len(y102_only_keys) > limit:
+            print(f"  ... {len(y102_only_keys) - limit} more y102-only parameter points", flush=True)
+
+    y100_sources = records_by_source(y100_by_key)
+    y102_sources = records_by_source(y102_by_key)
+    y100_missing_sources = sorted(set(y102_sources).difference(y100_sources))
+    y102_missing_sources = sorted(set(y100_sources).difference(y102_sources))
+    if y100_missing_sources:
+        labels = [f"{Path(csv).name}:row{row:04d}" for csv, row in y100_missing_sources[:limit]]
+        print(f"Sources present in y102 but missing from y100: {labels}", flush=True)
+    if y102_missing_sources:
+        labels = [f"{Path(csv).name}:row{row:04d}" for csv, row in y102_missing_sources[:limit]]
+        print(f"Sources present in y100 but missing from y102: {labels}", flush=True)
+
+
 def combine_realizations(y100_by_key, y102_by_key, x_columns: list[str], ell):
     import numpy as np
     import pandas as pd
@@ -551,6 +593,7 @@ def combine_realizations(y100_by_key, y102_by_key, x_columns: list[str], ell):
     if not common_keys:
         y100_examples = list(y100_by_key)[:5]
         y102_examples = list(y102_by_key)[:5]
+        print_match_diagnostics(y100_by_key, y102_by_key, common_keys)
         raise ValueError(
             "No y100/y102 parameter matches. "
             f"First y100 keys={y100_examples}; first y102 keys={y102_examples}"
@@ -565,6 +608,7 @@ def combine_realizations(y100_by_key, y102_by_key, x_columns: list[str], ell):
             print(f"First y100-only keys: {y100_only_keys[:5]}", flush=True)
         if y102_only_keys:
             print(f"First y102-only keys: {y102_only_keys[:5]}", flush=True)
+        print_match_diagnostics(y100_by_key, y102_by_key, common_keys)
 
     rows = []
     x_values = []

@@ -66,6 +66,10 @@ class ProfileRecord:
     csv_row: int
     values: Any
 
+    @property
+    def source_id(self) -> tuple[str, int]:
+        return (str(self.csv_path), int(self.csv_row))
+
 
 def normalize_name(name: str) -> str:
     normalized = name.strip().lower()
@@ -468,6 +472,52 @@ def load_profile_group(
     if not records_by_key:
         raise ValueError(f"{label}: no matched profile files")
     return records_by_key, base_ell
+
+
+def choose_profile_record(records: list[ProfileRecord], label: str, key: tuple[str, ...]) -> ProfileRecord:
+    if len(records) == 1:
+        return records[0]
+
+    def sort_key(record: ProfileRecord):
+        try:
+            stat = record.path.stat()
+            return (stat.st_mtime, stat.st_size, str(record.path))
+        except OSError:
+            return (0.0, 0, str(record.path))
+
+    chosen = max(records, key=sort_key)
+    print(
+        f"{label}: found {len(records)} duplicate files for Sobol row "
+        f"{chosen.csv_row} ({chosen.csv_path.name}); using newest {chosen.path.name}",
+        flush=True,
+    )
+    return chosen
+
+
+def deduplicate_profile_records(records_by_key: dict[tuple[str, ...], list[ProfileRecord]], label: str):
+    deduped_by_key: dict[tuple[str, ...], list[ProfileRecord]] = {}
+    duplicate_file_count = 0
+
+    for key, records in records_by_key.items():
+        by_source: dict[tuple[str, int], list[ProfileRecord]] = {}
+        for record in records:
+            by_source.setdefault(record.source_id, []).append(record)
+
+        deduped_records: list[ProfileRecord] = []
+        for source_records in by_source.values():
+            duplicate_file_count += max(0, len(source_records) - 1)
+            deduped_records.append(choose_profile_record(source_records, label, key))
+        deduped_by_key[key] = deduped_records
+
+    if duplicate_file_count:
+        total_after = sum(len(records) for records in deduped_by_key.values())
+        print(
+            f"{label}: removed {duplicate_file_count} duplicate files from reruns; "
+            f"kept {total_after} files for {len(deduped_by_key)} parameter points",
+            flush=True,
+        )
+
+    return deduped_by_key
 
 
 def mean_arrays_at_each_ell(cl_values, label: str):
@@ -932,16 +982,19 @@ def write_outputs(args, x_columns, ell, x, y, y100, y102, metadata, params, cv_b
     output_dir.mkdir(parents=True, exist_ok=True)
 
     combined_npz = output_dir / "combined_battaglia_profiles.npz"
-    np.savez_compressed(
-        combined_npz,
-        x=x,
-        y_combined=y,
-        y100=y100,
-        y102=y102,
-        ell=ell,
-        x_columns=np.asarray(x_columns),
-        param_key=metadata["param_key"].astype(str).to_numpy(),
-    )
+    if args.save_combined_dataset:
+        np.savez_compressed(
+            combined_npz,
+            x=x,
+            y_combined=y,
+            y100=y100,
+            y102=y102,
+            ell=ell,
+            x_columns=np.asarray(x_columns),
+            param_key=metadata["param_key"].astype(str).to_numpy(),
+        )
+    else:
+        combined_npz = None
 
     metadata_path = output_dir / "combined_battaglia_profiles_metadata.csv"
     metadata.to_csv(metadata_path, index=False)
@@ -957,7 +1010,7 @@ def write_outputs(args, x_columns, ell, x, y, y100, y102, metadata, params, cv_b
                 "best_params": params,
                 "holdout_report": report,
                 "artifact_path": str(artifact_path),
-                "combined_npz": str(combined_npz),
+                "combined_npz": None if combined_npz is None else str(combined_npz),
                 "metadata_csv": str(metadata_path),
             },
             handle,
@@ -969,7 +1022,10 @@ def write_outputs(args, x_columns, ell, x, y, y100, y102, metadata, params, cv_b
         trials_path = output_dir / "optuna_trials.csv"
         study.trials_dataframe().to_csv(trials_path, index=False)
 
-    print(f"Wrote combined dataset: {combined_npz}", flush=True)
+    if combined_npz is None:
+        print("Skipped writing combined dataset NPZ.", flush=True)
+    else:
+        print(f"Wrote combined dataset: {combined_npz}", flush=True)
     print(f"Wrote metadata: {metadata_path}", flush=True)
     print(f"Wrote emulator artifact: {artifact_path}", flush=True)
     print(f"Wrote best hyperparameters: {best_params_path}", flush=True)
@@ -1003,6 +1059,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--target-transform", choices=("log10", "none"), default="log10")
     parser.add_argument("--target-floor", type=float, default=1.0e-40)
     parser.add_argument("--expected-points", type=int, default=0, help="Require this many matched y100/y102 parameter points; 0 disables the check.")
+    parser.add_argument("--no-save-combined-dataset", dest="save_combined_dataset", action="store_false", help="Do not write combined_battaglia_profiles.npz.")
+    parser.set_defaults(save_combined_dataset=True)
     parser.add_argument("--n-trials", type=int, default=150)
     parser.add_argument("--timeout-seconds", type=int, default=None)
     parser.add_argument("--cv-folds", type=int, default=5)
@@ -1080,6 +1138,7 @@ def main(argv: list[str]) -> int:
         args.include_path_regex,
         args.exclude_path_regex,
     )
+    y100_by_key = deduplicate_profile_records(y100_by_key, "y100")
     y102_by_key, ell_102 = load_profile_group(
         "y102",
         args.y102_dirs,
@@ -1092,6 +1151,7 @@ def main(argv: list[str]) -> int:
         args.include_path_regex,
         args.exclude_path_regex,
     )
+    y102_by_key = deduplicate_profile_records(y102_by_key, "y102")
     if ell.shape != ell_102.shape or not np.allclose(ell, ell_102):
         raise ValueError("y100 and y102 ell grids differ")
 

@@ -23,7 +23,7 @@ JOB_ID="${PBS_JOBID:-manual}"
 : "${PROFILE_EXCLUDE_REGEX:=sobol_battaglia_sobol_256_row[0-9]+}"
 : "${EMULATOR_OUTPUT_DIR:=/lustre/work/kristero10/tSZ_data/emulator_battaglia_y100_y102_test}"
 : "${ELL_MIN:=2}"
-: "${ELL_MAX:=}"
+: "${ELL_MAX:=4096}"
 : "${N_TRIALS:=20}"
 : "${CV_FOLDS:=3}"
 : "${MAX_PCA_COMPONENTS:=24}"
@@ -32,6 +32,7 @@ JOB_ID="${PBS_JOBID:-manual}"
 : "${TARGET_TRANSFORM:=log10}"
 : "${TARGET_FLOOR:=1e-40}"
 : "${EXPECTED_POINTS:=256}"
+: "${SAVE_COMBINED_DATASET:=false}"
 : "${REGRESSORS:=krr,extra_trees}"
 : "${INCLUDE_GPR:=false}"
 : "${OPTUNA_STORAGE:=}"
@@ -113,6 +114,7 @@ echo "CV folds: ${CV_FOLDS}"
 echo "Regressors: ${REGRESSORS}"
 echo "N_JOBS: ${N_JOBS}"
 echo "Expected matched points: ${EXPECTED_POINTS:-<disabled>}"
+echo "Save combined dataset: ${SAVE_COMBINED_DATASET}"
 echo "PBS_NP/nodefile slots are MPI slots on this cluster, not OpenMP thread count."
 echo "PBS_NP: ${PBS_NP_HINT}"
 echo "PBS_NCPUS/NCPUS: ${ALLOCATED_CPUS_HINT}"
@@ -175,6 +177,9 @@ set -- \
 
 if [[ -n "${ELL_MAX}" ]]; then
   set -- "$@" --ell-max "${ELL_MAX}"
+fi
+if [[ "${SAVE_COMBINED_DATASET}" != "true" && "${SAVE_COMBINED_DATASET}" != "1" ]]; then
+  set -- "$@" --no-save-combined-dataset
 fi
 if [[ "${INCLUDE_GPR}" == "true" || "${INCLUDE_GPR}" == "1" ]]; then
   set -- "$@" --include-gpr

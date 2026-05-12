@@ -146,11 +146,52 @@ function existing_visual_interpolator_cache(cfg::VisualConfig)
     return nothing
 end
 
+function cache_file_settled(path::AbstractString; settle_seconds::Real=10.0)
+    try
+        info = stat(path)
+        return info.size > 0 && (time() - info.mtime) >= Float64(settle_seconds)
+    catch
+        return false
+    end
+end
+
+function wait_for_visual_interpolator_cache(cfg::VisualConfig)
+    deadline = time() + cfg.cache_wait_seconds
+    last_notice = 0.0
+
+    while true
+        existing_cache = existing_visual_interpolator_cache(cfg)
+        if existing_cache !== nothing
+            cache_file_settled(existing_cache) && return existing_cache
+        end
+
+        remaining = deadline - time()
+        remaining <= 0.0 && return nothing
+
+        now = time()
+        if now - last_notice >= max(cfg.cache_poll_seconds, 1.0)
+            if existing_cache === nothing
+                println(
+                    "Waiting for tSZ interpolator cache for $(cfg.cache_param_tag); " *
+                    "$(round(remaining; digits=1)) s remaining."
+                )
+            else
+                println(
+                    "Waiting for tSZ interpolator cache write to settle: $(existing_cache); " *
+                    "$(round(remaining; digits=1)) s remaining."
+                )
+            end
+            last_notice = now
+        end
+        sleep(min(cfg.cache_poll_seconds, remaining))
+    end
+end
+
 function missing_interpolator_cache_error(cfg::VisualConfig)
     checked_paths = join(visual_interpolator_cache_candidates(cfg), ", ")
     return (
         "model_exists=true, but no tSZ interpolator cache was found. Checked $(checked_paths). " *
-        "The Battaglia interpolator build is expensive and was the part killed by SIGTERM in the cluster stack trace. " *
+        "The Battaglia interpolator build is expensive and can leave little memory for NSIDE=4096 map allocation. " *
         "Copy an existing cache to cache_dir=$(cfg.cache_dir), set cache_dir to the directory that already contains it, " *
         "or rerun deliberately with model_exists=false using enough walltime/memory."
     )
@@ -159,11 +200,27 @@ end
 function build_visual_interpolator(cfg::VisualConfig)
     model = build_tsz_model(cfg)
     paths = visual_interpolator_cache_paths(cfg)
+    load_existing_cache = false
     y_cache_file = if cfg.model_exists
-        existing_cache = existing_visual_interpolator_cache(cfg)
+        existing_cache = cfg.cache_wait_seconds > 0.0 ? wait_for_visual_interpolator_cache(cfg) : existing_visual_interpolator_cache(cfg)
         existing_cache === nothing && error(missing_interpolator_cache_error(cfg))
         println("Loading tSZ interpolator cache: $(existing_cache)")
+        load_existing_cache = true
         existing_cache
+    elseif cfg.reuse_existing_cache
+        existing_cache = existing_visual_interpolator_cache(cfg)
+        if existing_cache !== nothing
+            println("Reusing existing tSZ interpolator cache: $(existing_cache)")
+            load_existing_cache = true
+            existing_cache
+        else
+            isdir(cfg.cache_dir) || mkpath(cfg.cache_dir)
+            println(
+                "Building tSZ interpolator cache: $(paths.primary) " *
+                "(pad=$(cfg.interpolator_pad), logM_max=$(cfg.interpolator_logM_max))"
+            )
+            paths.primary
+        end
     else
         isdir(cfg.cache_dir) || mkpath(cfg.cache_dir)
         println(
@@ -172,13 +229,18 @@ function build_visual_interpolator(cfg::VisualConfig)
         )
         paths.primary
     end
+
+    if load_existing_cache
+        println("Interpolator cache parameter tag: $(cfg.cache_param_tag)")
+    end
+
     interp_t0 = start_phase_timing()
     cleanup_env_key = "XGPAINT_CLEANUP_NONPOSITIVE"
     previous_cleanup_env = get(ENV, cleanup_env_key, nothing)
     ENV[cleanup_env_key] = cfg.cleanup_nonpositive_profile_values ? "true" : "false"
 
     interpolator = try
-        if cfg.model_exists
+        if load_existing_cache
             build_interpolator(
                 model,
                 cache_file=y_cache_file,

@@ -42,10 +42,21 @@ function run_tsz_visual_fits()
     end
 
     ensure_output_dir(cfg)
+    if cfg.skip_existing_outputs && visual_outputs_complete(cfg; allow_any_run_instance=cfg.skip_existing_any_run_instance)
+        existing_outputs = existing_completed_outputs(cfg; allow_any_run_instance=cfg.skip_existing_any_run_instance)
+        println("Skipping tSZ visual run because required outputs already exist:")
+        for path in existing_outputs
+            println("  $(abspath(path))")
+        end
+        return nothing
+    end
+
     print_visual_config(cfg)
     safe_print_runtime_environment()
 
     y_model_interp = build_visual_interpolator(cfg)
+    println("Running garbage collection before Healpix map allocation.")
+    trim_process_memory()
     state = init_visual_maps(cfg)
 
     println("Initiating HealPix with NSide: $(cfg.nside)")
@@ -74,7 +85,7 @@ function run_tsz_visual_fits()
     end
 
     if cfg.save_cl
-        cl = anafast(output_y_map, niter=0)
+        cl = compute_cl(cfg, output_y_map)
         write_cl_fits_overwrite(cfg.cl_output_path, cl)
     end
 

@@ -23,8 +23,16 @@ cd "$PBS_O_WORKDIR"
 : "${THREADS_PER_TASK:=26}"
 : "${MAX_PARALLEL:=1}"
 : "${MODEL_EXISTS:=false}"
+: "${REUSE_EXISTING_CACHE:=false}"
+: "${CACHE_WAIT_SECONDS:=0}"
+: "${CACHE_POLL_SECONDS:=30}"
 : "${INTERPOLATOR_PAD:=256}"
 : "${INTERPOLATOR_LOGM_MAX:=15.7}"
+: "${CL_LMAX:=4096}"
+: "${CL_NITER:=0}"
+: "${SKIP_EXISTING_OUTPUTS:=false}"
+: "${SKIP_EXISTING_ANY_RUN_INSTANCE:=true}"
+: "${RUN_INSTANCE_TAG:=pbsjob${PBS_JOBID:-manual}}"
 : "${ENFORCE_BATTAGLIA_GUARDRAILS:=true}"
 : "${SKIP_INVALID_BATTAGLIA_ROWS:=true}"
 : "${OMP_NUM_THREADS:=1}"
@@ -131,8 +139,16 @@ echo "output_dir=${OUTPUT_DIR}"
 echo "cache_dir=${CACHE_DIR}"
 echo "apply_gaussian_beam=false"
 echo "model_exists=${MODEL_EXISTS}"
+echo "reuse_existing_cache=${REUSE_EXISTING_CACHE}"
+echo "cache_wait_seconds=${CACHE_WAIT_SECONDS}"
+echo "cache_poll_seconds=${CACHE_POLL_SECONDS}"
 echo "interpolator_pad=${INTERPOLATOR_PAD}"
 echo "interpolator_logM_max=${INTERPOLATOR_LOGM_MAX}"
+echo "cl_lmax=${CL_LMAX}"
+echo "cl_niter=${CL_NITER}"
+echo "skip_existing_outputs=${SKIP_EXISTING_OUTPUTS}"
+echo "skip_existing_any_run_instance=${SKIP_EXISTING_ANY_RUN_INSTANCE}"
+echo "run_instance_tag=${RUN_INSTANCE_TAG}"
 echo "enforce_battaglia_guardrails=${ENFORCE_BATTAGLIA_GUARDRAILS}"
 echo "skip_invalid_battaglia_rows=${SKIP_INVALID_BATTAGLIA_ROWS}"
 
@@ -159,8 +175,15 @@ while [[ "${row}" -le "${SOBOL_ROW_STOP}" ]]; do
         save_cl=true \
         nside="${NSIDE}" \
         model_exists="${MODEL_EXISTS}" \
+        reuse_existing_cache="${REUSE_EXISTING_CACHE}" \
+        cache_wait_seconds="${CACHE_WAIT_SECONDS}" \
+        cache_poll_seconds="${CACHE_POLL_SECONDS}" \
         interpolator_pad="${INTERPOLATOR_PAD}" \
         interpolator_logM_max="${INTERPOLATOR_LOGM_MAX}" \
+        cl_lmax="${CL_LMAX}" \
+        cl_niter="${CL_NITER}" \
+        skip_existing_outputs="${SKIP_EXISTING_OUTPUTS}" \
+        skip_existing_any_run_instance="${SKIP_EXISTING_ANY_RUN_INSTANCE}" \
         enforce_battaglia_guardrails="${ENFORCE_BATTAGLIA_GUARDRAILS}" \
         skip_invalid_battaglia_rows="${SKIP_INVALID_BATTAGLIA_ROWS}" \
         sobol_csv_path="${SOBOL_CSV}" \
@@ -169,7 +192,7 @@ while [[ "${row}" -le "${SOBOL_ROW_STOP}" ]]; do
         halfdome_path="${HALFDOME_PATH}" \
         output_dir="${OUTPUT_DIR}" \
         cache_dir="${CACHE_DIR}" \
-        run_instance_tag="pbsjob${PBS_JOBID}" \
+        run_instance_tag="${RUN_INSTANCE_TAG}" \
         > "${stdout_path}" \
         2> "${stderr_path}"
     ) &

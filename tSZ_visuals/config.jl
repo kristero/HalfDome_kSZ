@@ -6,6 +6,7 @@ const CLUSTER_OUTPUT_DIR_DEFAULT = "/lustre/work/kristero10/tSZ_data"
 const CLUSTER_CACHE_DIR_DEFAULT = joinpath(CLUSTER_OUTPUT_DIR_DEFAULT, "cache")
 const CLUSTER_SOBOL_CSV_DEFAULT = "/home/kristero10/tSZ_data/battaglia_sobol_32.csv"
 const TSZ_GAUSSIAN_BEAM_FWHM_ARCMIN_DEFAULT = 1.6
+const TSZ_CL_LMAX_DEFAULT = 4096
 
 const TSZ_H_VALUE = 0.68
 const TSZ_C_KMS = 299_792.458
@@ -65,10 +66,15 @@ Base.showerror(io::IO, err::SkipVisualRun) = print(io, err.message)
 
 Base.@kwdef struct VisualConfig
     model_exists::Bool
+    reuse_existing_cache::Bool
+    cache_wait_seconds::Float64
+    cache_poll_seconds::Float64
     save_healpix_map::Bool
     save_mass_map::Bool
     save_cl::Bool
     save_bin_maps::Bool
+    skip_existing_outputs::Bool
+    skip_existing_any_run_instance::Bool
     apply_mass_cut::Bool
     cumulative_bin_maps::Bool
     catalog_source::String
@@ -94,6 +100,8 @@ Base.@kwdef struct VisualConfig
     skip_invalid_battaglia_rows::Bool
     interpolator_pad::Int
     interpolator_logM_max::Float64
+    cl_lmax::Int
+    cl_niter::Int
     batching_mode::String
     redshift_binning_mode::String
     redshift_bin_width::Float64
@@ -625,6 +633,19 @@ function build_beam_tag(apply_gaussian_beam::Bool, gaussian_beam_fwhm_arcmin::Re
     return "gaussbeam_$(fmt_param_value(Float64(gaussian_beam_fwhm_arcmin)))arcmin"
 end
 
+function healpix_default_lmax(nside::Integer)
+    nside > 0 || error("nside must be positive.")
+    return 3 * Int(nside) - 1
+end
+
+function default_cl_lmax(nside::Integer)
+    return min(TSZ_CL_LMAX_DEFAULT, healpix_default_lmax(nside))
+end
+
+function build_cl_lmax_tag(cl_lmax::Integer)
+    return cl_lmax < 0 ? "lmaxdefault" : "lmax$(Int(cl_lmax))"
+end
+
 function build_cosmology_tag(cosmo_h::Real, cosmo_omegab::Real, cosmo_omegac::Real)
     if isapprox(Float64(cosmo_h), TSZ_H_VALUE; atol=0.0, rtol=1e-12) &&
        isapprox(Float64(cosmo_omegab), TSZ_OMEGAB; atol=0.0, rtol=1e-12) &&
@@ -645,10 +666,15 @@ end
 
 function load_visual_config()
     model_exists = get_bool_arg("model_exists", true; env="MODEL_EXISTS")
+    reuse_existing_cache = get_bool_arg("reuse_existing_cache", false; env="REUSE_EXISTING_CACHE")
+    cache_wait_seconds = get_float_arg("cache_wait_seconds", 0.0; env="CACHE_WAIT_SECONDS")
+    cache_poll_seconds = get_float_arg("cache_poll_seconds", 30.0; env="CACHE_POLL_SECONDS")
     save_healpix_map = get_bool_arg("save_healpix_map", true; env="SAVE_HEALPIX_MAP")
     save_mass_map = get_bool_arg("save_mass_map", true; env="SAVE_MASS_MAP")
     save_cl = get_bool_arg("save_cl", false; env="SAVE_CL")
     save_bin_maps = get_bool_arg("save_bin_maps", true; env="SAVE_BIN_MAPS")
+    skip_existing_outputs = get_bool_arg("skip_existing_outputs", false; env="SKIP_EXISTING_OUTPUTS")
+    skip_existing_any_run_instance = get_bool_arg("skip_existing_any_run_instance", true; env="SKIP_EXISTING_ANY_RUN_INSTANCE")
     apply_mass_cut = get_bool_arg("apply_mass_cut", true; env="APPLY_MASS_CUT")
     cumulative_bin_maps = get_bool_arg("cumulative_bin_maps", true; env="CUMULATIVE_BIN_MAPS")
     catalog_source = lowercase(get_string_arg("catalog_source", "halfdome"; env="TSZ_CATALOG_SOURCE"))
@@ -696,6 +722,8 @@ function load_visual_config()
     )
     interpolator_pad = get_int_arg("interpolator_pad", 256; env="INTERPOLATOR_PAD")
     interpolator_logM_max = get_float_arg("interpolator_logM_max", 15.7; env="INTERPOLATOR_LOGM_MAX")
+    cl_lmax = get_int_arg("cl_lmax", default_cl_lmax(nside); env="TSZ_CL_LMAX")
+    cl_niter = get_int_arg("cl_niter", 0; env="TSZ_CL_NITER")
     batching_mode = normalize_batching_mode(get_string_arg("batching_mode", "redshift"; env="BATCHING_MODE"))
     redshift_binning_mode = normalize_redshift_binning_mode(get_string_arg("redshift_binning_mode", "linear"; env="REDSHIFT_BINNING_MODE"))
     redshift_bin_width = get_float_arg("redshift_bin_width", 1.0; env="REDSHIFT_BIN_WIDTH")
@@ -718,8 +746,15 @@ function load_visual_config()
     if apply_gaussian_beam
         gaussian_beam_fwhm_arcmin > 0.0 || error("apply_gaussian_beam=true requires gaussian_beam_fwhm_arcmin > 0.")
     end
+    cache_wait_seconds >= 0.0 || error("cache_wait_seconds must be nonnegative.")
+    cache_poll_seconds > 0.0 || error("cache_poll_seconds must be positive.")
     interpolator_pad >= 0 || error("interpolator_pad must be nonnegative.")
     interpolator_logM_max > 0.0 || error("interpolator_logM_max must be positive.")
+    cl_lmax == -1 || cl_lmax > 0 || error("cl_lmax must be positive, or -1 to use the Healpix default.")
+    if cl_lmax > healpix_default_lmax(nside)
+        error("cl_lmax=$(cl_lmax) exceeds the Healpix default maximum $(healpix_default_lmax(nside)) for nside=$(nside).")
+    end
+    cl_niter >= 0 || error("cl_niter must be nonnegative.")
     redshift_bin_width > 0.0 || error("redshift_bin_width must be positive.")
     log_redshift_bin_width > 0.0 || error("log_redshift_bin_width must be positive.")
     mass_bin_width_dex > 0.0 || error("mass_bin_width_dex must be positive.")
@@ -773,7 +808,8 @@ function load_visual_config()
     output_dir = abspath(get_string_arg("output_dir", CLUSTER_OUTPUT_DIR_DEFAULT; env="TSZ_VISUAL_OUTPUT_DIR"))
     cache_dir = abspath(get_string_arg("cache_dir", CLUSTER_CACHE_DIR_DEFAULT; env="TSZ_VISUAL_CACHE_DIR"))
     output_run_tag = isempty(run_instance_tag) ? run_tag : "$(run_tag)__$(run_instance_tag)"
-    cl_tag_base = "$(beam_tag)_$(binning_tag)_$(bin_map_mode_tag)"
+    cl_lmax_tag = build_cl_lmax_tag(cl_lmax)
+    cl_tag_base = "$(beam_tag)_$(binning_tag)_$(bin_map_mode_tag)_$(cl_lmax_tag)"
     cl_run_tag = isempty(run_instance_tag) ? cl_tag_base : "$(cl_tag_base)__$(run_instance_tag)"
     fits_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_nside$(nside)_$(output_run_tag)_m200c.fits")
     mass_fits_output_path = joinpath(output_dir, "$(simulation_tag)_mass_nside$(nside)_$(output_run_tag)_m200c.fits")
@@ -781,10 +817,15 @@ function load_visual_config()
 
     return VisualConfig(
         model_exists=model_exists,
+        reuse_existing_cache=reuse_existing_cache,
+        cache_wait_seconds=cache_wait_seconds,
+        cache_poll_seconds=cache_poll_seconds,
         save_healpix_map=save_healpix_map,
         save_mass_map=save_mass_map,
         save_cl=save_cl,
         save_bin_maps=save_bin_maps,
+        skip_existing_outputs=skip_existing_outputs,
+        skip_existing_any_run_instance=skip_existing_any_run_instance,
         apply_mass_cut=apply_mass_cut,
         cumulative_bin_maps=cumulative_bin_maps,
         catalog_source=catalog_source,
@@ -810,6 +851,8 @@ function load_visual_config()
         skip_invalid_battaglia_rows=skip_invalid_battaglia_rows,
         interpolator_pad=interpolator_pad,
         interpolator_logM_max=interpolator_logM_max,
+        cl_lmax=cl_lmax,
+        cl_niter=cl_niter,
         batching_mode=batching_mode,
         redshift_binning_mode=redshift_binning_mode,
         redshift_bin_width=redshift_bin_width,
@@ -847,8 +890,11 @@ function print_visual_config(cfg::VisualConfig)
     println("Gaussian beam: apply=$(cfg.apply_gaussian_beam), fwhm_arcmin=$(cfg.gaussian_beam_fwhm_arcmin)")
     println("Interpolator nonpositive cleanup: $(cfg.cleanup_nonpositive_profile_values)")
     println("Battaglia guardrails: enforce=$(cfg.enforce_battaglia_guardrails), skip_invalid_sobol_rows=$(cfg.skip_invalid_battaglia_rows)")
-    println("Interpolator cache mode: model_exists=$(cfg.model_exists), pad=$(cfg.interpolator_pad), logM_max=$(cfg.interpolator_logM_max)")
+    println("Interpolator cache mode: model_exists=$(cfg.model_exists), reuse_existing_cache=$(cfg.reuse_existing_cache), wait_seconds=$(cfg.cache_wait_seconds), poll_seconds=$(cfg.cache_poll_seconds), pad=$(cfg.interpolator_pad), logM_max=$(cfg.interpolator_logM_max)")
     println("Interpolator cache parameter tag: $(cfg.cache_param_tag)")
+    cl_lmax_display = cfg.cl_lmax < 0 ? "Healpix default ($(healpix_default_lmax(cfg.nside)))" : string(cfg.cl_lmax)
+    println("C_l transform: save=$(cfg.save_cl), lmax=$(cl_lmax_display), niter=$(cfg.cl_niter)")
+    println("Skip existing outputs: $(cfg.skip_existing_outputs), any_run_instance=$(cfg.skip_existing_any_run_instance)")
     println("Batching mode: $(cfg.batching_mode)")
     println("Bin map save mode: $(cfg.bin_map_mode_tag)")
     println("Save per-bin maps: $(cfg.save_bin_maps)")

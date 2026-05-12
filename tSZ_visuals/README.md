@@ -38,6 +38,19 @@ The default run writes only y and mass FITS maps. Add `save_cl=true` if you also
 The single-profile runner always writes the y map, the mass map, and the tSZ angular power spectrum FITS output.
 Use `batching_mode=full save_bin_maps=false save_cl=true` when you want only the final accumulated full-simulation Healpix map plus the corresponding `C_l`.
 Add `save_mass_map=false` if you do not want any mass FITS output.
+At high resolution, cap the harmonic transform with `cl_lmax=4096` unless the job requests enough memory for the Healpix default `lmax=3*nside-1`. The production PBS sets `CL_LMAX=4096` by default to avoid `anafast` out-of-memory failures at `NSIDE=4096` with 10 GB jobs.
+
+Interpolator cache behavior:
+
+- `model_exists=true` now requires an existing `.jld2` interpolator cache. The code checks `cache_dir` first and then the older repo-root cache location.
+- Use `cache_dir=...` to point at a directory that already contains the cache, or copy the cache there before the run.
+- Use `model_exists=false` only when you intentionally want to rebuild the Battaglia interpolator cache. This is expensive on the cluster; request enough walltime/memory and avoid launching several cache builds in parallel.
+- Use `reuse_existing_cache=true` with `model_exists=false` for resume runs: an existing row cache is loaded, while missing caches are still built.
+- Use `cache_wait_seconds=N` with `model_exists=true` when a dependent lightcone should start before every cache exists; it waits for each missing cache instead of failing immediately.
+- Use `skip_existing_outputs=true skip_existing_any_run_instance=true` for resume runs so completed products are skipped even when the previous PBS job used a different `run_instance_tag`.
+- Cache-build controls are exposed as `interpolator_pad=256` and `interpolator_logM_max=15.7`.
+- New caches are keyed by a stable hash of the physical Battaglia parameters plus cosmology, not by the Sobol CSV filename/row. This lets y100/y102 reuse the same interpolator even when the same parameter point is referenced through different split CSV files. Older row-tagged cache names are still checked as fallbacks.
+- To submit the full production set as four PBS jobs, run `bash submit_y100_y102_sobol256.sh` from this directory on the cluster login node. It submits y100 split 1 and y100 split 2 with `model_exists=false`, then submits the matching y102 jobs with `model_exists=true` and `afterok` dependencies so they reuse the caches built by y100.
 
 Sobol CSV support:
 
@@ -45,3 +58,5 @@ Sobol CSV support:
 - `sobol_row=N` loads one Battaglia model from row `N` of that CSV.
 - The Sobol loader expects columns for `P0`, `xc`, `beta`, `alpha_m_P0`, `alpha_m_xc`, `alpha_m_beta`, `alpha_z_P0`, `alpha_z_xc`, and `alpha_z_beta`.
 - `alpha`, `gamma`, and their exponents stay at the fiducial defaults unless you override them directly in the CLI.
+- Battaglia guardrails are enabled by default with `enforce_battaglia_guardrails=true skip_invalid_battaglia_rows=true`. Invalid Sobol rows are skipped before the expensive interpolator build and no map or `C_l` output is written.
+- The default guarded Sobol prior keeps the original broad ranges except for the compact-core/tail-sensitive parameters: use `xc >= 0.12` and `-0.08 <= alpha_m_xc <= 0.08`. These bounds avoid the observed slow interpolator rows with very small `xc` or broad high-mass tails.

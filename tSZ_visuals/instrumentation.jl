@@ -20,6 +20,18 @@ function start_phase_timing()
     return (wall=time(), cpu=process_cpu_time_seconds())
 end
 
+function trim_process_memory()
+    GC.gc()
+    if Sys.islinux()
+        try
+            ccall(:malloc_trim, Cint, (Csize_t,), 0)
+        catch err
+            println("malloc_trim unavailable ($(typeof(err))); continuing after GC.")
+        end
+    end
+    return nothing
+end
+
 function phase_usage_stats(start_state; thread_capacity::Integer=Base.Threads.nthreads())
     wall_elapsed = max(time() - start_state.wall, 0.0)
     cpu_end = process_cpu_time_seconds()

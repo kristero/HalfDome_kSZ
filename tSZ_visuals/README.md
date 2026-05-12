@@ -60,3 +60,10 @@ Sobol CSV support:
 - `alpha`, `gamma`, and their exponents stay at the fiducial defaults unless you override them directly in the CLI.
 - Battaglia guardrails are enabled by default with `enforce_battaglia_guardrails=true skip_invalid_battaglia_rows=true`. Invalid Sobol rows are skipped before the expensive interpolator build and no map or `C_l` output is written.
 - The default guarded Sobol prior keeps the original broad ranges except for the compact-core/tail-sensitive parameters: use `xc >= 0.12` and `-0.08 <= alpha_m_xc <= 0.08`. These bounds avoid the observed slow interpolator rows with very small `xc` or broad high-mass tails.
+
+Emulator test run:
+
+- `run_battaglia_emulator_optuna.pbs` now defaults to a test emulator using `/lustre/work/kristero10/tSZ_data/y100` and `/lustre/work/kristero10/tSZ_data/y102`.
+- Its default Sobol CSVs are only `battaglia_sobol_256_1.csv` and `battaglia_sobol_256_2.csv`; it intentionally does not include the older full `battaglia_sobol_256.csv`.
+- The default `PROFILE_INCLUDE_REGEX=sobol_battaglia_sobol_256_[12]_row[0-9]+` and `PROFILE_EXCLUDE_REGEX=sobol_battaglia_sobol_256_row[0-9]+` keep older larger-prior y100 products out of the training set.
+- The test run writes to `/lustre/work/kristero10/tSZ_data/emulator_battaglia_y100_y102_test`, uses 20 Optuna trials, and requires 256 matched y100/y102 parameter points by default.

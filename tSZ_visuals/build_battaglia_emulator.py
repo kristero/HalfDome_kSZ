@@ -102,6 +102,16 @@ def split_cli_values(values: list[str]) -> list[str]:
     return expanded
 
 
+def split_comma_values(values: list[str]) -> list[str]:
+    expanded: list[str] = []
+    for value in values:
+        for chunk in value.split(","):
+            chunk = chunk.strip()
+            if chunk:
+                expanded.append(chunk)
+    return expanded
+
+
 def param_key(params: dict[str, float], columns: list[str], precision: int) -> tuple[str, ...]:
     return tuple(format(float(params[col]), f".{precision}g") for col in columns)
 
@@ -342,7 +352,24 @@ def select_ell(profile, ell, ell_min: int, ell_max: int | None):
     return selected_ell, selected_profile
 
 
-def discover_profile_paths(dirs: list[str], globs: list[str]) -> list[Path]:
+def compile_optional_regexes(patterns: list[str]) -> list[re.Pattern[str]]:
+    return [re.compile(pattern) for pattern in patterns]
+
+
+def path_matches_any(path: Path, patterns: list[re.Pattern[str]]) -> bool:
+    if not patterns:
+        return False
+    text = str(path)
+    name = path.name
+    return any(pattern.search(text) or pattern.search(name) for pattern in patterns)
+
+
+def discover_profile_paths(
+    dirs: list[str],
+    globs: list[str],
+    include_patterns: list[str],
+    exclude_patterns: list[str],
+) -> tuple[list[Path], list[tuple[str, str]]]:
     paths: list[Path] = []
     for raw_dir in dirs:
         root = Path(raw_dir).expanduser()
@@ -350,7 +377,22 @@ def discover_profile_paths(dirs: list[str], globs: list[str]) -> list[Path]:
             raise FileNotFoundError(f"Profile directory not found: {root}")
         for pattern in globs:
             paths.extend(path for path in root.rglob(pattern) if path.is_file())
-    return sorted(set(path.resolve() for path in paths))
+    candidates = sorted(set(path.resolve() for path in paths))
+
+    include_regexes = compile_optional_regexes(include_patterns)
+    exclude_regexes = compile_optional_regexes(exclude_patterns)
+    kept: list[Path] = []
+    filtered: list[tuple[str, str]] = []
+    for path in candidates:
+        if include_regexes and not path_matches_any(path, include_regexes):
+            filtered.append((str(path), "did not match include-path regex"))
+            continue
+        if exclude_regexes and path_matches_any(path, exclude_regexes):
+            filtered.append((str(path), "matched exclude-path regex"))
+            continue
+        kept.append(path)
+
+    return kept, filtered
 
 
 def load_profile_group(
@@ -362,11 +404,22 @@ def load_profile_group(
     ell_min: int,
     ell_max: int | None,
     key_precision: int,
+    include_patterns: list[str],
+    exclude_patterns: list[str],
 ):
     import numpy as np
 
-    paths = discover_profile_paths(dirs, globs)
-    print(f"{label}: discovered {len(paths)} profile candidate files", flush=True)
+    paths, filtered = discover_profile_paths(dirs, globs, include_patterns, exclude_patterns)
+    print(
+        f"{label}: selected {len(paths)} profile candidate files after path filters; "
+        f"filtered {len(filtered)}",
+        flush=True,
+    )
+    for path, reason in filtered[:10]:
+        print(f"{label}: filtered {path}: {reason}", flush=True)
+    if len(filtered) > 10:
+        print(f"{label}: ... {len(filtered) - 10} more filtered files", flush=True)
+
     records_by_key: dict[tuple[str, ...], list[ProfileRecord]] = {}
     skipped: list[tuple[str, str]] = []
     base_ell = None
@@ -930,6 +983,18 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--y102-dirs", nargs="+", required=True, help="y102 profile directories; ':' or ',' separated is also accepted.")
     parser.add_argument("--sobol-csvs", nargs="+", required=True, help="Sobol CSVs used to generate the profile filenames.")
     parser.add_argument("--profile-globs", nargs="+", default=["*tSZ_cl*.fits"], help="Recursive file globs for profile products.")
+    parser.add_argument(
+        "--include-path-regex",
+        nargs="*",
+        default=[],
+        help="Optional comma-separated regexes; profile paths must match at least one. Use this to select the current Sobol split products.",
+    )
+    parser.add_argument(
+        "--exclude-path-regex",
+        nargs="*",
+        default=[],
+        help="Optional comma-separated regexes for profile paths to reject before row matching.",
+    )
     parser.add_argument("--output-dir", required=True, help="Directory for combined profiles and emulator artifact.")
     parser.add_argument("--artifact-name", default="battaglia_tsz_emulator.joblib")
     parser.add_argument("--ell-min", type=int, default=2)
@@ -937,6 +1002,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--key-precision", type=int, default=12)
     parser.add_argument("--target-transform", choices=("log10", "none"), default="log10")
     parser.add_argument("--target-floor", type=float, default=1.0e-40)
+    parser.add_argument("--expected-points", type=int, default=0, help="Require this many matched y100/y102 parameter points; 0 disables the check.")
     parser.add_argument("--n-trials", type=int, default=150)
     parser.add_argument("--timeout-seconds", type=int, default=None)
     parser.add_argument("--cv-folds", type=int, default=5)
@@ -963,6 +1029,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     args.y102_dirs = split_cli_values(args.y102_dirs)
     args.sobol_csvs = split_cli_values(args.sobol_csvs)
     args.profile_globs = split_cli_values(args.profile_globs)
+    args.include_path_regex = split_comma_values(args.include_path_regex)
+    args.exclude_path_regex = split_comma_values(args.exclude_path_regex)
     args.regressors = split_cli_values(args.regressors)
     if args.include_gpr and "gpr" not in args.regressors:
         args.regressors.append("gpr")
@@ -983,6 +1051,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         raise ValueError("--max-pca-components must be at least 2")
     if args.key_precision < 6:
         raise ValueError("--key-precision should be at least 6 significant digits")
+    if args.expected_points < 0:
+        raise ValueError("--expected-points must be nonnegative")
     return args
 
 
@@ -993,6 +1063,10 @@ def main(argv: list[str]) -> int:
     tables, x_columns = load_sobol_tables(args.sobol_csvs)
     print(f"Using Battaglia emulator inputs: {', '.join(x_columns)}", flush=True)
     print(f"Using Sobol CSV tags: {', '.join(table.tag for table in tables)}", flush=True)
+    if args.include_path_regex:
+        print(f"Using include path regexes: {args.include_path_regex}", flush=True)
+    if args.exclude_path_regex:
+        print(f"Using exclude path regexes: {args.exclude_path_regex}", flush=True)
 
     y100_by_key, ell = load_profile_group(
         "y100",
@@ -1003,6 +1077,8 @@ def main(argv: list[str]) -> int:
         args.ell_min,
         args.ell_max,
         args.key_precision,
+        args.include_path_regex,
+        args.exclude_path_regex,
     )
     y102_by_key, ell_102 = load_profile_group(
         "y102",
@@ -1013,6 +1089,8 @@ def main(argv: list[str]) -> int:
         args.ell_min,
         args.ell_max,
         args.key_precision,
+        args.include_path_regex,
+        args.exclude_path_regex,
     )
     if ell.shape != ell_102.shape or not np.allclose(ell, ell_102):
         raise ValueError("y100 and y102 ell grids differ")
@@ -1020,6 +1098,11 @@ def main(argv: list[str]) -> int:
     x, y, y100, y102, metadata, ell = combine_realizations(y100_by_key, y102_by_key, x_columns, ell)
     print(f"Combined {x.shape[0]} matched y100/y102 parameter points", flush=True)
     print(f"Profile length after ell cut: {y.shape[1]}", flush=True)
+    if args.expected_points and x.shape[0] != args.expected_points:
+        raise ValueError(
+            f"Expected {args.expected_points} matched parameter points, got {x.shape[0]}. "
+            "Check the Sobol CSVs and path filters before training."
+        )
 
     if x.shape[0] <= args.cv_folds:
         raise ValueError(f"Need more samples than cv_folds; samples={x.shape[0]}, cv_folds={args.cv_folds}")

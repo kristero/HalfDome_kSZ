@@ -16,31 +16,49 @@ cd "${PBS_O_WORKDIR:-$PWD}"
 JOB_ID="${PBS_JOBID:-manual}"
 : "${LOG_DIR:=/home/kristero10/logs/tSZ_baryon_run}"
 
-: "${Y100_DIRS:=/lustre/work/kristero10/tSZ_data/y100:/lustre/work/kristero10/tSZ_data/y100_2}"
+: "${Y100_DIRS:=/lustre/work/kristero10/tSZ_data/y100}"
 : "${Y102_DIRS:=/lustre/work/kristero10/tSZ_data/y102}"
 : "${PROFILE_GLOBS:=*tSZ_cl*.fits}"
-: "${EMULATOR_OUTPUT_DIR:=/lustre/work/kristero10/tSZ_data/emulator_battaglia_y100_y102}"
+: "${PROFILE_INCLUDE_REGEX:=sobol_battaglia_sobol_256_[12]_row[0-9]+}"
+: "${PROFILE_EXCLUDE_REGEX:=sobol_battaglia_sobol_256_row[0-9]+}"
+: "${EMULATOR_OUTPUT_DIR:=/lustre/work/kristero10/tSZ_data/emulator_battaglia_y100_y102_test}"
 : "${ELL_MIN:=2}"
 : "${ELL_MAX:=}"
-: "${N_TRIALS:=150}"
-: "${CV_FOLDS:=5}"
-: "${MAX_PCA_COMPONENTS:=32}"
+: "${N_TRIALS:=20}"
+: "${CV_FOLDS:=3}"
+: "${MAX_PCA_COMPONENTS:=24}"
 : "${N_JOBS:=${PBS_NCPUS:-26}}"
 : "${RANDOM_SEED:=1234}"
 : "${TARGET_TRANSFORM:=log10}"
 : "${TARGET_FLOOR:=1e-40}"
-: "${REGRESSORS:=mlp,krr}"
+: "${EXPECTED_POINTS:=256}"
+: "${REGRESSORS:=krr,extra_trees}"
 : "${INCLUDE_GPR:=false}"
 : "${OPTUNA_STORAGE:=}"
-: "${STUDY_NAME:=battaglia_tsz_emulator}"
+: "${STUDY_NAME:=battaglia_tsz_emulator_test}"
 : "${OMP_NUM_THREADS:=1}"
 : "${OPENBLAS_NUM_THREADS:=1}"
 : "${MKL_NUM_THREADS:=1}"
 
 if [[ -z "${SOBOL_CSVS:-}" ]]; then
-  SOBOL_CSVS=/home/kristero10/tSZ_data/battaglia_sobol_256.csv
-  [[ -f /home/kristero10/tSZ_data/battaglia_sobol_256_1.csv ]] && SOBOL_CSVS="${SOBOL_CSVS}:/home/kristero10/tSZ_data/battaglia_sobol_256_1.csv"
-  [[ -f /home/kristero10/tSZ_data/battaglia_sobol_256_2.csv ]] && SOBOL_CSVS="${SOBOL_CSVS}:/home/kristero10/tSZ_data/battaglia_sobol_256_2.csv"
+  SOBOL_CSVS=""
+  for csv_candidate in \
+    /home/kristero10/tSZ_data/battaglia_sobol_256_1.csv \
+    /home/kristero10/tSZ_data/battaglia_sobol_256_2.csv
+  do
+    if [[ -f "${csv_candidate}" ]]; then
+      if [[ -z "${SOBOL_CSVS}" ]]; then
+        SOBOL_CSVS="${csv_candidate}"
+      else
+        SOBOL_CSVS="${SOBOL_CSVS}:${csv_candidate}"
+      fi
+    fi
+  done
+  if [[ -z "${SOBOL_CSVS}" ]]; then
+    echo "No default guarded Sobol split CSVs found in /home/kristero10/tSZ_data." >&2
+    echo "Submit with -v SOBOL_CSVS=/path/to/battaglia_sobol_256_1.csv:/path/to/battaglia_sobol_256_2.csv" >&2
+    exit 1
+  fi
 fi
 
 if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
@@ -66,17 +84,6 @@ export OPENBLAS_NUM_THREADS
 export MKL_NUM_THREADS
 export N_TRIALS
 
-EXTRA_ARGS=()
-if [[ -n "${ELL_MAX}" ]]; then
-  EXTRA_ARGS+=(--ell-max "${ELL_MAX}")
-fi
-if [[ "${INCLUDE_GPR}" == "true" || "${INCLUDE_GPR}" == "1" ]]; then
-  EXTRA_ARGS+=(--include-gpr)
-fi
-if [[ -n "${OPTUNA_STORAGE}" ]]; then
-  EXTRA_ARGS+=(--optuna-storage "${OPTUNA_STORAGE}" --study-name "${STUDY_NAME}" --load-if-exists)
-fi
-
 ALLOCATED_CPUS_HINT="${PBS_NCPUS:-${NCPUS:-unknown}}"
 PBS_NP_HINT="${PBS_NP:-unknown}"
 NODEFILE_SLOTS="unknown"
@@ -97,12 +104,15 @@ echo "Y100 dirs: ${Y100_DIRS}"
 echo "Y102 dirs: ${Y102_DIRS}"
 echo "Sobol CSVs: ${SOBOL_CSVS}"
 echo "Profile globs: ${PROFILE_GLOBS}"
+echo "Profile include regex: ${PROFILE_INCLUDE_REGEX}"
+echo "Profile exclude regex: ${PROFILE_EXCLUDE_REGEX}"
 echo "Output dir: ${EMULATOR_OUTPUT_DIR}"
 echo "ell range: ${ELL_MIN}:${ELL_MAX:-end}"
 echo "Optuna trials: ${N_TRIALS}"
 echo "CV folds: ${CV_FOLDS}"
 echo "Regressors: ${REGRESSORS}"
 echo "N_JOBS: ${N_JOBS}"
+echo "Expected matched points: ${EXPECTED_POINTS:-<disabled>}"
 echo "PBS_NP/nodefile slots are MPI slots on this cluster, not OpenMP thread count."
 echo "PBS_NP: ${PBS_NP_HINT}"
 echo "PBS_NCPUS/NCPUS: ${ALLOCATED_CPUS_HINT}"
@@ -144,22 +154,36 @@ if missing:
     raise SystemExit(1)
 PY
 
-"${PYTHON}" "${SCRIPT}" \
+set -- \
   --y100-dirs "${Y100_DIRS}" \
   --y102-dirs "${Y102_DIRS}" \
   --sobol-csvs "${SOBOL_CSVS}" \
   --profile-globs "${PROFILE_GLOBS}" \
+  --include-path-regex "${PROFILE_INCLUDE_REGEX}" \
+  --exclude-path-regex "${PROFILE_EXCLUDE_REGEX}" \
   --output-dir "${EMULATOR_OUTPUT_DIR}" \
   --ell-min "${ELL_MIN}" \
   --target-transform "${TARGET_TRANSFORM}" \
   --target-floor "${TARGET_FLOOR}" \
+  --expected-points "${EXPECTED_POINTS:-0}" \
   --regressors "${REGRESSORS}" \
   --n-trials "${N_TRIALS}" \
   --cv-folds "${CV_FOLDS}" \
   --max-pca-components "${MAX_PCA_COMPONENTS}" \
   --random-seed "${RANDOM_SEED}" \
-  --n-jobs "${N_JOBS}" \
-  "${EXTRA_ARGS[@]}" \
+  --n-jobs "${N_JOBS}"
+
+if [[ -n "${ELL_MAX}" ]]; then
+  set -- "$@" --ell-max "${ELL_MAX}"
+fi
+if [[ "${INCLUDE_GPR}" == "true" || "${INCLUDE_GPR}" == "1" ]]; then
+  set -- "$@" --include-gpr
+fi
+if [[ -n "${OPTUNA_STORAGE}" ]]; then
+  set -- "$@" --optuna-storage "${OPTUNA_STORAGE}" --study-name "${STUDY_NAME}" --load-if-exists
+fi
+
+"${PYTHON}" "${SCRIPT}" "$@" \
   > "${LOG_DIR}/tSZ_emulator_optuna_${JOB_ID}.out" \
   2> "${LOG_DIR}/tSZ_emulator_optuna_${JOB_ID}.err"
 

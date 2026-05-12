@@ -24,6 +24,18 @@ if !isdefined(@__MODULE__, :existing_completed_outputs)
     end
 end
 
+if !isdefined(@__MODULE__, :compute_cl)
+    function compute_cl(cfg::VisualConfig, m_hp)
+        if cfg.cl_lmax < 0
+            println("compute_cl helper is unavailable; using Healpix default anafast with niter=$(cfg.cl_niter).")
+            return Healpix.anafast(m_hp; niter=cfg.cl_niter)
+        end
+
+        println("compute_cl helper is unavailable; using Healpix.anafast with lmax=$(cfg.cl_lmax), niter=$(cfg.cl_niter).")
+        return Healpix.anafast(m_hp; lmax=cfg.cl_lmax, niter=cfg.cl_niter)
+    end
+end
+
 function safe_print_runtime_environment()
     if !isdefined(@__MODULE__, :print_runtime_environment)
         println("Runtime environment logging unavailable: print_runtime_environment is not defined.")

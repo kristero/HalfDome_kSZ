@@ -248,7 +248,9 @@ def read_fits_profile_astropy(path: Path):
 
     profile_candidates: list[tuple[int, str, Any]] = []
     ell_candidates: list[Any] = []
-    preferred_tokens = ("cl", "tt", "power", "profile", "temperature", "y")
+    preferred_names = {"c_l", "cl", "tt", "power", "profile", "temperature", "y"}
+    preferred_tokens = ("cl", "power", "profile", "temperature")
+    non_profile_names = {"index", "row", "pixel"}
     ell_names = {"ell", "l", "multipole"}
 
     with fits.open(path, memmap=False) as hdul:
@@ -269,7 +271,9 @@ def read_fits_profile_astropy(path: Path):
                     if name_norm in ell_names:
                         ell_candidates.append(arr)
                         continue
-                    priority = 0 if any(token in name_norm for token in preferred_tokens) else 1
+                    if name_norm in non_profile_names:
+                        continue
+                    priority = 0 if name_norm in preferred_names or any(token in name_norm for token in preferred_tokens) else 1
                     profile_candidates.append((priority, f"hdu{hdu_index}:{field_name}", arr))
             else:
                 arr = np.asarray(data).squeeze()
@@ -291,7 +295,9 @@ def read_fits_profile_fitsio(path: Path):
 
     profile_candidates: list[tuple[int, str, Any]] = []
     ell_candidates: list[Any] = []
-    preferred_tokens = ("cl", "tt", "power", "profile", "temperature", "y")
+    preferred_names = {"c_l", "cl", "tt", "power", "profile", "temperature", "y"}
+    preferred_tokens = ("cl", "power", "profile", "temperature")
+    non_profile_names = {"index", "row", "pixel"}
     ell_names = {"ell", "l", "multipole"}
 
     with fitsio.FITS(str(path)) as hdul:
@@ -315,7 +321,9 @@ def read_fits_profile_fitsio(path: Path):
                     if name_norm in ell_names:
                         ell_candidates.append(arr)
                         continue
-                    priority = 0 if any(token in name_norm for token in preferred_tokens) else 1
+                    if name_norm in non_profile_names:
+                        continue
+                    priority = 0 if name_norm in preferred_names or any(token in name_norm for token in preferred_tokens) else 1
                     profile_candidates.append((priority, f"hdu{hdu_index}:{field_name}", arr))
             else:
                 arr = np.asarray(data).squeeze()
@@ -672,6 +680,32 @@ def inverse_transform_targets(y, transform: str):
     if transform == "log10":
         return np.power(10.0, np.asarray(y, dtype=float))
     raise ValueError(f"Unsupported target transform: {transform}")
+
+
+def print_target_diagnostics(y, y_t, floor: float) -> None:
+    import numpy as np
+
+    y = np.asarray(y, dtype=float)
+    y_t = np.asarray(y_t, dtype=float)
+    finite_y = y[np.isfinite(y)]
+    finite_y_t = y_t[np.isfinite(y_t)]
+    clipped_fraction = float(np.mean(y <= floor))
+    variance_sum = float(np.var(y_t, axis=0).sum())
+    print(
+        "Target diagnostics: "
+        f"raw_min={float(finite_y.min()) if finite_y.size else float('nan'):.6e}, "
+        f"raw_max={float(finite_y.max()) if finite_y.size else float('nan'):.6e}, "
+        f"transformed_min={float(finite_y_t.min()) if finite_y_t.size else float('nan'):.6e}, "
+        f"transformed_max={float(finite_y_t.max()) if finite_y_t.size else float('nan'):.6e}, "
+        f"clipped_fraction={clipped_fraction:.6g}, "
+        f"transformed_variance_sum={variance_sum:.6e}",
+        flush=True,
+    )
+    if not np.isfinite(variance_sum) or variance_sum <= 0.0:
+        raise ValueError(
+            "Training targets have zero or non-finite variance after preprocessing. "
+            "Check that the FITS reader is using the C_l column, not Index, and that the target floor is not clipping every value."
+        )
 
 
 def make_regressor(params: dict[str, Any], seed: int, n_jobs: int):
@@ -1217,6 +1251,7 @@ def main(argv: list[str]) -> int:
         raise ValueError("Not enough training samples/profile dimensions for PCA emulator")
 
     y_t = transform_targets(y, args.target_transform, args.target_floor)
+    print_target_diagnostics(y, y_t, args.target_floor)
     params, cv_best, study = optimize_hyperparameters(x, y_t, args, max_components)
     print(f"Best CV transformed RMSE: {cv_best:.6g}", flush=True)
     print(f"Best parameters: {json.dumps(params, sort_keys=True)}", flush=True)

@@ -4,7 +4,7 @@ using SHA
 const CLUSTER_HALFDOME_PATH_DEFAULT = "/lustre/work/Globus-lt/halfdome/full_res/halos"
 const CLUSTER_OUTPUT_DIR_DEFAULT = "/lustre/work/kristero10/tSZ_data"
 const CLUSTER_CACHE_DIR_DEFAULT = joinpath(CLUSTER_OUTPUT_DIR_DEFAULT, "cache")
-const CLUSTER_SOBOL_CSV_DEFAULT = "/home/kristero10/tSZ_data/battaglia_sobol_32.csv"
+const CLUSTER_SOBOL_CSV_DEFAULT = "/home/kristero10/tSZ_data/battaglia_sobol_512.csv"
 const TSZ_GAUSSIAN_BEAM_FWHM_ARCMIN_DEFAULT = 1.6
 const TSZ_CL_LMAX_DEFAULT = 4096
 
@@ -35,21 +35,21 @@ const BATTAGLIA_GAMMA_ALPHA_Z_DEFAULT = 0.0
 const BATTAGLIA_CACHE_TAG_DIGITS = 16
 const BATTAGLIA_GUARD_LOGM_MIN_DEFAULT = 12.0
 const BATTAGLIA_GUARD_Z_MAX_DEFAULT = 3.0
-const BATTAGLIA_GUARD_DERIVED_X_C_MIN_DEFAULT = 0.08
-const BATTAGLIA_GUARD_DERIVED_X_C_MAX_DEFAULT = 2.5
-const BATTAGLIA_GUARD_BETA_OUTER_MIN_DEFAULT = 3.0
-const BATTAGLIA_GUARD_BETA_OUTER_MAX_DEFAULT = 14.0
+const BATTAGLIA_GUARD_DERIVED_X_C_MIN_DEFAULT = 0.0
+const BATTAGLIA_GUARD_DERIVED_X_C_MAX_DEFAULT = Inf
+const BATTAGLIA_GUARD_BETA_OUTER_MIN_DEFAULT = 1.0
+const BATTAGLIA_GUARD_BETA_OUTER_MAX_DEFAULT = Inf
 
 const BATTAGLIA_GUARD_PRIOR_BOUNDS = (
-    P0_amp=(2.0, 25.0),
-    x_c_amp=(0.12, 0.70),
-    beta_amp=(3.8, 5.2),
-    P0_alpha_m=(0.0, 0.30),
-    x_c_alpha_m=(-0.08, 0.08),
-    beta_alpha_m=(0.0, 0.08),
-    P0_alpha_z=(-1.10, -0.40),
-    x_c_alpha_z=(0.10, 0.90),
-    beta_alpha_z=(0.25, 0.55),
+    P0_amp=(1.8099999999999998, 34.39),
+    x_c_amp=(0.1491, 0.8449),
+    beta_amp=(3.48, 5.22),
+    P0_alpha_m=(0.0, 0.29259999999999997),
+    x_c_alpha_m=(-0.1, 0.1),
+    beta_alpha_m=(-0.02, 0.1),
+    P0_alpha_z=(-1.3644, -0.22740000000000005),
+    x_c_alpha_z=(0.14619999999999997, 1.3158),
+    beta_alpha_z=(0.08299999999999998, 0.747),
     alpha_amp=(0.5, 2.0),
     alpha_alpha_m=(-0.25, 0.25),
     alpha_alpha_z=(-0.5, 0.5),
@@ -562,7 +562,8 @@ function validate_battaglia_params(
         for (field, bounds) in pairs(BATTAGLIA_GUARD_PRIOR_BOUNDS)
             value = getproperty(p, field)
             low, high = bounds
-            if !(low <= value <= high)
+            tol = max(1.0e-12, 1.0e-12 * max(abs(low), abs(high)))
+            if value < low - tol || value > high + tol
                 push!(reasons, "$(field)=$(value) is outside the guarded prior range [$(low), $(high)].")
             end
         end
@@ -579,10 +580,10 @@ function validate_battaglia_params(
             if !(isfinite(s.P0) && s.P0 > 0.0)
                 push!(reasons, "derived P0=$(s.P0) is invalid at M=$(mass_msun), z=$(z).")
             end
-            if !(isfinite(s.x_c) && derived_x_c_min <= s.x_c <= derived_x_c_max)
+            if !(isfinite(s.x_c) && s.x_c > derived_x_c_min && s.x_c <= derived_x_c_max)
                 push!(
                     reasons,
-                    "derived x_c=$(s.x_c) is outside [$(derived_x_c_min), $(derived_x_c_max)] at M=$(mass_msun), z=$(z)."
+                    "derived x_c=$(s.x_c) is outside ($(derived_x_c_min), $(derived_x_c_max)] at M=$(mass_msun), z=$(z)."
                 )
             end
             if !(isfinite(s.alpha) && s.alpha > 0.0)
@@ -591,13 +592,16 @@ function validate_battaglia_params(
             if !(isfinite(s.beta_raw) && s.beta_raw > 0.0)
                 push!(reasons, "derived beta_raw=$(s.beta_raw) is invalid at M=$(mass_msun), z=$(z).")
             end
-            if !(isfinite(s.gamma) && s.gamma < 0.0)
-                push!(reasons, "derived gamma=$(s.gamma) must stay negative in this convention at M=$(mass_msun), z=$(z).")
-            end
-            if !(isfinite(s.beta_outer) && beta_outer_min <= s.beta_outer <= beta_outer_max)
+            if !(isfinite(s.gamma) && -1.0 < s.gamma < 0.0)
                 push!(
                     reasons,
-                    "derived beta_outer=$(s.beta_outer) is outside [$(beta_outer_min), $(beta_outer_max)] at M=$(mass_msun), z=$(z)."
+                    "derived gamma=$(s.gamma) must be in (-1, 0) for LOS inner convergence at M=$(mass_msun), z=$(z)."
+                )
+            end
+            if !(isfinite(s.beta_outer) && s.beta_outer > beta_outer_min && s.beta_outer <= beta_outer_max)
+                push!(
+                    reasons,
+                    "derived beta_outer=$(s.beta_outer) is outside ($(beta_outer_min), $(beta_outer_max)] for LOS outer convergence at M=$(mass_msun), z=$(z)."
                 )
             end
         end
@@ -879,42 +883,35 @@ function load_visual_config()
     )
 end
 
+function battaglia_params_summary(p)
+    return (
+        "P0=$(p.P0_amp), xc=$(p.x_c_amp), beta=$(p.beta_amp), " *
+        "alpha_m=(P0=$(p.P0_alpha_m), xc=$(p.x_c_alpha_m), beta=$(p.beta_alpha_m)), " *
+        "alpha_z=(P0=$(p.P0_alpha_z), xc=$(p.x_c_alpha_z), beta=$(p.beta_alpha_z)), " *
+        "alpha=$(p.alpha_amp), gamma=$(p.gamma_amp)"
+    )
+end
+
 function print_visual_config(cfg::VisualConfig)
     run_instance_tag_display = isempty(cfg.run_instance_tag) ? "<none>" : cfg.run_instance_tag
-    println("Using output directory: $(cfg.output_dir)")
-    println("Using catalog source: $(cfg.catalog_source)")
-    println("Using simulation tag: $(cfg.simulation_tag)")
-    println("Using catalog path: $(cfg.catalog_path)")
-    println("Using cache directory: $(cfg.cache_dir)")
-    println("Run instance tag: $(run_instance_tag_display)")
-    println("Cosmology tag: $(cfg.cosmology_tag)")
-    println("Cosmology: h=$(cfg.cosmo_h), Omega_b=$(cfg.cosmo_omegab), Omega_c=$(cfg.cosmo_omegac), Omega_m=$(cfg.cosmo_omegam)")
-    println("Gaussian beam: apply=$(cfg.apply_gaussian_beam), fwhm_arcmin=$(cfg.gaussian_beam_fwhm_arcmin)")
-    println("Interpolator nonpositive cleanup: $(cfg.cleanup_nonpositive_profile_values)")
-    println("Battaglia guardrails: enforce=$(cfg.enforce_battaglia_guardrails), skip_invalid_sobol_rows=$(cfg.skip_invalid_battaglia_rows)")
-    println("Interpolator cache mode: model_exists=$(cfg.model_exists), reuse_existing_cache=$(cfg.reuse_existing_cache), wait_seconds=$(cfg.cache_wait_seconds), poll_seconds=$(cfg.cache_poll_seconds), pad=$(cfg.interpolator_pad), logM_max=$(cfg.interpolator_logM_max)")
-    println("Interpolator cache parameter tag: $(cfg.cache_param_tag)")
     cl_lmax_display = cfg.cl_lmax < 0 ? "Healpix default ($(healpix_default_lmax(cfg.nside)))" : string(cfg.cl_lmax)
-    println("C_l transform: save=$(cfg.save_cl), lmax=$(cl_lmax_display), niter=$(cfg.cl_niter)")
-    println("Skip existing outputs: $(cfg.skip_existing_outputs), any_run_instance=$(cfg.skip_existing_any_run_instance)")
-    println("Batching mode: $(cfg.batching_mode)")
-    println("Bin map save mode: $(cfg.bin_map_mode_tag)")
-    println("Save per-bin maps: $(cfg.save_bin_maps)")
-    println("Save mass maps: $(cfg.save_mass_map)")
-    println("Redshift binning mode: $(cfg.redshift_binning_mode)")
-    println("Linear redshift bin width dz: $(cfg.redshift_bin_width)")
-    println("Log redshift bin width dlog10(1+z): $(cfg.log_redshift_bin_width)")
-    println("Mass bin width dlog10(M): $(cfg.mass_bin_width_dex)")
-    println("Mass map extent: HalfDome uses Rdisp spatial components; WebSky uses the catalog R column.")
-    if cfg.sobol_row > 0
-        println("Battaglia model source: Sobol CSV row $(cfg.sobol_row) from $(cfg.sobol_csv_path)")
+    source = if cfg.sobol_row > 0
+        "Sobol row $(cfg.sobol_row) from $(cfg.sobol_csv_path)"
     else
-        println("Battaglia model source: direct/fiducial parameter inputs")
+        "direct/fiducial parameter inputs"
     end
-    println("Battaglia16 physical parameters:")
-    println("  P0_amp=$(cfg.battaglia_params.P0_amp), P0_alpha_m=$(cfg.battaglia_params.P0_alpha_m), P0_alpha_z=$(cfg.battaglia_params.P0_alpha_z)")
-    println("  x_c_amp=$(cfg.battaglia_params.x_c_amp), x_c_alpha_m=$(cfg.battaglia_params.x_c_alpha_m), x_c_alpha_z=$(cfg.battaglia_params.x_c_alpha_z)")
-    println("  beta_amp=$(cfg.battaglia_params.beta_amp), beta_alpha_m=$(cfg.battaglia_params.beta_alpha_m), beta_alpha_z=$(cfg.battaglia_params.beta_alpha_z)")
-    println("  alpha_amp=$(cfg.battaglia_params.alpha_amp), alpha_alpha_m=$(cfg.battaglia_params.alpha_alpha_m), alpha_alpha_z=$(cfg.battaglia_params.alpha_alpha_z)")
-    println("  gamma_amp=$(cfg.battaglia_params.gamma_amp), gamma_alpha_m=$(cfg.battaglia_params.gamma_alpha_m), gamma_alpha_z=$(cfg.battaglia_params.gamma_alpha_z)")
+
+    println(
+        "Run: simulation=$(cfg.simulation_tag), catalog=$(cfg.catalog_source), " *
+        "batching=$(cfg.batching_mode), nside=$(cfg.nside), save_cl=$(cfg.save_cl), cl_lmax=$(cl_lmax_display)"
+    )
+    println(
+        "Row source: $(source), run_instance=$(run_instance_tag_display), " *
+        "output_dir=$(cfg.output_dir), cache_dir=$(cfg.cache_dir)"
+    )
+    println(
+        "Cache/interpolator: model_exists=$(cfg.model_exists), reuse_existing_cache=$(cfg.reuse_existing_cache), " *
+        "pad=$(cfg.interpolator_pad), logM_max=$(cfg.interpolator_logM_max), cache_tag=$(cfg.cache_param_tag)"
+    )
+    println("Battaglia params: $(battaglia_params_summary(cfg.battaglia_params))")
 end

@@ -19,8 +19,8 @@ JOB_ID="${PBS_JOBID:-manual}"
 : "${Y100_DIRS:=/lustre/work/kristero10/tSZ_data/y100}"
 : "${Y102_DIRS:=/lustre/work/kristero10/tSZ_data/y102}"
 : "${PROFILE_GLOBS:=*tSZ_cl*.fits}"
-: "${PROFILE_INCLUDE_REGEX:=sobol_battaglia_sobol_256_[12]_row[0-9]+}"
-: "${PROFILE_EXCLUDE_REGEX:=sobol_battaglia_sobol_256_row[0-9]+}"
+: "${PROFILE_INCLUDE_REGEX:=sobol_battaglia_sobol_512_[1-4]_row[0-9]+}"
+: "${PROFILE_EXCLUDE_REGEX:=sobol_battaglia_sobol_512_row[0-9]+|sobol_battaglia_sobol_256}"
 : "${EMULATOR_OUTPUT_DIR:=/lustre/work/kristero10/tSZ_data/emulator_battaglia_y100_y102_test}"
 : "${ELL_MIN:=2}"
 : "${ELL_MAX:=4096}"
@@ -31,7 +31,7 @@ JOB_ID="${PBS_JOBID:-manual}"
 : "${RANDOM_SEED:=1234}"
 : "${TARGET_TRANSFORM:=log10}"
 : "${TARGET_FLOOR:=1e-40}"
-: "${EXPECTED_POINTS:=256}"
+: "${EXPECTED_POINTS:=512}"
 : "${SAVE_COMBINED_DATASET:=false}"
 : "${REGRESSORS:=krr,extra_trees}"
 : "${INCLUDE_GPR:=false}"
@@ -44,8 +44,10 @@ JOB_ID="${PBS_JOBID:-manual}"
 if [[ -z "${SOBOL_CSVS:-}" ]]; then
   SOBOL_CSVS=""
   for csv_candidate in \
-    /home/kristero10/tSZ_data/battaglia_sobol_256_1.csv \
-    /home/kristero10/tSZ_data/battaglia_sobol_256_2.csv
+    /home/kristero10/tSZ_data/battaglia_sobol_512_1.csv \
+    /home/kristero10/tSZ_data/battaglia_sobol_512_2.csv \
+    /home/kristero10/tSZ_data/battaglia_sobol_512_3.csv \
+    /home/kristero10/tSZ_data/battaglia_sobol_512_4.csv
   do
     if [[ -f "${csv_candidate}" ]]; then
       if [[ -z "${SOBOL_CSVS}" ]]; then
@@ -57,7 +59,7 @@ if [[ -z "${SOBOL_CSVS:-}" ]]; then
   done
   if [[ -z "${SOBOL_CSVS}" ]]; then
     echo "No default guarded Sobol split CSVs found in /home/kristero10/tSZ_data." >&2
-    echo "Submit with -v SOBOL_CSVS=/path/to/battaglia_sobol_256_1.csv:/path/to/battaglia_sobol_256_2.csv" >&2
+    echo "Submit with -v SOBOL_CSVS=/path/to/battaglia_sobol_512_1.csv:/path/to/battaglia_sobol_512_2.csv:/path/to/battaglia_sobol_512_3.csv:/path/to/battaglia_sobol_512_4.csv" >&2
     exit 1
   fi
 fi

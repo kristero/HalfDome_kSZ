@@ -215,17 +215,16 @@ function run_halfdome_full_map!(cfg::VisualConfig, state, y_model_interp, h5)
 
         chunk_counter += 1
         total_painted += painted_count
-        println("Accumulated HalfDome full-map chunk $(chunk_counter) for catalog indices $(chunk_start):$(chunk_stop) with $(painted_count) halos.")
     end
 
     total_painted > 0 || error("HalfDome full-map mode did not paint any selected halos.")
-    println("Finished accumulating HalfDome full map with $(total_painted) halos.")
+    println("Painted HalfDome full map with $(total_painted) halos across $(chunk_counter) chunks.")
 end
 
 function run_halfdome_visuals!(cfg::VisualConfig, state, y_model_interp)
     h5open(cfg.halfdome_path, "r") do h5
         total_halo_count = size(h5["Position"], 2)
-        @show total_halo_count
+        println("HalfDome catalog halos: $(total_halo_count).")
 
         if cfg.batching_mode == "full"
             return run_halfdome_full_map!(cfg, state, y_model_interp, h5)

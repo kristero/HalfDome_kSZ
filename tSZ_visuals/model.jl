@@ -67,7 +67,7 @@ function split_sobol_cache_param_tag_aliases(cfg::VisualConfig)
         end
     end
 
-    for split_index in (1, 2)
+    for split_index in 1:4
         split_csv_path = joinpath(csv_dir, "$(csv_stem)_$(split_index).csv")
         isfile(split_csv_path) || continue
         split_rows = csv_data_row_count(split_csv_path)
@@ -253,7 +253,7 @@ function build_visual_interpolator(cfg::VisualConfig)
                 pad=cfg.interpolator_pad,
                 logM_max=cfg.interpolator_logM_max,
                 overwrite=true,
-                verbose=true
+                verbose=false
             )
         end
     finally

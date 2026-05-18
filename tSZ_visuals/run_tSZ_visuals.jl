@@ -61,6 +61,7 @@ function run_tsz_visual_fits()
     catch err
         if err isa SkipVisualRun
             println("Skipping tSZ visual run: $(err.message)")
+            println("Total elapsed time: $(round(time() - t0; digits=2)) s")
             return nothing
         end
         rethrow()
@@ -73,21 +74,23 @@ function run_tsz_visual_fits()
         for path in existing_outputs
             println("  $(abspath(path))")
         end
+        println("Total elapsed time: $(round(time() - t0; digits=2)) s")
         return nothing
     end
 
-    print_visual_config(cfg)
-    safe_print_runtime_environment()
+    if get_bool_arg("print_run_summary", true; env="PRINT_RUN_SUMMARY")
+        print_visual_config(cfg)
+    end
+    if get_bool_arg("print_runtime_environment", false; env="PRINT_RUNTIME_ENVIRONMENT")
+        safe_print_runtime_environment()
+    end
 
     y_model_interp = build_visual_interpolator(cfg)
-    println("Running garbage collection before Healpix map allocation.")
     trim_process_memory()
     state = init_visual_maps(cfg)
 
-    println("Initiating HealPix with NSide: $(cfg.nside)")
-    println("Julia threads available: $(nthreads())")
     map_label = cfg.save_mass_map ? "y and mass FITS maps" : "y FITS maps"
-    println("Creating $(cfg.bin_map_mode_tag) $(map_label) with $(cfg.batching_mode) batching.")
+    println("Painting $(cfg.binning_tag) $(map_label); nside=$(cfg.nside), threads=$(nthreads()).")
 
     paint_t0 = start_phase_timing()
     if cfg.catalog_source == "halfdome"
@@ -115,8 +118,8 @@ function run_tsz_visual_fits()
     end
 
     elapsed = time() - t0
-    println("Finished $(cfg.simulation_tag) Healpix tSZ visual FITS creation ($(cfg.batching_mode)).")
-    println("Elapsed time: $(round(elapsed; digits=2)) s")
+    println("Finished $(cfg.simulation_tag) $(cfg.batching_mode) run.")
+    println("Total elapsed time: $(round(elapsed; digits=2)) s")
     return state
 end
 

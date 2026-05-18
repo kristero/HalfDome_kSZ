@@ -21,11 +21,12 @@ cd "${SCRIPT_DIR}"
 : "${CACHE_DIR:=/lustre/work/kristero10/tSZ_data/cache}"
 : "${LOG_DIR:=/home/kristero10/logs/tSZ_baryon_run}"
 : "${NSIDE:=4096}"
-: "${THREADS_PER_TASK:=26}"
+: "${THREADS_PER_TASK:=25}"
 : "${MAX_PARALLEL:=1}"
 : "${INTERPOLATOR_PAD:=256}"
 : "${INTERPOLATOR_LOGM_MAX:=15.7}"
 : "${INTERPOLATOR_TIMEOUT_SECONDS:=700}"
+: "${SEPARATE_INTERPOLATOR_STEP:=false}"
 : "${CL_LMAX:=4096}"
 : "${CL_NITER:=0}"
 : "${REUSE_EXISTING_CACHE:=false}"
@@ -90,6 +91,58 @@ split_sobol_csv() {
   done
 }
 
+validate_sobol_splits() {
+  local tmp_dir
+  tmp_dir="$(mktemp -d)"
+
+  local full_data="${tmp_dir}/full_rows.csv"
+  local split_data="${tmp_dir}/split_rows.csv"
+  local duplicate_rows="${tmp_dir}/duplicate_rows.csv"
+  : > "${split_data}"
+
+  local split sobol_csv row_count expected_total_rows
+  expected_total_rows=$(( SOBOL_SPLIT_ROWS * SOBOL_SPLIT_COUNT ))
+
+  for split in $(seq 1 "${SOBOL_SPLIT_COUNT}"); do
+    sobol_csv="$(sobol_split_csv_path "${split}")"
+    row_count="$(awk 'END {print NR-1}' "${sobol_csv}")"
+    if [[ "${row_count}" -ne "${SOBOL_SPLIT_ROWS}" ]]; then
+      echo "Expected ${SOBOL_SPLIT_ROWS} data rows in ${sobol_csv}, got ${row_count}" >&2
+      rm -rf "${tmp_dir}"
+      return 1
+    fi
+    awk 'NR > 1 { print }' "${sobol_csv}" >> "${split_data}"
+  done
+
+  local split_total_rows
+  split_total_rows="$(wc -l < "${split_data}")"
+  if [[ "${split_total_rows}" -ne "${expected_total_rows}" ]]; then
+    echo "Expected ${expected_total_rows} total split rows, got ${split_total_rows}" >&2
+    rm -rf "${tmp_dir}"
+    return 1
+  fi
+
+  LC_ALL=C sort "${split_data}" | uniq -d > "${duplicate_rows}"
+  if [[ -s "${duplicate_rows}" ]]; then
+    echo "Duplicate Sobol parameter rows found across split CSVs; refusing to submit." >&2
+    head -n 5 "${duplicate_rows}" >&2
+    rm -rf "${tmp_dir}"
+    return 1
+  fi
+
+  if [[ -f "${SOBOL_FULL_CSV}" ]]; then
+    awk 'NR > 1 { print }' "${SOBOL_FULL_CSV}" > "${full_data}"
+    if ! cmp -s "${full_data}" "${split_data}"; then
+      echo "Sobol split CSVs do not exactly cover ${SOBOL_FULL_CSV} in split order; regenerate splits before submitting." >&2
+      rm -rf "${tmp_dir}"
+      return 1
+    fi
+  fi
+
+  echo "Sobol split validation passed: ${SOBOL_SPLIT_COUNT} splits, ${SOBOL_SPLIT_ROWS} rows each, no duplicate parameter rows."
+  rm -rf "${tmp_dir}"
+}
+
 check_inputs() {
   local missing=0
   local split
@@ -131,6 +184,8 @@ check_inputs() {
   if [[ "${missing}" -ne 0 ]]; then
     exit 1
   fi
+
+  validate_sobol_splits || exit 1
 }
 
 row_bound_value() {
@@ -181,6 +236,7 @@ qsub_var_list() {
     ",INTERPOLATOR_PAD=${INTERPOLATOR_PAD}" \
     ",INTERPOLATOR_LOGM_MAX=${INTERPOLATOR_LOGM_MAX}" \
     ",INTERPOLATOR_TIMEOUT_SECONDS=${INTERPOLATOR_TIMEOUT_SECONDS}" \
+    ",SEPARATE_INTERPOLATOR_STEP=${SEPARATE_INTERPOLATOR_STEP}" \
     ",CL_LMAX=${CL_LMAX}" \
     ",CL_NITER=${CL_NITER}" \
     ",SKIP_EXISTING_OUTPUTS=${SKIP_EXISTING_OUTPUTS}" \

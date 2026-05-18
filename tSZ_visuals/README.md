@@ -48,7 +48,7 @@ Interpolator cache behavior:
 - Use `reuse_existing_cache=true` with `model_exists=false` for resume runs: an existing row cache is loaded, while missing caches are still built.
 - Use `cache_wait_seconds=N` with `model_exists=true` when a dependent lightcone should start before every cache exists; it waits for each missing cache instead of failing immediately.
 - Use `skip_existing_outputs=true skip_existing_any_run_instance=true` for resume runs so completed products are skipped even when the previous PBS job used a different `run_instance_tag`.
-- Cache-build controls are exposed as `interpolator_pad=256` and `interpolator_logM_max=15.7`. The PBS Sobol runner also uses `INTERPOLATOR_TIMEOUT_SECONDS=700` by default for cache builds.
+- Cache-build controls are exposed as `interpolator_pad=256` and `interpolator_logM_max=15.7`. By default each Sobol row runs in one Julia process so y100 builds the cache and paints without a second startup/cache reload. The older separate cache-build timeout path is available only if `SEPARATE_INTERPOLATOR_STEP=true`.
 - New caches are keyed by a stable hash of the physical Battaglia parameters plus cosmology, not by the Sobol CSV filename/row. This lets y100/y102 reuse the same interpolator even when the same parameter point is referenced through different split CSV files. Older row-tagged cache names are still checked as fallbacks.
 - To submit the full production set, place the 512-row Sobol table at `/home/kristero10/tSZ_data/battaglia_sobol_512.csv` and run `bash submit_y100_y102_sobol512.sh` from this directory on the cluster login node. The wrapper creates four 128-row split CSVs, submits y100 splits 1-4 with `model_exists=false`, then submits the matching y102 jobs with `model_exists=true` and `afterok` dependencies so they reuse the caches built by y100.
 
@@ -58,7 +58,7 @@ Sobol CSV support:
 - `sobol_row=N` loads one Battaglia model from row `N` of that CSV.
 - The Sobol loader expects columns for `P0`, `xc`, `beta`, `alpha_m_P0`, `alpha_m_xc`, `alpha_m_beta`, `alpha_z_P0`, `alpha_z_xc`, and `alpha_z_beta`.
 - `alpha`, `gamma`, and their exponents stay at the fiducial defaults unless you override them directly in the CLI.
-- Battaglia guardrails are enabled by default with `enforce_battaglia_guardrails=true skip_invalid_battaglia_rows=true`. The guarded priors match the current 512-point Sobol ranges; derived checks reject only non-finite, non-positive, or line-of-sight divergent profiles. Slow but physical interpolators are skipped by the PBS timeout and listed in the redo log.
+- Battaglia guardrails are enabled by default with `enforce_battaglia_guardrails=true skip_invalid_battaglia_rows=true`. The guarded priors match the current 512-point Sobol ranges; derived checks reject only non-finite, non-positive, or line-of-sight divergent profiles.
 
 Emulator test run:
 

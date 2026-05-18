@@ -20,7 +20,7 @@ cd "$PBS_O_WORKDIR"
 : "${CACHE_DIR:=/lustre/work/kristero10/tSZ_data/cache}"
 : "${SIMULATION_NAME:=halfdome_lightcone_${LIGHTCONE_ID}}"
 : "${NSIDE:=4096}"
-: "${THREADS_PER_TASK:=26}"
+: "${THREADS_PER_TASK:=${PBS_NCPUS:-${NCPUS:-25}}}"
 : "${MAX_PARALLEL:=1}"
 : "${MODEL_EXISTS:=false}"
 : "${REUSE_EXISTING_CACHE:=false}"
@@ -29,6 +29,7 @@ cd "$PBS_O_WORKDIR"
 : "${INTERPOLATOR_PAD:=256}"
 : "${INTERPOLATOR_LOGM_MAX:=15.7}"
 : "${INTERPOLATOR_TIMEOUT_SECONDS:=700}"
+: "${SEPARATE_INTERPOLATOR_STEP:=false}"
 : "${CL_LMAX:=4096}"
 : "${CL_NITER:=0}"
 : "${SKIP_EXISTING_OUTPUTS:=false}"
@@ -43,6 +44,13 @@ cd "$PBS_O_WORKDIR"
 : "${OPENBLAS_NUM_THREADS:=1}"
 : "${MKL_NUM_THREADS:=1}"
 
+is_true() {
+  case "${1:-}" in
+    true|TRUE|True|1|yes|YES|Yes|y|Y|on|ON|On) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 SCRIPT_CANDIDATE_1="${PBS_O_WORKDIR}/run_full_map.jl"
 SCRIPT_CANDIDATE_2="${PBS_O_WORKDIR}/tSZ_visuals/run_full_map.jl"
 if [[ -f "${SCRIPT_CANDIDATE_1}" ]]; then
@@ -54,15 +62,18 @@ else
   exit 1
 fi
 
-BUILD_SCRIPT_CANDIDATE_1="${PBS_O_WORKDIR}/build_interpolator_cache.jl"
-BUILD_SCRIPT_CANDIDATE_2="${PBS_O_WORKDIR}/tSZ_visuals/build_interpolator_cache.jl"
-if [[ -f "${BUILD_SCRIPT_CANDIDATE_1}" ]]; then
-  BUILD_SCRIPT="${BUILD_SCRIPT_CANDIDATE_1}"
-elif [[ -f "${BUILD_SCRIPT_CANDIDATE_2}" ]]; then
-  BUILD_SCRIPT="${BUILD_SCRIPT_CANDIDATE_2}"
-else
-  echo "Could not locate build_interpolator_cache.jl from PBS_O_WORKDIR=${PBS_O_WORKDIR}" >&2
-  exit 1
+BUILD_SCRIPT=""
+if is_true "${SEPARATE_INTERPOLATOR_STEP}"; then
+  BUILD_SCRIPT_CANDIDATE_1="${PBS_O_WORKDIR}/build_interpolator_cache.jl"
+  BUILD_SCRIPT_CANDIDATE_2="${PBS_O_WORKDIR}/tSZ_visuals/build_interpolator_cache.jl"
+  if [[ -f "${BUILD_SCRIPT_CANDIDATE_1}" ]]; then
+    BUILD_SCRIPT="${BUILD_SCRIPT_CANDIDATE_1}"
+  elif [[ -f "${BUILD_SCRIPT_CANDIDATE_2}" ]]; then
+    BUILD_SCRIPT="${BUILD_SCRIPT_CANDIDATE_2}"
+  else
+    echo "Could not locate build_interpolator_cache.jl from PBS_O_WORKDIR=${PBS_O_WORKDIR}" >&2
+    exit 1
+  fi
 fi
 
 mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${CACHE_DIR}"
@@ -101,8 +112,8 @@ if [[ "${REQUESTED_ROW_COUNT}" -lt "${MAX_PARALLEL}" ]]; then
 else
   CONCURRENT_JOBS="${MAX_PARALLEL}"
 fi
-if [[ "${CONCURRENT_JOBS}" -gt 1 && "${THREADS_PER_TASK}" -eq 26 ]]; then
-  THREADS_PER_TASK=$(( 26 / CONCURRENT_JOBS ))
+if [[ "${CONCURRENT_JOBS}" -gt 1 ]]; then
+  THREADS_PER_TASK=$(( THREADS_PER_TASK / CONCURRENT_JOBS ))
   if [[ "${THREADS_PER_TASK}" -lt 1 ]]; then
     THREADS_PER_TASK=1
   fi
@@ -122,7 +133,9 @@ echo "Nodefile: ${PBS_NODEFILE:-NA}"
 echo "Host: $(hostname)"
 echo "Date: $(date -Is)"
 echo "Julia script: ${SCRIPT}"
-echo "Interpolator build script: ${BUILD_SCRIPT}"
+if is_true "${SEPARATE_INTERPOLATOR_STEP}"; then
+  echo "Interpolator build script: ${BUILD_SCRIPT}"
+fi
 echo "Julia executable: ${JULIA}"
 "${JULIA}" --version
 echo "Lightcone id: ${LIGHTCONE_ID}"
@@ -162,6 +175,7 @@ echo "cache_poll_seconds=${CACHE_POLL_SECONDS}"
 echo "interpolator_pad=${INTERPOLATOR_PAD}"
 echo "interpolator_logM_max=${INTERPOLATOR_LOGM_MAX}"
 echo "interpolator_timeout_seconds=${INTERPOLATOR_TIMEOUT_SECONDS}"
+echo "separate_interpolator_step=${SEPARATE_INTERPOLATOR_STEP}"
 echo "cl_lmax=${CL_LMAX}"
 echo "cl_niter=${CL_NITER}"
 echo "skip_existing_outputs=${SKIP_EXISTING_OUTPUTS}"
@@ -171,13 +185,6 @@ echo "enforce_battaglia_guardrails=${ENFORCE_BATTAGLIA_GUARDRAILS}"
 echo "skip_invalid_battaglia_rows=${SKIP_INVALID_BATTAGLIA_ROWS}"
 echo "continue_on_row_error=${CONTINUE_ON_ROW_ERROR}"
 echo "redo_log=${REDO_LOG}"
-
-is_true() {
-  case "${1:-}" in
-    true|TRUE|True|1|yes|YES|Yes|y|Y|on|ON|On) return 0 ;;
-    *) return 1 ;;
-  esac
-}
 
 log_redo_required() {
   local sobol_row="$1"
@@ -282,22 +289,29 @@ run_one_row() {
   local sobol_row="$1"
   local build_status=0
   local run_status=0
+  local row_wall_start
   local full_run_model_exists="${MODEL_EXISTS}"
   local full_run_print_summary="true"
 
   set +e
+  row_wall_start="$(date +%s)"
   export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
   echo "Row start: lightcone=${LIGHTCONE_ID}, split=${SOBOL_SPLIT}, sobol_row=${sobol_row}, threads=${THREADS_PER_TASK}."
 
-  if ! is_true "${MODEL_EXISTS}"; then
+  if ! is_true "${MODEL_EXISTS}" && is_true "${SEPARATE_INTERPOLATOR_STEP}"; then
     run_interpolator_step "${sobol_row}"
     build_status=$?
     if [[ "${build_status}" -eq 124 || "${build_status}" -eq 137 || "${build_status}" -eq 143 ]]; then
       log_redo_required "${sobol_row}" "interpolator_timeout" "limit_seconds=${INTERPOLATOR_TIMEOUT_SECONDS}"
+      echo "Row wall elapsed time: $(( $(date +%s) - row_wall_start )) s"
       return 0
     elif [[ "${build_status}" -ne 0 ]]; then
       log_redo_required "${sobol_row}" "interpolator_build_failed" "exit_status=${build_status}"
-      is_true "${CONTINUE_ON_ROW_ERROR}" && return 0
+      if is_true "${CONTINUE_ON_ROW_ERROR}"; then
+        echo "Row wall elapsed time: $(( $(date +%s) - row_wall_start )) s"
+        return 0
+      fi
+      echo "Row wall elapsed time: $(( $(date +%s) - row_wall_start )) s"
       return "${build_status}"
     fi
 
@@ -310,11 +324,16 @@ run_one_row() {
   run_status=$?
   if [[ "${run_status}" -ne 0 ]]; then
     log_redo_required "${sobol_row}" "full_map_failed" "exit_status=${run_status}"
-    is_true "${CONTINUE_ON_ROW_ERROR}" && return 0
+    if is_true "${CONTINUE_ON_ROW_ERROR}"; then
+      echo "Row wall elapsed time: $(( $(date +%s) - row_wall_start )) s"
+      return 0
+    fi
+    echo "Row wall elapsed time: $(( $(date +%s) - row_wall_start )) s"
     return "${run_status}"
   fi
 
   echo "Row finished: sobol_row=${sobol_row}."
+  echo "Row wall elapsed time: $(( $(date +%s) - row_wall_start )) s"
   return 0
 }
 

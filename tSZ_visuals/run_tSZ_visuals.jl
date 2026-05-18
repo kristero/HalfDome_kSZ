@@ -113,8 +113,10 @@ function run_tsz_visual_fits()
     end
 
     if cfg.save_cl
+        cl_t0 = start_phase_timing()
         cl = compute_cl(cfg, output_y_map)
         write_cl_fits_overwrite(cfg.cl_output_path, cl)
+        print_phase_usage("C_l output", cl_t0)
     end
 
     elapsed = time() - t0

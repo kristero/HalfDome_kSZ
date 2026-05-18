@@ -7,6 +7,7 @@ const CLUSTER_CACHE_DIR_DEFAULT = joinpath(CLUSTER_OUTPUT_DIR_DEFAULT, "cache")
 const CLUSTER_SOBOL_CSV_DEFAULT = "/home/kristero10/tSZ_data/battaglia_sobol_32.csv"
 const TSZ_GAUSSIAN_BEAM_FWHM_ARCMIN_DEFAULT = 1.6
 const TSZ_CL_LMAX_DEFAULT = 4096
+const TSZ_OUTPUT_PARAM_TAG_MAX_BYTES = 120
 
 const TSZ_H_VALUE = 0.68
 const TSZ_C_KMS = 299_792.458
@@ -493,7 +494,8 @@ end
 
 function build_param_tag(p)
     parts = collect_param_tag_parts(p)
-    return isempty(parts) ? "base" : "base_plus_" * join(parts, "__")
+    tag = isempty(parts) ? "base" : "base_plus_" * join(parts, "__")
+    return compact_battaglia_output_tag(tag, p)
 end
 
 function battaglia_cache_tag(p)
@@ -519,6 +521,17 @@ function battaglia_cache_tag(p)
     return "battaglia_phys_" * digest
 end
 
+function compact_battaglia_output_tag(tag::AbstractString, p)
+    sizeof(tag) <= TSZ_OUTPUT_PARAM_TAG_MAX_BYTES && return String(tag)
+
+    compact_tag = battaglia_cache_tag(p)
+    println(
+        "Compacting long Battaglia output parameter tag " *
+        "($(sizeof(tag)) bytes) to $(compact_tag)."
+    )
+    return compact_tag
+end
+
 function battaglia_powerlaw_param(amp::Real, alpha_m::Real, alpha_z::Real, m14::Real, z1::Real)
     return Float64(amp) * Float64(m14)^Float64(alpha_m) * Float64(z1)^Float64(alpha_z)
 end
@@ -538,6 +551,7 @@ end
 function validate_battaglia_params(
     p;
     enforce_prior_bounds::Bool=true,
+    enforce_derived_bounds::Bool=true,
     logM_min::Real=BATTAGLIA_GUARD_LOGM_MIN_DEFAULT,
     logM_max::Real=15.7,
     z_max::Real=BATTAGLIA_GUARD_Z_MAX_DEFAULT,
@@ -567,7 +581,7 @@ function validate_battaglia_params(
         end
     end
 
-    if isempty(reasons)
+    if enforce_derived_bounds && isempty(reasons)
         logM_mid = 0.5 * (Float64(logM_min) + Float64(logM_max))
         z_mid = 0.5 * Float64(z_max)
         masses = 10.0 .^ unique(Float64[Float64(logM_min), logM_mid, Float64(logM_max)])
@@ -780,9 +794,11 @@ function load_visual_config()
         battaglia_params = manual_battaglia_params
         param_tag = build_param_tag(battaglia_params)
     end
+    param_tag = compact_battaglia_output_tag(param_tag, battaglia_params)
     validation_reasons = validate_battaglia_params(
         battaglia_params;
         enforce_prior_bounds=enforce_battaglia_guardrails,
+        enforce_derived_bounds=enforce_battaglia_guardrails,
         logM_max=interpolator_logM_max
     )
     if !isempty(validation_reasons)

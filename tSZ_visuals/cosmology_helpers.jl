@@ -51,7 +51,7 @@ function compute_redshift_and_mass(x, y, z, radius, itp_z_of_chi, rho_m, omegam=
     halo_mass = Vector{Float64}(undef, n)
     mass_prefactor = (4.0 * pi / 3.0) * rho_m
 
-    @threads for i in 1:n
+    Threads.@threads for i in 1:n
         xi = Float64(x[i])
         yi = Float64(y[i])
         zi = Float64(z[i])
@@ -74,7 +74,7 @@ function xyz_to_ra_dec_threaded(x::AbstractVector{T}, y::AbstractVector{T}, z::A
     ra = Vector{T}(undef, n)
     dec = Vector{T}(undef, n)
 
-    @threads for i in 1:n
+    Threads.@threads for i in 1:n
         r = sqrt(x[i]^2 + y[i]^2 + z[i]^2)
         vx = x[i] / r
         vy = y[i] / r

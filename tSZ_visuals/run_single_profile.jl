@@ -181,7 +181,7 @@ function run_single_tsz_profile()
     output_y_map = prepare_tsz_map_for_output(cfg.base_cfg, state.m_hp)
     save_single_profile_maps!(cfg, (m_hp=output_y_map, mass_hp=state.mass_hp))
 
-    cl = anafast(output_y_map, niter=0)
+    cl = compute_cl(cfg.base_cfg, output_y_map)
     write_cl_fits_overwrite(cfg.cl_output_path, cl)
 
     elapsed = time() - t0

@@ -109,6 +109,7 @@ function run_tsz_visual_fits()
         save_final_maps!(cfg, output_y_map, state.mass_hp)
     end
 
+    cl = nothing
     if cfg.save_cl
         cl = compute_cl(cfg, output_y_map)
         write_cl_fits_overwrite(cfg.cl_output_path, cl)
@@ -117,7 +118,7 @@ function run_tsz_visual_fits()
     elapsed = time() - t0
     println("Finished $(cfg.simulation_tag) Healpix tSZ visual FITS creation ($(cfg.batching_mode)).")
     println("Elapsed time: $(round(elapsed; digits=2)) s")
-    return state
+    return (cfg=cfg, cl=cl)
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__

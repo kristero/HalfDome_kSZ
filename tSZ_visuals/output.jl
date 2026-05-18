@@ -169,6 +169,7 @@ function write_cl_fits_overwrite(path::AbstractString, cl_values)
     isdir(parent_dir) || mkpath(parent_dir)
 
     cl_array = Float64.(collect(cl_values))
+    isfile(abs_path) && rm(abs_path; force=true)
     Healpix.writeClToFITS(abs_path, cl_array; overwrite=true)
 
     println("Saved Cl FITS to $(abs_path)")

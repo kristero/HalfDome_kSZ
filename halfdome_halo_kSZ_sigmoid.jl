@@ -39,7 +39,7 @@ a = @. 1 / (1 + redshift)
 
 
 # projected v/c (vectorized)
-r = sqrt.(x .* x .+ y .* y .+ z .* z 
+r = sqrt.(x .* x .+ y .* y .+ z .* z)
 proj_v_over_c = (x .* vx .+ y .* vy .+ z .* vz) ./ r ./ c_kms
 
 #proj_v_over_c = @. proj_v_over_c / a   # include scale factor
@@ -53,7 +53,7 @@ dec = dec[perm]
 redshift = redshift[perm]
 halo_mass = halo_mass[perm]
 proj_v_over_c = proj_v_over_c[perm]
-
+# proj_v_over_c .= proj_v_over_c .* (h_value^5) .* (1 .+ redshift)
 
 # For kSZ no sigmoid
 # model = BattagliaTauProfile(Omega_c=0.2603, Omega_b=0.0486,  h=0.6774)
@@ -75,5 +75,5 @@ print("Initiating the HealPix with NSide: $nside \n")
 w = XGPaint.HealpixRingProfileWorkspace{Float64}(res)
 
 @time paint!(m_hp, w, y_model_interp, halo_mass, redshift, ra, dec, proj_v_over_c)
-Healpix.saveToFITS(m_hp, "!HalfDome_kSZ_nside4096_sigmoid_r0_3_position_hcorr_$(add_str_end).fits", typechar="D")  
+Healpix.saveToFITS(m_hp, "!HalfDome_kSZ_nside4096_sigmoid_r0_3_position_phys_units_$(add_str_end).fits", typechar="D")  
 print("Finished Healpix kSZ total with sigmoid \n")

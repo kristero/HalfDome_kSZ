@@ -10,7 +10,7 @@ const c_kms = 299_792.458
 # -------------------------
 # options
 # -------------------------
-model_exists = false         # set to false to (re)build the model interpolator
+model_exists = true         # set to false to (re)build the model interpolator
 save_healpix_map = false    # save Healpix map FITS
 save_cl = true              # compute and save power spectrum
 apply_mass_cut = true       # apply mass cut
@@ -18,15 +18,13 @@ apply_mass_cut = true       # apply mass cut
 t0 = time()
 
 path = "other_sims/sims/halos.pksc"
-nside = 4096
+nside = 1024
 chunkN = 2_000_000          # tune to your RAM
 
 add_str_end = "13Msol_cutoff_HALO"
 mass_min = 1.0e+13
 
-# output file names (set these to whatever you want)
-fits_output_path = "batched_data/websky_tSZ_nside4096_$(add_str_end)_m200m.fits"
-cl_output_path = "batched_data/websky_tSZ_cl_m200c_test_phys_param.fits"
+# output file names are finalized after parameter tag is built
 
 # -------------------------
 # Battaglia16 model parameters (editable)
@@ -44,7 +42,7 @@ function get_float_arg(key, default; env=nothing)
             return parse(Float64, split(a, "=", limit=2)[2])
         end
     end
-    return default
+    return Float64(default)
 end
 
 const BATTAGLIA_P0_AMP_DEFAULT = 18.1
@@ -147,6 +145,10 @@ end
 param_tag = build_param_tag()
 add_str_end = add_str_end * "_" * param_tag
 
+# output file names (include parameter tag so array jobs do not overwrite)
+fits_output_path = "batched_data/websky_tSZ_nside$(nside)_$(add_str_end)_m200c.fits"
+cl_output_path = "batched_data/websky_tSZ_cl_m200c_test_phys_param_$(param_tag)_nside$(nside).fits"
+
 println("Battaglia16 physical parameters:")
 println("  P0_amp=$(battaglia_P0_amp), P0_alpha_m=$(battaglia_P0_alpha_m), P0_alpha_z=$(battaglia_P0_alpha_z)")
 println("  x_c_amp=$(battaglia_x_c_amp), x_c_alpha_m=$(battaglia_x_c_alpha_m), x_c_alpha_z=$(battaglia_x_c_alpha_z)")
@@ -155,17 +157,7 @@ println("  alpha_amp=$(battaglia_alpha_amp), alpha_alpha_m=$(battaglia_alpha_alp
 println("  gamma_amp=$(battaglia_gamma_amp), gamma_alpha_m=$(battaglia_gamma_alpha_m), gamma_alpha_z=$(battaglia_gamma_alpha_z)")
 
 using LinearAlgebra
-
-# -------------------------
-# (optional) ratio approximation m200m(z)/m200c(z)
-# y = a0 + a1 z + a2 z^2 + a3 z^3 + a4 z^4
-# -------------------------
-const a0 = 1.3595873806301997
-const a1 = -0.49815455039058704
-const a2 = 0.3014644154503205
-const a3 = -0.08294138910919961
-const a4 = 0.0083985355523884
-ratio_m200m_over_m200c(z) = a0 + a1*z + a2*z^2 + a3*z^3 + a4*z^4
+using Base.Threads
 
 # -------------------------
 # cosmology: chi(z) and z(chi)
@@ -198,11 +190,66 @@ end
 
 itp_z_of_chi = make_z_of_chi_itp(omegam=omegam, h_value=h_value)
 
+function m200m_to_m200c(m200m,z)
+    omegamz = omegam .* (1 .+ z) .^3 ./ (omegam .* (1 .+ z) .^3 .+ 1 .- omegam)
+    return m200m .* omegamz .^0.35
+end    
+
+@inline function m200m_to_m200c_scalar(m200m::Float64, z::Float64)
+    one_plus_z = 1.0 + z
+    ez_num = omegam * one_plus_z^3
+    omegamz = ez_num / (ez_num + 1.0 - omegam)
+    return m200m * omegamz^0.35
+end
+
+function compute_redshift_and_mass(x, y, z, R, itp_z_of_chi, rho_m)
+    n = length(x)
+    redshift = Vector{Float64}(undef, n)
+    halo_mass = Vector{Float64}(undef, n)
+    mass_prefactor = (4.0 * pi / 3.0) * rho_m
+
+    @threads for i in 1:n
+        xi = Float64(x[i])
+        yi = Float64(y[i])
+        zi = Float64(z[i])
+        ri = Float64(R[i])
+
+        chi = sqrt(xi * xi + yi * yi + zi * zi)
+        zi_redshift = itp_z_of_chi(chi)
+
+        redshift[i] = zi_redshift
+        halo_mass[i] = m200m_to_m200c_scalar(mass_prefactor * ri^3, zi_redshift)
+    end
+
+    return redshift, halo_mass
+end
+
+function xyz_to_ra_dec_threaded(x::AbstractVector{T}, y::AbstractVector{T}, z::AbstractVector{T}) where T
+    @assert length(x) == length(y) == length(z)
+
+    n = length(x)
+    ra = Vector{T}(undef, n)
+    dec = Vector{T}(undef, n)
+
+    @threads for i in 1:n
+        r = sqrt(x[i]^2 + y[i]^2 + z[i]^2)
+        vx = x[i] / r
+        vy = y[i] / r
+        vz = z[i] / r
+
+        theta, phi = Healpix.vec2ang(vx, vy, vz)
+        dec[i] = T(pi) / 2 - theta
+        ra[i] = phi
+    end
+
+    return ra, dec
+end
 
 # -------------------------
 # density + selection
 # -------------------------
 ρ = 2.775e11 * omegam * h^2  # Msun / Mpc^3
+rho_m = 2.775e11 * omegam * h^2
 selection = apply_mass_cut
 
 # -------------------------
@@ -239,6 +286,7 @@ res  = Healpix.Resolution(nside)
 w    = XGPaint.HealpixRingProfileWorkspace{Float64}(res)
 
 println("Initiating HealPix with NSide: $nside")
+println("Julia threads available: $(nthreads())")
 
 # If you previously observed "only last batch remains", use temp accumulation:
 tmp_hp = HealpixMap{Float64,RingOrder}(nside)
@@ -271,15 +319,7 @@ open(path, "r") do io
         vx = @view cat[4, :];  vy = @view cat[5, :];  vz = @view cat[6, :]
         R  = @view cat[7, :]
 
-        # chi and redshift
-        chi = sqrt.(Float64.(x).^2 .+ Float64.(y).^2 .+ Float64.(z).^2)
-        redshift = itp_z_of_chi.(chi)
-
-        # ρ = 2.775e11 * h^2 .* (omegam .* (1 .+ redshift).^3)  # Msun / Mpc^3
-
-
-        halo_mass = (4π/3) * ρ .* (Float64.(R) .^ 3)   # Float64 for XGPaint
-
+        redshift, halo_mass = compute_redshift_and_mass(x, y, z, R, itp_z_of_chi, rho_m)
 
         # Test with h units
 
@@ -287,8 +327,7 @@ open(path, "r") do io
         # y .= y .* (1 .+ redshift)
         # z .= z .* (1 .+ redshift)
 
-
-        halo_mass = M200Convert.m200m_to_m200c_arrays(halo_mass, redshift)
+        #halo_mass = M200Convert.m200m_to_m200c_arrays(halo_mass, redshift)
 
         # OPTIONAL: if your mass is actually M200m and you want to convert to M200c:
         # halo_mass .= halo_mass ./ ratio_m200m_over_m200c.(redshift)   # M200m to M200c
@@ -307,11 +346,10 @@ open(path, "r") do io
 
             # materialize selected subset as Float64 vectors (avoid holding full chunk)
             xs  = Float64.(x[sel]);  ys  = Float64.(y[sel]);  zs  = Float64.(z[sel])
-            vxs = Float64.(vx[sel]); vys = Float64.(vy[sel]); vzs = Float64.(vz[sel])
             ms  = halo_mass[sel]
             zsft = redshift[sel]
 
-            ra, dec = xyz_to_ra_dec(xs, ys, zs)
+            ra, dec = xyz_to_ra_dec_threaded(xs, ys, zs)
 
 
             # sort by dec (like your original)
@@ -328,12 +366,11 @@ open(path, "r") do io
         else
             # no selection: still avoid global arrays, but need Float64 vectors
             xs  = Float64.(x);  ys  = Float64.(y);  zs = Float64.(z)
-            vxs = Float64.(vx); vys = Float64.(vy); vzs = Float64.(vz)
             ms  = halo_mass
             zsft = redshift
 
 
-            ra, dec = xyz_to_ra_dec(xs, ys, zs)
+            ra, dec = xyz_to_ra_dec_threaded(xs, ys, zs)
     
             perm = sortperm(dec)
             ra  = ra[perm]

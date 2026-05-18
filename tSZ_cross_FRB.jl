@@ -180,9 +180,24 @@ frb_z_max = get_float_arg("frb_z_max", 2.5; env="FRB_Z_MAX")
 frb_redshift_weight_bin_width = get_float_arg("frb_redshift_weight_bin_width", 0.05; env="FRB_REDSHIFT_WEIGHT_BIN_WIDTH")
 dm_residual_bin_width = get_float_arg("dm_residual_bin_width", 0.05; env="DM_RESIDUAL_BIN_WIDTH")
 use_dm_residual_for_cross = get_bool_arg("use_dm_residual_for_cross", true; env="USE_DM_RESIDUAL_FOR_CROSS")
+normalize_weighted_frb_map_by_density = get_bool_arg(
+    "normalize_weighted_frb_map_by_density",
+    false;
+    env="NORMALIZE_WEIGHTED_FRB_MAP_BY_DENSITY"
+)
+use_normalized_dm_residual_estimator = get_bool_arg(
+    "use_normalized_dm_residual_estimator",
+    false;
+    env="USE_NORMALIZED_DM_RESIDUAL_ESTIMATOR"
+)
 save_frb_catalog = get_bool_arg("save_frb_catalog", true; env="SAVE_FRB_CATALOG")
 save_dm_residual_diagnostic = get_bool_arg("save_dm_residual_diagnostic", true; env="SAVE_DM_RESIDUAL_DIAGNOSTIC")
 truncate_beam_support = get_bool_arg("truncate_beam_support", false; env="TRUNCATE_BEAM_SUPPORT")
+
+if use_normalized_dm_residual_estimator
+    use_dm_residual_for_cross = true
+    normalize_weighted_frb_map_by_density = true
+end
 
 legacy_apply_gaussian_beam_set = has_arg_value("apply_gaussian_beam"; env="APPLY_GAUSSIAN_BEAM")
 legacy_gaussian_beam_fwhm_set = has_arg_value("gaussian_beam_fwhm_arcmin"; env="GAUSSIAN_BEAM_FWHM_ARCMIN")
@@ -426,6 +441,26 @@ function build_path_config_tag(;
     return "cfg_h" * bytes2hex(sha1(signature))[1:10]
 end
 
+function build_tsz_path_config_tag(;
+    add_str_end::AbstractString,
+    apply_mass_cut::Bool,
+    mass_min::Real,
+    truncate_beam_support::Bool,
+    tsz_beam_support_radius_arcmin::Real
+)
+    signature = join(
+        (
+            "add_str_end=$(add_str_end)",
+            "apply_mass_cut=$(apply_mass_cut)",
+            "mass_min=$(Float64(mass_min))",
+            "truncate_beam_support=$(truncate_beam_support)",
+            "tsz_beam_support_radius_arcmin=$(Float64(tsz_beam_support_radius_arcmin))"
+        ),
+        "|"
+    )
+    return "tszcfg_h" * bytes2hex(sha1(signature))[1:10]
+end
+
 param_tag = build_param_tag()
 catalog_input_path = resolve_catalog_input_path(catalog_source, halfdome_path, websky_path)
 catalog_input_tag = build_catalog_input_tag(catalog_source, catalog_input_path)
@@ -437,6 +472,13 @@ path_config_tag = build_path_config_tag(
     truncate_beam_support=truncate_beam_support,
     tsz_beam_support_radius_arcmin=tsz_beam_support_radius_arcmin,
     dm_beam_support_radius_arcmin=dm_beam_support_radius_arcmin
+)
+tsz_path_config_tag = build_tsz_path_config_tag(
+    add_str_end=add_str_end,
+    apply_mass_cut=apply_mass_cut,
+    mass_min=mass_min,
+    truncate_beam_support=truncate_beam_support,
+    tsz_beam_support_radius_arcmin=tsz_beam_support_radius_arcmin
 )
 mean_tag = subtract_map_means ? "monopole_removed" : "monopole_kept"
 run_config_tag = "$(catalog_input_tag)_$(path_config_tag)"
@@ -459,11 +501,12 @@ frb_weight_tag =
     "redshiftcorr_dz$(fmt_param_value(frb_redshift_weight_bin_width))" :
     "random_uniformhalo"
 frb_tag = "nfrb$(frb_count)_seed$(frb_seed)_$(frb_weight_tag)_$(frb_redshift_tag)_$(run_config_tag)"
-tsz_map_tag = "$(catalog_input_tag)_$(param_tag)_$(tsz_beam_tag)_$(path_config_tag)_$(mean_tag)"
+tsz_map_tag = "$(catalog_input_tag)_$(param_tag)_$(tsz_beam_tag)_$(tsz_path_config_tag)_$(mean_tag)"
 frb_map_tag = "$(frb_tag)_$(mean_tag)"
 dm_map_tag = "$(frb_tag)_$(param_tag)_$(dm_beam_tag)_$(mean_tag)"
 dm_residual_tag = "dmresid_dz$(fmt_param_value(dm_residual_bin_width))"
-dm_cross_tag = use_dm_residual_for_cross ? "cross_dmresidual" : "cross_dmraw"
+dm_norm_tag = normalize_weighted_frb_map_by_density ? "normnbar" : "unnorm"
+dm_cross_tag = "$(use_dm_residual_for_cross ? "cross_dmresidual" : "cross_dmraw")_$(dm_norm_tag)"
 cl_tag_base = "$(frb_tag)_$(param_tag)_$(tsz_beam_tag)_$(dm_beam_tag)_$(dm_residual_tag)_$(dm_cross_tag)"
 
 output_dir = joinpath(@__DIR__, "batched_data")
@@ -486,22 +529,22 @@ fits_output_path_dm = joinpath(
 )
 fits_output_path_dm_residual = joinpath(
     output_dir,
-    make_output_filename("$(catalog_tag)_FRB_DM_residual_nside$(nside)_$(dm_map_tag)_$(dm_residual_tag)", ".fits")
+    make_output_filename("$(catalog_tag)_FRB_DM_residual_nside$(nside)_$(dm_map_tag)_$(dm_residual_tag)_$(dm_norm_tag)", ".fits")
 )
 frb_catalog_output_path = joinpath(
     output_dir,
     make_output_filename("$(catalog_tag)_FRB_catalog_nside$(nside)_$(frb_tag)_$(param_tag)_$(dm_residual_tag)", ".h5")
 )
-cl_output_path_raw = joinpath(
+cl_output_path = joinpath(
     output_dir,
-    make_output_filename("$(catalog_tag)_tSZ_x_FRB_selected1_DM_cl_$(cl_tag_base)_monopole_kept_nside$(nside)", ".fits")
-)
-cl_output_path_monopole_removed = joinpath(
-    output_dir,
-    make_output_filename("$(catalog_tag)_tSZ_x_FRB_selected1_DM_cl_$(cl_tag_base)_monopole_removed_nside$(nside)", ".fits")
+    make_output_filename("$(catalog_tag)_tSZ_x_FRB_selected1_DM_cl_$(cl_tag_base)_nside$(nside)", ".fits")
 )
 linear_hist_output_path = joinpath(plot_output_dir, "redshift_distribution_FRB_$(frb_selection_mode)_linear.png")
 log_hist_output_path = joinpath(plot_output_dir, "redshift_distribution_FRB_$(frb_selection_mode)_logx.png")
+selected_halo_hist_output_path = joinpath(
+    plot_output_dir,
+    make_output_filename("selected_FRB_host_halo_histograms_$(catalog_tag)_$(frb_tag)", ".png")
+)
 dm_residual_diagnostic_output_path = joinpath(
     plot_output_dir,
     make_output_filename("FRB_DM_residual_diagnostic_$(catalog_tag)_$(frb_tag)_$(dm_residual_tag)", ".png")
@@ -514,6 +557,7 @@ println("FRB configuration:")
 println("  catalog_input_path=$(catalog_input_path)")
 println("  catalog_input_tag=$(catalog_input_tag)")
 println("  path_config_tag=$(path_config_tag)  # hidden mass-cut / beam-support config")
+println("  tsz_path_config_tag=$(tsz_path_config_tag)  # hidden tSZ-only cache config")
 println("  add_str_end=$(add_str_end), apply_mass_cut=$(apply_mass_cut), mass_min=$(mass_min)")
 println("  frb_count=$(frb_count), frb_seed=$(frb_seed)")
 println("  frb_selection_mode=$(frb_selection_mode)")
@@ -524,7 +568,10 @@ end
 println("  tSZ Gaussian beam: apply=$(apply_tsz_gaussian_beam), fwhm_arcmin=$(tsz_gaussian_beam_fwhm_arcmin)")
 println("  DM Gaussian beam: apply=$(apply_dm_gaussian_beam), fwhm_arcmin=$(dm_gaussian_beam_fwhm_arcmin)")
 println("  use_dm_residual_for_cross=$(use_dm_residual_for_cross)")
+println("  normalize_weighted_frb_map_by_density=$(normalize_weighted_frb_map_by_density)")
+println("  use_normalized_dm_residual_estimator=$(use_normalized_dm_residual_estimator)")
 println("  dm_residual_bin_width=$(dm_residual_bin_width)")
+println("  dm_cross_tag=$(dm_cross_tag)")
 println("  truncate_beam_support=$(truncate_beam_support)")
 println("  tSZ beam support radius arcmin=$(tsz_beam_support_radius_arcmin)")
 println("  DM beam support radius arcmin=$(dm_beam_support_radius_arcmin)")
@@ -848,7 +895,7 @@ function build_frb_overdensity_map(sample_x, sample_y, sample_z, nside)
     return frb_map
 end
 
-function build_frb_weighted_map(sample_x, sample_y, sample_z, weights, nside)
+function build_frb_weighted_map(sample_x, sample_y, sample_z, weights, nside; normalize_by_mean_density::Bool=false)
     length(sample_x) == length(sample_y) == length(sample_z) == length(weights) || error(
         "FRB weighted map inputs must have the same length."
     )
@@ -865,6 +912,12 @@ function build_frb_weighted_map(sample_x, sample_y, sample_z, weights, nside)
         theta, phi = Healpix.vec2ang(vx, vy, vz)
         pix = Healpix.ang2pixRing(res, theta, phi)
         weighted_map.pixels[pix] += weights[i]
+    end
+
+    if normalize_by_mean_density
+        mean_counts = length(sample_x) / length(weighted_map.pixels)
+        mean_counts > 0.0 || error("Cannot normalize the FRB weighted map with zero selected FRBs.")
+        weighted_map.pixels ./= mean_counts
     end
 
     return weighted_map
@@ -1029,6 +1082,64 @@ function save_dm_residual_diagnostic_plot(
     )
 
     return save_plot_accessible(diagnostic_plot, output_path)
+end
+
+function save_selected_frb_host_histogram_plot(
+    sample_redshift,
+    sample_mass,
+    output_path::AbstractString
+)
+    sample_count = length(sample_redshift)
+    length(sample_mass) == sample_count || error("sample_mass length does not match sample_redshift length.")
+
+    finite_sample_redshift = sample_redshift[isfinite.(sample_redshift)]
+    positive_sample_mass = sample_mass[isfinite.(sample_mass) .& (sample_mass .> 0.0)]
+
+    isempty(finite_sample_redshift) && error("Need at least one finite FRB host redshift to make the selected-halo histogram.")
+    isempty(positive_sample_mass) && error("Need at least one positive FRB host mass to make the selected-halo histogram.")
+
+    redshift_limits = expanded_linear_limits(0.0, maximum(finite_sample_redshift))
+    mass_limits = expanded_positive_limits(minimum(positive_sample_mass), maximum(positive_sample_mass))
+
+    redshift_bins = collect(range(redshift_limits[1], redshift_limits[2]; length=26))
+    mass_bins = 10 .^ range(log10(mass_limits[1]), log10(mass_limits[2]); length=26)
+
+    p_redshift = histogram(
+        finite_sample_redshift;
+        bins=redshift_bins,
+        xlims=redshift_limits,
+        color=:grey,
+        linecolor=:grey,
+        alpha=0.9,
+        label="",
+        xlabel="Chosen FRB host redshift",
+        ylabel="counts",
+        title="Chosen FRB host redshift distribution"
+    )
+
+    p_mass = histogram(
+        positive_sample_mass;
+        bins=mass_bins,
+        xlims=mass_limits,
+        xscale=:log10,
+        color=:grey,
+        linecolor=:grey,
+        alpha=0.9,
+        label="",
+        xlabel="Chosen FRB host halo mass [Msun]",
+        ylabel="counts",
+        title="Chosen FRB host halo mass distribution"
+    )
+
+    combined_plot = plot(
+        p_redshift,
+        p_mass;
+        layout=(2, 1),
+        size=(900, 900),
+        plot_title="Chosen FRB host halo histograms (N=$(sample_count))"
+    )
+
+    return save_plot_accessible(combined_plot, output_path)
 end
 
 function capture_selected_halos!(
@@ -1698,6 +1809,12 @@ end
 sample_ra_unsorted, sample_dec_unsorted = xyz_to_ra_dec_threaded(sample_x, sample_y, sample_z)
 sample_redshift_unsorted = copy(sample_redshift)
 sample_mass_unsorted = copy(sample_mass)
+selected_halo_hist_saved_path = save_selected_frb_host_histogram_plot(
+    sample_redshift_unsorted,
+    sample_mass_unsorted,
+    selected_halo_hist_output_path
+)
+println("Saved selected FRB host halo histogram plot to $(selected_halo_hist_saved_path)")
 sample_perm = sortperm(sample_dec_unsorted)
 sample_ra = sample_ra_unsorted[sample_perm]
 sample_dec = sample_dec_unsorted[sample_perm]
@@ -1823,11 +1940,29 @@ dm_mean_bin_centers, dm_mean_bin_values, dm_mean_bin_counts, mu_dm_at_z = comput
 sample_dm_mean = mu_dm_at_z.(sample_redshift_unsorted)
 sample_dm_residual = sample_dm_raw .- sample_dm_mean
 
-dm_raw_frb_hp = build_frb_weighted_map(sample_x, sample_y, sample_z, sample_dm_raw, nside)
-dm_residual_hp = build_frb_weighted_map(sample_x, sample_y, sample_z, sample_dm_residual, nside)
+dm_raw_frb_hp = build_frb_weighted_map(
+    sample_x,
+    sample_y,
+    sample_z,
+    sample_dm_raw,
+    nside;
+    normalize_by_mean_density=normalize_weighted_frb_map_by_density
+)
+dm_residual_hp = build_frb_weighted_map(
+    sample_x,
+    sample_y,
+    sample_z,
+    sample_dm_residual,
+    nside;
+    normalize_by_mean_density=normalize_weighted_frb_map_by_density
+)
 dm_analysis_hp = use_dm_residual_for_cross ? dm_residual_hp : dm_raw_frb_hp
 
-println("Using $(use_dm_residual_for_cross ? "DM residuals" : "raw DM") for downstream FRB x tSZ cross-correlations.")
+println(
+    "Using $(use_dm_residual_for_cross ? "DM residuals" : "raw DM") " *
+    "$(normalize_weighted_frb_map_by_density ? "with mean surface-density normalization" : "without mean surface-density normalization") " *
+    "for downstream FRB x tSZ cross-correlations."
+)
 
 if save_frb_catalog
     saved_frb_catalog_path = save_frb_dm_catalog(
@@ -1889,18 +2024,13 @@ validate_healpix_map(dm_hp, "DM profile map")
 validate_healpix_map(dm_raw_frb_hp, "Raw FRB DM map")
 validate_healpix_map(dm_residual_hp, "DM residual map")
 
-cl_cross_raw = nothing
-cl_cross_monopole_removed = nothing
+cl_cross = nothing
 if save_cl
-    m_hp_cl_raw = copy_healpix_map(m_hp)
-    dm_analysis_hp_cl_raw = copy_healpix_map(dm_analysis_hp)
-    cl_cross_raw = anafast(m_hp_cl_raw, dm_analysis_hp_cl_raw, niter=0)
-
     m_hp_cl_monopole_removed = copy_healpix_map(m_hp)
     dm_analysis_hp_cl_monopole_removed = copy_healpix_map(dm_analysis_hp)
     remove_monopole!(m_hp_cl_monopole_removed)
     remove_monopole!(dm_analysis_hp_cl_monopole_removed)
-    cl_cross_monopole_removed = anafast(m_hp_cl_monopole_removed, dm_analysis_hp_cl_monopole_removed, niter=0)
+    cl_cross = anafast(m_hp_cl_monopole_removed, dm_analysis_hp_cl_monopole_removed, niter=0)
 end
 
 if subtract_map_means
@@ -1933,8 +2063,7 @@ if save_healpix_maps
 end
 
 if save_cl
-    write_cl_fits_overwrite(cl_output_path_raw, cl_cross_raw)
-    write_cl_fits_overwrite(cl_output_path_monopole_removed, cl_cross_monopole_removed)
+    write_cl_fits_overwrite(cl_output_path, cl_cross)
 end
 
 println("Finished Healpix y x true FRB DM cross-correlation")

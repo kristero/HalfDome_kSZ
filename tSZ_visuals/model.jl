@@ -131,11 +131,30 @@ function visual_interpolator_cache_candidates(cfg::VisualConfig)
     return unique_cache_paths(candidates)
 end
 
+function cache_candidate_isfile(path::AbstractString)
+    filename = basename(path)
+    if sizeof(filename) > 240
+        preview = first(filename, min(length(filename), 96))
+        println(
+            "Skipping interpolator cache candidate with too-long filename " *
+            "($(sizeof(filename)) bytes): $(preview)..."
+        )
+        return false
+    end
+
+    try
+        return isfile(path)
+    catch err
+        @warn "Skipping inaccessible interpolator cache candidate." path=path exception=(err, catch_backtrace())
+        return false
+    end
+end
+
 function existing_visual_interpolator_cache(cfg::VisualConfig)
     paths = visual_interpolator_cache_paths(cfg)
     candidates = visual_interpolator_cache_candidates(cfg)
     for candidate in candidates
-        if isfile(candidate)
+        if cache_candidate_isfile(candidate)
             if !same_cache_path(candidate, paths.primary)
                 println("Primary interpolator cache not found at $(paths.primary)")
                 println("Using fallback interpolator cache: $(candidate)")

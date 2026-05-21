@@ -42,6 +42,8 @@ cd "${SCRIPT_DIR}"
 : "${Y100_MODEL_EXISTS:=false}"
 : "${Y102_MODEL_EXISTS:=true}"
 : "${DEPEND_Y102_ON_Y100:=true}"
+: "${JOB_SET_TAG:=s512}"
+: "${SUBMIT_SUMMARY_LABEL:=Sobol 512}"
 : "${CHECK_INPUTS:=true}"
 : "${DRY_RUN:=false}"
 
@@ -265,7 +267,7 @@ submit_job() {
   local row_start="${5:-}"
   local row_stop="${6:-}"
 
-  local job_name="tSZ_y${lightcone_id}_s512_${split}"
+  local job_name="tSZ_y${lightcone_id}_${JOB_SET_TAG}_${split}"
   local vars
   vars="$(qsub_var_list "${lightcone_id}" "${split}" "${model_exists}" "${row_start}" "${row_stop}")"
 
@@ -305,7 +307,7 @@ maybe_submit_job() {
   shift
 
   if ! is_true "${should_submit}"; then
-    echo "Skipping tSZ_y${1}_s512_${2} because its SUBMIT flag is ${should_submit}" >&2
+    echo "Skipping tSZ_y${1}_${JOB_SET_TAG}_${2} because its SUBMIT flag is ${should_submit}" >&2
     return 0
   fi
 
@@ -339,7 +341,7 @@ for split in $(seq 1 "${SOBOL_SPLIT_COUNT}"); do
   y102_jobs[$split]="$(maybe_submit_job "$(submit_flag_value 102 "${split}")" 102 "${split}" "${Y102_MODEL_EXISTS}" "${dependency}" "${row_start}" "${row_stop}")"
 done
 
-echo "Submitted Sobol 512 jobs:"
+echo "Submitted ${SUBMIT_SUMMARY_LABEL} jobs:"
 for split in $(seq 1 "${SOBOL_SPLIT_COUNT}"); do
   echo "  y100 split ${split}: ${y100_jobs[$split]:-}"
 done

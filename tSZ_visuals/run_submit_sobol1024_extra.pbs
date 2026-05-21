@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+#PBS -N tSZ_sobol1024_submit
+#PBS -q mini
+#PBS -l select=1:ncpus=1:mpiprocs=1:mem=2gb
+#PBS -l walltime=00:15:00
+#PBS -o /home/kristero10/logs/tSZ_baryon_run/
+#PBS -e /home/kristero10/logs/tSZ_baryon_run/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+if [[ ! -f "${WORK_DIR}/submit_y100_y102_sobol512.sh" ]]; then
+  if [[ -f "/home/kristero10/HalfDome_kSZ/tSZ_visuals/submit_y100_y102_sobol512.sh" ]]; then
+    WORK_DIR="/home/kristero10/HalfDome_kSZ/tSZ_visuals"
+  elif [[ -f "/home/kristero10/HalfDome/tSZ_visuals/submit_y100_y102_sobol512.sh" ]]; then
+    WORK_DIR="/home/kristero10/HalfDome/tSZ_visuals"
+  fi
+fi
+cd "${WORK_DIR}"
+
+: "${QSUB:=qsub}"
+: "${PYTHON:=python3}"
+: "${LOG_DIR:=/home/kristero10/logs/tSZ_baryon_run}"
+: "${SOBOL_BASE_DIR:=/home/kristero10/tSZ_data}"
+: "${SOBOL_BASENAME:=battaglia_sobol_1024}"
+: "${SOBOL_FULL_CSV:=${SOBOL_BASE_DIR}/${SOBOL_BASENAME}.csv}"
+: "${OLD_SOBOL_CSV:=${SOBOL_BASE_DIR}/battaglia_sobol_512.csv}"
+: "${SOBOL_SPLIT_DIR:=${SOBOL_BASE_DIR}}"
+: "${SOBOL_SPLIT_ROWS:=128}"
+: "${SOBOL_SPLIT_COUNT:=8}"
+: "${FIRST_NEW_SPLIT:=5}"
+: "${LAST_NEW_SPLIT:=8}"
+: "${CREATE_SOBOL_SPLITS:=true}"
+: "${OVERWRITE_SOBOL_SPLITS:=true}"
+: "${CHECK_FIRST_512_MATCH:=true}"
+: "${FIRST_512_TOL:=1e-10}"
+: "${HALFDOME_BASE_DIR:=/lustre/work/Globus-lt/halfdome/full_res/halos}"
+: "${OUTPUT_BASE_DIR:=/lustre/work/kristero10/tSZ_data}"
+: "${CACHE_DIR:=/lustre/work/kristero10/tSZ_data/cache}"
+: "${THREADS_PER_TASK:=25}"
+: "${MAX_PARALLEL:=1}"
+: "${SEPARATE_INTERPOLATOR_STEP:=false}"
+: "${REUSE_EXISTING_CACHE:=false}"
+: "${SKIP_EXISTING_OUTPUTS:=true}"
+: "${SKIP_EXISTING_ANY_RUN_INSTANCE:=true}"
+: "${CONTINUE_ON_ROW_ERROR:=true}"
+: "${Y100_MODEL_EXISTS:=false}"
+: "${Y102_MODEL_EXISTS:=true}"
+: "${DEPEND_Y102_ON_Y100:=true}"
+: "${PBS_SCRIPT:=${WORK_DIR}/run_full_map_sobol_parallel.pbs}"
+: "${DRY_RUN:=false}"
+
+is_true() {
+  case "${1:-}" in
+    true|TRUE|True|1|yes|YES|Yes|y|Y|on|ON|On) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+mkdir -p "${LOG_DIR}"
+
+if [[ ! -f "${SOBOL_FULL_CSV}" ]]; then
+  echo "Missing 1024 Sobol CSV: ${SOBOL_FULL_CSV}" >&2
+  echo "Convert the Excel file to CSV and place it there before submitting." >&2
+  exit 1
+fi
+
+if is_true "${CHECK_FIRST_512_MATCH}"; then
+  if [[ ! -f "${OLD_SOBOL_CSV}" ]]; then
+    echo "Missing old 512 Sobol CSV for consistency check: ${OLD_SOBOL_CSV}" >&2
+    exit 1
+  fi
+  "${PYTHON}" - "${OLD_SOBOL_CSV}" "${SOBOL_FULL_CSV}" "${FIRST_512_TOL}" <<'PY'
+import csv
+import sys
+
+old_path, new_path, tol_text = sys.argv[1:4]
+tol = float(tol_text)
+
+def read_table(path):
+    with open(path, newline="", encoding="utf-8-sig") as handle:
+        rows = list(csv.reader(handle))
+    if not rows:
+        raise SystemExit(f"{path} is empty")
+    header = [value.strip() for value in rows[0]]
+    data = [[float(value) for value in row] for row in rows[1:] if any(cell.strip() for cell in row)]
+    return header, data
+
+old_header, old_data = read_table(old_path)
+new_header, new_data = read_table(new_path)
+
+if old_header != new_header:
+    raise SystemExit(f"Sobol CSV headers differ:\n512:  {old_header}\n1024: {new_header}")
+if len(old_data) != 512:
+    raise SystemExit(f"Expected 512 data rows in {old_path}, got {len(old_data)}")
+if len(new_data) != 1024:
+    raise SystemExit(f"Expected 1024 data rows in {new_path}, got {len(new_data)}")
+
+max_diff = 0.0
+for old_row, new_row in zip(old_data, new_data[:512]):
+    max_diff = max(max_diff, *(abs(a - b) for a, b in zip(old_row, new_row)))
+if max_diff > tol:
+    raise SystemExit(f"First 512 rows of 1024 CSV do not match old 512 CSV; max diff={max_diff:g}")
+
+rounded = {tuple(round(value, 12) for value in row) for row in new_data}
+if len(rounded) != len(new_data):
+    raise SystemExit("Duplicate parameter rows found in 1024 Sobol CSV after rounding to 12 decimals")
+
+print("Sobol 1024 CSV validation passed: first 512 match old run, all 1024 rows are unique.")
+PY
+fi
+
+if [[ "${FIRST_NEW_SPLIT}" -ne 5 || "${LAST_NEW_SPLIT}" -ne 8 ]]; then
+  echo "This wrapper is intended for the additional 512 simulations: splits 5-8." >&2
+  echo "Got FIRST_NEW_SPLIT=${FIRST_NEW_SPLIT}, LAST_NEW_SPLIT=${LAST_NEW_SPLIT}" >&2
+  exit 1
+fi
+
+for split in $(seq 1 "${SOBOL_SPLIT_COUNT}"); do
+  export "SUBMIT_Y100_SPLIT${split}=false"
+  export "SUBMIT_Y102_SPLIT${split}=false"
+done
+
+for split in $(seq "${FIRST_NEW_SPLIT}" "${LAST_NEW_SPLIT}"); do
+  export "SUBMIT_Y100_SPLIT${split}=true"
+  export "SUBMIT_Y102_SPLIT${split}=true"
+done
+
+export QSUB
+export PBS_SCRIPT
+export SOBOL_BASE_DIR
+export SOBOL_BASENAME
+export SOBOL_FULL_CSV
+export SOBOL_SPLIT_DIR
+export SOBOL_SPLIT_ROWS
+export SOBOL_SPLIT_COUNT
+export CREATE_SOBOL_SPLITS
+export OVERWRITE_SOBOL_SPLITS
+export HALFDOME_BASE_DIR
+export OUTPUT_BASE_DIR
+export CACHE_DIR
+export LOG_DIR
+export THREADS_PER_TASK
+export MAX_PARALLEL
+export SEPARATE_INTERPOLATOR_STEP
+export REUSE_EXISTING_CACHE
+export SKIP_EXISTING_OUTPUTS
+export SKIP_EXISTING_ANY_RUN_INSTANCE
+export CONTINUE_ON_ROW_ERROR
+export Y100_MODEL_EXISTS
+export Y102_MODEL_EXISTS
+export DEPEND_Y102_ON_Y100
+export JOB_SET_TAG="s1024"
+export SUBMIT_SUMMARY_LABEL="Sobol 1024 additional splits 5-8"
+export DRY_RUN
+
+echo "======================================="
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Working directory: ${WORK_DIR}"
+echo "Date: $(date -Is)"
+echo "Sobol full CSV: ${SOBOL_FULL_CSV}"
+echo "Splits: ${SOBOL_SPLIT_COUNT} x ${SOBOL_SPLIT_ROWS} rows"
+echo "Submitting only new splits: ${FIRST_NEW_SPLIT}-${LAST_NEW_SPLIT}"
+echo "Per-split PBS script: ${PBS_SCRIPT}"
+echo "Dry run: ${DRY_RUN}"
+echo "======================================="
+
+bash "${WORK_DIR}/submit_y100_y102_sobol512.sh"

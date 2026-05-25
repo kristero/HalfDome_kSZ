@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+#PBS -N tSZ_sbi_y100_2048
+#PBS -q mini
+#PBS -l select=1:ncpus=4:mpiprocs=1:mem=32gb
+#PBS -l walltime=02:00:00
+#PBS -o /home/kristero10/logs/tSZ_sbi/
+#PBS -e /home/kristero10/logs/tSZ_sbi/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+cd "${PBS_O_WORKDIR:-$PWD}"
+
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+: "${LOG_DIR:=/home/kristero10/logs/tSZ_sbi}"
+: "${Y100_DIRS:=/lustre/work/kristero10/tSZ_data/y100}"
+
+# Full y100-only 2048 dataset:
+#   rows 1-512     from battaglia_sobol_512_1..4
+#   rows 513-1024  from battaglia_sobol_1024_5..8
+#   rows 1025-2048 from battaglia_sobol_2048_9..16
+: "${SOBOL_CSVS:=/home/kristero10/tSZ_data/battaglia_sobol_512_1.csv:/home/kristero10/tSZ_data/battaglia_sobol_512_2.csv:/home/kristero10/tSZ_data/battaglia_sobol_512_3.csv:/home/kristero10/tSZ_data/battaglia_sobol_512_4.csv:/home/kristero10/tSZ_data/battaglia_sobol_1024_5.csv:/home/kristero10/tSZ_data/battaglia_sobol_1024_6.csv:/home/kristero10/tSZ_data/battaglia_sobol_1024_7.csv:/home/kristero10/tSZ_data/battaglia_sobol_1024_8.csv:/home/kristero10/tSZ_data/battaglia_sobol_2048_9.csv:/home/kristero10/tSZ_data/battaglia_sobol_2048_10.csv:/home/kristero10/tSZ_data/battaglia_sobol_2048_11.csv:/home/kristero10/tSZ_data/battaglia_sobol_2048_12.csv:/home/kristero10/tSZ_data/battaglia_sobol_2048_13.csv:/home/kristero10/tSZ_data/battaglia_sobol_2048_14.csv:/home/kristero10/tSZ_data/battaglia_sobol_2048_15.csv:/home/kristero10/tSZ_data/battaglia_sobol_2048_16.csv}"
+: "${PROFILE_GLOBS:=*tSZ_cl*.fits}"
+: "${PROFILE_INCLUDE_REGEX:=sobol_battaglia_sobol_512_[1-4]_row[0-9]+|sobol_battaglia_sobol_1024_[5-8]_row[0-9]+|sobol_battaglia_sobol_2048_(9|1[0-6])_row[0-9]+}"
+: "${PROFILE_EXCLUDE_REGEX:=sobol_battaglia_sobol_512_row[0-9]+|sobol_battaglia_sobol_1024_[1-4]_row[0-9]+|sobol_battaglia_sobol_2048_[1-8]_row[0-9]+|sobol_battaglia_sobol_256}"
+: "${OUTPUT_DIR:=/lustre/work/kristero10/tSZ_data/sbi_battaglia_y100_2048}"
+: "${DATASET_NAME:=sbi_battaglia_y100_2048.npz}"
+: "${METADATA_NAME:=sbi_battaglia_y100_2048_metadata.csv}"
+: "${MANIFEST_NAME:=sbi_battaglia_y100_2048_manifest.json}"
+: "${ELL_MIN:=2}"
+: "${ELL_MAX:=4096}"
+: "${EXPECTED_POINTS:=2048}"
+: "${ROWS_PER_SPLIT:=128}"
+: "${KEY_PRECISION:=12}"
+: "${TARGET_FLOOR:=1e-40}"
+: "${ALLOW_MISSING:=false}"
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+
+SCRIPT_CANDIDATE_1="${PBS_O_WORKDIR:-$PWD}/combine_sbi_dataset_y100.py"
+SCRIPT_CANDIDATE_2="${PBS_O_WORKDIR:-$PWD}/tSZ_visuals/combine_sbi_dataset_y100.py"
+if [[ -f "${SCRIPT_CANDIDATE_1}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_1}"
+elif [[ -f "${SCRIPT_CANDIDATE_2}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_2}"
+else
+  echo "Could not locate combine_sbi_dataset_y100.py from PBS_O_WORKDIR=${PBS_O_WORKDIR:-$PWD}" >&2
+  exit 1
+fi
+
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+
+export OMP_NUM_THREADS
+export OPENBLAS_NUM_THREADS
+export MKL_NUM_THREADS
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  echo "Running Python environment setup command."
+  eval "${PYTHON_ENV_SETUP}"
+fi
+
+echo "======================================="
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Working directory: ${PBS_O_WORKDIR:-$PWD}"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Python executable: ${PYTHON}"
+"${PYTHON}" --version
+echo "Script: ${SCRIPT}"
+echo "Y100 dirs: ${Y100_DIRS}"
+echo "Sobol CSVs: ${SOBOL_CSVS}"
+echo "Profile globs: ${PROFILE_GLOBS}"
+echo "Profile include regex: ${PROFILE_INCLUDE_REGEX}"
+echo "Profile exclude regex: ${PROFILE_EXCLUDE_REGEX}"
+echo "Output dir: ${OUTPUT_DIR}"
+echo "Expected points: ${EXPECTED_POINTS}"
+echo "Rows per split: ${ROWS_PER_SPLIT}"
+echo "Ell range: ${ELL_MIN}:${ELL_MAX}"
+echo "Allow missing: ${ALLOW_MISSING}"
+echo "======================================="
+
+args=(
+  "${SCRIPT}"
+  --y100-dirs "${Y100_DIRS}"
+  --sobol-csvs "${SOBOL_CSVS}"
+  --profile-globs "${PROFILE_GLOBS}"
+  --include-path-regex "${PROFILE_INCLUDE_REGEX}"
+  --exclude-path-regex "${PROFILE_EXCLUDE_REGEX}"
+  --output-dir "${OUTPUT_DIR}"
+  --dataset-name "${DATASET_NAME}"
+  --metadata-name "${METADATA_NAME}"
+  --manifest-name "${MANIFEST_NAME}"
+  --ell-min "${ELL_MIN}"
+  --ell-max "${ELL_MAX}"
+  --expected-points "${EXPECTED_POINTS}"
+  --rows-per-split "${ROWS_PER_SPLIT}"
+  --key-precision "${KEY_PRECISION}"
+  --target-floor "${TARGET_FLOOR}"
+)
+
+if [[ "${ALLOW_MISSING}" == "true" ]]; then
+  args+=(--allow-missing)
+fi
+
+"${PYTHON}" "${args[@]}"
+
+echo "SBI y100-only 2048 dataset combination finished."

@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+#PBS -N tSZ_cmp_y100
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=25gb
+#PBS -l walltime=04:00:00
+#PBS -o /home/kristero10/logs/SZ/
+#PBS -e /home/kristero10/logs/SZ/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+if [[ -f "${WORK_DIR}/HalfDome_tSZ.jl" ]]; then
+  SCRIPT_DIR="${WORK_DIR}"
+elif [[ -f "${WORK_DIR}/tSZ_visuals/HalfDome_tSZ.jl" ]]; then
+  SCRIPT_DIR="${WORK_DIR}/tSZ_visuals"
+elif [[ -f "/home/kristero10/HalfDome/tSZ_visuals/HalfDome_tSZ.jl" ]]; then
+  SCRIPT_DIR="/home/kristero10/HalfDome/tSZ_visuals"
+elif [[ -f "/home/kristero10/HalfDome_kSZ/tSZ_visuals/HalfDome_tSZ.jl" ]]; then
+  SCRIPT_DIR="/home/kristero10/HalfDome_kSZ/tSZ_visuals"
+else
+  echo "Could not locate HalfDome_tSZ.jl from PBS_O_WORKDIR=${PBS_O_WORKDIR:-unset}" >&2
+  exit 1
+fi
+cd "${SCRIPT_DIR}"
+
+: "${JULIA:=/usr/local/bin/julia}"
+: "${LIGHTCONE_ID:=100}"
+: "${LOG_DIR:=/home/kristero10/logs/SZ}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
+: "${OUTPUT_DIR:=${SCRIPT_DIR}/full_tsz_outputs}"
+: "${CACHE_DIR:=${SCRIPT_DIR}/cache}"
+: "${SIMULATION_NAME:=halfdome_lightcone_${LIGHTCONE_ID}}"
+: "${NSIDE:=4096}"
+: "${THREADS_PER_TASK:=26}"
+: "${MODEL_EXISTS:=false}"
+: "${REUSE_EXISTING_CACHE:=false}"
+: "${INTERPOLATOR_PAD:=256}"
+: "${INTERPOLATOR_LOGM_MAX:=15.7}"
+: "${CL_LMAX:=4096}"
+: "${CL_NITER:=0}"
+: "${SKIP_EXISTING_OUTPUTS:=false}"
+: "${SKIP_EXISTING_ANY_RUN_INSTANCE:=true}"
+: "${RUN_INSTANCE_TAG:=compare_y${LIGHTCONE_ID}_pbsjob${PBS_JOBID:-manual}}"
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}" "${CACHE_DIR}"
+
+if [[ ! -f "${HALFDOME_PATH}" ]]; then
+  echo "Missing HalfDome lightcone: ${HALFDOME_PATH}" >&2
+  exit 1
+fi
+
+export OMP_NUM_THREADS
+export OPENBLAS_NUM_THREADS
+export MKL_NUM_THREADS
+
+ALLOCATED_CPUS_HINT="${PBS_NCPUS:-${NCPUS:-unknown}}"
+PBS_NP_HINT="${PBS_NP:-unknown}"
+NODEFILE_SLOTS="unknown"
+if [[ -n "${PBS_NODEFILE:-}" && -f "${PBS_NODEFILE}" ]]; then
+  NODEFILE_SLOTS="$(wc -l < "${PBS_NODEFILE}")"
+fi
+
+echo "======================================="
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Working directory: ${WORK_DIR}"
+echo "Script directory: ${SCRIPT_DIR}"
+echo "Nodefile: ${PBS_NODEFILE:-NA}"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Julia script: ${SCRIPT_DIR}/HalfDome_tSZ.jl"
+echo "Julia executable: ${JULIA}"
+"${JULIA}" --version
+echo "Lightcone id: ${LIGHTCONE_ID}"
+echo "Simulation name: ${SIMULATION_NAME}"
+echo "halfdome_path=${HALFDOME_PATH}"
+echo "output_dir=${OUTPUT_DIR}"
+echo "cache_dir=${CACHE_DIR}"
+echo "model_exists=${MODEL_EXISTS}"
+echo "reuse_existing_cache=${REUSE_EXISTING_CACHE}"
+echo "nside=${NSIDE}"
+echo "interpolator_pad=${INTERPOLATOR_PAD}"
+echo "interpolator_logM_max=${INTERPOLATOR_LOGM_MAX}"
+echo "cl_lmax=${CL_LMAX}"
+echo "cl_niter=${CL_NITER}"
+echo "run_instance_tag=${RUN_INSTANCE_TAG}"
+echo "PBS_NP/nodefile slots are MPI slots on this cluster, not OpenMP thread count."
+echo "PBS_NP: ${PBS_NP_HINT}"
+echo "PBS_NCPUS/NCPUS: ${ALLOCATED_CPUS_HINT}"
+echo "PBS nodefile slots: ${NODEFILE_SLOTS}"
+echo "Threads per Julia task: ${THREADS_PER_TASK}"
+"${JULIA}" --threads="${THREADS_PER_TASK}" -e 'println("Julia preflight nthreads=", Base.Threads.nthreads())'
+echo "OMP_NUM_THREADS: ${OMP_NUM_THREADS}"
+echo "OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS}"
+echo "MKL_NUM_THREADS: ${MKL_NUM_THREADS}"
+if [[ -n "${PBS_NODEFILE:-}" && -f "${PBS_NODEFILE}" ]]; then
+  echo "PBS node allocation:"
+  sort "${PBS_NODEFILE}" | uniq -c
+fi
+command -v taskset >/dev/null 2>&1 && taskset -pc $$
+command -v lscpu >/dev/null 2>&1 && lscpu | egrep 'Model name|CPU\(s\)|Thread|Core|Socket|MHz|NUMA'
+echo "======================================="
+
+stdout_path="${LOG_DIR}/tSZ_compare_y${LIGHTCONE_ID}_${PBS_JOBID:-manual}.out"
+stderr_path="${LOG_DIR}/tSZ_compare_y${LIGHTCONE_ID}_${PBS_JOBID:-manual}.err"
+
+echo "Launching custom Battaglia HalfDome tSZ comparison run."
+(
+  export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
+  "${JULIA}" --threads="${THREADS_PER_TASK}" "${SCRIPT_DIR}/HalfDome_tSZ.jl" \
+    model_exists="${MODEL_EXISTS}" \
+    reuse_existing_cache="${REUSE_EXISTING_CACHE}" \
+    batching_mode=full \
+    save_bin_maps=false \
+    apply_gaussian_beam=false \
+    save_healpix_map=false \
+    save_mass_map=false \
+    save_cl=true \
+    nside="${NSIDE}" \
+    interpolator_pad="${INTERPOLATOR_PAD}" \
+    interpolator_logM_max="${INTERPOLATOR_LOGM_MAX}" \
+    cl_lmax="${CL_LMAX}" \
+    cl_niter="${CL_NITER}" \
+    skip_existing_outputs="${SKIP_EXISTING_OUTPUTS}" \
+    skip_existing_any_run_instance="${SKIP_EXISTING_ANY_RUN_INSTANCE}" \
+    catalog_source=halfdome \
+    simulation_name="${SIMULATION_NAME}" \
+    halfdome_path="${HALFDOME_PATH}" \
+    output_dir="${OUTPUT_DIR}" \
+    cache_dir="${CACHE_DIR}" \
+    run_instance_tag="${RUN_INSTANCE_TAG}" \
+    battaglia_P0_amp=2.79581386e+01 \
+    battaglia_x_c_amp=1.55268803e-01 \
+    battaglia_beta_amp=3.85984256e+00 \
+    battaglia_P0_alpha_m=1.72146233e-01 \
+    battaglia_x_c_alpha_m=-3.73934602e-02 \
+    battaglia_beta_alpha_m=1.37082533e-02 \
+    battaglia_P0_alpha_z=-4.73341709e-01 \
+    battaglia_x_c_alpha_z=1.08180647e+00 \
+    battaglia_beta_alpha_z=1.43260471e-01 \
+    > "${stdout_path}" \
+    2> "${stderr_path}"
+)
+
+echo "Job finished. Julia stdout: ${stdout_path}"
+echo "Job finished. Julia stderr: ${stderr_path}"

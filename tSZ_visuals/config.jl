@@ -268,6 +268,21 @@ function optional_filename_tag(s::AbstractString)
     return strip(tag, '_')
 end
 
+function shorten_filename_stem(stem::AbstractString; max_length::Int=220)
+    stem_string = String(stem)
+    ncodeunits(stem_string) <= max_length && return stem_string
+
+    digest = bytes2hex(sha1(stem_string))[1:12]
+    suffix = "_h" * digest
+    head_length = max_length - ncodeunits(suffix)
+    head_length > 0 || error("max_length=$(max_length) is too small to shorten filename stems.")
+    return stem_string[1:head_length] * suffix
+end
+
+function make_output_filename(stem::AbstractString, extension::AbstractString; max_stem_length::Int=220)
+    return shorten_filename_stem(stem; max_length=max_stem_length) * String(extension)
+end
+
 function default_slurm_run_instance_tag()
     job_id = strip(get(ENV, "SLURM_JOB_ID", ""))
     task_id = strip(get(ENV, "SLURM_ARRAY_TASK_ID", ""))
@@ -817,9 +832,18 @@ function load_visual_config()
     cl_lmax_tag = build_cl_lmax_tag(cl_lmax)
     cl_tag_base = "$(beam_tag)_$(binning_tag)_$(bin_map_mode_tag)_$(cl_lmax_tag)"
     cl_run_tag = isempty(run_instance_tag) ? cl_tag_base : "$(cl_tag_base)__$(run_instance_tag)"
-    fits_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_nside$(nside)_$(output_run_tag)_m200c.fits")
-    mass_fits_output_path = joinpath(output_dir, "$(simulation_tag)_mass_nside$(nside)_$(output_run_tag)_m200c.fits")
-    cl_output_path = joinpath(output_dir, "$(simulation_tag)_tSZ_cl_m200c_$(param_tag)_$(cosmology_tag)_nside$(nside)_$(cl_run_tag).fits")
+    fits_output_path = joinpath(
+        output_dir,
+        make_output_filename("$(simulation_tag)_tSZ_nside$(nside)_$(output_run_tag)_m200c", ".fits")
+    )
+    mass_fits_output_path = joinpath(
+        output_dir,
+        make_output_filename("$(simulation_tag)_mass_nside$(nside)_$(output_run_tag)_m200c", ".fits")
+    )
+    cl_output_path = joinpath(
+        output_dir,
+        make_output_filename("$(simulation_tag)_tSZ_cl_m200c_$(param_tag)_$(cosmology_tag)_nside$(nside)_$(cl_run_tag)", ".fits")
+    )
 
     return VisualConfig(
         model_exists=model_exists,

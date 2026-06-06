@@ -14,6 +14,7 @@ cd "${SCRIPT_DIR}"
 : "${SOBOL_SPLIT_DIR:=${SOBOL_BASE_DIR}}"
 : "${SOBOL_SPLIT_ROWS:=128}"
 : "${SOBOL_SPLIT_COUNT:=4}"
+: "${SOBOL_ROWS_PER_JOB:=0}"
 : "${CREATE_SOBOL_SPLITS:=true}"
 : "${OVERWRITE_SOBOL_SPLITS:=true}"
 : "${HALFDOME_BASE_DIR:=/lustre/work/Globus-lt/halfdome/full_res/halos}"
@@ -39,6 +40,7 @@ cd "${SCRIPT_DIR}"
 : "${SKIP_INVALID_BATTAGLIA_ROWS:=true}"
 : "${CONTINUE_ON_ROW_ERROR:=true}"
 : "${PRINT_RUNTIME_ENVIRONMENT:=false}"
+: "${SHORT_LOGS:=false}"
 : "${Y100_MODEL_EXISTS:=false}"
 : "${Y102_MODEL_EXISTS:=true}"
 : "${DEPEND_Y102_ON_Y100:=true}"
@@ -205,6 +207,13 @@ submit_flag_value() {
   printf '%s' "${!var_name:-true}"
 }
 
+validate_submit_options() {
+  if ! [[ "${SOBOL_ROWS_PER_JOB}" =~ ^[0-9]+$ ]]; then
+    echo "SOBOL_ROWS_PER_JOB must be a non-negative integer, got ${SOBOL_ROWS_PER_JOB}" >&2
+    exit 1
+  fi
+}
+
 qsub_var_list() {
   local lightcone_id="$1"
   local split="$2"
@@ -227,6 +236,7 @@ qsub_var_list() {
     ",OUTPUT_DIR=${output_dir}" \
     ",CACHE_DIR=${CACHE_DIR}" \
     ",LOG_DIR=${LOG_DIR}" \
+    ",JOB_SET_TAG=${JOB_SET_TAG}" \
     ",SIMULATION_NAME=${simulation_name}" \
     ",NSIDE=${NSIDE}" \
     ",THREADS_PER_TASK=${THREADS_PER_TASK}" \
@@ -247,6 +257,7 @@ qsub_var_list() {
     ",ENFORCE_BATTAGLIA_GUARDRAILS=${ENFORCE_BATTAGLIA_GUARDRAILS}" \
     ",SKIP_INVALID_BATTAGLIA_ROWS=${SKIP_INVALID_BATTAGLIA_ROWS}" \
     ",CONTINUE_ON_ROW_ERROR=${CONTINUE_ON_ROW_ERROR}" \
+    ",SHORT_LOGS=${SHORT_LOGS}" \
     ",PRINT_RUNTIME_ENVIRONMENT=${PRINT_RUNTIME_ENVIRONMENT}")"
 
   if [[ -n "${row_start}" ]]; then
@@ -267,7 +278,11 @@ submit_job() {
   local row_start="${5:-}"
   local row_stop="${6:-}"
 
-  local job_name="tSZ_y${lightcone_id}_${JOB_SET_TAG}_${split}"
+  local range_tag=""
+  if [[ -n "${row_start}" || -n "${row_stop}" ]]; then
+    range_tag="_r${row_start:-1}to${row_stop:-${SOBOL_SPLIT_ROWS}}"
+  fi
+  local job_name="tSZ_y${lightcone_id}_${JOB_SET_TAG}_${split}${range_tag}"
   local vars
   vars="$(qsub_var_list "${lightcone_id}" "${split}" "${model_exists}" "${row_start}" "${row_stop}")"
 
@@ -314,11 +329,53 @@ maybe_submit_job() {
   submit_job "$@"
 }
 
+submit_jobs_for_split() {
+  local should_submit="$1"
+  local lightcone_id="$2"
+  local split="$3"
+  local model_exists="$4"
+  local dependency="${5:-}"
+  local row_start="${6:-}"
+  local row_stop="${7:-}"
+
+  if ! is_true "${should_submit}"; then
+    echo "Skipping tSZ_y${lightcone_id}_${JOB_SET_TAG}_${split} because its SUBMIT flag is ${should_submit}" >&2
+    return 0
+  fi
+
+  local effective_start="${row_start:-1}"
+  local effective_stop="${row_stop:-${SOBOL_SPLIT_ROWS}}"
+  local requested_rows=$(( effective_stop - effective_start + 1 ))
+  if [[ "${SOBOL_ROWS_PER_JOB}" -eq 0 || "${SOBOL_ROWS_PER_JOB}" -ge "${requested_rows}" ]]; then
+    submit_job "${lightcone_id}" "${split}" "${model_exists}" "${dependency}" "${row_start}" "${row_stop}"
+    return 0
+  fi
+
+  local job_ids=()
+  local batch_start="${effective_start}"
+  local batch_stop
+  local job_id
+  while [[ "${batch_start}" -le "${effective_stop}" ]]; do
+    batch_stop=$(( batch_start + SOBOL_ROWS_PER_JOB - 1 ))
+    if [[ "${batch_stop}" -gt "${effective_stop}" ]]; then
+      batch_stop="${effective_stop}"
+    fi
+    job_id="$(submit_job "${lightcone_id}" "${split}" "${model_exists}" "${dependency}" "${batch_start}" "${batch_stop}")"
+    job_ids+=("${job_id}")
+    batch_start=$(( batch_stop + 1 ))
+  done
+
+  local IFS=:
+  printf '%s' "${job_ids[*]}"
+}
+
 split_sobol_csv
 
 if [[ "${CHECK_INPUTS}" == "true" ]]; then
   check_inputs
 fi
+
+validate_submit_options
 
 mkdir -p "${LOG_DIR}"
 
@@ -328,7 +385,7 @@ declare -a y102_jobs
 for split in $(seq 1 "${SOBOL_SPLIT_COUNT}"); do
   row_start="$(row_bound_value 100 "${split}" START)"
   row_stop="$(row_bound_value 100 "${split}" STOP)"
-  y100_jobs[$split]="$(maybe_submit_job "$(submit_flag_value 100 "${split}")" 100 "${split}" "${Y100_MODEL_EXISTS}" "" "${row_start}" "${row_stop}")"
+  y100_jobs[$split]="$(submit_jobs_for_split "$(submit_flag_value 100 "${split}")" 100 "${split}" "${Y100_MODEL_EXISTS}" "" "${row_start}" "${row_stop}")"
 done
 
 for split in $(seq 1 "${SOBOL_SPLIT_COUNT}"); do
@@ -338,10 +395,13 @@ for split in $(seq 1 "${SOBOL_SPLIT_COUNT}"); do
   if is_true "${DEPEND_Y102_ON_Y100}"; then
     dependency="${y100_jobs[$split]:-}"
   fi
-  y102_jobs[$split]="$(maybe_submit_job "$(submit_flag_value 102 "${split}")" 102 "${split}" "${Y102_MODEL_EXISTS}" "${dependency}" "${row_start}" "${row_stop}")"
+  y102_jobs[$split]="$(submit_jobs_for_split "$(submit_flag_value 102 "${split}")" 102 "${split}" "${Y102_MODEL_EXISTS}" "${dependency}" "${row_start}" "${row_stop}")"
 done
 
 echo "Submitted ${SUBMIT_SUMMARY_LABEL} jobs:"
+if [[ "${SOBOL_ROWS_PER_JOB}" -gt 0 ]]; then
+  echo "  row batch size: ${SOBOL_ROWS_PER_JOB}"
+fi
 for split in $(seq 1 "${SOBOL_SPLIT_COUNT}"); do
   echo "  y100 split ${split}: ${y100_jobs[$split]:-}"
 done

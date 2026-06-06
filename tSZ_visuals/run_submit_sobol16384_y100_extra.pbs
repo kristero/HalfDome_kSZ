@@ -1,0 +1,215 @@
+#!/usr/bin/env bash
+#PBS -N tSZ_sobol16384_y100_submit
+#PBS -q mini
+#PBS -l select=1:ncpus=1:mpiprocs=1:mem=2gb
+#PBS -l walltime=00:20:00
+#PBS -o /home/kristero10/logs/tSZ_baryon_run/
+#PBS -j oe
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+if [[ ! -f "${WORK_DIR}/submit_y100_y102_sobol512.sh" ]]; then
+  if [[ -f "/home/kristero10/HalfDome_kSZ/tSZ_visuals/submit_y100_y102_sobol512.sh" ]]; then
+    WORK_DIR="/home/kristero10/HalfDome_kSZ/tSZ_visuals"
+  elif [[ -f "/home/kristero10/HalfDome/tSZ_visuals/submit_y100_y102_sobol512.sh" ]]; then
+    WORK_DIR="/home/kristero10/HalfDome/tSZ_visuals"
+  fi
+fi
+cd "${WORK_DIR}"
+
+: "${QSUB:=qsub}"
+: "${PYTHON:=python3}"
+: "${LOG_DIR:=/home/kristero10/logs/tSZ_baryon_run}"
+: "${SOBOL_BASE_DIR:=/home/kristero10/tSZ_data}"
+: "${SOBOL_BASENAME:=battaglia_sobol_16384}"
+: "${SOBOL_FULL_CSV:=${SOBOL_BASE_DIR}/${SOBOL_BASENAME}.csv}"
+: "${OLD_SOBOL_CSV:=${SOBOL_BASE_DIR}/battaglia_sobol_4096.csv}"
+: "${SOBOL_SPLIT_DIR:=${SOBOL_BASE_DIR}}"
+: "${SOBOL_SPLIT_ROWS:=128}"
+: "${SOBOL_SPLIT_COUNT:=128}"
+: "${SOBOL_ROWS_PER_JOB:=0}"
+: "${SOBOL_SPLITS_PER_JOB:=3}"
+: "${FIRST_NEW_SPLIT:=33}"
+: "${LAST_NEW_SPLIT:=128}"
+: "${CREATE_SOBOL_SPLITS:=true}"
+: "${OVERWRITE_SOBOL_SPLITS:=true}"
+: "${CHECK_FIRST_4096_MATCH:=true}"
+: "${FIRST_4096_TOL:=1e-10}"
+: "${HALFDOME_BASE_DIR:=/lustre/work/Globus-lt/halfdome/full_res/halos}"
+: "${OUTPUT_BASE_DIR:=/lustre/work/kristero10/tSZ_data}"
+: "${CACHE_DIR:=/lustre/work/kristero10/tSZ_data/cache}"
+: "${NSIDE:=4096}"
+: "${THREADS_PER_TASK:=25}"
+: "${MAX_PARALLEL:=1}"
+: "${SEPARATE_INTERPOLATOR_STEP:=false}"
+: "${REUSE_EXISTING_CACHE:=false}"
+: "${SKIP_EXISTING_OUTPUTS:=true}"
+: "${SKIP_EXISTING_ANY_RUN_INSTANCE:=true}"
+: "${CONTINUE_ON_ROW_ERROR:=true}"
+: "${Y100_MODEL_EXISTS:=false}"
+: "${Y102_MODEL_EXISTS:=true}"
+: "${DEPEND_Y102_ON_Y100:=false}"
+: "${SHORT_LOGS:=true}"
+: "${PRINT_RUNTIME_ENVIRONMENT:=false}"
+: "${CL_LMAX:=-1}"
+: "${PBS_SCRIPT:=${WORK_DIR}/run_full_map_sobol_parallel.pbs}"
+: "${DRY_RUN:=false}"
+
+is_true() {
+  case "${1:-}" in
+    true|TRUE|True|1|yes|YES|Yes|y|Y|on|ON|On) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+mkdir -p "${LOG_DIR}"
+
+[[ -f "${SOBOL_FULL_CSV}" ]] || {
+  echo "Missing 16384 Sobol CSV: ${SOBOL_FULL_CSV}" >&2
+  exit 1
+}
+
+if is_true "${CHECK_FIRST_4096_MATCH}"; then
+  [[ -f "${OLD_SOBOL_CSV}" ]] || {
+    echo "Missing old 4096 Sobol CSV: ${OLD_SOBOL_CSV}" >&2
+    exit 1
+  }
+  "${PYTHON}" - "${OLD_SOBOL_CSV}" "${SOBOL_FULL_CSV}" "${FIRST_4096_TOL}" <<'PY'
+import csv
+import sys
+
+old_path, new_path, tol_text = sys.argv[1:4]
+tol = float(tol_text)
+
+def read_table(path):
+    with open(path, newline="", encoding="utf-8-sig") as handle:
+        rows = list(csv.reader(handle))
+    if not rows:
+        raise SystemExit(f"{path} is empty")
+    header = [value.strip() for value in rows[0]]
+    data = [[float(value) for value in row] for row in rows[1:] if any(cell.strip() for cell in row)]
+    return header, data
+
+old_header, old_data = read_table(old_path)
+new_header, new_data = read_table(new_path)
+if old_header != new_header:
+    raise SystemExit(f"Sobol CSV headers differ:\n4096: {old_header}\n16384: {new_header}")
+if len(old_data) != 4096:
+    raise SystemExit(f"Expected 4096 data rows in {old_path}, got {len(old_data)}")
+if len(new_data) != 16384:
+    raise SystemExit(f"Expected 16384 data rows in {new_path}, got {len(new_data)}")
+
+max_diff = 0.0
+for old_row, new_row in zip(old_data, new_data[:4096]):
+    max_diff = max(max_diff, *(abs(a - b) for a, b in zip(old_row, new_row)))
+if max_diff > tol:
+    raise SystemExit(f"First 4096 rows of 16384 CSV do not match old 4096 CSV; max diff={max_diff:g}")
+if len({tuple(round(value, 12) for value in row) for row in new_data}) != len(new_data):
+    raise SystemExit("Duplicate parameter rows found in 16384 Sobol CSV after rounding to 12 decimals")
+print("Sobol 16384 CSV validation passed: first 4096 match old run, all rows unique.")
+PY
+fi
+
+if [[ "${FIRST_NEW_SPLIT}" -ne 33 || "${LAST_NEW_SPLIT}" -ne 128 ]]; then
+  echo "This wrapper is for 16384 y100-only extra rows: splits 33-128." >&2
+  exit 1
+fi
+
+for split in $(seq 1 "${SOBOL_SPLIT_COUNT}"); do
+  export "SUBMIT_Y100_SPLIT${split}=false"
+  export "SUBMIT_Y102_SPLIT${split}=false"
+done
+
+export QSUB PBS_SCRIPT SOBOL_BASE_DIR SOBOL_BASENAME SOBOL_FULL_CSV SOBOL_SPLIT_DIR
+export SOBOL_SPLIT_ROWS SOBOL_SPLIT_COUNT SOBOL_ROWS_PER_JOB CREATE_SOBOL_SPLITS OVERWRITE_SOBOL_SPLITS
+export HALFDOME_BASE_DIR OUTPUT_BASE_DIR CACHE_DIR LOG_DIR NSIDE THREADS_PER_TASK MAX_PARALLEL
+export SEPARATE_INTERPOLATOR_STEP REUSE_EXISTING_CACHE SKIP_EXISTING_OUTPUTS SKIP_EXISTING_ANY_RUN_INSTANCE
+export CONTINUE_ON_ROW_ERROR Y100_MODEL_EXISTS Y102_MODEL_EXISTS DEPEND_Y102_ON_Y100 SHORT_LOGS PRINT_RUNTIME_ENVIRONMENT CL_LMAX
+export JOB_SET_TAG="s16384"
+export SUBMIT_SUMMARY_LABEL="Sobol 16384 y100-only additional splits 33-128"
+
+validation_log="${LOG_DIR}/tSZ_sobol16384_split_validation_${PBS_JOBID:-manual}.log"
+echo "Creating/validating split CSVs; validation_log=${validation_log}"
+if ! DRY_RUN=true bash "${WORK_DIR}/submit_y100_y102_sobol512.sh" > "${validation_log}" 2>&1; then
+  cat "${validation_log}" >&2
+  exit 1
+fi
+
+if [[ "${DRY_RUN}" != "true" ]] && ! command -v "${QSUB}" >/dev/null 2>&1; then
+  echo "Could not find qsub command: ${QSUB}" >&2
+  exit 1
+fi
+
+sobol_split_csv_path() {
+  local split="$1"
+  printf '%s/%s_%s.csv' "${SOBOL_SPLIT_DIR}" "${SOBOL_BASENAME}" "${split}"
+}
+
+submit_split_group() {
+  local first_split="$1"
+  local last_split="$2"
+  local split_list=""
+  local csv_list=""
+  local split
+
+  for split in $(seq "${first_split}" "${last_split}"); do
+    if [[ -z "${split_list}" ]]; then
+      split_list="${split}"
+      csv_list="$(sobol_split_csv_path "${split}")"
+    else
+      split_list+=":${split}"
+      csv_list+=":$(sobol_split_csv_path "${split}")"
+    fi
+  done
+
+  local job_name="tSZ_y100_s16384_${first_split}to${last_split}"
+  local vars
+  vars="$(printf '%s' \
+    "LIGHTCONE_ID=100" \
+    ",SOBOL_SPLIT=${first_split}" \
+    ",SOBOL_CSV=$(sobol_split_csv_path "${first_split}")" \
+    ",SOBOL_SPLIT_LIST=${split_list}" \
+    ",SOBOL_CSV_LIST=${csv_list}" \
+    ",HALFDOME_PATH=${HALFDOME_BASE_DIR}/lightcone_100.hdf5" \
+    ",OUTPUT_DIR=${OUTPUT_BASE_DIR}/y100" \
+    ",CACHE_DIR=${CACHE_DIR}" \
+    ",LOG_DIR=${LOG_DIR}" \
+    ",JOB_SET_TAG=s16384" \
+    ",SIMULATION_NAME=halfdome_lightcone_100" \
+    ",NSIDE=${NSIDE}" \
+    ",THREADS_PER_TASK=${THREADS_PER_TASK}" \
+    ",MAX_PARALLEL=${MAX_PARALLEL}" \
+    ",MODEL_EXISTS=${Y100_MODEL_EXISTS}" \
+    ",REUSE_EXISTING_CACHE=${REUSE_EXISTING_CACHE}" \
+    ",SEPARATE_INTERPOLATOR_STEP=${SEPARATE_INTERPOLATOR_STEP}" \
+    ",CL_LMAX=${CL_LMAX}" \
+    ",SKIP_EXISTING_OUTPUTS=${SKIP_EXISTING_OUTPUTS}" \
+    ",SKIP_EXISTING_ANY_RUN_INSTANCE=${SKIP_EXISTING_ANY_RUN_INSTANCE}" \
+    ",CONTINUE_ON_ROW_ERROR=${CONTINUE_ON_ROW_ERROR}" \
+    ",SHORT_LOGS=${SHORT_LOGS}" \
+    ",PRINT_RUNTIME_ENVIRONMENT=${PRINT_RUNTIME_ENVIRONMENT}")"
+
+  local cmd=("${QSUB}" -N "${job_name}" -v "${vars}" "${PBS_SCRIPT}")
+  printf 'Submitting %s: ' "${job_name}"
+  printf '%q ' "${cmd[@]}"
+  printf '\n'
+  if [[ "${DRY_RUN}" == "true" ]]; then
+    return 0
+  fi
+  "${cmd[@]}"
+}
+
+echo "Submit: sobol=${SOBOL_FULL_CSV}, splits=${FIRST_NEW_SPLIT}-${LAST_NEW_SPLIT}/${SOBOL_SPLIT_COUNT}, rows_per_split=${SOBOL_SPLIT_ROWS}, splits_per_job=${SOBOL_SPLITS_PER_JOB}, cl_lmax=${CL_LMAX}, dry_run=${DRY_RUN}"
+echo "PBS script: ${PBS_SCRIPT}"
+
+group_start="${FIRST_NEW_SPLIT}"
+while [[ "${group_start}" -le "${LAST_NEW_SPLIT}" ]]; do
+  group_stop=$(( group_start + SOBOL_SPLITS_PER_JOB - 1 ))
+  if [[ "${group_stop}" -gt "${LAST_NEW_SPLIT}" ]]; then
+    group_stop="${LAST_NEW_SPLIT}"
+  fi
+  submit_split_group "${group_start}" "${group_stop}"
+  group_start=$(( group_stop + 1 ))
+done

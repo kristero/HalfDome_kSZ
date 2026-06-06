@@ -4,6 +4,7 @@
 #PBS -l walltime=23:59:00
 #PBS -o /home/kristero10/logs/tSZ_baryon_run/
 #PBS -e /home/kristero10/logs/tSZ_baryon_run/
+#PBS -j oe
 #PBS -S /bin/bash
 
 set -euo pipefail
@@ -39,6 +40,8 @@ cd "$PBS_O_WORKDIR"
 : "${SKIP_INVALID_BATTAGLIA_ROWS:=true}"
 : "${CONTINUE_ON_ROW_ERROR:=true}"
 : "${PRINT_RUNTIME_ENVIRONMENT:=false}"
+: "${SHORT_LOGS:=false}"
+: "${JOB_SET_TAG:=sobol}"
 : "${REDO_LOG:=${LOG_DIR}/tSZ_sobol_redo_${PBS_JOBID:-manual}.log}"
 : "${OMP_NUM_THREADS:=1}"
 : "${OPENBLAS_NUM_THREADS:=1}"
@@ -85,6 +88,35 @@ export MKL_NUM_THREADS
 export ENFORCE_BATTAGLIA_GUARDRAILS
 export SKIP_INVALID_BATTAGLIA_ROWS
 
+if [[ -n "${SOBOL_SPLIT_LIST:-}" || -n "${SOBOL_CSV_LIST:-}" ]]; then
+  IFS=':' read -r -a split_items <<< "${SOBOL_SPLIT_LIST:-}"
+  IFS=':' read -r -a csv_items <<< "${SOBOL_CSV_LIST:-}"
+  if [[ "${#split_items[@]}" -eq 0 || "${#split_items[@]}" -ne "${#csv_items[@]}" ]]; then
+    echo "SOBOL_SPLIT_LIST and SOBOL_CSV_LIST must be non-empty colon-separated lists with the same length." >&2
+    exit 1
+  fi
+
+  echo "Multi-split PBS batch: splits=${SOBOL_SPLIT_LIST}, csvs=${SOBOL_CSV_LIST}"
+  group_status=0
+  for idx in "${!split_items[@]}"; do
+    split_item="${split_items[$idx]}"
+    csv_item="${csv_items[$idx]}"
+    echo "Starting grouped split ${split_item} at $(date -Is)"
+    set +e
+    SOBOL_SPLIT_LIST= SOBOL_CSV_LIST= SOBOL_SPLIT="${split_item}" SOBOL_CSV="${csv_item}" \
+      SOBOL_ROW_START=1 SOBOL_ROW_STOP= bash "${BASH_SOURCE[0]}"
+    split_status=$?
+    set -e
+    if [[ "${split_status}" -ne 0 ]]; then
+      echo "Grouped split ${split_item} failed with status ${split_status}" >&2
+      group_status="${split_status}"
+      break
+    fi
+    echo "Finished grouped split ${split_item} at $(date -Is)"
+  done
+  exit "${group_status}"
+fi
+
 ROW_COUNT="$(awk 'END {print NR-1}' "${SOBOL_CSV}")"
 
 if [[ "${ROW_COUNT}" -lt 1 ]]; then
@@ -127,64 +159,73 @@ if [[ -n "${PBS_NODEFILE:-}" && -f "${PBS_NODEFILE}" ]]; then
 fi
 
 echo "======================================="
-echo "PBS job id: ${PBS_JOBID:-NA}"
-echo "Working directory: ${PBS_O_WORKDIR:-NA}"
-echo "Nodefile: ${PBS_NODEFILE:-NA}"
-echo "Host: $(hostname)"
-echo "Date: $(date -Is)"
-echo "Julia script: ${SCRIPT}"
-if is_true "${SEPARATE_INTERPOLATOR_STEP}"; then
-  echo "Interpolator build script: ${BUILD_SCRIPT}"
-fi
-echo "Julia executable: ${JULIA}"
-"${JULIA}" --version
-echo "Lightcone id: ${LIGHTCONE_ID}"
-echo "Simulation name: ${SIMULATION_NAME}"
-echo "Sobol split: ${SOBOL_SPLIT}"
-echo "Sobol CSV: ${SOBOL_CSV}"
-echo "Sobol rows: ${ROW_COUNT}"
-echo "Sobol row range for this job: ${SOBOL_ROW_START}:${SOBOL_ROW_STOP}"
-echo "PBS_NP/nodefile slots are MPI slots on this cluster, not OpenMP thread count."
-echo "PBS_NP: ${PBS_NP_HINT}"
-echo "PBS_NCPUS/NCPUS: ${ALLOCATED_CPUS_HINT}"
-echo "PBS nodefile slots: ${NODEFILE_SLOTS}"
-echo "Concurrent Julia tasks: ${CONCURRENT_JOBS}"
-echo "Threads per Julia task: ${THREADS_PER_TASK}"
-"${JULIA}" --threads="${THREADS_PER_TASK}" -e 'println("Julia preflight nthreads=", Base.Threads.nthreads())'
-echo "OMP_NUM_THREADS: ${OMP_NUM_THREADS}"
-echo "OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS}"
-echo "MKL_NUM_THREADS: ${MKL_NUM_THREADS}"
-if [[ -n "${PBS_NODEFILE:-}" && -f "${PBS_NODEFILE}" ]]; then
-  echo "PBS node allocation:"
-  sort "${PBS_NODEFILE}" | uniq -c
-fi
-command -v taskset >/dev/null 2>&1 && taskset -pc $$
-command -v lscpu >/dev/null 2>&1 && lscpu | egrep 'Model name|CPU\\(s\\)|Thread|Core|Socket|MHz|NUMA'
-echo "======================================="
+if is_true "${SHORT_LOGS}"; then
+  echo "Job: id=${PBS_JOBID:-NA}, host=$(hostname), date=$(date -Is)"
+  echo "Run: lightcone=${LIGHTCONE_ID}, split=${SOBOL_SPLIT}, rows=${SOBOL_ROW_START}:${SOBOL_ROW_STOP}/${ROW_COUNT}, nside=${NSIDE}, threads=${THREADS_PER_TASK}, concurrent=${CONCURRENT_JOBS}"
+  echo "Paths: csv=${SOBOL_CSV}, output=${OUTPUT_DIR}, cache=${CACHE_DIR}"
+  echo "Settings: model_exists=${MODEL_EXISTS}, reuse_cache=${REUSE_EXISTING_CACHE}, skip_existing=${SKIP_EXISTING_OUTPUTS}, any_run=${SKIP_EXISTING_ANY_RUN_INSTANCE}, guardrails=${ENFORCE_BATTAGLIA_GUARDRAILS}, cl_lmax=${CL_LMAX}, pad=${INTERPOLATOR_PAD}, logM_max=${INTERPOLATOR_LOGM_MAX}"
+  echo "Logs: dir=${LOG_DIR}, redo=${REDO_LOG}"
+else
+  echo "PBS job id: ${PBS_JOBID:-NA}"
+  echo "Working directory: ${PBS_O_WORKDIR:-NA}"
+  echo "Nodefile: ${PBS_NODEFILE:-NA}"
+  echo "Host: $(hostname)"
+  echo "Date: $(date -Is)"
+  echo "Julia script: ${SCRIPT}"
+  if is_true "${SEPARATE_INTERPOLATOR_STEP}"; then
+    echo "Interpolator build script: ${BUILD_SCRIPT}"
+  fi
+  echo "Julia executable: ${JULIA}"
+  "${JULIA}" --version
+  echo "Lightcone id: ${LIGHTCONE_ID}"
+  echo "Simulation name: ${SIMULATION_NAME}"
+  echo "Sobol split: ${SOBOL_SPLIT}"
+  echo "Sobol CSV: ${SOBOL_CSV}"
+  echo "Sobol rows: ${ROW_COUNT}"
+  echo "Sobol row range for this job: ${SOBOL_ROW_START}:${SOBOL_ROW_STOP}"
+  echo "PBS_NP/nodefile slots are MPI slots on this cluster, not OpenMP thread count."
+  echo "PBS_NP: ${PBS_NP_HINT}"
+  echo "PBS_NCPUS/NCPUS: ${ALLOCATED_CPUS_HINT}"
+  echo "PBS nodefile slots: ${NODEFILE_SLOTS}"
+  echo "Concurrent Julia tasks: ${CONCURRENT_JOBS}"
+  echo "Threads per Julia task: ${THREADS_PER_TASK}"
+  "${JULIA}" --threads="${THREADS_PER_TASK}" -e 'println("Julia preflight nthreads=", Base.Threads.nthreads())'
+  echo "OMP_NUM_THREADS: ${OMP_NUM_THREADS}"
+  echo "OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS}"
+  echo "MKL_NUM_THREADS: ${MKL_NUM_THREADS}"
+  if [[ -n "${PBS_NODEFILE:-}" && -f "${PBS_NODEFILE}" ]]; then
+    echo "PBS node allocation:"
+    sort "${PBS_NODEFILE}" | uniq -c
+  fi
+  command -v taskset >/dev/null 2>&1 && taskset -pc $$
+  command -v lscpu >/dev/null 2>&1 && lscpu | egrep 'Model name|CPU\\(s\\)|Thread|Core|Socket|MHz|NUMA'
+  echo "======================================="
 
-echo "Running full Sobol sequence"
-echo "simulation_name=${SIMULATION_NAME}"
-echo "halfdome_path=${HALFDOME_PATH}"
-echo "output_dir=${OUTPUT_DIR}"
-echo "cache_dir=${CACHE_DIR}"
-echo "apply_gaussian_beam=false"
-echo "model_exists=${MODEL_EXISTS}"
-echo "reuse_existing_cache=${REUSE_EXISTING_CACHE}"
-echo "cache_wait_seconds=${CACHE_WAIT_SECONDS}"
-echo "cache_poll_seconds=${CACHE_POLL_SECONDS}"
-echo "interpolator_pad=${INTERPOLATOR_PAD}"
-echo "interpolator_logM_max=${INTERPOLATOR_LOGM_MAX}"
-echo "interpolator_timeout_seconds=${INTERPOLATOR_TIMEOUT_SECONDS}"
-echo "separate_interpolator_step=${SEPARATE_INTERPOLATOR_STEP}"
-echo "cl_lmax=${CL_LMAX}"
-echo "cl_niter=${CL_NITER}"
-echo "skip_existing_outputs=${SKIP_EXISTING_OUTPUTS}"
-echo "skip_existing_any_run_instance=${SKIP_EXISTING_ANY_RUN_INSTANCE}"
-echo "run_instance_tag=${RUN_INSTANCE_TAG}"
-echo "enforce_battaglia_guardrails=${ENFORCE_BATTAGLIA_GUARDRAILS}"
-echo "skip_invalid_battaglia_rows=${SKIP_INVALID_BATTAGLIA_ROWS}"
-echo "continue_on_row_error=${CONTINUE_ON_ROW_ERROR}"
-echo "redo_log=${REDO_LOG}"
+  echo "Running full Sobol sequence"
+  echo "simulation_name=${SIMULATION_NAME}"
+  echo "halfdome_path=${HALFDOME_PATH}"
+  echo "output_dir=${OUTPUT_DIR}"
+  echo "cache_dir=${CACHE_DIR}"
+  echo "apply_gaussian_beam=false"
+  echo "model_exists=${MODEL_EXISTS}"
+  echo "reuse_existing_cache=${REUSE_EXISTING_CACHE}"
+  echo "cache_wait_seconds=${CACHE_WAIT_SECONDS}"
+  echo "cache_poll_seconds=${CACHE_POLL_SECONDS}"
+  echo "interpolator_pad=${INTERPOLATOR_PAD}"
+  echo "interpolator_logM_max=${INTERPOLATOR_LOGM_MAX}"
+  echo "interpolator_timeout_seconds=${INTERPOLATOR_TIMEOUT_SECONDS}"
+  echo "separate_interpolator_step=${SEPARATE_INTERPOLATOR_STEP}"
+  echo "cl_lmax=${CL_LMAX}"
+  echo "cl_niter=${CL_NITER}"
+  echo "skip_existing_outputs=${SKIP_EXISTING_OUTPUTS}"
+  echo "skip_existing_any_run_instance=${SKIP_EXISTING_ANY_RUN_INSTANCE}"
+  echo "run_instance_tag=${RUN_INSTANCE_TAG}"
+  echo "enforce_battaglia_guardrails=${ENFORCE_BATTAGLIA_GUARDRAILS}"
+  echo "skip_invalid_battaglia_rows=${SKIP_INVALID_BATTAGLIA_ROWS}"
+  echo "continue_on_row_error=${CONTINUE_ON_ROW_ERROR}"
+  echo "redo_log=${REDO_LOG}"
+fi
+echo "======================================="
 
 log_redo_required() {
   local sobol_row="$1"
@@ -292,11 +333,12 @@ run_one_row() {
   local row_wall_start
   local full_run_model_exists="${MODEL_EXISTS}"
   local full_run_print_summary="true"
+  local global_sobol_row=$(( (SOBOL_SPLIT - 1) * ROW_COUNT + sobol_row ))
 
   set +e
   row_wall_start="$(date +%s)"
   export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
-  echo "Row start: lightcone=${LIGHTCONE_ID}, split=${SOBOL_SPLIT}, sobol_row=${sobol_row}, threads=${THREADS_PER_TASK}."
+  echo "Row start: lightcone=${LIGHTCONE_ID}, split=${SOBOL_SPLIT}, sobol_row=${sobol_row}, global_sobol_row=${global_sobol_row}, threads=${THREADS_PER_TASK}."
 
   if ! is_true "${MODEL_EXISTS}" && is_true "${SEPARATE_INTERPOLATOR_STEP}"; then
     run_interpolator_step "${sobol_row}"
@@ -344,11 +386,10 @@ while [[ "${row}" -le "${SOBOL_ROW_STOP}" ]]; do
 
   for ((slot = 0; slot < CONCURRENT_JOBS && row <= SOBOL_ROW_STOP; slot++)); do
     row_tag="$(printf '%04d' "${row}")"
-    stdout_path="${LOG_DIR}/tSZ_sobol_row${row_tag}_${PBS_JOBID:-manual}.out"
-    stderr_path="${LOG_DIR}/tSZ_sobol_row${row_tag}_${PBS_JOBID:-manual}.err"
+    log_path="${LOG_DIR}/tSZ_y${LIGHTCONE_ID}_${JOB_SET_TAG}_split${SOBOL_SPLIT}_row${row_tag}_${PBS_JOBID:-manual}.log"
 
-    echo "Launching sobol_row=${row} with ${THREADS_PER_TASK} threads"
-    run_one_row "${row}" > "${stdout_path}" 2> "${stderr_path}" &
+    echo "Launching sobol_row=${row} with ${THREADS_PER_TASK} threads; log=${log_path}"
+    run_one_row "${row}" > "${log_path}" 2>&1 &
 
     pids+=("$!")
     batch_rows+=("${row}")
@@ -358,7 +399,7 @@ while [[ "${row}" -le "${SOBOL_ROW_STOP}" ]]; do
   for idx in "${!pids[@]}"; do
     if ! wait "${pids[$idx]}"; then
       failed_row="${batch_rows[$idx]}"
-      echo "Sobol row ${failed_row} failed. Check ${LOG_DIR}/tSZ_sobol_row$(printf '%04d' "${failed_row}")_${PBS_JOBID:-manual}.err" >&2
+      echo "Sobol row ${failed_row} failed. Check ${LOG_DIR}/tSZ_y${LIGHTCONE_ID}_${JOB_SET_TAG}_split${SOBOL_SPLIT}_row$(printf '%04d' "${failed_row}")_${PBS_JOBID:-manual}.log" >&2
       exit 1
     fi
   done

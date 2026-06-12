@@ -66,3 +66,16 @@ Emulator test run:
 - Its default Sobol CSVs are `battaglia_sobol_512_1.csv` through `battaglia_sobol_512_4.csv`; it intentionally excludes older 256-point products.
 - The default `PROFILE_INCLUDE_REGEX=sobol_battaglia_sobol_512_[1-4]_row[0-9]+` and `PROFILE_EXCLUDE_REGEX=sobol_battaglia_sobol_512_row[0-9]+|sobol_battaglia_sobol_256` keep older products out of the training set.
 - The test run writes to `/lustre/work/kristero10/tSZ_data/emulator_battaglia_y100_y102_test`, uses 20 Optuna trials, and requires 512 matched y100/y102 parameter points by default.
+
+SBI dataset combination:
+
+- `combine_sbi_dataset.py` combines the generated y100/y102 `C_l` products without training an emulator.
+- Default command after all split jobs finish:
+  `python3 combine_sbi_dataset.py`
+- PBS command after all split jobs finish:
+  `qsub run_combine_sbi_dataset.pbs`
+- The default output is `/lustre/work/kristero10/tSZ_data/sbi_battaglia_y100_y102/sbi_battaglia_y100_y102_512.npz`.
+- The NPZ contains `theta`, `theta_columns`, `ell`, `cl_y100`, `cl_y102`, `cl_mean`, `cl_stack`, `cl_concat`, and log10-transformed variants. A metadata CSV records the source files and Sobol rows.
+- For the y100-only 16384 run with full C_l, excluding the old first 4096 capped spectra, run:
+  `qsub run_combine_sbi_dataset_y100_16384_minus4096_fullcl.pbs`
+- That job combines `battaglia_sobol_16384_33.csv` through `_128.csv`, expects 12288 parameter points, keeps all ell values with `ELL_MAX=none`, and writes to `/lustre/work/kristero10/tSZ_data/sbi_battaglia_y100_16384_minus4096_fullcl`.

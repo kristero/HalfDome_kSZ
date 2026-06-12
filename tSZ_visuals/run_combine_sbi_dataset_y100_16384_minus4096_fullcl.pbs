@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+#PBS -N tSZ_sbi_y100_s16384_extra
+#PBS -q mini
+#PBS -l select=1:ncpus=4:mpiprocs=1:mem=64gb
+#PBS -l walltime=04:00:00
+#PBS -o /home/kristero10/logs/tSZ_sbi/
+#PBS -e /home/kristero10/logs/tSZ_sbi/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+cd "${PBS_O_WORKDIR:-$PWD}"
+
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+: "${LOG_DIR:=/home/kristero10/logs/tSZ_sbi}"
+: "${Y100_DIRS:=/lustre/work/kristero10/tSZ_data/y100}"
+: "${SOBOL_BASE_DIR:=/home/kristero10/tSZ_data}"
+: "${SOBOL_BASENAME:=battaglia_sobol_16384}"
+: "${SOBOL_SPLIT_DIR:=${SOBOL_BASE_DIR}}"
+: "${FIRST_SPLIT:=33}"
+: "${LAST_SPLIT:=128}"
+: "${SOBOL_SPLIT_ROWS:=128}"
+
+build_default_sobol_csvs() {
+  local first_split="$1"
+  local last_split="$2"
+  local out=""
+  local split
+
+  for split in $(seq "${first_split}" "${last_split}"); do
+    if [[ -z "${out}" ]]; then
+      out="${SOBOL_SPLIT_DIR}/${SOBOL_BASENAME}_${split}.csv"
+    else
+      out+=":${SOBOL_SPLIT_DIR}/${SOBOL_BASENAME}_${split}.csv"
+    fi
+  done
+
+  printf '%s' "${out}"
+}
+
+# This is the y100-only extension beyond the old 4096-point run:
+#   rows 4097-16384 from battaglia_sobol_16384_33..128
+# The old rows 1-4096 are intentionally excluded because their C_l products
+# were generated only up to ell=4096.
+if [[ -z "${SOBOL_CSVS:-}" ]]; then
+  SOBOL_CSVS="$(build_default_sobol_csvs "${FIRST_SPLIT}" "${LAST_SPLIT}")"
+fi
+
+DEFAULT_EXPECTED_POINTS=$(( (LAST_SPLIT - FIRST_SPLIT + 1) * SOBOL_SPLIT_ROWS ))
+: "${PROFILE_GLOBS:=*tSZ_cl*.fits}"
+: "${PROFILE_INCLUDE_REGEX:=sobol_battaglia_sobol_16384_(3[3-9]|[4-9][0-9]|1[01][0-9]|12[0-8])_row[0-9]+}"
+: "${PROFILE_EXCLUDE_REGEX:=sobol_battaglia_sobol_512_|sobol_battaglia_sobol_1024_|sobol_battaglia_sobol_2048_|sobol_battaglia_sobol_4096_|sobol_battaglia_sobol_16384_([1-9]|[12][0-9]|3[0-2])_row[0-9]+|sobol_battaglia_sobol_256}"
+: "${OUTPUT_DIR:=/lustre/work/kristero10/tSZ_data/sbi_battaglia_y100_16384_minus4096_fullcl}"
+: "${DATASET_NAME:=sbi_battaglia_y100_16384_minus4096_fullcl.npz}"
+: "${METADATA_NAME:=sbi_battaglia_y100_16384_minus4096_fullcl_metadata.csv}"
+: "${MANIFEST_NAME:=sbi_battaglia_y100_16384_minus4096_fullcl_manifest.json}"
+: "${ELL_MIN:=2}"
+: "${ELL_MAX:=none}"
+: "${EXPECTED_POINTS:=${DEFAULT_EXPECTED_POINTS}}"
+: "${ROWS_PER_SPLIT:=128}"
+: "${KEY_PRECISION:=12}"
+: "${TARGET_FLOOR:=1e-40}"
+: "${ALLOW_MISSING:=false}"
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+
+SCRIPT_CANDIDATE_1="${PBS_O_WORKDIR:-$PWD}/combine_sbi_dataset_y100.py"
+SCRIPT_CANDIDATE_2="${PBS_O_WORKDIR:-$PWD}/tSZ_visuals/combine_sbi_dataset_y100.py"
+if [[ -f "${SCRIPT_CANDIDATE_1}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_1}"
+elif [[ -f "${SCRIPT_CANDIDATE_2}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_2}"
+else
+  echo "Could not locate combine_sbi_dataset_y100.py from PBS_O_WORKDIR=${PBS_O_WORKDIR:-$PWD}" >&2
+  exit 1
+fi
+
+IFS=':' read -r -a sobol_csv_items <<< "${SOBOL_CSVS}"
+missing_csvs=0
+for csv_path in "${sobol_csv_items[@]}"; do
+  if [[ ! -f "${csv_path}" ]]; then
+    echo "Missing Sobol split CSV: ${csv_path}" >&2
+    missing_csvs=$(( missing_csvs + 1 ))
+  fi
+done
+if [[ "${missing_csvs}" -ne 0 ]]; then
+  echo "Found ${missing_csvs} missing Sobol split CSVs. Run the 16384 submit wrapper first so it creates splits 33-128." >&2
+  exit 1
+fi
+
+mkdir -p "${LOG_DIR}" "${OUTPUT_DIR}"
+
+export OMP_NUM_THREADS
+export OPENBLAS_NUM_THREADS
+export MKL_NUM_THREADS
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  echo "Running Python environment setup command."
+  eval "${PYTHON_ENV_SETUP}"
+fi
+
+echo "======================================="
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Working directory: ${PBS_O_WORKDIR:-$PWD}"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Python executable: ${PYTHON}"
+"${PYTHON}" --version
+echo "Script: ${SCRIPT}"
+echo "Y100 dirs: ${Y100_DIRS}"
+echo "Sobol split CSVs: ${SOBOL_CSVS}"
+echo "Profile globs: ${PROFILE_GLOBS}"
+echo "Profile include regex: ${PROFILE_INCLUDE_REGEX}"
+echo "Profile exclude regex: ${PROFILE_EXCLUDE_REGEX}"
+echo "Output dir: ${OUTPUT_DIR}"
+echo "Dataset name: ${DATASET_NAME}"
+echo "Expected points: ${EXPECTED_POINTS}"
+echo "Rows per split: ${ROWS_PER_SPLIT}"
+echo "Ell range: ${ELL_MIN}:${ELL_MAX}"
+echo "Allow missing: ${ALLOW_MISSING}"
+echo "======================================="
+
+args=(
+  "${SCRIPT}"
+  --y100-dirs "${Y100_DIRS}"
+  --sobol-csvs "${SOBOL_CSVS}"
+  --profile-globs "${PROFILE_GLOBS}"
+  --include-path-regex "${PROFILE_INCLUDE_REGEX}"
+  --exclude-path-regex "${PROFILE_EXCLUDE_REGEX}"
+  --output-dir "${OUTPUT_DIR}"
+  --dataset-name "${DATASET_NAME}"
+  --metadata-name "${METADATA_NAME}"
+  --manifest-name "${MANIFEST_NAME}"
+  --ell-min "${ELL_MIN}"
+  --ell-max "${ELL_MAX}"
+  --expected-points "${EXPECTED_POINTS}"
+  --rows-per-split "${ROWS_PER_SPLIT}"
+  --key-precision "${KEY_PRECISION}"
+  --target-floor "${TARGET_FLOOR}"
+)
+
+if [[ "${ALLOW_MISSING}" == "true" ]]; then
+  args+=(--allow-missing)
+fi
+
+"${PYTHON}" "${args[@]}"
+
+echo "SBI y100-only Sobol 16384 minus first 4096 full-C_l dataset combination finished."

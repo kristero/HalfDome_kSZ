@@ -151,6 +151,22 @@ def write_sbi_outputs(args, x_columns, ell, theta, cl_y100, metadata):
     print(f"Wrote manifest: {manifest_path}", flush=True)
 
 
+def parse_optional_ell_max(value: str) -> int | None:
+    normalized = str(value).strip().lower()
+    if normalized in {"", "none", "null", "all", "full", "unbounded"}:
+        return None
+
+    try:
+        ell_max = int(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "--ell-max must be an integer, or one of: none, all, full"
+        ) from exc
+    if ell_max < 0:
+        return None
+    return ell_max
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Combine generated y100-only Battaglia Sobol C_l products for later SBI use."
@@ -165,7 +181,12 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--metadata-name", default="sbi_battaglia_y100_2048_metadata.csv")
     parser.add_argument("--manifest-name", default="sbi_battaglia_y100_2048_manifest.json")
     parser.add_argument("--ell-min", type=int, default=2)
-    parser.add_argument("--ell-max", type=int, default=4096)
+    parser.add_argument(
+        "--ell-max",
+        type=parse_optional_ell_max,
+        default=4096,
+        help="Maximum ell to keep. Use none/all/full, or any negative integer, for no upper cut.",
+    )
     parser.add_argument("--key-precision", type=int, default=12)
     parser.add_argument("--expected-points", type=int, default=2048)
     parser.add_argument("--rows-per-split", type=int, default=128)

@@ -23,7 +23,7 @@ from build_battaglia_emulator import (
     split_cli_values,
     split_comma_values,
 )
-from combine_sbi_dataset import add_global_sobol_rows, reorder_by_metadata
+from combine_sbi_dataset import add_global_sobol_rows, reorder_by_metadata, split_index_from_csv
 
 
 DEFAULT_SOBOL_CSVS = [
@@ -151,6 +151,62 @@ def write_sbi_outputs(args, x_columns, ell, theta, cl_y100, metadata):
     print(f"Wrote manifest: {manifest_path}", flush=True)
 
 
+def expected_rows_from_tables(tables, rows_per_split: int):
+    rows = []
+    for table in tables:
+        split_index = split_index_from_csv(str(table.path))
+        split_value = split_index if split_index is not None else -1
+        for row_number in range(1, len(table.rows) + 1):
+            if split_index is None or split_index < 1:
+                global_row = row_number
+            else:
+                global_row = (split_index - 1) * int(rows_per_split) + row_number
+            rows.append(
+                {
+                    "sobol_global_row": int(global_row),
+                    "sobol_split": int(split_value),
+                    "sobol_row": int(row_number),
+                    "sobol_csv": str(table.path),
+                }
+            )
+    return rows
+
+
+def missing_expected_rows(tables, metadata, rows_per_split: int):
+    import pandas as pd
+
+    present = {
+        (str(Path(csv_path).expanduser().resolve()), int(row))
+        for csv_path, row in zip(metadata["sobol_csv"], metadata["sobol_row"])
+    }
+
+    missing = [
+        row
+        for row in expected_rows_from_tables(tables, rows_per_split)
+        if (str(Path(row["sobol_csv"]).expanduser().resolve()), int(row["sobol_row"])) not in present
+    ]
+    return pd.DataFrame(missing)
+
+
+def report_missing_expected_rows(args, tables, metadata):
+    output_dir = Path(args.output_dir).expanduser().resolve()
+    missing = missing_expected_rows(tables, metadata, args.rows_per_split)
+    if missing.empty:
+        print("No missing Sobol rows found relative to the provided Sobol CSVs.", flush=True)
+        return missing
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    missing_path = output_dir / args.missing_name
+    missing.to_csv(missing_path, index=False)
+
+    print(f"Missing expected y100 rows: {len(missing)}", flush=True)
+    print(f"Wrote missing-row report: {missing_path}", flush=True)
+    print("First missing rows:", flush=True)
+    preview_columns = ["sobol_global_row", "sobol_split", "sobol_row", "sobol_csv"]
+    print(missing.loc[:, preview_columns].head(20).to_string(index=False), flush=True)
+    return missing
+
+
 def parse_optional_ell_max(value: str) -> int | None:
     normalized = str(value).strip().lower()
     if normalized in {"", "none", "null", "all", "full", "unbounded"}:
@@ -180,6 +236,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--dataset-name", default="sbi_battaglia_y100_2048.npz")
     parser.add_argument("--metadata-name", default="sbi_battaglia_y100_2048_metadata.csv")
     parser.add_argument("--manifest-name", default="sbi_battaglia_y100_2048_manifest.json")
+    parser.add_argument("--missing-name", default="sbi_battaglia_y100_missing_rows.csv")
     parser.add_argument("--ell-min", type=int, default=2)
     parser.add_argument(
         "--ell-max",
@@ -229,9 +286,15 @@ def main(argv: list[str]) -> int:
 
     print(f"Matched y100 parameter points: {theta.shape[0]}", flush=True)
     print(f"Profile length after ell cut: {cl_y100.shape[1]}", flush=True)
+    missing = None
+    if args.expected_points and theta.shape[0] != args.expected_points:
+        missing = report_missing_expected_rows(args, tables, metadata)
+
     if args.expected_points and theta.shape[0] != args.expected_points and not args.allow_missing:
+        missing_count = "unknown" if missing is None else str(len(missing))
         raise ValueError(
             f"Expected {args.expected_points} y100 points, got {theta.shape[0]}. "
+            f"Missing-row report contains {missing_count} rows. "
             "Use --allow-missing if you intentionally want a partial SBI dataset."
         )
 

@@ -123,21 +123,52 @@ if [[ "${ROW_COUNT}" -lt 1 ]]; then
   echo "Sobol CSV has no data rows: ${SOBOL_CSV}" >&2
   exit 1
 fi
-: "${SOBOL_ROW_START:=1}"
-: "${SOBOL_ROW_STOP:=${ROW_COUNT}}"
-if [[ "${SOBOL_ROW_START}" -lt 1 ]]; then
-  echo "SOBOL_ROW_START must be >= 1, got ${SOBOL_ROW_START}" >&2
-  exit 1
+
+rows_to_run=()
+if [[ -n "${SOBOL_ROW_LIST:-}" ]]; then
+  row_list_normalized="${SOBOL_ROW_LIST//,/ }"
+  row_list_normalized="${row_list_normalized//:/ }"
+  row_list_normalized="${row_list_normalized//;/ }"
+  for row_item in ${row_list_normalized}; do
+    if [[ ! "${row_item}" =~ ^[0-9]+$ ]]; then
+      echo "SOBOL_ROW_LIST contains a non-integer row value: ${row_item}" >&2
+      exit 1
+    fi
+    row_value=$((10#${row_item}))
+    if [[ "${row_value}" -lt 1 || "${row_value}" -gt "${ROW_COUNT}" ]]; then
+      echo "SOBOL_ROW_LIST row ${row_value} is outside 1:${ROW_COUNT} for ${SOBOL_CSV}" >&2
+      exit 1
+    fi
+    rows_to_run+=("${row_value}")
+  done
+  if [[ "${#rows_to_run[@]}" -eq 0 ]]; then
+    echo "SOBOL_ROW_LIST was set but no rows were parsed." >&2
+    exit 1
+  fi
+  row_selection_display="list(${#rows_to_run[@]})=${SOBOL_ROW_LIST}"
+else
+  : "${SOBOL_ROW_START:=1}"
+  : "${SOBOL_ROW_STOP:=${ROW_COUNT}}"
+  if [[ "${SOBOL_ROW_START}" -lt 1 ]]; then
+    echo "SOBOL_ROW_START must be >= 1, got ${SOBOL_ROW_START}" >&2
+    exit 1
+  fi
+  if [[ "${SOBOL_ROW_STOP}" -lt "${SOBOL_ROW_START}" ]]; then
+    echo "SOBOL_ROW_STOP must be >= SOBOL_ROW_START, got ${SOBOL_ROW_STOP} < ${SOBOL_ROW_START}" >&2
+    exit 1
+  fi
+  if [[ "${SOBOL_ROW_STOP}" -gt "${ROW_COUNT}" ]]; then
+    echo "SOBOL_ROW_STOP=${SOBOL_ROW_STOP} exceeds Sobol row count ${ROW_COUNT}" >&2
+    exit 1
+  fi
+  row_item="${SOBOL_ROW_START}"
+  while [[ "${row_item}" -le "${SOBOL_ROW_STOP}" ]]; do
+    rows_to_run+=("${row_item}")
+    row_item=$((row_item + 1))
+  done
+  row_selection_display="${SOBOL_ROW_START}:${SOBOL_ROW_STOP}/${ROW_COUNT}"
 fi
-if [[ "${SOBOL_ROW_STOP}" -lt "${SOBOL_ROW_START}" ]]; then
-  echo "SOBOL_ROW_STOP must be >= SOBOL_ROW_START, got ${SOBOL_ROW_STOP} < ${SOBOL_ROW_START}" >&2
-  exit 1
-fi
-if [[ "${SOBOL_ROW_STOP}" -gt "${ROW_COUNT}" ]]; then
-  echo "SOBOL_ROW_STOP=${SOBOL_ROW_STOP} exceeds Sobol row count ${ROW_COUNT}" >&2
-  exit 1
-fi
-REQUESTED_ROW_COUNT=$(( SOBOL_ROW_STOP - SOBOL_ROW_START + 1 ))
+REQUESTED_ROW_COUNT="${#rows_to_run[@]}"
 
 if [[ "${REQUESTED_ROW_COUNT}" -lt "${MAX_PARALLEL}" ]]; then
   CONCURRENT_JOBS="${REQUESTED_ROW_COUNT}"
@@ -161,7 +192,7 @@ fi
 echo "======================================="
 if is_true "${SHORT_LOGS}"; then
   echo "Job: id=${PBS_JOBID:-NA}, host=$(hostname), date=$(date -Is)"
-  echo "Run: lightcone=${LIGHTCONE_ID}, split=${SOBOL_SPLIT}, rows=${SOBOL_ROW_START}:${SOBOL_ROW_STOP}/${ROW_COUNT}, nside=${NSIDE}, threads=${THREADS_PER_TASK}, concurrent=${CONCURRENT_JOBS}"
+  echo "Run: lightcone=${LIGHTCONE_ID}, split=${SOBOL_SPLIT}, rows=${row_selection_display}, nside=${NSIDE}, threads=${THREADS_PER_TASK}, concurrent=${CONCURRENT_JOBS}"
   echo "Paths: csv=${SOBOL_CSV}, output=${OUTPUT_DIR}, cache=${CACHE_DIR}"
   echo "Settings: model_exists=${MODEL_EXISTS}, reuse_cache=${REUSE_EXISTING_CACHE}, skip_existing=${SKIP_EXISTING_OUTPUTS}, any_run=${SKIP_EXISTING_ANY_RUN_INSTANCE}, guardrails=${ENFORCE_BATTAGLIA_GUARDRAILS}, cl_lmax=${CL_LMAX}, pad=${INTERPOLATOR_PAD}, logM_max=${INTERPOLATOR_LOGM_MAX}"
   echo "Logs: dir=${LOG_DIR}, redo=${REDO_LOG}"
@@ -182,7 +213,7 @@ else
   echo "Sobol split: ${SOBOL_SPLIT}"
   echo "Sobol CSV: ${SOBOL_CSV}"
   echo "Sobol rows: ${ROW_COUNT}"
-  echo "Sobol row range for this job: ${SOBOL_ROW_START}:${SOBOL_ROW_STOP}"
+  echo "Sobol rows selected for this job: ${row_selection_display}"
   echo "PBS_NP/nodefile slots are MPI slots on this cluster, not OpenMP thread count."
   echo "PBS_NP: ${PBS_NP_HINT}"
   echo "PBS_NCPUS/NCPUS: ${ALLOCATED_CPUS_HINT}"
@@ -379,12 +410,13 @@ run_one_row() {
   return 0
 }
 
-row="${SOBOL_ROW_START}"
-while [[ "${row}" -le "${SOBOL_ROW_STOP}" ]]; do
+row_index=0
+while [[ "${row_index}" -lt "${REQUESTED_ROW_COUNT}" ]]; do
   pids=()
   batch_rows=()
 
-  for ((slot = 0; slot < CONCURRENT_JOBS && row <= SOBOL_ROW_STOP; slot++)); do
+  for ((slot = 0; slot < CONCURRENT_JOBS && row_index < REQUESTED_ROW_COUNT; slot++)); do
+    row="${rows_to_run[$row_index]}"
     row_tag="$(printf '%04d' "${row}")"
     log_path="${LOG_DIR}/tSZ_y${LIGHTCONE_ID}_${JOB_SET_TAG}_split${SOBOL_SPLIT}_row${row_tag}_${PBS_JOBID:-manual}.log"
 
@@ -393,7 +425,7 @@ while [[ "${row}" -le "${SOBOL_ROW_STOP}" ]]; do
 
     pids+=("$!")
     batch_rows+=("${row}")
-    row=$((row + 1))
+    row_index=$((row_index + 1))
   done
 
   for idx in "${!pids[@]}"; do

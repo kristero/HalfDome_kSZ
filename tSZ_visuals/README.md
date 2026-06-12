@@ -79,3 +79,5 @@ SBI dataset combination:
 - For the y100-only 16384 run with full C_l, excluding the old first 4096 capped spectra, run:
   `qsub run_combine_sbi_dataset_y100_16384_minus4096_fullcl.pbs`
 - That job combines `battaglia_sobol_16384_33.csv` through `_128.csv`, expects 12288 parameter points, keeps all ell values with `ELL_MAX=none`, and writes to `/lustre/work/kristero10/tSZ_data/sbi_battaglia_y100_16384_minus4096_fullcl`.
+- If that combine job reports missing rows, it writes `sbi_battaglia_y100_16384_minus4096_fullcl_missing_rows.csv`. To recompute those rows and then rebuild the full NPZ after the repairs finish, run:
+  `qsub run_repair_missing_y100_16384_minus4096_fullcl.pbs`

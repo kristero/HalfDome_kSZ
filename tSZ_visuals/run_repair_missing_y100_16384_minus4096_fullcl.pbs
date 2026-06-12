@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+#PBS -N tSZ_repair_y100_s16384
+#PBS -q mini
+#PBS -l select=1:ncpus=1:mpiprocs=1:mem=2gb
+#PBS -l walltime=00:20:00
+#PBS -o /home/kristero10/logs/tSZ_sbi/
+#PBS -e /home/kristero10/logs/tSZ_sbi/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+if [[ ! -f "${WORK_DIR}/submit_missing_y100_rows.py" ]]; then
+  if [[ -f "/home/kristero10/HalfDome_kSZ/tSZ_visuals/submit_missing_y100_rows.py" ]]; then
+    WORK_DIR="/home/kristero10/HalfDome_kSZ/tSZ_visuals"
+  elif [[ -f "/home/kristero10/HalfDome/tSZ_visuals/submit_missing_y100_rows.py" ]]; then
+    WORK_DIR="/home/kristero10/HalfDome/tSZ_visuals"
+  fi
+fi
+cd "${WORK_DIR}"
+
+: "${PYTHON:=python3}"
+: "${QSUB:=qsub}"
+: "${MISSING_CSV:=/lustre/work/kristero10/tSZ_data/sbi_battaglia_y100_16384_minus4096_fullcl/sbi_battaglia_y100_16384_minus4096_fullcl_missing_rows.csv}"
+: "${ROW_PBS_SCRIPT:=${WORK_DIR}/run_full_map_sobol_parallel.pbs}"
+: "${COMBINE_PBS_SCRIPT:=${WORK_DIR}/run_combine_sbi_dataset_y100_16384_minus4096_fullcl.pbs}"
+: "${ROWS_PER_JOB:=1}"
+: "${SUBMIT_COMBINE:=true}"
+: "${DRY_RUN:=false}"
+: "${LOG_DIR:=/home/kristero10/logs/tSZ_baryon_run}"
+: "${HALFDOME_BASE_DIR:=/lustre/work/Globus-lt/halfdome/full_res/halos}"
+: "${OUTPUT_BASE_DIR:=/lustre/work/kristero10/tSZ_data}"
+: "${CACHE_DIR:=/lustre/work/kristero10/tSZ_data/cache}"
+: "${NSIDE:=4096}"
+: "${THREADS_PER_TASK:=25}"
+: "${MAX_PARALLEL:=1}"
+: "${JOB_SET_TAG:=s16384repair}"
+: "${MODEL_EXISTS:=false}"
+: "${REUSE_EXISTING_CACHE:=true}"
+: "${SEPARATE_INTERPOLATOR_STEP:=false}"
+: "${CL_LMAX:=-1}"
+: "${SKIP_EXISTING_OUTPUTS:=true}"
+: "${SKIP_EXISTING_ANY_RUN_INSTANCE:=true}"
+: "${CONTINUE_ON_ROW_ERROR:=false}"
+: "${SHORT_LOGS:=true}"
+: "${PRINT_RUNTIME_ENVIRONMENT:=false}"
+
+is_true() {
+  case "${1:-}" in
+    true|TRUE|True|1|yes|YES|Yes|y|Y|on|ON|On) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+[[ -f "${MISSING_CSV}" ]] || {
+  echo "Missing report does not exist: ${MISSING_CSV}" >&2
+  echo "Run the combine job first so it writes the missing-row CSV." >&2
+  exit 1
+}
+[[ -f "${ROW_PBS_SCRIPT}" ]] || {
+  echo "Missing row PBS script: ${ROW_PBS_SCRIPT}" >&2
+  exit 1
+}
+[[ -f "${COMBINE_PBS_SCRIPT}" ]] || {
+  echo "Missing combine PBS script: ${COMBINE_PBS_SCRIPT}" >&2
+  exit 1
+}
+
+mkdir -p /home/kristero10/logs/tSZ_sbi "${LOG_DIR}"
+
+echo "======================================="
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Working directory: ${WORK_DIR}"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Missing-row CSV: ${MISSING_CSV}"
+echo "Row PBS script: ${ROW_PBS_SCRIPT}"
+echo "Combine PBS script: ${COMBINE_PBS_SCRIPT}"
+echo "Rows per repair job: ${ROWS_PER_JOB}"
+echo "Submit combine after repairs: ${SUBMIT_COMBINE}"
+echo "Dry run: ${DRY_RUN}"
+echo "======================================="
+
+args=(
+  "${WORK_DIR}/submit_missing_y100_rows.py"
+  --missing-csv "${MISSING_CSV}"
+  --row-pbs-script "${ROW_PBS_SCRIPT}"
+  --combine-pbs-script "${COMBINE_PBS_SCRIPT}"
+  --qsub "${QSUB}"
+  --rows-per-job "${ROWS_PER_JOB}"
+  --log-dir "${LOG_DIR}"
+  --halfdome-base-dir "${HALFDOME_BASE_DIR}"
+  --output-base-dir "${OUTPUT_BASE_DIR}"
+  --cache-dir "${CACHE_DIR}"
+  --nside "${NSIDE}"
+  --threads-per-task "${THREADS_PER_TASK}"
+  --max-parallel "${MAX_PARALLEL}"
+  --job-set-tag "${JOB_SET_TAG}"
+  --model-exists "${MODEL_EXISTS}"
+  --reuse-existing-cache "${REUSE_EXISTING_CACHE}"
+  --separate-interpolator-step "${SEPARATE_INTERPOLATOR_STEP}"
+  --cl-lmax "${CL_LMAX}"
+  --skip-existing-outputs "${SKIP_EXISTING_OUTPUTS}"
+  --skip-existing-any-run-instance "${SKIP_EXISTING_ANY_RUN_INSTANCE}"
+  --continue-on-row-error "${CONTINUE_ON_ROW_ERROR}"
+  --short-logs "${SHORT_LOGS}"
+  --print-runtime-environment "${PRINT_RUNTIME_ENVIRONMENT}"
+)
+
+if is_true "${SUBMIT_COMBINE}"; then
+  args+=(--submit-combine)
+fi
+if is_true "${DRY_RUN}"; then
+  args+=(--dry-run)
+fi
+
+"${PYTHON}" "${args[@]}"

@@ -45,8 +45,16 @@ def add_global_sobol_rows(metadata, rows_per_split: int):
     metadata = metadata.copy()
     split_indices = []
     global_rows = []
+    sobol_csv = metadata["sobol_csv"]
+    sobol_rows = metadata["sobol_row"]
 
-    for csv_path, row in zip(metadata["sobol_csv"], metadata["sobol_row"], strict=True):
+    if len(sobol_csv) != len(sobol_rows):
+        raise ValueError(
+            f"metadata sobol_csv and sobol_row lengths differ: "
+            f"{len(sobol_csv)} != {len(sobol_rows)}"
+        )
+
+    for csv_path, row in zip(sobol_csv, sobol_rows):
         split_index = split_index_from_csv(str(csv_path))
         split_indices.append(split_index if split_index is not None else -1)
         if split_index is None or split_index < 1:

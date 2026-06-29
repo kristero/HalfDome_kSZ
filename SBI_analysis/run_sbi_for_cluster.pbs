@@ -1,0 +1,136 @@
+#PBS -N sbi_for_cluster
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR=${PBS_O_WORKDIR:-$PWD}
+cd "$WORK_DIR"
+
+: ${PYTHON:=python3}
+: ${PYTHON_ENV_SETUP:=}
+: ${LOG_DIR:=/home/kristero10/logs/SBI_runs}
+
+ALLOCATED_CPUS=${PBS_NCPUS:-${NCPUS:-}}
+if [ -z "$ALLOCATED_CPUS" ] && [ -n "${PBS_NODEFILE:-}" ] && [ -f "$PBS_NODEFILE" ]; then
+  ALLOCATED_CPUS=$(wc -l < "$PBS_NODEFILE")
+fi
+if [ -z "$ALLOCATED_CPUS" ]; then
+  ALLOCATED_CPUS=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
+fi
+
+: ${SBI_NUM_THREADS:=$ALLOCATED_CPUS}
+: ${OMP_NUM_THREADS:=$SBI_NUM_THREADS}
+: ${OPENBLAS_NUM_THREADS:=$SBI_NUM_THREADS}
+: ${MKL_NUM_THREADS:=$SBI_NUM_THREADS}
+: ${NUMEXPR_NUM_THREADS:=$SBI_NUM_THREADS}
+: ${TORCH_NUM_THREADS:=$SBI_NUM_THREADS}
+: ${TORCH_NUM_INTEROP_THREADS:=1}
+: ${SBI_DEVICE:=cpu}
+: ${SBI_SEED:=42}
+: ${SBI_SCALE:=1.3813351099973066}
+: ${SBI_DENSITY_ESTIMATOR:=maf}
+: ${SBI_STOP_AFTER_EPOCHS:=60}
+: ${SBI_NUM_POSTERIOR_SAMPLES:=100000}
+: ${SBI_DATASET_SIZES:=1024,2048,4096,8192,16384,32768,50e3,70e3,85e3,100e3}
+: ${SBI_DATASET_ORDER:=shuffle}
+: ${PREPARED_DATASET_PATH:=}
+: ${PREPARED_THETA_PATH:=}
+: ${PREPARED_X_PATH:=}
+: ${PREPARED_OBS_PATH:=}
+: ${PREPARED_PRIOR_PATH:=}
+
+if [ -f "$WORK_DIR/sbi_for_cluster.py" ]; then
+  SCRIPT=$WORK_DIR/sbi_for_cluster.py
+elif [ -f "$WORK_DIR/SBI_analysis/sbi_for_cluster.py" ]; then
+  SCRIPT=$WORK_DIR/SBI_analysis/sbi_for_cluster.py
+elif [ -f "$WORK_DIR/../SBI_analysis/sbi_for_cluster.py" ]; then
+  SCRIPT=$WORK_DIR/../SBI_analysis/sbi_for_cluster.py
+else
+  echo Could not locate sbi_for_cluster.py from WORK_DIR=$WORK_DIR >&2
+  exit 1
+fi
+
+SCRIPT_DIR=$(cd "$(dirname "$SCRIPT")" && pwd)
+JOB_ID=${PBS_JOBID:-manual}
+OUTPUT_BASE=$SCRIPT_DIR/outputs/sbi_for_cluster/$JOB_ID
+: ${SBI_OUTPUT_DIR:=$OUTPUT_BASE}
+: ${POSTERIOR_SAVE_PATH:=$OUTPUT_BASE/posterior_samples.npy}
+: ${PLOT_SUMMARY_PATH:=$OUTPUT_BASE/training_validation_loss.png}
+
+mkdir -p "$LOG_DIR" "$SBI_OUTPUT_DIR"
+
+if [ -n "$PYTHON_ENV_SETUP" ]; then
+  eval "$PYTHON_ENV_SETUP"
+fi
+
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS NUMEXPR_NUM_THREADS
+export TORCH_NUM_THREADS TORCH_NUM_INTEROP_THREADS
+export SBI_DEVICE SBI_SEED SBI_SCALE SBI_DENSITY_ESTIMATOR
+export SBI_STOP_AFTER_EPOCHS SBI_NUM_POSTERIOR_SAMPLES
+export SBI_DATASET_SIZES SBI_DATASET_ORDER SBI_OUTPUT_DIR
+export PREPARED_DATASET_PATH PREPARED_THETA_PATH PREPARED_X_PATH
+export PREPARED_OBS_PATH PREPARED_PRIOR_PATH
+export POSTERIOR_SAVE_PATH PLOT_SUMMARY_PATH
+
+if [ -z "$PREPARED_DATASET_PATH" ]; then
+  if [ -z "$PREPARED_THETA_PATH" ] || [ -z "$PREPARED_X_PATH" ] || [ -z "$PREPARED_OBS_PATH" ] || [ -z "$PREPARED_PRIOR_PATH" ]; then
+    echo Set PREPARED_DATASET_PATH or PREPARED_THETA_PATH, PREPARED_X_PATH, PREPARED_OBS_PATH, and PREPARED_PRIOR_PATH >&2
+    exit 2
+  fi
+fi
+
+for required_path in "$PREPARED_DATASET_PATH" "$PREPARED_THETA_PATH" "$PREPARED_X_PATH" "$PREPARED_OBS_PATH" "$PREPARED_PRIOR_PATH"; do
+  if [ -n "$required_path" ] && [ ! -f "$required_path" ]; then
+    echo Input path does not exist: $required_path >&2
+    exit 2
+  fi
+done
+
+echo PBS job id: $JOB_ID
+echo Working directory: $WORK_DIR
+echo Host: $(hostname)
+echo Date: $(date -Is)
+echo Python script: $SCRIPT
+echo Python executable: $PYTHON
+$PYTHON --version
+echo Prepared dataset: ${PREPARED_DATASET_PATH:-not_set}
+echo SBI output directory: $SBI_OUTPUT_DIR
+echo Dataset sizes: $SBI_DATASET_SIZES
+echo Dataset order: $SBI_DATASET_ORDER
+echo Posterior output: $POSTERIOR_SAVE_PATH
+echo Plot output: $PLOT_SUMMARY_PATH
+echo Allocated CPUs: $ALLOCATED_CPUS
+echo SBI_NUM_THREADS: $SBI_NUM_THREADS
+echo OMP_NUM_THREADS: $OMP_NUM_THREADS
+echo OPENBLAS_NUM_THREADS: $OPENBLAS_NUM_THREADS
+echo MKL_NUM_THREADS: $MKL_NUM_THREADS
+echo TORCH_NUM_THREADS: $TORCH_NUM_THREADS
+echo TORCH_NUM_INTEROP_THREADS: $TORCH_NUM_INTEROP_THREADS
+
+$PYTHON - <<'PY'
+import sys
+
+try:
+    import numpy
+    import matplotlib
+    import torch
+    try:
+        from sbi.inference import NPE
+    except ImportError:
+        from sbi.inference import SNPE
+except Exception as exc:
+    print("Python/SBI environment import check failed:", repr(exc), file=sys.stderr)
+    print("If this mentions backports.tarfile, fix the mixed conda/user-site environment.", file=sys.stderr)
+    print("Try: python -m pip install --user backports.tarfile", file=sys.stderr)
+    print("If that does not work, try: python -m pip install --user 'setuptools<70'", file=sys.stderr)
+    raise SystemExit(1)
+PY
+
+$PYTHON "$SCRIPT" > "$LOG_DIR/sbi_for_cluster_$JOB_ID.out" 2> "$LOG_DIR/sbi_for_cluster_$JOB_ID.err"
+
+echo Job finished.

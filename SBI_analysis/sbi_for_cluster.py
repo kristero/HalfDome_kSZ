@@ -31,7 +31,7 @@ DEFAULT_POSTERIOR_SAVE_PATH = (
     "outputs/posteriors/posterior_16e3emul_N4e4_binned16_s42_xo_Planck_synthetic_no_noise.npy"
 )
 DEFAULT_PLOT_SUMMARY_PATH = "training_validation_loss.png"
-DEFAULT_SCALE = 1.3813351099973066
+DEFAULT_GAUSSIAN_BEAM_FWHM_ARCMIN = 1.6
 DEFAULT_DATASET_SIZES = "1024,2048,4096,8192,16384,32768,50e3,70e3,85e3,100e3"
 
 
@@ -125,7 +125,12 @@ def parse_args() -> argparse.Namespace:
         "--plot-summary-path",
         default=os.environ.get("PLOT_SUMMARY_PATH", DEFAULT_PLOT_SUMMARY_PATH),
     )
-    parser.add_argument("--scale", type=float, default=env_float("SBI_SCALE", DEFAULT_SCALE))
+    parser.add_argument(
+        "--gaussian-beam-fwhm-arcmin",
+        type=float,
+        default=env_float("SBI_GAUSSIAN_BEAM_FWHM_ARCMIN", DEFAULT_GAUSSIAN_BEAM_FWHM_ARCMIN),
+        help="Apply this Gaussian beam to both prepared x and obs in log10(D_ell) space. Use 0 to disable.",
+    )
     parser.add_argument("--seed", type=int, default=env_int("SBI_SEED", 42))
     parser.add_argument(
         "--density-estimator",
@@ -235,10 +240,31 @@ def maybe_save_pickle(path: str | Path, obj: Any, label: str) -> Path | None:
         return None
 
 
+def load_array_from_path(path_value: str | Path, aliases: tuple[str, ...], label: str) -> np.ndarray:
+    path = require_file(str(path_value), label)
+    if path.suffix.lower() == ".npz":
+        with np.load(path, allow_pickle=True) as data:
+            for alias in aliases:
+                if alias in data:
+                    return as_numpy_float(unpack_numpy_object(data[alias]), f"{label}:{alias}")
+            if len(data.files) == 1:
+                key = data.files[0]
+                return as_numpy_float(unpack_numpy_object(data[key]), f"{label}:{key}")
+            raise KeyError(f"{label} file {path} is missing one of {aliases}; keys={data.files}")
+    return as_numpy_float(load_numpy_or_pickle(path, label), label)
+
+
 def resolve_array(path_value: str, prepared: dict[str, Any], aliases: tuple[str, ...], label: str) -> np.ndarray:
     if path_value:
-        return as_numpy_float(load_numpy_or_pickle(path_value, label), label)
+        return load_array_from_path(path_value, aliases, label)
     return as_numpy_float(first_present(prepared, aliases, label), label)
+
+
+def resolve_optional_array(prepared: dict[str, Any], aliases: tuple[str, ...], label: str) -> np.ndarray | None:
+    for alias in aliases:
+        if alias in prepared:
+            return as_numpy_float(prepared[alias], f"{label}:{alias}")
+    return None
 
 
 def build_prior_from_bounds(prepared: dict[str, Any], device: str) -> Any:
@@ -449,6 +475,62 @@ def validate_training_size(size: int, n_rows: int) -> None:
         raise ValueError(f"Requested training size {size} exceeds available rows {n_rows}")
 
 
+def gaussian_beam_window(ell: np.ndarray, fwhm_arcmin: float) -> np.ndarray:
+    ell = np.asarray(ell, dtype=np.float64).reshape(-1)
+    fwhm_arcmin = float(fwhm_arcmin)
+    if fwhm_arcmin < 0.0:
+        raise ValueError("gaussian_beam_fwhm_arcmin must be non-negative")
+    if fwhm_arcmin == 0.0:
+        return np.ones_like(ell, dtype=np.float64)
+    fwhm_rad = np.deg2rad(fwhm_arcmin / 60.0)
+    sigma_rad = fwhm_rad / np.sqrt(8.0 * np.log(2.0))
+    return np.exp(-0.5 * ell * (ell + 1.0) * sigma_rad**2)
+
+
+def apply_gaussian_beam_to_log10_dl(
+    values: np.ndarray,
+    ell: np.ndarray,
+    fwhm_arcmin: float,
+    label: str,
+) -> np.ndarray:
+    values = np.asarray(values, dtype=np.float32)
+    fwhm_arcmin = float(fwhm_arcmin)
+    if fwhm_arcmin == 0.0:
+        return values
+
+    ell = np.asarray(ell, dtype=np.float64).reshape(-1)
+    if values.shape[-1] != ell.size:
+        raise ValueError(
+            f"Cannot apply Gaussian beam to {label}: last dimension {values.shape[-1]} "
+            f"does not match ell length {ell.size}."
+        )
+
+    beam = gaussian_beam_window(ell, fwhm_arcmin)
+    beam_log_factor = np.log10(np.maximum(beam**2, 1.0e-40)).astype(np.float32)
+    return np.ascontiguousarray(values + beam_log_factor, dtype=np.float32)
+
+
+def apply_requested_gaussian_beam(
+    x: np.ndarray,
+    obs: np.ndarray,
+    ell: np.ndarray | None,
+    fwhm_arcmin: float,
+) -> tuple[np.ndarray, np.ndarray]:
+    if float(fwhm_arcmin) == 0.0:
+        print("Gaussian beam application disabled.")
+        return x, obs
+    if ell is None:
+        raise ValueError(
+            "Gaussian beam application requires an ell array in the prepared dataset. "
+            "Add ell=... to the NPZ or set SBI_GAUSSIAN_BEAM_FWHM_ARCMIN=0."
+        )
+
+    print(f"Applying Gaussian beam to prepared x and obs: FWHM={float(fwhm_arcmin)} arcmin.")
+    x_beamed = apply_gaussian_beam_to_log10_dl(x, ell, fwhm_arcmin, "prepared x")
+    obs_beamed = apply_gaussian_beam_to_log10_dl(obs, ell, fwhm_arcmin, "prepared observation")
+    return x_beamed, obs_beamed
+
+
 def train_one_size(
     *,
     theta: np.ndarray,
@@ -470,10 +552,9 @@ def train_one_size(
     x_train = np.ascontiguousarray(x[train_indices], dtype=np.float32)
     obs_np = np.asarray(obs, dtype=np.float32).reshape(-1)
 
-    log_scale = np.float32(np.log10(args.scale))
     theta_t = torch.as_tensor(theta_train, dtype=torch.float32, device=args.device)
-    x_t = torch.as_tensor(x_train + log_scale, dtype=torch.float32, device=args.device)
-    obs_t = torch.as_tensor(obs_np + log_scale, dtype=torch.float32, device=args.device)
+    x_t = torch.as_tensor(x_train, dtype=torch.float32, device=args.device)
+    obs_t = torch.as_tensor(obs_np, dtype=torch.float32, device=args.device)
 
     print("")
     print(f"=== Training SBI with n_train={n_train} ===")
@@ -526,8 +607,7 @@ def train_one_size(
         "theta_dim": int(theta.shape[1]),
         "seed": int(args.seed),
         "dataset_order": args.dataset_order,
-        "scale": float(args.scale),
-        "log10_scale": float(log_scale),
+        "gaussian_beam_fwhm_arcmin": float(args.gaussian_beam_fwhm_arcmin),
         "density_estimator": args.density_estimator,
         "stop_after_epochs": int(args.stop_after_epochs),
         "num_posterior_samples": int(args.num_posterior_samples),
@@ -645,10 +725,21 @@ def main() -> int:
     obs = resolve_array(
         args.prepared_obs_path,
         prepared,
-        ("obs", "prepared_obs", "x_o", "x_observed_log10", "x_observed_noisy_log10"),
+        (
+            "obs",
+            "prepared_obs",
+            "observed",
+            "x_obs",
+            "x_o",
+            "x_obs_log10_dl",
+            "x_observed_log10",
+            "x_observed_log10_dl",
+            "x_observed_noisy_log10",
+        ),
         "prepared observation",
     )
     prior = resolve_prior(args.prepared_prior_path, prepared, args.device)
+    ell = resolve_optional_array(prepared, ("ell", "ells", "l", "multipole"), "ell")
 
     if theta.ndim != 2:
         raise ValueError(f"prepared theta must be 2D, got shape {theta.shape}")
@@ -660,6 +751,7 @@ def main() -> int:
         obs = np.asarray(obs, dtype=np.float32).reshape(-1)
     if obs.shape[-1] != x.shape[-1]:
         raise ValueError(f"observation length {obs.shape[-1]} does not match x dimension {x.shape[-1]}")
+    x, obs = apply_requested_gaussian_beam(x, obs, ell, args.gaussian_beam_fwhm_arcmin)
 
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)

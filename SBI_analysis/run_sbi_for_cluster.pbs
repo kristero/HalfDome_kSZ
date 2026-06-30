@@ -1,7 +1,7 @@
 #PBS -N sbi_for_cluster
 #PBS -q mini
 #PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
-#PBS -l walltime=23:59:00
+#PBS -l walltime=04:00:00
 #PBS -o /home/kristero10/logs/SBI_runs/
 #PBS -e /home/kristero10/logs/SBI_runs/
 #PBS -S /bin/bash
@@ -36,7 +36,11 @@ fi
 : ${SBI_DENSITY_ESTIMATOR:=maf}
 : ${SBI_STOP_AFTER_EPOCHS:=60}
 : ${SBI_NUM_POSTERIOR_SAMPLES:=100000}
-: ${SBI_DATASET_SIZES:=1024,2048,4096,8192,16384,32768,50e3,70e3,85e3,100e3}
+: ${SBI_DATASET_SIZE_GROUP_1:=100e3}
+: ${SBI_DATASET_SIZE_GROUP_2:=85e3,8192}
+: ${SBI_DATASET_SIZE_GROUP_3:=70e3,16384,2048}
+: ${SBI_DATASET_SIZE_GROUP_4:=50e3,32768,4096,1024}
+: ${SBI_GROUP_ID:=}
 : ${SBI_DATASET_ORDER:=shuffle}
 : ${PREPARED_DATASET_PATH:=}
 : ${PREPARED_THETA_PATH:=}
@@ -65,7 +69,29 @@ fi
 
 SCRIPT_DIR=$(cd "$(dirname "$SCRIPT")" && pwd)
 JOB_ID=${PBS_JOBID:-manual}
-OUTPUT_BASE=$SCRIPT_DIR/outputs/sbi_for_cluster/$JOB_ID
+GROUP_ID=${SBI_GROUP_ID:-${PBS_ARRAY_INDEX:-${PBS_ARRAYID:-1}}}
+case "$GROUP_ID" in
+  1)
+    SBI_DATASET_SIZES=$SBI_DATASET_SIZE_GROUP_1
+    ;;
+  2)
+    SBI_DATASET_SIZES=$SBI_DATASET_SIZE_GROUP_2
+    ;;
+  3)
+    SBI_DATASET_SIZES=$SBI_DATASET_SIZE_GROUP_3
+    ;;
+  4)
+    SBI_DATASET_SIZES=$SBI_DATASET_SIZE_GROUP_4
+    ;;
+  *)
+    echo "Unsupported SBI_GROUP_ID/PBS array task id: $GROUP_ID. Expected 1, 2, 3, or 4." >&2
+    exit 2
+    ;;
+esac
+JOB_ROOT=$(printf '%s' "$JOB_ID" | sed 's/\[[^]]*\]//g')
+LOG_JOB_TAG=$(printf '%s' "$JOB_ID" | tr '[]' '__')
+OUTPUT_ROOT=$SCRIPT_DIR/outputs/sbi_for_cluster/$JOB_ROOT
+OUTPUT_BASE=$OUTPUT_ROOT/group${GROUP_ID}
 : ${SBI_OUTPUT_DIR:=$OUTPUT_BASE}
 : ${POSTERIOR_SAVE_PATH:=$OUTPUT_BASE/posterior_samples.npy}
 : ${PLOT_SUMMARY_PATH:=$OUTPUT_BASE/training_validation_loss.png}
@@ -110,8 +136,15 @@ echo Python script: $SCRIPT
 echo Python executable: $PYTHON
 $PYTHON --version
 echo Prepared dataset: ${PREPARED_DATASET_PATH:-not_set}
+echo SBI group id: $GROUP_ID
+echo SBI output root: $OUTPUT_ROOT
 echo SBI output directory: $SBI_OUTPUT_DIR
 echo Dataset sizes: $SBI_DATASET_SIZES
+echo Dataset size groups:
+echo "  group1: $SBI_DATASET_SIZE_GROUP_1"
+echo "  group2: $SBI_DATASET_SIZE_GROUP_2"
+echo "  group3: $SBI_DATASET_SIZE_GROUP_3"
+echo "  group4: $SBI_DATASET_SIZE_GROUP_4"
 echo Dataset order: $SBI_DATASET_ORDER
 echo Gaussian beam FWHM arcmin: $SBI_GAUSSIAN_BEAM_FWHM_ARCMIN
 echo Posterior output: $POSTERIOR_SAVE_PATH
@@ -143,6 +176,7 @@ except Exception as exc:
     raise SystemExit(1)
 PY
 
-$PYTHON "$SCRIPT" > "$LOG_DIR/sbi_for_cluster_$JOB_ID.out" 2> "$LOG_DIR/sbi_for_cluster_$JOB_ID.err"
+RUN_LOG_BASE=sbi_for_cluster_${LOG_JOB_TAG}_group${GROUP_ID}
+$PYTHON "$SCRIPT" > "$LOG_DIR/${RUN_LOG_BASE}.out" 2> "$LOG_DIR/${RUN_LOG_BASE}.err"
 
 echo Job finished.

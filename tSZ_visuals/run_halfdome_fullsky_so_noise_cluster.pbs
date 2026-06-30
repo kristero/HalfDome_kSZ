@@ -1,0 +1,208 @@
+#PBS -N tSZ_SO_sobol4_cl
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -o tSZ_SO_sobol4_cl.pbs.out
+#PBS -e tSZ_SO_sobol4_cl.pbs.err
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+# =========================
+# Edit this block for the cluster/user.
+# =========================
+: "${PROJECT_DIR:=${PBS_O_WORKDIR:-$PWD}}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${CLUSTER_USER:=${USER:-kristero10}}"
+: "${LIGHTCONE_ID:=100}"
+
+# Required input paths.
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
+: "${SOBOL_CSV:=${PROJECT_DIR}/Sobol_tSZ/battaglia_sobol_4.csv}"
+: "${SO_NOISE_DIR:=${PROJECT_DIR}/other_sims/SO}"
+: "${BASELINE_NOISE_PATH:=${SO_NOISE_DIR}/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt}"
+: "${GOAL_NOISE_PATH:=${SO_NOISE_DIR}/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt}"
+
+# Output/cache/log paths.
+: "${OUTPUT_DIR:=/lustre/work/${CLUSTER_USER}/tSZ_data/so_noise_cl_only_sobol4_y${LIGHTCONE_ID}_deproj0_3}"
+: "${CACHE_DIR:=/lustre/work/${CLUSTER_USER}/tSZ_data/cache}"
+: "${LOG_DIR:=/home/${CLUSTER_USER}/logs/tSZ_so_noise}"
+
+# Science/run configuration.
+: "${SIMULATION_NAME:=halfdome_lightcone_${LIGHTCONE_ID}}"
+: "${NSIDE:=4096}"
+: "${SOBOL_ROW_LIST:=${PBS_ARRAY_INDEX:-${PBS_ARRAYID:-1,2,3,4}}}"
+: "${SO_NOISE_DEPROJECTIONS:=0,3}"
+: "${ELL_MIN:=80}"
+: "${ELL_MAX:=7979}"
+: "${MASK_FSKY:=0.4}"
+: "${MASK_APODIZATION_ARCMIN:=60.0}"
+: "${SEED:=12345}"
+
+# Runtime configuration.
+: "${THREADS_PER_TASK:=26}"
+: "${CL_NITER:=0}"
+: "${MODEL_EXISTS:=false}"
+: "${REUSE_EXISTING_CACHE:=true}"
+: "${CACHE_WAIT_SECONDS:=0}"
+: "${CACHE_POLL_SECONDS:=30}"
+: "${INTERPOLATOR_PAD:=256}"
+: "${INTERPOLATOR_LOGM_MAX:=15.7}"
+: "${ENFORCE_BATTAGLIA_GUARDRAILS:=true}"
+: "${SKIP_INVALID_BATTAGLIA_ROWS:=true}"
+: "${SAVE_DEBUG_MAPS:=false}"
+
+# Keep BLAS single-threaded; the Julia job itself gets THREADS_PER_TASK threads.
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+
+cd "${PROJECT_DIR}"
+
+SCRIPT_CANDIDATE_1="${PROJECT_DIR}/tSZ_visuals/run_halfdome_fullsky_so_noise.jl"
+SCRIPT_CANDIDATE_2="${PROJECT_DIR}/run_halfdome_fullsky_so_noise.jl"
+if [[ -f "${SCRIPT_CANDIDATE_1}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_1}"
+elif [[ -f "${SCRIPT_CANDIDATE_2}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_2}"
+else
+  echo "Could not locate run_halfdome_fullsky_so_noise.jl from PROJECT_DIR=${PROJECT_DIR}" >&2
+  exit 2
+fi
+
+for required_path in "${SCRIPT}" "${HALFDOME_PATH}" "${SOBOL_CSV}" "${BASELINE_NOISE_PATH}" "${GOAL_NOISE_PATH}"; do
+  if [[ ! -e "${required_path}" ]]; then
+    echo "Required path does not exist: ${required_path}" >&2
+    exit 2
+  fi
+done
+
+SOBOL_ROW_COUNT=$(( $(wc -l < "${SOBOL_CSV}") - 1 ))
+if [[ "${SOBOL_ROW_COUNT}" -lt 1 ]]; then
+  echo "Sobol CSV has no data rows: ${SOBOL_CSV}" >&2
+  exit 2
+fi
+
+rows_to_run=()
+row_list_normalized="${SOBOL_ROW_LIST//,/ }"
+row_list_normalized="${row_list_normalized//:/ }"
+row_list_normalized="${row_list_normalized//;/ }"
+for row_item in ${row_list_normalized}; do
+  if [[ ! "${row_item}" =~ ^[0-9]+$ ]]; then
+    echo "SOBOL_ROW_LIST contains a non-integer row value: ${row_item}" >&2
+    exit 2
+  fi
+  if [[ "${row_item}" -lt 1 || "${row_item}" -gt "${SOBOL_ROW_COUNT}" ]]; then
+    echo "SOBOL_ROW_LIST row ${row_item} is outside 1:${SOBOL_ROW_COUNT} for ${SOBOL_CSV}" >&2
+    exit 2
+  fi
+  rows_to_run+=("${row_item}")
+done
+if [[ "${#rows_to_run[@]}" -eq 0 ]]; then
+  echo "No Sobol rows were parsed from SOBOL_ROW_LIST=${SOBOL_ROW_LIST}" >&2
+  exit 2
+fi
+
+mkdir -p "${OUTPUT_DIR}" "${CACHE_DIR}" "${LOG_DIR}"
+
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS
+export ENFORCE_BATTAGLIA_GUARDRAILS SKIP_INVALID_BATTAGLIA_ROWS
+
+JOB_TAG="$(printf '%s' "${PBS_JOBID:-manual}" | tr '[]' '__')"
+
+echo "======================================="
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Project dir: ${PROJECT_DIR}"
+echo "Julia script: ${SCRIPT}"
+echo "Julia executable: ${JULIA}"
+"${JULIA}" --version
+echo "Lightcone id: ${LIGHTCONE_ID}"
+echo "Simulation name: ${SIMULATION_NAME}"
+echo "HalfDome path: ${HALFDOME_PATH}"
+echo "Sobol CSV: ${SOBOL_CSV}"
+echo "Sobol CSV row count: ${SOBOL_ROW_COUNT}"
+echo "Sobol rows to run: ${rows_to_run[*]}"
+echo "Baseline SO noise path: ${BASELINE_NOISE_PATH}"
+echo "Goal SO noise path: ${GOAL_NOISE_PATH}"
+echo "Output dir: ${OUTPUT_DIR}"
+echo "Cache dir: ${CACHE_DIR}"
+echo "Log dir: ${LOG_DIR}"
+echo "NSIDE: ${NSIDE}"
+echo "SO deprojections: ${SO_NOISE_DEPROJECTIONS}"
+echo "SO native ell_min: ${ELL_MIN}"
+echo "C_l/noise ell_max: ${ELL_MAX}"
+echo "Mask fsky: ${MASK_FSKY}"
+echo "Mask apodization arcmin: ${MASK_APODIZATION_ARCMIN}"
+echo "Seed: ${SEED}"
+echo "Save debug maps: ${SAVE_DEBUG_MAPS}"
+echo "Threads per Julia task: ${THREADS_PER_TASK}"
+echo "OMP_NUM_THREADS: ${OMP_NUM_THREADS}"
+echo "OPENBLAS_NUM_THREADS: ${OPENBLAS_NUM_THREADS}"
+echo "MKL_NUM_THREADS: ${MKL_NUM_THREADS}"
+echo "======================================="
+
+echo "Running SO split-noise spectra only."
+echo "Expected outputs per Sobol row: NumPy .npy no-noise, baseline cross, goal cross for each deprojection."
+
+run_one_sobol_row() {
+  local sobol_row="$1"
+  local row_stdout="${LOG_DIR}/halfdome_so_noise_cl_y${LIGHTCONE_ID}_sobolrow${sobol_row}_${JOB_TAG}.out"
+  local row_stderr="${LOG_DIR}/halfdome_so_noise_cl_y${LIGHTCONE_ID}_sobolrow${sobol_row}_${JOB_TAG}.err"
+  local row_start
+  row_start="$(date +%s)"
+
+  echo "---------------------------------------"
+  echo "Starting Sobol row ${sobol_row} at $(date -Is)"
+  echo "Row stdout: ${row_stdout}"
+  echo "Row stderr: ${row_stderr}"
+  echo "---------------------------------------"
+
+  (
+    export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
+    "${JULIA}" --threads="${THREADS_PER_TASK}" "${SCRIPT}" \
+    simulation_name="${SIMULATION_NAME}" \
+    halfdome_path="${HALFDOME_PATH}" \
+    output_dir="${OUTPUT_DIR}" \
+    cache_dir="${CACHE_DIR}" \
+    sobol_csv_path="${SOBOL_CSV}" \
+    sobol_row="${sobol_row}" \
+    baseline_noise_path="${BASELINE_NOISE_PATH}" \
+    goal_noise_path="${GOAL_NOISE_PATH}" \
+    nside="${NSIDE}" \
+    cl_lmax="${ELL_MAX}" \
+    so_noise_lmax="${ELL_MAX}" \
+    cl_niter="${CL_NITER}" \
+    so_noise_deprojections="${SO_NOISE_DEPROJECTIONS}" \
+    so_noise_is_dl=false \
+    mask_fsky="${MASK_FSKY}" \
+    mask_apodization_arcmin="${MASK_APODIZATION_ARCMIN}" \
+    seed="${SEED}" \
+    model_exists="${MODEL_EXISTS}" \
+    reuse_existing_cache="${REUSE_EXISTING_CACHE}" \
+    cache_wait_seconds="${CACHE_WAIT_SECONDS}" \
+    cache_poll_seconds="${CACHE_POLL_SECONDS}" \
+    interpolator_pad="${INTERPOLATOR_PAD}" \
+    interpolator_logM_max="${INTERPOLATOR_LOGM_MAX}" \
+    save_no_noise_cl=true \
+    save_baseline_noise_cross_cl=true \
+    save_goal_noise_cross_cl=true \
+    save_unmasked_no_noise_cl=false \
+    save_noise_maps="${SAVE_DEBUG_MAPS}" \
+    save_noisy_maps="${SAVE_DEBUG_MAPS}" \
+    save_mask_map="${SAVE_DEBUG_MAPS}" \
+    save_signal_map="${SAVE_DEBUG_MAPS}" \
+    save_masked_signal_map="${SAVE_DEBUG_MAPS}" \
+      > "${row_stdout}" \
+      2> "${row_stderr}"
+  )
+
+  echo "Finished Sobol row ${sobol_row} at $(date -Is); elapsed $(( $(date +%s) - row_start )) s."
+}
+
+for sobol_row in "${rows_to_run[@]}"; do
+  run_one_sobol_row "${sobol_row}"
+done
+
+echo "Job finished at $(date -Is)."

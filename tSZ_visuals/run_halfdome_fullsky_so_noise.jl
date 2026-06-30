@@ -38,8 +38,8 @@ replace_or_add_arg!(ARGS, "catalog_source", "halfdome")
 replace_or_add_arg!(ARGS, "batching_mode", "full")
 replace_or_add_arg!(ARGS, "save_bin_maps", "false")
 replace_or_add_arg!(ARGS, "save_mass_map", "false")
-replace_or_add_arg!(ARGS, "apply_gaussian_beam", "false")
-replace_or_add_arg!(ARGS, "gaussian_beam_fwhm_arcmin", "0.0")
+add_arg_if_missing!(ARGS, "apply_gaussian_beam", "true")
+add_arg_if_missing!(ARGS, "gaussian_beam_fwhm_arcmin", "2.0")
 add_arg_if_missing!(ARGS, "cl_lmax", SO_NOISE_ELL_MAX_DEFAULT)
 add_arg_if_missing!(ARGS, "so_noise_lmax", SO_NOISE_ELL_MAX_DEFAULT)
 if !has_arg(ARGS, "halfdome_path") && !haskey(ENV, "HALFDOME_PATH") && isfile(LOCAL_HALFDOME_PATH_DEFAULT)
@@ -52,8 +52,12 @@ if !has_arg(ARGS, "cache_dir") && !haskey(ENV, "TSZ_VISUAL_CACHE_DIR")
     add_arg_if_missing!(ARGS, "cache_dir", LOCAL_SO_NOISE_CACHE_DIR_DEFAULT)
 end
 
-ENV["APPLY_GAUSSIAN_BEAM"] = "false"
-ENV["GAUSSIAN_BEAM_FWHM_ARCMIN"] = "0.0"
+if !haskey(ENV, "APPLY_GAUSSIAN_BEAM")
+    ENV["APPLY_GAUSSIAN_BEAM"] = "true"
+end
+if !haskey(ENV, "GAUSSIAN_BEAM_FWHM_ARCMIN")
+    ENV["GAUSSIAN_BEAM_FWHM_ARCMIN"] = "2.0"
+end
 
 include(joinpath(@__DIR__, "run_tSZ_visuals.jl"))
 

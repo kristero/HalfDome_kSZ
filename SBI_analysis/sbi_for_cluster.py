@@ -31,7 +31,8 @@ DEFAULT_POSTERIOR_SAVE_PATH = (
     "outputs/posteriors/posterior_16e3emul_N4e4_binned16_s42_xo_Planck_synthetic_no_noise.npy"
 )
 DEFAULT_PLOT_SUMMARY_PATH = "training_validation_loss.png"
-DEFAULT_GAUSSIAN_BEAM_FWHM_ARCMIN = 1.6
+DEFAULT_GAUSSIAN_BEAM_FWHM_ARCMIN = 2.0
+DEFAULT_GAUSSIAN_BEAM_MODE = "signal_only"
 DEFAULT_DATASET_SIZES = "1024,2048,4096,8192,16384,32768,50e3,70e3,85e3,100e3"
 
 
@@ -129,7 +130,19 @@ def parse_args() -> argparse.Namespace:
         "--gaussian-beam-fwhm-arcmin",
         type=float,
         default=env_float("SBI_GAUSSIAN_BEAM_FWHM_ARCMIN", DEFAULT_GAUSSIAN_BEAM_FWHM_ARCMIN),
-        help="Apply this Gaussian beam to both prepared x and obs in log10(D_ell) space. Use 0 to disable.",
+        help=(
+            "Gaussian beam FWHM in arcmin. In the default signal_only mode this is applied only "
+            "to the prepared simulation signal x, not to the observed/noisy vector. Use 0 to disable."
+        ),
+    )
+    parser.add_argument(
+        "--gaussian-beam-mode",
+        choices=("signal_only", "final_vector", "off"),
+        default=os.environ.get("SBI_GAUSSIAN_BEAM_MODE", DEFAULT_GAUSSIAN_BEAM_MODE),
+        help=(
+            "signal_only beams the prepared signal x and leaves obs untouched; final_vector keeps "
+            "the old behavior and beams both final log10(D_ell) vectors; off disables the beam."
+        ),
     )
     parser.add_argument("--seed", type=int, default=env_int("SBI_SEED", 42))
     parser.add_argument(
@@ -536,8 +549,10 @@ def apply_requested_gaussian_beam(
     obs: np.ndarray,
     ell: np.ndarray | None,
     fwhm_arcmin: float,
+    mode: str,
 ) -> tuple[np.ndarray, np.ndarray]:
-    if float(fwhm_arcmin) == 0.0:
+    mode = str(mode or DEFAULT_GAUSSIAN_BEAM_MODE).strip().lower().replace("-", "_")
+    if mode == "off" or float(fwhm_arcmin) == 0.0:
         print("Gaussian beam application disabled.")
         return x, obs
     if ell is None:
@@ -546,10 +561,26 @@ def apply_requested_gaussian_beam(
             "Add ell=... to the NPZ or set SBI_GAUSSIAN_BEAM_FWHM_ARCMIN=0."
         )
 
-    print(f"Applying Gaussian beam to prepared x and obs: FWHM={float(fwhm_arcmin)} arcmin.")
-    x_beamed = apply_gaussian_beam_to_log10_dl(x, ell, fwhm_arcmin, "prepared x")
-    obs_beamed = apply_gaussian_beam_to_log10_dl(obs, ell, fwhm_arcmin, "prepared observation")
-    return x_beamed, obs_beamed
+    if mode == "signal_only":
+        print(
+            "Applying Gaussian beam only to prepared simulation signal x: "
+            f"FWHM={float(fwhm_arcmin)} arcmin. The observation is left unchanged; "
+            "it must already be generated as cross_spectrum(beam(signal) + noise_1, "
+            "beam(signal) + noise_2)."
+        )
+        x_beamed = apply_gaussian_beam_to_log10_dl(x, ell, fwhm_arcmin, "prepared signal x")
+        return x_beamed, obs
+
+    if mode == "final_vector":
+        print(
+            "Warning: applying Gaussian beam to final prepared x and obs vectors. "
+            "This beams any noise already present and is not the correct map-level SO ordering."
+        )
+        x_beamed = apply_gaussian_beam_to_log10_dl(x, ell, fwhm_arcmin, "prepared x")
+        obs_beamed = apply_gaussian_beam_to_log10_dl(obs, ell, fwhm_arcmin, "prepared observation")
+        return x_beamed, obs_beamed
+
+    raise ValueError(f"Unsupported gaussian beam mode: {mode!r}")
 
 
 def train_one_size(
@@ -629,6 +660,7 @@ def train_one_size(
         "seed": int(args.seed),
         "dataset_order": args.dataset_order,
         "gaussian_beam_fwhm_arcmin": float(args.gaussian_beam_fwhm_arcmin),
+        "gaussian_beam_mode": args.gaussian_beam_mode,
         "density_estimator": args.density_estimator,
         "stop_after_epochs": int(args.stop_after_epochs),
         "num_posterior_samples": int(args.num_posterior_samples),
@@ -772,7 +804,13 @@ def main() -> int:
         obs = np.asarray(obs, dtype=np.float32).reshape(-1)
     if obs.shape[-1] != x.shape[-1]:
         raise ValueError(f"observation length {obs.shape[-1]} does not match x dimension {x.shape[-1]}")
-    x, obs = apply_requested_gaussian_beam(x, obs, ell, args.gaussian_beam_fwhm_arcmin)
+    x, obs = apply_requested_gaussian_beam(
+        x,
+        obs,
+        ell,
+        args.gaussian_beam_fwhm_arcmin,
+        args.gaussian_beam_mode,
+    )
 
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)

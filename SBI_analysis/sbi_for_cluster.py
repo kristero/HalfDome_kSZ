@@ -385,10 +385,17 @@ def plot_loss_history(loss_history: dict[str, np.ndarray], plot_path: str | Path
 def save_loss_history(inference: Any, output_dir: str | Path, plot_summary_path: str | Path, title: str) -> dict[str, np.ndarray]:
     output_dir = Path(output_dir).expanduser()
     output_dir.mkdir(parents=True, exist_ok=True)
-    loss_history = extract_loss_history(inference)
+    try:
+        loss_history = extract_loss_history(inference)
+    except Exception as exc:
+        print(f"Warning: could not extract loss history; continuing: {exc!r}")
+        loss_history = {}
 
     if loss_history:
-        np.savez_compressed(output_dir / "loss_history.npz", **loss_history)
+        try:
+            np.savez_compressed(output_dir / "loss_history.npz", **loss_history)
+        except Exception as exc:
+            print(f"Warning: could not save loss history; continuing: {exc!r}")
         summary = {
             key: {
                 "n": int(values.size),
@@ -401,7 +408,10 @@ def save_loss_history(inference: Any, output_dir: str | Path, plot_summary_path:
         }
     else:
         summary = {"warning": "No loss history was exposed by this sbi version."}
-    write_json(output_dir / "loss_history_summary.json", summary)
+    try:
+        write_json(output_dir / "loss_history_summary.json", summary)
+    except Exception as exc:
+        print(f"Warning: could not save loss history summary; continuing: {exc!r}")
     save_training_summary_plot(inference, plot_summary_path, loss_history, title)
     return loss_history
 
@@ -412,6 +422,17 @@ def save_training_summary_plot(
     loss_history: dict[str, np.ndarray] | None = None,
     title: str = "SBI training loss",
 ) -> None:
+    use_sbi_plot_summary = os.environ.get("SBI_USE_PLOT_SUMMARY", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+    if not use_sbi_plot_summary:
+        print("Using manual loss plot; set SBI_USE_PLOT_SUMMARY=1 to try sbi.analysis.plot_summary.")
+        plot_loss_history(loss_history or {}, plot_summary_path, title)
+        return
+
     tag_sets = (
         ["training_loss", "validation_loss"],
         ["training_log_probs", "validation_log_probs"],

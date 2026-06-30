@@ -1,3 +1,4 @@
+#!/bin/bash
 #PBS -N tSZ_SO_sobol4_cl
 #PBS -q mini
 #PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
@@ -108,7 +109,9 @@ mkdir -p "${OUTPUT_DIR}" "${CACHE_DIR}" "${LOG_DIR}"
 export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS
 export ENFORCE_BATTAGLIA_GUARDRAILS SKIP_INVALID_BATTAGLIA_ROWS
 
-JOB_TAG="$(printf '%s' "${PBS_JOBID:-manual}" | tr '[]' '__')"
+JOB_TAG="${PBS_JOBID:-manual}"
+JOB_TAG="${JOB_TAG//[/_}"
+JOB_TAG="${JOB_TAG//]/_}"
 
 echo "======================================="
 echo "PBS job id: ${PBS_JOBID:-NA}"
@@ -198,7 +201,9 @@ run_one_sobol_row() {
       2> "${row_stderr}"
   )
 
-  echo "Finished Sobol row ${sobol_row} at $(date -Is); elapsed $(( $(date +%s) - row_start )) s."
+  local row_end
+  row_end="$(date +%s)"
+  echo "Finished Sobol row ${sobol_row} at $(date -Is); elapsed $(( row_end - row_start )) s."
 }
 
 for sobol_row in "${rows_to_run[@]}"; do

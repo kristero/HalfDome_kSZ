@@ -1,7 +1,6 @@
 #!/bin/bash
 #PBS -N xgp_b40_edges
 #PBS -q mini
-#PBS -J 1-19
 #PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
 #PBS -l walltime=23:59:00
 #PBS -S /bin/bash
@@ -59,9 +58,9 @@ set -euo pipefail
 : "${OPENBLAS_NUM_THREADS:=1}"
 : "${MKL_NUM_THREADS:=1}"
 
-# PBS arrays set either PBS_ARRAY_INDEX or PBS_ARRAYID depending on the cluster.
 # Profile 1 is Battaglia12; profiles 2:19 are low/high prior edges.
-: "${EDGE_PROFILE_INDEX:=${PBS_ARRAY_INDEX:-${PBS_ARRAYID:-0}}}"
+# For non-array PBS submission, set EDGE_PROFILE_LIST, e.g. "1 2 3 4 5".
+: "${EDGE_PROFILE_LIST:=${EDGE_PROFILE_INDEX:-${PBS_ARRAY_INDEX:-${PBS_ARRAYID:-1}}}}"
 
 cd "${PROJECT_DIR}"
 
@@ -96,14 +95,36 @@ export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
 JOB_TAG="${PBS_JOBID:-manual}"
 JOB_TAG="${JOB_TAG//[/_}"
 JOB_TAG="${JOB_TAG//]/_}"
-RUN_STDOUT="${LOG_DIR}/xgpaint_b40_profile${EDGE_PROFILE_INDEX}_${JOB_TAG}.out"
-RUN_STDERR="${LOG_DIR}/xgpaint_b40_profile${EDGE_PROFILE_INDEX}_${JOB_TAG}.err"
+
+profile_list_normalized="${EDGE_PROFILE_LIST//,/ }"
+profile_list_normalized="${profile_list_normalized//:/ }"
+profile_list_normalized="${profile_list_normalized//;/ }"
+profile_indices=()
+for profile_index in ${profile_list_normalized}; do
+  if [[ ! "${profile_index}" =~ ^[0-9]+$ ]]; then
+    echo "EDGE_PROFILE_LIST contains a non-integer profile index: ${profile_index}" >&2
+    exit 2
+  fi
+  if [[ "${profile_index}" -lt 1 || "${profile_index}" -gt 19 ]]; then
+    echo "EDGE_PROFILE_LIST profile index ${profile_index} is outside 1:19." >&2
+    exit 2
+  fi
+  profile_indices+=("${profile_index}")
+done
+if [[ "${#profile_indices[@]}" -eq 0 ]]; then
+  echo "No profile indices were parsed from EDGE_PROFILE_LIST=${EDGE_PROFILE_LIST}" >&2
+  exit 2
+fi
+
+PROFILE_TAG="$(printf '%s_' "${profile_indices[@]}")"
+PROFILE_TAG="${PROFILE_TAG%_}"
+RUN_STDOUT="${LOG_DIR}/xgpaint_b40_profiles${PROFILE_TAG}_${JOB_TAG}.out"
+RUN_STDERR="${LOG_DIR}/xgpaint_b40_profiles${PROFILE_TAG}_${JOB_TAG}.err"
 
 echo "======================================="
 echo "XGPaint no-noise binned-40 edge profile"
 echo "No emulator; no SO noise; no mask"
 echo "PBS job id: ${PBS_JOBID:-NA}"
-echo "PBS array index: ${PBS_ARRAY_INDEX:-${PBS_ARRAYID:-NA}}"
 echo "Host: $(hostname)"
 echo "Date: $(date -Is)"
 echo "Project dir: ${PROJECT_DIR}"
@@ -119,7 +140,7 @@ echo "Cache dir: ${CACHE_DIR}"
 echo "Log dir: ${LOG_DIR}"
 echo "Run stdout: ${RUN_STDOUT}"
 echo "Run stderr: ${RUN_STDERR}"
-echo "Edge profile index: ${EDGE_PROFILE_INDEX}"
+echo "Edge profile list: ${profile_indices[*]}"
 echo "NSIDE: ${NSIDE}"
 echo "CL_LMAX: ${CL_LMAX}"
 echo "Apply mass cut: ${APPLY_MASS_CUT}"
@@ -131,30 +152,57 @@ echo "Reuse existing cache: ${REUSE_EXISTING_CACHE}"
 echo "Save text metadata: ${SAVE_EDGE_METADATA}"
 echo "======================================="
 
-"${JULIA}" --threads="${THREADS_PER_TASK}" "${SCRIPT}" \
-  simulation_name="${SIMULATION_NAME}" \
-  halfdome_path="${HALFDOME_PATH}" \
-  output_dir="${OUTPUT_DIR}" \
-  edge_profile_output_dir="${OUTPUT_DIR}" \
-  edge_profile_index="${EDGE_PROFILE_INDEX}" \
-  nside="${NSIDE}" \
-  cl_lmax="${CL_LMAX}" \
-  cl_niter="${CL_NITER}" \
-  chunkN="${CHUNKN}" \
-  mass_min="${MASS_MIN}" \
-  apply_mass_cut="${APPLY_MASS_CUT}" \
-  model_exists="${MODEL_EXISTS}" \
-  reuse_existing_cache="${REUSE_EXISTING_CACHE}" \
-  cache_wait_seconds="${CACHE_WAIT_SECONDS}" \
-  cache_poll_seconds="${CACHE_POLL_SECONDS}" \
-  interpolator_pad="${INTERPOLATOR_PAD}" \
-  interpolator_logM_max="${INTERPOLATOR_LOGM_MAX}" \
-  enforce_battaglia_guardrails="${ENFORCE_BATTAGLIA_GUARDRAILS}" \
-  skip_invalid_battaglia_rows="${SKIP_INVALID_BATTAGLIA_ROWS}" \
-  apply_gaussian_beam="${APPLY_GAUSSIAN_BEAM}" \
-  gaussian_beam_fwhm_arcmin="${GAUSSIAN_BEAM_FWHM_ARCMIN}" \
-  overwrite_edge_profile="${OVERWRITE_EDGE_PROFILE}" \
-  save_edge_metadata="${SAVE_EDGE_METADATA}" \
-  print_runtime_environment="${PRINT_RUNTIME_ENVIRONMENT}" \
-  > "${RUN_STDOUT}" \
-  2> "${RUN_STDERR}"
+run_one_edge_profile() {
+  local edge_profile_index="$1"
+  local profile_stdout="${LOG_DIR}/xgpaint_b40_profile${edge_profile_index}_${JOB_TAG}.out"
+  local profile_stderr="${LOG_DIR}/xgpaint_b40_profile${edge_profile_index}_${JOB_TAG}.err"
+  local start_seconds
+  start_seconds="$(date +%s)"
+
+  echo "---------------------------------------"
+  echo "Starting edge profile ${edge_profile_index} at $(date -Is)"
+  echo "Profile stdout: ${profile_stdout}"
+  echo "Profile stderr: ${profile_stderr}"
+  echo "---------------------------------------"
+
+  "${JULIA}" --threads="${THREADS_PER_TASK}" "${SCRIPT}" \
+    simulation_name="${SIMULATION_NAME}" \
+    halfdome_path="${HALFDOME_PATH}" \
+    output_dir="${OUTPUT_DIR}" \
+    edge_profile_output_dir="${OUTPUT_DIR}" \
+    edge_profile_index="${edge_profile_index}" \
+    nside="${NSIDE}" \
+    cl_lmax="${CL_LMAX}" \
+    cl_niter="${CL_NITER}" \
+    chunkN="${CHUNKN}" \
+    mass_min="${MASS_MIN}" \
+    apply_mass_cut="${APPLY_MASS_CUT}" \
+    model_exists="${MODEL_EXISTS}" \
+    reuse_existing_cache="${REUSE_EXISTING_CACHE}" \
+    cache_wait_seconds="${CACHE_WAIT_SECONDS}" \
+    cache_poll_seconds="${CACHE_POLL_SECONDS}" \
+    interpolator_pad="${INTERPOLATOR_PAD}" \
+    interpolator_logM_max="${INTERPOLATOR_LOGM_MAX}" \
+    enforce_battaglia_guardrails="${ENFORCE_BATTAGLIA_GUARDRAILS}" \
+    skip_invalid_battaglia_rows="${SKIP_INVALID_BATTAGLIA_ROWS}" \
+    apply_gaussian_beam="${APPLY_GAUSSIAN_BEAM}" \
+    gaussian_beam_fwhm_arcmin="${GAUSSIAN_BEAM_FWHM_ARCMIN}" \
+    overwrite_edge_profile="${OVERWRITE_EDGE_PROFILE}" \
+    save_edge_metadata="${SAVE_EDGE_METADATA}" \
+    print_runtime_environment="${PRINT_RUNTIME_ENVIRONMENT}" \
+    > "${profile_stdout}" \
+    2> "${profile_stderr}"
+
+  local stop_seconds
+  stop_seconds="$(date +%s)"
+  echo "Finished edge profile ${edge_profile_index} at $(date -Is); elapsed $(( stop_seconds - start_seconds )) s."
+}
+
+{
+  echo "PBS job-level log for edge profiles: ${profile_indices[*]}"
+  echo "Started at $(date -Is)"
+  for edge_profile_index in "${profile_indices[@]}"; do
+    run_one_edge_profile "${edge_profile_index}"
+  done
+  echo "Finished all requested edge profiles at $(date -Is)"
+} > "${RUN_STDOUT}" 2> "${RUN_STDERR}"

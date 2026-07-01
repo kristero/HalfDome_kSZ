@@ -38,6 +38,8 @@ set -euo pipefail
 : "${ELL_MAX:=7979}"
 : "${MASK_FSKY:=0.4}"
 : "${MASK_APODIZATION_ARCMIN:=60.0}"
+: "${APPLY_GAUSSIAN_BEAM:=true}"
+: "${GAUSSIAN_BEAM_FWHM_ARCMIN:=2.0}"
 : "${SEED:=12345}"
 
 # Runtime configuration.
@@ -138,6 +140,8 @@ echo "SO native ell_min: ${ELL_MIN}"
 echo "C_l/noise ell_max: ${ELL_MAX}"
 echo "Mask fsky: ${MASK_FSKY}"
 echo "Mask apodization arcmin: ${MASK_APODIZATION_ARCMIN}"
+echo "Apply Gaussian beam to signal map: ${APPLY_GAUSSIAN_BEAM}"
+echo "Gaussian beam FWHM arcmin: ${GAUSSIAN_BEAM_FWHM_ARCMIN}"
 echo "Seed: ${SEED}"
 echo "Save debug maps: ${SAVE_DEBUG_MAPS}"
 echo "Threads per Julia task: ${THREADS_PER_TASK}"
@@ -179,6 +183,8 @@ run_one_sobol_row() {
     cl_niter="${CL_NITER}" \
     so_noise_deprojections="${SO_NOISE_DEPROJECTIONS}" \
     so_noise_is_dl=false \
+    apply_gaussian_beam="${APPLY_GAUSSIAN_BEAM}" \
+    gaussian_beam_fwhm_arcmin="${GAUSSIAN_BEAM_FWHM_ARCMIN}" \
     mask_fsky="${MASK_FSKY}" \
     mask_apodization_arcmin="${MASK_APODIZATION_ARCMIN}" \
     seed="${SEED}" \

@@ -41,6 +41,9 @@ set -euo pipefail
 : "${APPLY_GAUSSIAN_BEAM:=true}"
 : "${GAUSSIAN_BEAM_FWHM_ARCMIN:=2.0}"
 : "${SEED:=12345}"
+: "${APPLY_GAUSSIAN_BEAM:=true}"
+: "${GAUSSIAN_BEAM_FWHM_ARCMIN:=2.0}"
+
 
 # Runtime configuration.
 : "${THREADS_PER_TASK:=26}"

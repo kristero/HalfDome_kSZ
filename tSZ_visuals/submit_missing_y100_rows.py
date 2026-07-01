@@ -107,6 +107,7 @@ def build_row_job_vars(args: argparse.Namespace, split: int, sobol_csv: str, row
         "CL_LMAX": str(args.cl_lmax),
         "SKIP_EXISTING_OUTPUTS": args.skip_existing_outputs,
         "SKIP_EXISTING_ANY_RUN_INSTANCE": args.skip_existing_any_run_instance,
+        "SKIP_INVALID_BATTAGLIA_ROWS": args.skip_invalid_battaglia_rows,
         "CONTINUE_ON_ROW_ERROR": args.continue_on_row_error,
         "SHORT_LOGS": args.short_logs,
         "PRINT_RUNTIME_ENVIRONMENT": args.print_runtime_environment,
@@ -165,8 +166,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--reuse-existing-cache", default="true")
     parser.add_argument("--separate-interpolator-step", default="false")
     parser.add_argument("--cl-lmax", default="-1")
-    parser.add_argument("--skip-existing-outputs", default="true")
+    parser.add_argument("--skip-existing-outputs", default="false")
     parser.add_argument("--skip-existing-any-run-instance", default="true")
+    parser.add_argument("--skip-invalid-battaglia-rows", default="false")
     parser.add_argument("--continue-on-row-error", default="false")
     parser.add_argument("--short-logs", default="true")
     parser.add_argument("--print-runtime-environment", default="false")

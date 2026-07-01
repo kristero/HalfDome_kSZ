@@ -1,13 +1,4 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=tSZ_SO_s32768
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=25
-#SBATCH --mem=128G
-#SBATCH --time=23:59:00
-#SBATCH --output=slurm-%x-%A_%a.out
-#SBATCH --error=slurm-%x-%A_%a.err
-
 set -euo pipefail
 
 is_true() {
@@ -17,82 +8,51 @@ is_true() {
   esac
 }
 
-# =========================
-# USER EDITS / cluster-specific paths
-# These can be edited here, but the submit_sobol32768_slurm.sh helper normally
-# exports them. Prefer editing the submitter unless running this worker directly.
-# =========================
-: "${PROJECT_DIR:=${SLURM_SUBMIT_DIR:-$PWD}}"
-: "${JULIA:=julia}"
+require_var() {
+  local name="$1"
+  if [[ -z "${!name:-}" ]]; then
+    echo "Missing required environment variable: ${name}" >&2
+    echo "Submit with submit_sobol32768_slurm.sh, or export ${name} before calling this worker directly." >&2
+    exit 2
+  fi
+}
+
+# This worker intentionally has no user-editable science/path/resource defaults.
+# The submit_sobol32768_slurm.sh submitter owns configuration and exports it.
+required_vars=(
+  PROJECT_DIR JULIA LIGHTCONE_ID HALFDOME_PATH OUTPUT_DIR CACHE_DIR LOG_DIR
+  BASELINE_NOISE_PATH GOAL_NOISE_PATH
+  SOBOL_BASENAME SOBOL_SPLIT_DIR SOBOL_SPLIT_ROWS
+  SIMULATION_NAME NSIDE ELL_MIN ELL_MAX SO_NOISE_DEPROJECTIONS SO_NOISE_IS_DL
+  MASK_FSKY MASK_APODIZATION_ARCMIN SEED
+  SAVE_NO_NOISE_CL SAVE_BASELINE_NOISE_CROSS_CL SAVE_GOAL_NOISE_CROSS_CL SAVE_UNMASKED_NO_NOISE_CL
+  SAVE_NOISE_MAPS SAVE_NOISY_MAPS SAVE_MASK_MAP SAVE_SIGNAL_MAP SAVE_MASKED_SIGNAL_MAP
+  MAX_PARALLEL MODEL_EXISTS REUSE_EXISTING_CACHE CACHE_WAIT_SECONDS CACHE_POLL_SECONDS
+  INTERPOLATOR_PAD INTERPOLATOR_LOGM_MAX CL_NITER
+  ENFORCE_BATTAGLIA_GUARDRAILS SKIP_INVALID_BATTAGLIA_ROWS CONTINUE_ON_ROW_ERROR
+  PRINT_RUNTIME_ENVIRONMENT JOB_SET_TAG
+)
+for required_var in "${required_vars[@]}"; do
+  require_var "${required_var}"
+done
+
 : "${ENV_SETUP:=}"
-: "${LIGHTCONE_ID:=100}"
-: "${HALFDOME_BASE_DIR:=/lustre/work/Globus-lt/halfdome/full_res/halos}"
-: "${HALFDOME_PATH:=${HALFDOME_BASE_DIR}/lightcone_${LIGHTCONE_ID}.hdf5}"
-: "${OUTPUT_BASE_DIR:=/lustre/work/${USER}/tSZ_data/so_noise_s32768}"
-: "${OUTPUT_DIR:=${OUTPUT_BASE_DIR}/y${LIGHTCONE_ID}}"
-: "${CACHE_DIR:=/lustre/work/${USER}/tSZ_data/cache}"
-: "${LOG_DIR:=${HOME}/logs/tSZ_so_noise}"
-: "${SO_NOISE_DIR:=${PROJECT_DIR}/other_sims/SO}"
-: "${BASELINE_NOISE_PATH:=${SO_NOISE_DIR}/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt}"
-: "${GOAL_NOISE_PATH:=${SO_NOISE_DIR}/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt}"
-
-# =========================
-# Dataset/split configuration
-# =========================
-: "${SOBOL_SPLIT:=${SLURM_ARRAY_TASK_ID:-1}}"
-: "${SOBOL_BASE_DIR:=${PROJECT_DIR}/Sobol_tSZ}"
-: "${SOBOL_BASENAME:=battaglia_sobol_32768}"
-: "${SOBOL_SPLIT_DIR:=${SOBOL_BASE_DIR}/splits_${SOBOL_BASENAME}}"
-: "${SOBOL_CSV:=${SOBOL_SPLIT_DIR}/${SOBOL_BASENAME}_${SOBOL_SPLIT}.csv}"
-: "${SOBOL_SPLIT_ROWS:=128}"
-
-# =========================
-# SO-noise science configuration
-# =========================
-: "${SIMULATION_NAME:=halfdome_lightcone_${LIGHTCONE_ID}}"
-: "${NSIDE:=4096}"
-: "${ELL_MIN:=80}"
-: "${ELL_MAX:=7979}"
-: "${SO_NOISE_DEPROJECTIONS:=0,3}"
-: "${SO_NOISE_IS_DL:=false}"
-: "${MASK_FSKY:=0.4}"
-: "${MASK_APODIZATION_ARCMIN:=60.0}"
-: "${SEED:=12345}"
-
-# C_l profile save flags. Profiles are saved as .npy only by the Julia code.
-: "${SAVE_NO_NOISE_CL:=true}"
-: "${SAVE_BASELINE_NOISE_CROSS_CL:=true}"
-: "${SAVE_GOAL_NOISE_CROSS_CL:=true}"
-: "${SAVE_UNMASKED_NO_NOISE_CL:=false}"
-
-# Debug map save flags. Keep all false for production; FITS maps are large.
-: "${SAVE_NOISE_MAPS:=false}"
-: "${SAVE_NOISY_MAPS:=false}"
-: "${SAVE_MASK_MAP:=false}"
-: "${SAVE_SIGNAL_MAP:=false}"
-: "${SAVE_MASKED_SIGNAL_MAP:=false}"
-
-# =========================
-# Runtime/cache configuration
-# =========================
-: "${THREADS_PER_TASK:=${SLURM_CPUS_PER_TASK:-25}}"
-: "${MAX_PARALLEL:=1}"
-: "${MODEL_EXISTS:=false}"
-: "${REUSE_EXISTING_CACHE:=false}"
-: "${CACHE_WAIT_SECONDS:=0}"
-: "${CACHE_POLL_SECONDS:=30}"
-: "${INTERPOLATOR_PAD:=256}"
-: "${INTERPOLATOR_LOGM_MAX:=15.7}"
-: "${CL_NITER:=0}"
-: "${ENFORCE_BATTAGLIA_GUARDRAILS:=true}"
-: "${SKIP_INVALID_BATTAGLIA_ROWS:=true}"
-: "${CONTINUE_ON_ROW_ERROR:=true}"
-: "${PRINT_RUNTIME_ENVIRONMENT:=false}"
-: "${JOB_SET_TAG:=so_s32768}"
-: "${REDO_LOG:=${LOG_DIR}/tSZ_SO_sobol32768_y${LIGHTCONE_ID}_split${SOBOL_SPLIT}_${SLURM_JOB_ID:-manual}.redo.log}"
 : "${OMP_NUM_THREADS:=1}"
 : "${OPENBLAS_NUM_THREADS:=1}"
 : "${MKL_NUM_THREADS:=1}"
+
+# In SLURM array mode, always trust SLURM_ARRAY_TASK_ID over any inherited
+# SOBOL_SPLIT/SOBOL_CSV environment variable from the submit shell.
+if [[ -n "${SLURM_ARRAY_TASK_ID:-}" ]]; then
+  SOBOL_SPLIT="${SLURM_ARRAY_TASK_ID}"
+  SOBOL_CSV="${SOBOL_SPLIT_DIR}/${SOBOL_BASENAME}_${SOBOL_SPLIT}.csv"
+else
+  require_var SOBOL_SPLIT
+  SOBOL_CSV="${SOBOL_SPLIT_DIR}/${SOBOL_BASENAME}_${SOBOL_SPLIT}.csv"
+fi
+
+: "${THREADS_PER_TASK:=${SLURM_CPUS_PER_TASK:-25}}"
+: "${REDO_LOG:=${LOG_DIR}/tSZ_SO_sobol32768_y${LIGHTCONE_ID}_split${SOBOL_SPLIT}_${SLURM_JOB_ID:-manual}.redo.log}"
 
 cd "${PROJECT_DIR}"
 

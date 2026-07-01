@@ -27,7 +27,7 @@ PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 : "${SOBOL_FULL_CSV:=${SOBOL_BASE_DIR}/${SOBOL_BASENAME}.csv}"
 : "${SOBOL_SPLIT_DIR:=${SOBOL_BASE_DIR}/splits_${SOBOL_BASENAME}}"
 : "${SOBOL_SPLIT_ROWS:=128}"
-: "${SOBOL_SPLIT_COUNT:=256}"
+: "${SOBOL_SPLIT_COUNT:=}"
 : "${CREATE_SOBOL_SPLITS:=true}"
 : "${OVERWRITE_SOBOL_SPLITS:=true}"
 : "${CHECK_INPUTS:=true}"
@@ -49,14 +49,14 @@ PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 : "${NSIDE:=4096}"
 : "${ELL_MIN:=80}"
 : "${ELL_MAX:=7979}"
-: "${SO_NOISE_DEPROJECTIONS:=0,3}"
+: "${SO_NOISE_DEPROJECTIONS:=0,2}"
 : "${SO_NOISE_IS_DL:=false}"
 : "${MASK_FSKY:=0.4}"
 : "${MASK_APODIZATION_ARCMIN:=60.0}"
 : "${SEED:=12345}"
 
 # Profiles are saved as .npy only. These six outputs are expected per row for
-# deprojections 0,3: no-noise, baseline cross, goal cross for each deprojection.
+# two deprojections: no-noise, baseline cross, goal cross for each deprojection.
 : "${SAVE_NO_NOISE_CL:=true}"
 : "${SAVE_BASELINE_NOISE_CROSS_CL:=true}"
 : "${SAVE_GOAL_NOISE_CROSS_CL:=true}"
@@ -84,7 +84,7 @@ PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 # Lightcones. Keep RUN_Y102=false if they only need one HalfDome lightcone.
 : "${RUN_Y100:=true}"
-: "${RUN_Y102:=true}"
+: "${RUN_Y102:=false}"
 : "${DEPEND_Y102_ON_Y100:=true}"
 : "${Y100_MODEL_EXISTS:=false}"
 : "${Y102_MODEL_EXISTS:=true}"
@@ -103,13 +103,38 @@ sobol_split_csv_path() {
   printf '%s/%s_%s.csv' "${SOBOL_SPLIT_DIR}" "${SOBOL_BASENAME}" "${split}"
 }
 
-split_sobol_csv() {
-  is_true "${CREATE_SOBOL_SPLITS}" || return 0
-
+configure_sobol_split_count() {
   if [[ ! -f "${SOBOL_FULL_CSV}" ]]; then
     echo "Missing full Sobol CSV: ${SOBOL_FULL_CSV}" >&2
     exit 1
   fi
+  if [[ ! "${SOBOL_SPLIT_ROWS}" =~ ^[0-9]+$ || "${SOBOL_SPLIT_ROWS}" -lt 1 ]]; then
+    echo "SOBOL_SPLIT_ROWS must be a positive integer, got ${SOBOL_SPLIT_ROWS}" >&2
+    exit 1
+  fi
+
+  local total_rows
+  total_rows="$(awk 'END {print NR-1}' "${SOBOL_FULL_CSV}")"
+  if [[ "${total_rows}" -lt 1 ]]; then
+    echo "Sobol CSV has no data rows: ${SOBOL_FULL_CSV}" >&2
+    exit 1
+  fi
+  if [[ $(( total_rows % SOBOL_SPLIT_ROWS )) -ne 0 ]]; then
+    echo "Cannot split ${total_rows} rows evenly into chunks of ${SOBOL_SPLIT_ROWS} rows." >&2
+    exit 1
+  fi
+
+  local computed_split_count
+  computed_split_count=$(( total_rows / SOBOL_SPLIT_ROWS ))
+  if [[ -n "${SOBOL_SPLIT_COUNT}" && "${SOBOL_SPLIT_COUNT}" -ne "${computed_split_count}" ]]; then
+    echo "SOBOL_SPLIT_COUNT=${SOBOL_SPLIT_COUNT} does not match ${total_rows}/${SOBOL_SPLIT_ROWS}=${computed_split_count}." >&2
+    exit 1
+  fi
+  SOBOL_SPLIT_COUNT="${computed_split_count}"
+}
+
+split_sobol_csv() {
+  is_true "${CREATE_SOBOL_SPLITS}" || return 0
 
   mkdir -p "${SOBOL_SPLIT_DIR}"
 
@@ -225,9 +250,9 @@ submit_lightcone_array() {
   local job_name="tSZ_SO_y${lightcone_id}_${JOB_SET_TAG}"
 
   export PROJECT_DIR JULIA ENV_SETUP
-  export SOBOL_BASE_DIR SOBOL_BASENAME SOBOL_SPLIT_DIR SOBOL_SPLIT_ROWS
-  export HALFDOME_BASE_DIR OUTPUT_BASE_DIR CACHE_DIR LOG_DIR
-  export SO_NOISE_DIR BASELINE_NOISE_PATH GOAL_NOISE_PATH
+  export SOBOL_BASENAME SOBOL_SPLIT_DIR SOBOL_SPLIT_ROWS
+  export CACHE_DIR LOG_DIR
+  export BASELINE_NOISE_PATH GOAL_NOISE_PATH
   export NSIDE ELL_MIN ELL_MAX SO_NOISE_DEPROJECTIONS SO_NOISE_IS_DL
   export MASK_FSKY MASK_APODIZATION_ARCMIN SEED
   export SAVE_NO_NOISE_CL SAVE_BASELINE_NOISE_CROSS_CL SAVE_GOAL_NOISE_CROSS_CL SAVE_UNMASKED_NO_NOISE_CL
@@ -237,6 +262,13 @@ submit_lightcone_array() {
   export CONTINUE_ON_ROW_ERROR PRINT_RUNTIME_ENVIRONMENT JOB_SET_TAG
   export LIGHTCONE_ID="${lightcone_id}"
   export MODEL_EXISTS="${model_exists}"
+  export HALFDOME_PATH="${HALFDOME_BASE_DIR}/lightcone_${lightcone_id}.hdf5"
+  export OUTPUT_DIR="${OUTPUT_BASE_DIR}/y${lightcone_id}"
+  export SIMULATION_NAME="halfdome_lightcone_${lightcone_id}"
+
+  # Avoid inherited values from interactive debugging or previous jobs
+  # defeating the SLURM array mapping.
+  unset SOBOL_SPLIT SOBOL_CSV SOBOL_ROW_START SOBOL_ROW_STOP SOBOL_ROW_LIST THREADS_PER_TASK REDO_LOG
 
   local cmd=(
     "${SBATCH}"
@@ -281,6 +313,7 @@ submit_lightcone_array() {
   printf '%s' "${job_id}"
 }
 
+configure_sobol_split_count
 split_sobol_csv
 
 if [[ "${CHECK_INPUTS}" == "true" ]]; then

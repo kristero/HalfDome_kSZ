@@ -39,6 +39,9 @@ set -euo pipefail
 : "${MASK_FSKY:=0.4}"
 : "${MASK_APODIZATION_ARCMIN:=60.0}"
 : "${SEED:=12345}"
+: "${APPLY_GAUSSIAN_BEAM:=true}"
+: "${GAUSSIAN_BEAM_FWHM_ARCMIN:=2.0}"
+
 
 # Runtime configuration.
 : "${THREADS_PER_TASK:=26}"

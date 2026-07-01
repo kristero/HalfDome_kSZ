@@ -222,8 +222,8 @@ run_so_row() {
     interpolator_logM_max="${INTERPOLATOR_LOGM_MAX}" \
     enforce_battaglia_guardrails="${ENFORCE_BATTAGLIA_GUARDRAILS}" \
     skip_invalid_battaglia_rows="${SKIP_INVALID_BATTAGLIA_ROWS}" \
-    apply_gaussian_beam=false \
-    gaussian_beam_fwhm_arcmin=0.0 \
+    apply_gaussian_beam=true \
+    gaussian_beam_fwhm_arcmin=2.0 \
     save_no_noise_cl="${SAVE_NO_NOISE_CL}" \
     save_baseline_noise_cross_cl="${SAVE_BASELINE_NOISE_CROSS_CL}" \
     save_goal_noise_cross_cl="${SAVE_GOAL_NOISE_CROSS_CL}" \

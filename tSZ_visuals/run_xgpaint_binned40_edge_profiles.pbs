@@ -1,0 +1,160 @@
+#!/bin/bash
+#PBS -N xgp_b40_edges
+#PBS -q mini
+#PBS -J 1-19
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+# =========================
+# Edit this block for your cluster.
+# =========================
+: "${PROJECT_DIR:=${PBS_O_WORKDIR:-$PWD}}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${ENV_SETUP:=}"  # e.g. 'module load julia' or 'source /path/to/julia_env.sh'
+: "${CLUSTER_USER:=${USER:-kristero10}}"
+: "${LIGHTCONE_ID:=100}"
+
+# Required HalfDome input.
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
+
+# Output/cache/log paths. Profiles are saved as .npy files in OUTPUT_DIR.
+: "${OUTPUT_DIR:=/lustre/work/${CLUSTER_USER}/tSZ_data/xgpaint_binned40_edge_profiles/y${LIGHTCONE_ID}}"
+: "${CACHE_DIR:=/lustre/work/${CLUSTER_USER}/tSZ_data/cache}"
+: "${LOG_DIR:=/home/${CLUSTER_USER}/logs/tSZ_xgpaint_binned40}"
+
+# XGPaint/full-map settings.
+: "${SIMULATION_NAME:=halfdome_lightcone_${LIGHTCONE_ID}}"
+: "${NSIDE:=4096}"
+: "${CL_LMAX:=7979}"
+: "${CL_NITER:=0}"
+: "${CHUNKN:=2000000}"
+: "${MASS_MIN:=1.0e12}"
+: "${APPLY_MASS_CUT:=true}"
+
+# Beam setting. 2 arcsec = 2/60 arcmin = 0.03333333333333333.
+# For no beam, set APPLY_GAUSSIAN_BEAM=false and GAUSSIAN_BEAM_FWHM_ARCMIN=0.
+# For 2 arcmin, set GAUSSIAN_BEAM_FWHM_ARCMIN=2.0.
+: "${APPLY_GAUSSIAN_BEAM:=true}"
+: "${GAUSSIAN_BEAM_FWHM_ARCMIN:=0.03333333333333333}"
+
+# Cache/runtime behavior.
+: "${THREADS_PER_TASK:=26}"
+: "${MODEL_EXISTS:=false}"
+: "${REUSE_EXISTING_CACHE:=true}"
+: "${CACHE_WAIT_SECONDS:=0}"
+: "${CACHE_POLL_SECONDS:=30}"
+: "${INTERPOLATOR_PAD:=128}"
+: "${INTERPOLATOR_LOGM_MAX:=15.7}"
+: "${ENFORCE_BATTAGLIA_GUARDRAILS:=false}"
+: "${SKIP_INVALID_BATTAGLIA_ROWS:=false}"
+: "${OVERWRITE_EDGE_PROFILE:=true}"
+: "${SAVE_EDGE_METADATA:=false}"
+: "${PRINT_RUNTIME_ENVIRONMENT:=false}"
+
+# Keep BLAS single-threaded; the Julia job itself gets THREADS_PER_TASK threads.
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+
+# PBS arrays set either PBS_ARRAY_INDEX or PBS_ARRAYID depending on the cluster.
+# Profile 1 is Battaglia12; profiles 2:19 are low/high prior edges.
+: "${EDGE_PROFILE_INDEX:=${PBS_ARRAY_INDEX:-${PBS_ARRAYID:-0}}}"
+
+cd "${PROJECT_DIR}"
+
+if [[ -n "${ENV_SETUP}" ]]; then
+  echo "Running environment setup command."
+  eval "${ENV_SETUP}"
+fi
+
+SCRIPT_CANDIDATE_1="${PROJECT_DIR}/tSZ_visuals/run_xgpaint_binned40_edge_profiles.jl"
+SCRIPT_CANDIDATE_2="${PROJECT_DIR}/run_xgpaint_binned40_edge_profiles.jl"
+if [[ -f "${SCRIPT_CANDIDATE_1}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_1}"
+elif [[ -f "${SCRIPT_CANDIDATE_2}" ]]; then
+  SCRIPT="${SCRIPT_CANDIDATE_2}"
+else
+  echo "Could not locate run_xgpaint_binned40_edge_profiles.jl from PROJECT_DIR=${PROJECT_DIR}" >&2
+  exit 2
+fi
+
+for required_path in "${SCRIPT}" "${HALFDOME_PATH}"; do
+  if [[ ! -e "${required_path}" ]]; then
+    echo "Required path does not exist: ${required_path}" >&2
+    exit 2
+  fi
+done
+
+mkdir -p "${OUTPUT_DIR}" "${CACHE_DIR}" "${LOG_DIR}"
+
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS
+export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
+
+JOB_TAG="${PBS_JOBID:-manual}"
+JOB_TAG="${JOB_TAG//[/_}"
+JOB_TAG="${JOB_TAG//]/_}"
+RUN_STDOUT="${LOG_DIR}/xgpaint_b40_profile${EDGE_PROFILE_INDEX}_${JOB_TAG}.out"
+RUN_STDERR="${LOG_DIR}/xgpaint_b40_profile${EDGE_PROFILE_INDEX}_${JOB_TAG}.err"
+
+echo "======================================="
+echo "XGPaint no-noise binned-40 edge profile"
+echo "No emulator; no SO noise; no mask"
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "PBS array index: ${PBS_ARRAY_INDEX:-${PBS_ARRAYID:-NA}}"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Project dir: ${PROJECT_DIR}"
+echo "Julia script: ${SCRIPT}"
+echo "Julia executable: ${JULIA}"
+"${JULIA}" --version
+echo "Julia threads: ${THREADS_PER_TASK}"
+echo "Lightcone id: ${LIGHTCONE_ID}"
+echo "Simulation name: ${SIMULATION_NAME}"
+echo "HalfDome path: ${HALFDOME_PATH}"
+echo "Output dir: ${OUTPUT_DIR}"
+echo "Cache dir: ${CACHE_DIR}"
+echo "Log dir: ${LOG_DIR}"
+echo "Run stdout: ${RUN_STDOUT}"
+echo "Run stderr: ${RUN_STDERR}"
+echo "Edge profile index: ${EDGE_PROFILE_INDEX}"
+echo "NSIDE: ${NSIDE}"
+echo "CL_LMAX: ${CL_LMAX}"
+echo "Apply mass cut: ${APPLY_MASS_CUT}"
+echo "Mass min: ${MASS_MIN}"
+echo "Gaussian beam apply: ${APPLY_GAUSSIAN_BEAM}"
+echo "Gaussian beam FWHM arcmin: ${GAUSSIAN_BEAM_FWHM_ARCMIN}"
+echo "Model exists: ${MODEL_EXISTS}"
+echo "Reuse existing cache: ${REUSE_EXISTING_CACHE}"
+echo "Save text metadata: ${SAVE_EDGE_METADATA}"
+echo "======================================="
+
+"${JULIA}" --threads="${THREADS_PER_TASK}" "${SCRIPT}" \
+  simulation_name="${SIMULATION_NAME}" \
+  halfdome_path="${HALFDOME_PATH}" \
+  output_dir="${OUTPUT_DIR}" \
+  edge_profile_output_dir="${OUTPUT_DIR}" \
+  edge_profile_index="${EDGE_PROFILE_INDEX}" \
+  nside="${NSIDE}" \
+  cl_lmax="${CL_LMAX}" \
+  cl_niter="${CL_NITER}" \
+  chunkN="${CHUNKN}" \
+  mass_min="${MASS_MIN}" \
+  apply_mass_cut="${APPLY_MASS_CUT}" \
+  model_exists="${MODEL_EXISTS}" \
+  reuse_existing_cache="${REUSE_EXISTING_CACHE}" \
+  cache_wait_seconds="${CACHE_WAIT_SECONDS}" \
+  cache_poll_seconds="${CACHE_POLL_SECONDS}" \
+  interpolator_pad="${INTERPOLATOR_PAD}" \
+  interpolator_logM_max="${INTERPOLATOR_LOGM_MAX}" \
+  enforce_battaglia_guardrails="${ENFORCE_BATTAGLIA_GUARDRAILS}" \
+  skip_invalid_battaglia_rows="${SKIP_INVALID_BATTAGLIA_ROWS}" \
+  apply_gaussian_beam="${APPLY_GAUSSIAN_BEAM}" \
+  gaussian_beam_fwhm_arcmin="${GAUSSIAN_BEAM_FWHM_ARCMIN}" \
+  overwrite_edge_profile="${OVERWRITE_EDGE_PROFILE}" \
+  save_edge_metadata="${SAVE_EDGE_METADATA}" \
+  print_runtime_environment="${PRINT_RUNTIME_ENVIRONMENT}" \
+  > "${RUN_STDOUT}" \
+  2> "${RUN_STDERR}"

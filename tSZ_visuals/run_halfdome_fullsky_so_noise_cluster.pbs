@@ -19,10 +19,10 @@ set -euo pipefail
 
 # Required input paths.
 : "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
-: "${SOBOL_CSV:=${PROJECT_DIR}/Sobol_tSZ/battaglia_sobol_4.csv}"
-: "${SO_NOISE_DIR:=${PROJECT_DIR}/other_sims/SO}"
-: "${BASELINE_NOISE_PATH:=${SO_NOISE_DIR}/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt}"
-: "${GOAL_NOISE_PATH:=${SO_NOISE_DIR}/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt}"
+: "${SOBOL_CSV:=/home/kristero10/tSZ_data/battaglia_sobol_4.csv}"
+: "${SO_NOISE_DIR:=/home/kristero10/tSZ_data/SO_noise}"
+: "${BASELINE_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt}"
+: "${GOAL_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt}"
 
 # Output/cache/log paths.
 : "${OUTPUT_DIR:=/lustre/work/${CLUSTER_USER}/tSZ_data/so_noise_cl_only_sobol4_y${LIGHTCONE_ID}_deproj0_3}"

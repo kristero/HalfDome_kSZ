@@ -32,8 +32,8 @@ fi
 : ${TORCH_NUM_INTEROP_THREADS:=1}
 : ${SBI_DEVICE:=cpu}
 : ${SBI_SEED:=42}
-: ${SBI_GAUSSIAN_BEAM_FWHM_ARCMIN:=2.0}
-: ${SBI_GAUSSIAN_BEAM_MODE:=signal_only}
+: ${SBI_GAUSSIAN_BEAM_FWHM_ARCMIN:=0.0}
+: ${SBI_GAUSSIAN_BEAM_MODE:=off}
 : ${SBI_DENSITY_ESTIMATOR:=maf}
 : ${SBI_STOP_AFTER_EPOCHS:=60}
 : ${SBI_NUM_POSTERIOR_SAMPLES:=100000}
@@ -49,12 +49,37 @@ fi
 : ${PREPARED_OBS_PATH:=}
 : ${PREPARED_PRIOR_PATH:=}
 
-DEFAULT_PREPARED_DATASET_CANDIDATE=$WORK_DIR/SBI_analysis/data_for_cluster/_sbi_run.npz
-DEFAULT_PREPARED_DATASET_CANDIDATE_ALT=$WORK_DIR/data_for_cluster/_sbi_run.npz
+DEFAULT_PREPARED_DATASET_CANDIDATE=$WORK_DIR/SBI_analysis/data_for_cluster/emulated_so_binned_beam2arcmin_sbi_run.npz
+DEFAULT_PREPARED_DATASET_CANDIDATE_ALT=$WORK_DIR/data_for_cluster/emulated_so_binned_beam2arcmin_sbi_run.npz
+PREPARED_CLUSTER_DATASET_CANDIDATE=$WORK_DIR/SBI_analysis/data_for_cluster/prepared_cluster_sbi_run.npz
+PREPARED_CLUSTER_DATASET_CANDIDATE_ALT=$WORK_DIR/data_for_cluster/prepared_cluster_sbi_run.npz
+PLANCK_PREPARED_DATASET_CANDIDATE=$WORK_DIR/SBI_analysis/data_for_cluster/planck_binned16_no_noise_sbi_run.npz
+PLANCK_PREPARED_DATASET_CANDIDATE_ALT=$WORK_DIR/data_for_cluster/planck_binned16_no_noise_sbi_run.npz
+PREPARE_SBI_DATASET_CANDIDATE=/lustre/work/kristero10/tSZ_data/sbi_battaglia9_full_ell/sbi_prepared_dataset.npz
+PREPARE_SBI_OBS_CANDIDATE=/lustre/work/kristero10/tSZ_data/sbi_battaglia9_full_ell/observed_log10_dl.npy
+LEGACY_PREPARED_DATASET_CANDIDATE=$WORK_DIR/SBI_analysis/data_for_cluster/_sbi_run.npz
+LEGACY_PREPARED_DATASET_CANDIDATE_ALT=$WORK_DIR/data_for_cluster/_sbi_run.npz
 if [ -z "$PREPARED_DATASET_PATH" ] && [ -f "$DEFAULT_PREPARED_DATASET_CANDIDATE" ]; then
   PREPARED_DATASET_PATH=$DEFAULT_PREPARED_DATASET_CANDIDATE
 elif [ -z "$PREPARED_DATASET_PATH" ] && [ -f "$DEFAULT_PREPARED_DATASET_CANDIDATE_ALT" ]; then
   PREPARED_DATASET_PATH=$DEFAULT_PREPARED_DATASET_CANDIDATE_ALT
+elif [ -z "$PREPARED_DATASET_PATH" ] && [ -f "$PREPARED_CLUSTER_DATASET_CANDIDATE" ]; then
+  PREPARED_DATASET_PATH=$PREPARED_CLUSTER_DATASET_CANDIDATE
+elif [ -z "$PREPARED_DATASET_PATH" ] && [ -f "$PREPARED_CLUSTER_DATASET_CANDIDATE_ALT" ]; then
+  PREPARED_DATASET_PATH=$PREPARED_CLUSTER_DATASET_CANDIDATE_ALT
+elif [ -z "$PREPARED_DATASET_PATH" ] && [ -f "$PLANCK_PREPARED_DATASET_CANDIDATE" ]; then
+  PREPARED_DATASET_PATH=$PLANCK_PREPARED_DATASET_CANDIDATE
+elif [ -z "$PREPARED_DATASET_PATH" ] && [ -f "$PLANCK_PREPARED_DATASET_CANDIDATE_ALT" ]; then
+  PREPARED_DATASET_PATH=$PLANCK_PREPARED_DATASET_CANDIDATE_ALT
+elif [ -z "$PREPARED_DATASET_PATH" ] && [ -f "$PREPARE_SBI_DATASET_CANDIDATE" ]; then
+  PREPARED_DATASET_PATH=$PREPARE_SBI_DATASET_CANDIDATE
+elif [ -z "$PREPARED_DATASET_PATH" ] && [ -f "$LEGACY_PREPARED_DATASET_CANDIDATE" ]; then
+  PREPARED_DATASET_PATH=$LEGACY_PREPARED_DATASET_CANDIDATE
+elif [ -z "$PREPARED_DATASET_PATH" ] && [ -f "$LEGACY_PREPARED_DATASET_CANDIDATE_ALT" ]; then
+  PREPARED_DATASET_PATH=$LEGACY_PREPARED_DATASET_CANDIDATE_ALT
+fi
+if [ -z "$PREPARED_OBS_PATH" ] && [ "$PREPARED_DATASET_PATH" = "$PREPARE_SBI_DATASET_CANDIDATE" ] && [ -f "$PREPARE_SBI_OBS_CANDIDATE" ]; then
+  PREPARED_OBS_PATH=$PREPARE_SBI_OBS_CANDIDATE
 fi
 
 if [ -f "$WORK_DIR/sbi_for_cluster.py" ]; then
@@ -95,7 +120,6 @@ OUTPUT_ROOT=$SCRIPT_DIR/outputs/sbi_for_cluster/$JOB_ROOT
 OUTPUT_BASE=$OUTPUT_ROOT/group${GROUP_ID}
 : ${SBI_OUTPUT_DIR:=$OUTPUT_BASE}
 : ${POSTERIOR_SAVE_PATH:=$OUTPUT_BASE/posterior_samples.npy}
-: ${PLOT_SUMMARY_PATH:=$OUTPUT_BASE/training_validation_loss.png}
 
 mkdir -p "$LOG_DIR" "$SBI_OUTPUT_DIR"
 
@@ -110,13 +134,17 @@ export SBI_STOP_AFTER_EPOCHS SBI_NUM_POSTERIOR_SAMPLES
 export SBI_DATASET_SIZES SBI_DATASET_ORDER SBI_OUTPUT_DIR
 export PREPARED_DATASET_PATH PREPARED_THETA_PATH PREPARED_X_PATH
 export PREPARED_OBS_PATH PREPARED_PRIOR_PATH
-export POSTERIOR_SAVE_PATH PLOT_SUMMARY_PATH
+export POSTERIOR_SAVE_PATH
 
 if [ -z "$PREPARED_DATASET_PATH" ]; then
   if [ -z "$PREPARED_THETA_PATH" ] || [ -z "$PREPARED_X_PATH" ] || [ -z "$PREPARED_OBS_PATH" ] || [ -z "$PREPARED_PRIOR_PATH" ]; then
     echo Set PREPARED_DATASET_PATH or PREPARED_THETA_PATH, PREPARED_X_PATH, PREPARED_OBS_PATH, and PREPARED_PRIOR_PATH >&2
     echo No default prepared dataset was found at: $DEFAULT_PREPARED_DATASET_CANDIDATE >&2
     echo Alternate default checked: $DEFAULT_PREPARED_DATASET_CANDIDATE_ALT >&2
+    echo Cluster prepared defaults checked: $PREPARED_CLUSTER_DATASET_CANDIDATE and $PREPARED_CLUSTER_DATASET_CANDIDATE_ALT >&2
+    echo Planck defaults checked: $PLANCK_PREPARED_DATASET_CANDIDATE and $PLANCK_PREPARED_DATASET_CANDIDATE_ALT >&2
+    echo prepare_sbi_dataset.py default checked: $PREPARE_SBI_DATASET_CANDIDATE >&2
+    echo Legacy defaults checked: $LEGACY_PREPARED_DATASET_CANDIDATE and $LEGACY_PREPARED_DATASET_CANDIDATE_ALT >&2
     echo Example: qsub -v PREPARED_DATASET_PATH=/path/to/prepared_sbi_dataset.npz run_sbi_for_cluster.pbs >&2
     exit 2
   fi
@@ -150,7 +178,8 @@ echo Dataset order: $SBI_DATASET_ORDER
 echo Gaussian beam FWHM arcmin: $SBI_GAUSSIAN_BEAM_FWHM_ARCMIN
 echo Gaussian beam mode: $SBI_GAUSSIAN_BEAM_MODE
 echo Posterior output: $POSTERIOR_SAVE_PATH
-echo Plot output: $PLOT_SUMMARY_PATH
+echo Validation losses output: $SBI_OUTPUT_DIR/validation_losses.json
+echo Training summary output: $SBI_OUTPUT_DIR/training_summary_stdout.txt
 echo Allocated CPUs: $ALLOCATED_CPUS
 echo SBI_NUM_THREADS: $SBI_NUM_THREADS
 echo OMP_NUM_THREADS: $OMP_NUM_THREADS
@@ -164,7 +193,6 @@ import sys
 
 try:
     import numpy
-    import matplotlib
     import torch
     try:
         from sbi.inference import NPE

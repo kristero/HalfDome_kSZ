@@ -2,25 +2,20 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import csv
 import gc
+import io
 import json
 import os
 import pickle
+import re
+import sys
 from pathlib import Path
 from typing import Any
 
-import matplotlib
-
-matplotlib.use("Agg")
-
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
-try:
-    from sbi.analysis import plot_summary
-except Exception:
-    plot_summary = None
 try:
     from sbi.inference import NPE as SBI_NPE
 except ImportError:
@@ -30,10 +25,12 @@ except ImportError:
 DEFAULT_POSTERIOR_SAVE_PATH = (
     "outputs/posteriors/posterior_16e3emul_N4e4_binned16_s42_xo_Planck_synthetic_no_noise.npy"
 )
-DEFAULT_PLOT_SUMMARY_PATH = "training_validation_loss.png"
-DEFAULT_GAUSSIAN_BEAM_FWHM_ARCMIN = 2.0
-DEFAULT_GAUSSIAN_BEAM_MODE = "signal_only"
+DEFAULT_GAUSSIAN_BEAM_FWHM_ARCMIN = 0.0
+DEFAULT_GAUSSIAN_BEAM_MODE = "off"
 DEFAULT_DATASET_SIZES = "1024,2048,4096,8192,16384,32768,50e3,70e3,85e3,100e3"
+BEST_VALIDATION_RE = re.compile(
+    r"Best validation performance:\s*([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)"
+)
 
 
 def env_int(name: str, default: int) -> int:
@@ -121,10 +118,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--posterior-save-path",
         default=os.environ.get("POSTERIOR_SAVE_PATH", DEFAULT_POSTERIOR_SAVE_PATH),
-    )
-    parser.add_argument(
-        "--plot-summary-path",
-        default=os.environ.get("PLOT_SUMMARY_PATH", DEFAULT_PLOT_SUMMARY_PATH),
     )
     parser.add_argument(
         "--gaussian-beam-fwhm-arcmin",
@@ -236,6 +229,51 @@ def write_json(path: str | Path, data: Any) -> None:
         json.dump(to_jsonable(data), handle, indent=2, sort_keys=True)
 
 
+class ForwardingCapture:
+    def __init__(self, stream: Any) -> None:
+        self.stream = stream
+        self.buffer = io.StringIO()
+
+    def write(self, text: str) -> int:
+        self.buffer.write(text)
+        return self.stream.write(text)
+
+    def flush(self) -> None:
+        self.stream.flush()
+
+    def getvalue(self) -> str:
+        return self.buffer.getvalue()
+
+    def __getattr__(self, name: str) -> Any:
+        return getattr(self.stream, name)
+
+
+def parse_validation_losses_from_training_output(output: str) -> list[float]:
+    return [float(match.group(1)) for match in BEST_VALIDATION_RE.finditer(output or "")]
+
+
+def save_training_output_and_validation_losses(
+    output_dir: str | Path,
+    training_output: str,
+    validation_losses: list[float],
+) -> Path:
+    output_dir = Path(output_dir).expanduser()
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    training_output_path = output_dir / "training_summary_stdout.txt"
+    with training_output_path.open("w", encoding="utf-8") as handle:
+        handle.write(training_output)
+
+    write_json(output_dir / "validation_losses.json", validation_losses)
+    if validation_losses:
+        print(f"Captured validation losses from SBI summary: {validation_losses}")
+    else:
+        print("Warning: no 'Best validation performance' values were found in the SBI training summary.")
+    print(f"Saved SBI training summary output to {training_output_path}")
+    print(f"Saved validation losses to {output_dir / 'validation_losses.json'}")
+    return training_output_path
+
+
 def save_pickle(path: str | Path, obj: Any, label: str) -> Path:
     path = Path(path).expanduser()
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -315,171 +353,6 @@ def make_npe(prior: Any, density_estimator: str, device: str) -> Any:
         return SBI_NPE(prior=prior, density_estimator=density_estimator, device=device)
     except TypeError:
         return SBI_NPE(prior=prior, density_estimator=density_estimator)
-
-
-def to_numpy_1d(value: Any) -> np.ndarray | None:
-    if value is None:
-        return None
-    if torch.is_tensor(value):
-        value = value.detach().cpu().numpy()
-    try:
-        arr = np.asarray(value, dtype=np.float64).reshape(-1)
-    except (TypeError, ValueError):
-        return None
-    if arr.size == 0:
-        return None
-    return arr
-
-
-def extract_loss_history(inference: Any) -> dict[str, np.ndarray]:
-    summary = getattr(inference, "_summary", {}) or {}
-    if not isinstance(summary, dict):
-        return {}
-
-    loss_history: dict[str, np.ndarray] = {}
-    preferred_keys = (
-        "training_loss",
-        "validation_loss",
-        "training_log_probs",
-        "validation_log_probs",
-    )
-    for key in preferred_keys:
-        arr = to_numpy_1d(summary.get(key))
-        if arr is not None:
-            loss_history[key] = arr
-
-    for key, value in summary.items():
-        key_str = str(key)
-        if key_str in loss_history:
-            continue
-        if "loss" not in key_str.lower() and "log_prob" not in key_str.lower():
-            continue
-        arr = to_numpy_1d(value)
-        if arr is not None:
-            loss_history[key_str] = arr
-    return loss_history
-
-
-def plot_loss_history(loss_history: dict[str, np.ndarray], plot_path: str | Path, title: str) -> None:
-    fig = None
-    plot_path = Path(plot_path).expanduser()
-    try:
-        plot_path.parent.mkdir(parents=True, exist_ok=True)
-
-        fig, ax = plt.subplots(figsize=(8, 4.5))
-        if loss_history:
-            for key, values in loss_history.items():
-                finite = np.asarray(values, dtype=float)
-                ax.plot(np.arange(1, finite.size + 1), finite, label=key)
-            ax.set_xlabel("epoch")
-            ax.set_ylabel("loss / log probability")
-            ax.legend()
-        else:
-            ax.text(
-                0.5,
-                0.5,
-                "No loss history was exposed by this sbi version.",
-                ha="center",
-                va="center",
-                transform=ax.transAxes,
-            )
-            ax.set_axis_off()
-        ax.set_title(title)
-        fig.tight_layout()
-        fig.savefig(plot_path, dpi=300, bbox_inches="tight")
-        print(f"Saved loss plot to {plot_path}")
-    except Exception as exc:
-        print(f"Warning: could not save loss plot to {plot_path}: {exc!r}")
-    finally:
-        if fig is not None:
-            plt.close(fig)
-
-
-def save_loss_history(inference: Any, output_dir: str | Path, plot_summary_path: str | Path, title: str) -> dict[str, np.ndarray]:
-    output_dir = Path(output_dir).expanduser()
-    output_dir.mkdir(parents=True, exist_ok=True)
-    try:
-        loss_history = extract_loss_history(inference)
-    except Exception as exc:
-        print(f"Warning: could not extract loss history; continuing: {exc!r}")
-        loss_history = {}
-
-    if loss_history:
-        try:
-            np.savez_compressed(output_dir / "loss_history.npz", **loss_history)
-        except Exception as exc:
-            print(f"Warning: could not save loss history; continuing: {exc!r}")
-        summary = {
-            key: {
-                "n": int(values.size),
-                "first": float(values[0]),
-                "last": float(values[-1]),
-                "min": float(np.nanmin(values)),
-                "max": float(np.nanmax(values)),
-            }
-            for key, values in loss_history.items()
-        }
-    else:
-        summary = {"warning": "No loss history was exposed by this sbi version."}
-    try:
-        write_json(output_dir / "loss_history_summary.json", summary)
-    except Exception as exc:
-        print(f"Warning: could not save loss history summary; continuing: {exc!r}")
-    save_training_summary_plot(inference, plot_summary_path, loss_history, title)
-    return loss_history
-
-
-def save_training_summary_plot(
-    inference: Any,
-    plot_summary_path: str | Path,
-    loss_history: dict[str, np.ndarray] | None = None,
-    title: str = "SBI training loss",
-) -> None:
-    use_sbi_plot_summary = os.environ.get("SBI_USE_PLOT_SUMMARY", "").strip().lower() in {
-        "1",
-        "true",
-        "yes",
-        "on",
-    }
-    if not use_sbi_plot_summary:
-        print("Using manual loss plot; set SBI_USE_PLOT_SUMMARY=1 to try sbi.analysis.plot_summary.")
-        plot_loss_history(loss_history or {}, plot_summary_path, title)
-        return
-
-    tag_sets = (
-        ["training_loss", "validation_loss"],
-        ["training_log_probs", "validation_log_probs"],
-    )
-    last_error = None
-    if plot_summary is None:
-        print("Falling back to manual loss plot because sbi.analysis.plot_summary is unavailable.")
-        plot_loss_history(loss_history or {}, plot_summary_path, title)
-        return
-
-    for tags in tag_sets:
-        fig = None
-        try:
-            out = plot_summary(
-                inference,
-                tags=tags,
-                figsize=(10, 2),
-            )
-            fig = out[0] if isinstance(out, tuple) else out
-            plot_path = Path(plot_summary_path).expanduser()
-            plot_path.parent.mkdir(parents=True, exist_ok=True)
-            fig.savefig(plot_path, dpi=300, bbox_inches="tight")
-            print(f"Saved training summary plot to {plot_path} with tags {tags}")
-            return
-        except KeyError as exc:
-            last_error = exc
-        except Exception as exc:
-            last_error = exc
-        finally:
-            if fig is not None:
-                plt.close(fig)
-
-    print(f"Falling back to manual loss plot because sbi.plot_summary failed: {last_error}")
-    plot_loss_history(loss_history or {}, plot_summary_path, title)
 
 
 def sample_posterior(posterior: Any, obs_t: torch.Tensor, num_samples: int) -> np.ndarray:
@@ -594,7 +467,6 @@ def train_one_size(
     args: argparse.Namespace,
     output_dir: Path,
     posterior_save_path: Path,
-    plot_summary_path: Path,
 ) -> dict[str, Any]:
     validate_training_size(n_train, theta.shape[0])
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -619,16 +491,21 @@ def train_one_size(
     print(f"output directory: {output_dir}")
 
     inference = make_npe(prior, args.density_estimator, args.device)
+    training_stdout = ForwardingCapture(sys.stdout)
     try:
-        density_estimator = inference.append_simulations(theta_t, x_t).train(
-            stop_after_epochs=args.stop_after_epochs
-        )
+        with contextlib.redirect_stdout(training_stdout):
+            density_estimator = inference.append_simulations(theta_t, x_t).train(
+                stop_after_epochs=args.stop_after_epochs,
+                show_train_summary=True,
+            )
     except NotImplementedError as exc:
         raise NotImplementedError(
             f"The installed sbi version could not build density_estimator={args.density_estimator!r}. "
             "Try SBI_DENSITY_ESTIMATOR=maf for older sbi versions, or use a newer sbi environment "
             "if you need zuko_maf."
         ) from exc
+    training_output = training_stdout.getvalue()
+    validation_losses = parse_validation_losses_from_training_output(training_output)
 
     posterior = inference.build_posterior(density_estimator)
     samples = sample_posterior(posterior, obs_t, args.num_posterior_samples)
@@ -645,11 +522,10 @@ def train_one_size(
         torch.save(density_estimator.state_dict(), output_dir / "density_estimator_state_dict.pt")
         print(f"Saved density estimator state_dict to {output_dir / 'density_estimator_state_dict.pt'}")
 
-    loss_history = save_loss_history(
-        inference,
+    training_summary_stdout_path = save_training_output_and_validation_losses(
         output_dir,
-        plot_summary_path,
-        f"SBI training loss, N={n_train}",
+        training_output,
+        validation_losses,
     )
 
     metadata = {
@@ -665,14 +541,11 @@ def train_one_size(
         "stop_after_epochs": int(args.stop_after_epochs),
         "num_posterior_samples": int(args.num_posterior_samples),
         "posterior_samples_path": str(posterior_save_path),
-        "plot_summary_path": str(plot_summary_path),
+        "training_summary_stdout_path": str(training_summary_stdout_path),
+        "validation_losses": validation_losses,
+        "best_validation_loss": validation_losses[-1] if validation_losses else None,
     }
     write_json(output_dir / "run_metadata.json", metadata)
-
-    final_losses = {}
-    for key, values in loss_history.items():
-        final_losses[f"final_{key}"] = float(values[-1])
-        final_losses[f"epochs_{key}"] = int(values.size)
 
     del theta_t, x_t, obs_t, inference, density_estimator, posterior
     gc.collect()
@@ -681,7 +554,6 @@ def train_one_size(
 
     return {
         **metadata,
-        **final_losses,
         "output_dir": str(output_dir),
     }
 
@@ -700,53 +572,28 @@ def save_sweep_summary(base_output_dir: Path, rows: list[dict[str, Any]]) -> Non
     print(f"Saved sweep summary to {csv_path}")
 
 
-def save_aggregate_loss_plot(base_output_dir: Path, run_dirs: list[Path]) -> None:
-    fig = None
-    try:
-        fig, ax = plt.subplots(figsize=(9, 5))
-        any_history = False
-        for run_dir in run_dirs:
-            loss_path = run_dir / "loss_history.npz"
-            if not loss_path.is_file():
-                continue
-            with np.load(loss_path) as data:
-                key = "validation_loss" if "validation_loss" in data else None
-                if key is None and "validation_log_probs" in data:
-                    key = "validation_log_probs"
-                if key is None and "training_loss" in data:
-                    key = "training_loss"
-                if key is None and "training_log_probs" in data:
-                    key = "training_log_probs"
-                if key is None:
-                    continue
-                values = np.asarray(data[key], dtype=float)
-            ax.plot(np.arange(1, values.size + 1), values, label=f"{run_dir.name}:{key}")
-            any_history = True
+def save_validation_loss_outputs(base_output_dir: Path, rows: list[dict[str, Any]]) -> None:
+    if not rows:
+        return
 
-        plot_path = base_output_dir / "all_training_validation_loss.png"
-        if any_history:
-            ax.set_xlabel("epoch")
-            ax.set_ylabel("loss / log probability")
-            ax.legend(fontsize=8)
-        else:
-            ax.text(
-                0.5,
-                0.5,
-                "No loss histories were exposed by this sbi version.",
-                ha="center",
-                va="center",
-                transform=ax.transAxes,
-            )
-            ax.set_axis_off()
-        ax.set_title("SBI training-size sweep loss")
-        fig.tight_layout()
-        fig.savefig(plot_path, dpi=300, bbox_inches="tight")
-        print(f"Saved aggregate loss plot to {plot_path}")
-    except Exception as exc:
-        print(f"Warning: could not save aggregate loss plot to {base_output_dir}: {exc!r}")
-    finally:
-        if fig is not None:
-            plt.close(fig)
+    all_validation_losses: list[float] = []
+    by_run: list[dict[str, Any]] = []
+    for row in rows:
+        validation_losses = [float(value) for value in row.get("validation_losses", [])]
+        all_validation_losses.extend(validation_losses)
+        by_run.append(
+            {
+                "n_train": int(row["n_train"]),
+                "validation_losses": validation_losses,
+                "best_validation_loss": row.get("best_validation_loss"),
+                "output_dir": row.get("output_dir", ""),
+            }
+        )
+
+    loss_path = base_output_dir / "validation_losses.json"
+    write_json(loss_path, all_validation_losses)
+    write_json(base_output_dir / "validation_loss_by_run.json", by_run)
+    print(f"Saved aggregate validation losses to {loss_path}")
 
 
 def main() -> int:
@@ -838,16 +685,13 @@ def main() -> int:
     print(f"base output directory: {base_output_dir}")
 
     run_summaries: list[dict[str, Any]] = []
-    run_dirs: list[Path] = []
     for n_train in dataset_sizes:
         if sweep_mode:
             run_dir = base_output_dir / f"N{n_train}"
             run_posterior_path = run_dir / "posterior_samples.npy"
-            run_plot_path = run_dir / "training_validation_loss.png"
         else:
             run_dir = base_output_dir
             run_posterior_path = posterior_path
-            run_plot_path = Path(args.plot_summary_path).expanduser()
 
         summary = train_one_size(
             theta=theta,
@@ -859,14 +703,12 @@ def main() -> int:
             args=args,
             output_dir=run_dir,
             posterior_save_path=run_posterior_path,
-            plot_summary_path=run_plot_path,
         )
         run_summaries.append(summary)
-        run_dirs.append(run_dir)
 
     if sweep_mode:
         save_sweep_summary(base_output_dir, run_summaries)
-        save_aggregate_loss_plot(base_output_dir, run_dirs)
+        save_validation_loss_outputs(base_output_dir, run_summaries)
     return 0
 
 

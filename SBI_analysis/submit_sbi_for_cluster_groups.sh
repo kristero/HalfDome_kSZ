@@ -4,11 +4,19 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 BASE_PBS="$SCRIPT_DIR/run_sbi_for_cluster.pbs"
 
+: "${PYTHON:=python3}"
 : "${PREPARED_DATASET_PATH:=}"
 : "${PREPARED_OBS_PATH:=}"
 : "${SBI_GAUSSIAN_BEAM_FWHM_ARCMIN:=0.0}"
 : "${SBI_GAUSSIAN_BEAM_MODE:=off}"
+: "${SBI_NUM_GROUPS:=4}"
+: "${SBI_DATASET_SIZES_ALL:=100e3,85e3,70e3,50e3,32768,16384,8192,4096,2048,1024}"
 : "${TMP_SUBMIT_DIR:=$SCRIPT_DIR/generated_group_pbs}"
+
+if [ "$SBI_NUM_GROUPS" != "4" ]; then
+  echo "This submit helper creates exactly 4 PBS jobs; set SBI_NUM_GROUPS=4 or edit run_sbi_for_cluster.pbs too." >&2
+  exit 2
+fi
 
 if [ -z "$PREPARED_DATASET_PATH" ]; then
   for candidate in \
@@ -45,6 +53,47 @@ fi
 
 mkdir -p "$TMP_SUBMIT_DIR"
 
+BALANCED_GROUP_ASSIGNMENTS=$("$PYTHON" - "$SBI_DATASET_SIZES_ALL" <<'PY'
+import math
+import shlex
+import sys
+
+
+def parse_size(value):
+    raw = str(value).strip().lower().replace("_", "")
+    if not raw:
+        raise ValueError("empty dataset size")
+    if raw.endswith("k"):
+        number = float(raw[:-1]) * 1000.0
+    else:
+        number = float(raw)
+    rounded = int(round(number))
+    if rounded <= 0 or not math.isclose(number, rounded):
+        raise ValueError(f"dataset size must be a positive integer count: {value!r}")
+    return rounded
+
+
+parts = [part for part in sys.argv[1].replace(";", ",").replace(" ", ",").split(",") if part]
+items = [(parse_size(part), str(parse_size(part))) for part in parts]
+groups = [{"sizes": [], "load": 0} for _ in range(4)]
+for size, label in sorted(items, key=lambda item: item[0], reverse=True):
+    group = min(groups, key=lambda candidate: (candidate["load"], len(candidate["sizes"])))
+    group["sizes"].append(label)
+    group["load"] += size
+
+for idx, group in enumerate(groups, start=1):
+    print(f"SBI_DATASET_SIZE_GROUP_{idx}={shlex.quote(','.join(group['sizes']))}")
+    print(f"SBI_DATASET_SIZE_GROUP_{idx}_LOAD={group['load']}")
+PY
+)
+eval "$BALANCED_GROUP_ASSIGNMENTS"
+
+echo "Balanced SBI dataset-size groups:"
+echo "  group1: $SBI_DATASET_SIZE_GROUP_1  total_rows=$SBI_DATASET_SIZE_GROUP_1_LOAD"
+echo "  group2: $SBI_DATASET_SIZE_GROUP_2  total_rows=$SBI_DATASET_SIZE_GROUP_2_LOAD"
+echo "  group3: $SBI_DATASET_SIZE_GROUP_3  total_rows=$SBI_DATASET_SIZE_GROUP_3_LOAD"
+echo "  group4: $SBI_DATASET_SIZE_GROUP_4  total_rows=$SBI_DATASET_SIZE_GROUP_4_LOAD"
+
 for group_id in 1 2 3 4; do
   group_pbs="$TMP_SUBMIT_DIR/run_sbi_for_cluster_group${group_id}.pbs"
   cat > "$group_pbs" <<EOF
@@ -61,6 +110,10 @@ set -euo pipefail
 export PREPARED_DATASET_PATH="$PREPARED_DATASET_PATH"
 export PREPARED_OBS_PATH="$PREPARED_OBS_PATH"
 export SBI_GROUP_ID="$group_id"
+export SBI_DATASET_SIZE_GROUP_1="$SBI_DATASET_SIZE_GROUP_1"
+export SBI_DATASET_SIZE_GROUP_2="$SBI_DATASET_SIZE_GROUP_2"
+export SBI_DATASET_SIZE_GROUP_3="$SBI_DATASET_SIZE_GROUP_3"
+export SBI_DATASET_SIZE_GROUP_4="$SBI_DATASET_SIZE_GROUP_4"
 export SBI_GAUSSIAN_BEAM_FWHM_ARCMIN="$SBI_GAUSSIAN_BEAM_FWHM_ARCMIN"
 export SBI_GAUSSIAN_BEAM_MODE="$SBI_GAUSSIAN_BEAM_MODE"
 

@@ -1,0 +1,132 @@
+#PBS -N so_maf_tune
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=24:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR=${PBS_O_WORKDIR:-$PWD}
+cd "$WORK_DIR"
+
+: ${PYTHON:=python3}
+: ${PYTHON_ENV_SETUP:=}
+: ${LOG_DIR:=/home/kristero10/logs/SBI_runs}
+
+ALLOCATED_CPUS=${PBS_NCPUS:-${NCPUS:-}}
+if [ -z "$ALLOCATED_CPUS" ] && [ -n "${PBS_NODEFILE:-}" ] && [ -f "$PBS_NODEFILE" ]; then
+  ALLOCATED_CPUS=$(wc -l < "$PBS_NODEFILE")
+fi
+if [ -z "$ALLOCATED_CPUS" ]; then
+  ALLOCATED_CPUS=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
+fi
+
+: ${NPE_TUNE_NUM_THREADS:=$ALLOCATED_CPUS}
+: ${OMP_NUM_THREADS:=$NPE_TUNE_NUM_THREADS}
+: ${OPENBLAS_NUM_THREADS:=$NPE_TUNE_NUM_THREADS}
+: ${MKL_NUM_THREADS:=$NPE_TUNE_NUM_THREADS}
+: ${NUMEXPR_NUM_THREADS:=$NPE_TUNE_NUM_THREADS}
+: ${TORCH_NUM_THREADS:=$NPE_TUNE_NUM_THREADS}
+: ${TORCH_NUM_INTEROP_THREADS:=1}
+
+: ${NPE_TUNE_PREPARED_DATASET_PATH:=${PREPARED_DATASET_PATH:-}}
+: ${NPE_TUNE_OUTPUT_DIR:=SBI_analysis/outputs/cluster_outputs/SBI_SO_npe_maf_tuning}
+: ${NPE_TUNE_N_TRAIN:=16384}
+: ${NPE_TUNE_LAST_N_OBS:=10}
+: ${NPE_TUNE_CONTEXT:=40}
+: ${NPE_TUNE_HIDDEN_FEATURES:=64,128,256}
+: ${NPE_TUNE_NUM_TRANSFORMS:=4,6,8,10}
+: ${NPE_TUNE_RANDPERM_VALUES:=false,true}
+: ${NPE_TUNE_RANDPERM_KW:=use_random_permutations}
+: ${NPE_TUNE_MAX_TRIALS:=24}
+: ${NPE_TUNE_OBJECTIVE:=mean_mse}
+: ${NPE_TUNE_USE_OPTUNA:=auto}
+: ${NPE_TUNE_DATASET_ORDER:=shuffle}
+: ${NPE_TUNE_SEED:=42}
+: ${NPE_TUNE_DEVICE:=cpu}
+: ${NPE_TUNE_STOP_AFTER_EPOCHS:=60}
+: ${NPE_TUNE_NUM_POSTERIOR_SAMPLES:=50000}
+: ${NPE_TUNE_POSTERIOR_SAMPLE_DTYPE:=float32}
+
+if [ -f "$WORK_DIR/SBI_analysis/tune_so_npe_maf_cluster.py" ]; then
+  SCRIPT=$WORK_DIR/SBI_analysis/tune_so_npe_maf_cluster.py
+elif [ -f "$WORK_DIR/tune_so_npe_maf_cluster.py" ]; then
+  SCRIPT=$WORK_DIR/tune_so_npe_maf_cluster.py
+else
+  echo "Could not locate tune_so_npe_maf_cluster.py from WORK_DIR=$WORK_DIR" >&2
+  exit 1
+fi
+
+if [ -z "$NPE_TUNE_PREPARED_DATASET_PATH" ]; then
+  echo "Set NPE_TUNE_PREPARED_DATASET_PATH or PREPARED_DATASET_PATH to a case-specific SBI NPZ." >&2
+  echo "Example: qsub -v NPE_TUNE_PREPARED_DATASET_PATH=/path/to/so_goal_deproj0_ell80_7979_sbi_run.npz SBI_analysis/run_so_npe_maf_tuning.pbs" >&2
+  exit 2
+fi
+if [ ! -f "$NPE_TUNE_PREPARED_DATASET_PATH" ]; then
+  echo "Prepared dataset not found: $NPE_TUNE_PREPARED_DATASET_PATH" >&2
+  exit 2
+fi
+
+mkdir -p "$LOG_DIR" "$NPE_TUNE_OUTPUT_DIR"
+
+if [ -n "$PYTHON_ENV_SETUP" ]; then
+  eval "$PYTHON_ENV_SETUP"
+fi
+
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS NUMEXPR_NUM_THREADS
+export TORCH_NUM_THREADS TORCH_NUM_INTEROP_THREADS
+export NPE_TUNE_PREPARED_DATASET_PATH NPE_TUNE_OUTPUT_DIR
+export NPE_TUNE_N_TRAIN NPE_TUNE_LAST_N_OBS NPE_TUNE_CONTEXT
+export NPE_TUNE_HIDDEN_FEATURES NPE_TUNE_NUM_TRANSFORMS NPE_TUNE_RANDPERM_VALUES NPE_TUNE_RANDPERM_KW
+export NPE_TUNE_MAX_TRIALS NPE_TUNE_OBJECTIVE NPE_TUNE_USE_OPTUNA
+export NPE_TUNE_DATASET_ORDER NPE_TUNE_SEED NPE_TUNE_DEVICE
+export NPE_TUNE_STOP_AFTER_EPOCHS NPE_TUNE_NUM_POSTERIOR_SAMPLES NPE_TUNE_POSTERIOR_SAMPLE_DTYPE
+
+echo PBS job id: ${PBS_JOBID:-manual}
+echo Working directory: "$WORK_DIR"
+echo Host: "$(hostname)"
+echo Date: "$(date -Is)"
+echo Python script: "$SCRIPT"
+echo Python executable: "$PYTHON"
+"$PYTHON" --version
+echo Prepared dataset: "$NPE_TUNE_PREPARED_DATASET_PATH"
+echo Output directory: "$NPE_TUNE_OUTPUT_DIR"
+echo N train: "$NPE_TUNE_N_TRAIN"
+echo Last N obs: "$NPE_TUNE_LAST_N_OBS"
+echo Context: "$NPE_TUNE_CONTEXT"
+echo Hidden features: "$NPE_TUNE_HIDDEN_FEATURES"
+echo Num transforms: "$NPE_TUNE_NUM_TRANSFORMS"
+echo Randperm values: "$NPE_TUNE_RANDPERM_VALUES"
+echo Objective: "$NPE_TUNE_OBJECTIVE"
+echo Optuna: "$NPE_TUNE_USE_OPTUNA"
+echo Posterior samples per obs: "$NPE_TUNE_NUM_POSTERIOR_SAMPLES"
+echo Allocated CPUs: "$ALLOCATED_CPUS"
+echo TORCH_NUM_THREADS: "$TORCH_NUM_THREADS"
+
+"$PYTHON" - <<'PY'
+import sys
+try:
+    import numpy
+    import torch
+    try:
+        from sbi.inference import NPE
+    except ImportError:
+        from sbi.inference import SNPE
+    try:
+        from sbi.neural_nets import posterior_nn
+    except ImportError:
+        from sbi.utils.get_nn_models import posterior_nn
+except Exception as exc:
+    print("Python/SBI environment import check failed:", repr(exc), file=sys.stderr)
+    raise SystemExit(1)
+PY
+
+JOB_ID=${PBS_JOBID:-manual}
+LOG_JOB_TAG=$(printf '%s' "$JOB_ID" | tr '[]' '__')
+RUN_LOG_BASE=so_npe_maf_tuning_${LOG_JOB_TAG}
+
+"$PYTHON" "$SCRIPT" --resume > "$LOG_DIR/${RUN_LOG_BASE}.out" 2> "$LOG_DIR/${RUN_LOG_BASE}.err"
+
+echo Job finished.

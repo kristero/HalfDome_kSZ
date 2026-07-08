@@ -266,6 +266,41 @@ def scalar_string(value: Any, default: str = "") -> str:
     return default
 
 
+def load_x_transform(run_dir: Path) -> dict[str, Any]:
+    transform_path = run_dir / "x_transform.npz"
+    if not transform_path.is_file():
+        return {"mode": "none", "path": ""}
+    with np.load(transform_path, allow_pickle=True) as data:
+        out = {key: np.asarray(data[key]).copy() for key in data.files}
+    out["mode"] = scalar_string(out.get("mode", "none"), "none")
+    out["path"] = str(transform_path)
+    return out
+
+
+def apply_x_transform(x_values: np.ndarray, transform: dict[str, Any]) -> np.ndarray:
+    values = np.asarray(x_values, dtype=np.float32)
+    mode = str(transform.get("mode", "none")).strip().lower().replace("-", "_")
+    if mode in {"", "none", "raw"}:
+        return np.ascontiguousarray(values, dtype=np.float32)
+
+    if mode in {"asinh", "asinh_median_abs"}:
+        scale = np.asarray(transform["scale"], dtype=np.float32)
+        return np.ascontiguousarray(np.arcsinh(values / scale), dtype=np.float32)
+
+    if mode == "standardize":
+        mean = np.asarray(transform["mean"], dtype=np.float32)
+        std = np.asarray(transform["std"], dtype=np.float32)
+        return np.ascontiguousarray((values - mean) / std, dtype=np.float32)
+
+    if mode == "asinh_standardize":
+        scale = np.asarray(transform["scale"], dtype=np.float32)
+        mean = np.asarray(transform["mean"], dtype=np.float32)
+        std = np.asarray(transform["std"], dtype=np.float32)
+        return np.ascontiguousarray((np.arcsinh(values / scale) - mean) / std, dtype=np.float32)
+
+    raise ValueError(f"Unsupported x transform mode in {transform.get('path', '<memory>')}: {mode!r}")
+
+
 def evaluation_set_from_dataset(
     data: Any,
     analysis_target: str,
@@ -333,9 +368,13 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
         for n_train, run_dir in run_dirs.items():
             print(f"  N={n_train}: {run_dir}")
             posterior = load_posterior(run_dir)
+            x_transform = load_x_transform(run_dir)
+            x_rescale_mode = str(x_transform.get("mode", "none"))
+            print(f"    x rescale mode: {x_rescale_mode}")
 
             for eval_idx, eval_label in enumerate(eval_labels):
-                samples = sample_posterior_at_x(posterior, x_eval[eval_idx], args.num_posterior_samples, args.device)
+                x_condition = apply_x_transform(x_eval[eval_idx], x_transform)
+                samples = sample_posterior_at_x(posterior, x_condition, args.num_posterior_samples, args.device)
                 n_params = min(samples.shape[1], theta_eval.shape[1], len(param_names))
                 samples = samples[:, :n_params]
                 theta_true = theta_eval[eval_idx, :n_params]
@@ -353,6 +392,7 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
                         "n_train": int(n_train),
                         "test_index": str(eval_label),
                         "analysis_target": args.analysis_target,
+                        "x_rescale_mode": x_rescale_mode,
                         "mse": mse,
                         "rmse": float(np.sqrt(mse)),
                         "rmse_over_std": float(np.sqrt(np.nanmean(error_over_std**2))),
@@ -368,6 +408,7 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
                             "n_train": int(n_train),
                             "test_index": str(eval_label),
                             "analysis_target": args.analysis_target,
+                            "x_rescale_mode": x_rescale_mode,
                             "param": param_names[j],
                             "param_index": int(j),
                             "theta_true": float(theta_true[j]),
@@ -703,6 +744,7 @@ def main() -> int:
                 "n_train",
                 "test_index",
                 "analysis_target",
+                "x_rescale_mode",
                 "param",
                 "param_index",
                 "theta_true",
@@ -723,6 +765,7 @@ def main() -> int:
                 "n_train",
                 "test_index",
                 "analysis_target",
+                "x_rescale_mode",
                 "mse",
                 "rmse",
                 "rmse_over_std",

@@ -27,6 +27,9 @@ BASE_PBS="$SCRIPT_DIR/run_sbi_for_cluster.pbs"
 : "${SBI_DEVICE:=cpu}"
 : "${SBI_GAUSSIAN_BEAM_FWHM_ARCMIN:=0.0}"
 : "${SBI_GAUSSIAN_BEAM_MODE:=off}"
+: "${SBI_X_RESCALE_MODE:=asinh}"
+: "${SBI_X_RESCALE_EPS:=1e-30}"
+: "${SBI_X_STANDARDIZE_EPS:=1e-8}"
 : "${PYTHON_ENV_SETUP:=}"
 
 : "${PBS_QUEUE:=mini}"
@@ -57,7 +60,8 @@ PY
 )
 
 : "${CASE_DATASET_DIR:=$SCRIPT_DIR/data_for_cluster/so_noise_sbi_cases_${ELL_TAG}_${OBS_SOURCE}}"
-: "${OUTPUT_ROOT:=$SCRIPT_DIR/outputs/cluster_outputs/SBI_SO_noise_dataset_size_${ELL_TAG}_${OBS_SOURCE}}"
+SCALE_TAG=$(printf "%s" "$SBI_X_RESCALE_MODE" | tr -c 'A-Za-z0-9_' '_')
+: "${OUTPUT_ROOT:=$SCRIPT_DIR/outputs/cluster_outputs/SBI_SO_noise_dataset_size_${ELL_TAG}_${OBS_SOURCE}_${SCALE_TAG}}"
 
 if [ ! -f "$BASE_PBS" ]; then
   echo "Base PBS script not found: $BASE_PBS" >&2
@@ -138,6 +142,7 @@ echo "Case dataset dir: $CASE_DATASET_DIR"
 echo "Observation source: $OBS_SOURCE"
 echo "Battaglia12 profile dir: $BATTAGLIA12_DIR"
 echo "Exclude last N rows from training: $TRAIN_EXCLUDE_LAST_N"
+echo "X rescale mode: $SBI_X_RESCALE_MODE"
 echo "Dataset-size groups:"
 echo "  group1: $SBI_DATASET_SIZE_GROUP_1  total_rows=$SBI_DATASET_SIZE_GROUP_1_LOAD"
 echo "  group2: $SBI_DATASET_SIZE_GROUP_2  total_rows=$SBI_DATASET_SIZE_GROUP_2_LOAD"
@@ -204,6 +209,9 @@ export SBI_NUM_POSTERIOR_SAMPLES="$SBI_NUM_POSTERIOR_SAMPLES"
 export SBI_DEVICE="$SBI_DEVICE"
 export SBI_GAUSSIAN_BEAM_FWHM_ARCMIN="$SBI_GAUSSIAN_BEAM_FWHM_ARCMIN"
 export SBI_GAUSSIAN_BEAM_MODE="$SBI_GAUSSIAN_BEAM_MODE"
+export SBI_X_RESCALE_MODE="$SBI_X_RESCALE_MODE"
+export SBI_X_RESCALE_EPS="$SBI_X_RESCALE_EPS"
+export SBI_X_STANDARDIZE_EPS="$SBI_X_STANDARDIZE_EPS"
 
 cd "\${PBS_O_WORKDIR:-$PROJECT_ROOT}"
 bash "$BASE_PBS"

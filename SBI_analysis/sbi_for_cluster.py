@@ -27,6 +27,9 @@ DEFAULT_POSTERIOR_SAVE_PATH = (
 )
 DEFAULT_GAUSSIAN_BEAM_FWHM_ARCMIN = 0.0
 DEFAULT_GAUSSIAN_BEAM_MODE = "off"
+DEFAULT_X_RESCALE_MODE = "asinh"
+DEFAULT_X_RESCALE_EPS = 1.0e-30
+DEFAULT_X_STANDARDIZE_EPS = 1.0e-8
 DEFAULT_DATASET_SIZES = "1024,2048,4096,8192,16384,32768,50e3,70e3,85e3,100e3"
 BEST_VALIDATION_RE = re.compile(
     r"Best validation performance:\s*([-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?)"
@@ -116,6 +119,15 @@ def parse_args() -> argparse.Namespace:
         help="How rows are selected for each training-set size. Shuffle is deterministic from --seed.",
     )
     parser.add_argument(
+        "--exclude-last-n-from-training",
+        type=int,
+        default=env_int("SBI_EXCLUDE_LAST_N_FROM_TRAINING", 0),
+        help=(
+            "Hold out the last N rows from the training pool. Use this for diagnostics "
+            "that condition on the last profiles as test observations."
+        ),
+    )
+    parser.add_argument(
         "--posterior-save-path",
         default=os.environ.get("POSTERIOR_SAVE_PATH", DEFAULT_POSTERIOR_SAVE_PATH),
     )
@@ -136,6 +148,27 @@ def parse_args() -> argparse.Namespace:
             "signal_only beams the prepared signal x and leaves obs untouched; final_vector keeps "
             "the old behavior and beams both final log10(D_ell) vectors; off disables the beam."
         ),
+    )
+    parser.add_argument(
+        "--x-rescale-mode",
+        choices=("none", "standardize", "asinh", "asinh_standardize"),
+        default=os.environ.get("SBI_X_RESCALE_MODE", DEFAULT_X_RESCALE_MODE),
+        help=(
+            "Transform x and obs before SBI training. Default asinh uses "
+            "asinh(x / median(abs(x_train))) with the scale recomputed for each N_train."
+        ),
+    )
+    parser.add_argument(
+        "--x-rescale-eps",
+        type=float,
+        default=env_float("SBI_X_RESCALE_EPS", DEFAULT_X_RESCALE_EPS),
+        help="Minimum median-absolute scale for asinh x rescaling.",
+    )
+    parser.add_argument(
+        "--x-standardize-eps",
+        type=float,
+        default=env_float("SBI_X_STANDARDIZE_EPS", DEFAULT_X_STANDARDIZE_EPS),
+        help="Minimum standard deviation for standardize/asinh_standardize x rescaling.",
     )
     parser.add_argument("--seed", type=int, default=env_int("SBI_SEED", 42))
     parser.add_argument(
@@ -456,6 +489,78 @@ def apply_requested_gaussian_beam(
     raise ValueError(f"Unsupported gaussian beam mode: {mode!r}")
 
 
+def transform_x_for_sbi(
+    x_train: np.ndarray,
+    obs: np.ndarray,
+    args: argparse.Namespace,
+) -> tuple[torch.Tensor, torch.Tensor, dict[str, Any]]:
+    mode = str(args.x_rescale_mode or DEFAULT_X_RESCALE_MODE).strip().lower().replace("-", "_")
+    x_t = torch.as_tensor(np.asarray(x_train, dtype=np.float32), dtype=torch.float32, device=args.device)
+    obs_t = torch.as_tensor(np.asarray(obs, dtype=np.float32).reshape(-1), dtype=torch.float32, device=args.device)
+
+    transform: dict[str, Any] = {
+        "mode": mode,
+        "x_rescale_eps": float(args.x_rescale_eps),
+        "x_standardize_eps": float(args.x_standardize_eps),
+    }
+
+    if mode == "none":
+        return x_t, obs_t, transform
+
+    if mode == "standardize":
+        x_mean = x_t.mean(dim=0)
+        x_std = torch.clamp(x_t.std(dim=0), min=float(args.x_standardize_eps))
+        x_final = (x_t - x_mean) / x_std
+        obs_final = (obs_t - x_mean) / x_std
+        transform.update(
+            {
+                "mean": x_mean.detach().cpu().numpy().astype(np.float32),
+                "std": x_std.detach().cpu().numpy().astype(np.float32),
+            }
+        )
+        return x_final, obs_final, transform
+
+    if mode in {"asinh", "asinh_standardize"}:
+        scale = torch.median(torch.abs(x_t), dim=0).values
+        scale = torch.clamp(scale, min=float(args.x_rescale_eps))
+        x_asinh = torch.asinh(x_t / scale)
+        obs_asinh = torch.asinh(obs_t / scale)
+        transform["scale"] = scale.detach().cpu().numpy().astype(np.float32)
+
+        if mode == "asinh":
+            return x_asinh, obs_asinh, transform
+
+        x_mean = x_asinh.mean(dim=0)
+        x_std = torch.clamp(x_asinh.std(dim=0), min=float(args.x_standardize_eps))
+        x_final = (x_asinh - x_mean) / x_std
+        obs_final = (obs_asinh - x_mean) / x_std
+        transform.update(
+            {
+                "mean": x_mean.detach().cpu().numpy().astype(np.float32),
+                "std": x_std.detach().cpu().numpy().astype(np.float32),
+            }
+        )
+        return x_final, obs_final, transform
+
+    raise ValueError(f"Unsupported x_rescale_mode: {args.x_rescale_mode!r}")
+
+
+def save_x_transform(path: Path, transform: dict[str, Any], train_indices: np.ndarray) -> None:
+    payload: dict[str, Any] = {
+        "mode": np.asarray(str(transform["mode"])),
+        "x_rescale_eps": np.asarray(float(transform.get("x_rescale_eps", DEFAULT_X_RESCALE_EPS)), dtype=np.float32),
+        "x_standardize_eps": np.asarray(
+            float(transform.get("x_standardize_eps", DEFAULT_X_STANDARDIZE_EPS)),
+            dtype=np.float32,
+        ),
+        "train_indices": np.asarray(train_indices, dtype=np.int64),
+    }
+    for key in ("scale", "mean", "std"):
+        if key in transform:
+            payload[key] = np.asarray(transform[key], dtype=np.float32)
+    np.savez_compressed(path, **payload)
+
+
 def train_one_size(
     *,
     theta: np.ndarray,
@@ -468,23 +573,33 @@ def train_one_size(
     output_dir: Path,
     posterior_save_path: Path,
 ) -> dict[str, Any]:
-    validate_training_size(n_train, theta.shape[0])
+    validate_training_size(n_train, row_order.size)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     train_indices = row_order[:n_train]
+    np.save(output_dir / "train_indices.npy", train_indices)
+    if int(args.exclude_last_n_from_training) > 0:
+        test_indices = np.arange(
+            theta.shape[0] - int(args.exclude_last_n_from_training),
+            theta.shape[0],
+            dtype=np.int64,
+        )
+        np.save(output_dir / "heldout_test_indices.npy", test_indices)
     theta_train = np.ascontiguousarray(theta[train_indices], dtype=np.float32)
     x_train = np.ascontiguousarray(x[train_indices], dtype=np.float32)
     obs_np = np.asarray(obs, dtype=np.float32).reshape(-1)
 
     theta_t = torch.as_tensor(theta_train, dtype=torch.float32, device=args.device)
-    x_t = torch.as_tensor(x_train, dtype=torch.float32, device=args.device)
-    obs_t = torch.as_tensor(obs_np, dtype=torch.float32, device=args.device)
+    x_t, obs_t, x_transform = transform_x_for_sbi(x_train, obs_np, args)
+    save_x_transform(output_dir / "x_transform.npz", x_transform, train_indices)
+    np.save(output_dir / "obs_transformed.npy", obs_t.detach().cpu().numpy().astype(np.float32))
 
     print("")
     print(f"=== Training SBI with n_train={n_train} ===")
     print(f"theta shape: {tuple(theta_t.shape)}")
     print(f"x shape: {tuple(x_t.shape)}")
     print(f"obs shape: {tuple(obs_t.shape)}")
+    print(f"x rescale mode: {x_transform['mode']}")
     print(f"density estimator: {args.density_estimator}")
     print(f"stop_after_epochs: {args.stop_after_epochs}")
     print(f"posterior samples: {args.num_posterior_samples}")
@@ -531,12 +646,18 @@ def train_one_size(
     metadata = {
         "n_train": int(n_train),
         "available_rows": int(theta.shape[0]),
+        "training_pool_rows": int(row_order.size),
+        "exclude_last_n_from_training": int(args.exclude_last_n_from_training),
         "x_dim": int(x.shape[1]),
         "theta_dim": int(theta.shape[1]),
         "seed": int(args.seed),
         "dataset_order": args.dataset_order,
         "gaussian_beam_fwhm_arcmin": float(args.gaussian_beam_fwhm_arcmin),
         "gaussian_beam_mode": args.gaussian_beam_mode,
+        "x_rescale_mode": str(x_transform["mode"]),
+        "x_rescale_eps": float(args.x_rescale_eps),
+        "x_standardize_eps": float(args.x_standardize_eps),
+        "x_transform_path": str(output_dir / "x_transform.npz"),
         "density_estimator": args.density_estimator,
         "stop_after_epochs": int(args.stop_after_epochs),
         "num_posterior_samples": int(args.num_posterior_samples),
@@ -671,17 +792,29 @@ def main() -> int:
         sweep_mode = False
     else:
         sweep_mode = True
-    for n_train in dataset_sizes:
-        validate_training_size(n_train, theta.shape[0])
+    exclude_last_n = int(args.exclude_last_n_from_training)
+    if exclude_last_n < 0:
+        raise ValueError("--exclude-last-n-from-training must be non-negative")
+    if exclude_last_n >= theta.shape[0]:
+        raise ValueError(
+            f"Cannot exclude the last {exclude_last_n} rows from a dataset with {theta.shape[0]} rows"
+        )
+    training_pool_rows = theta.shape[0] - exclude_last_n
 
-    row_order = build_row_order(theta.shape[0], args.seed, args.dataset_order)
+    for n_train in dataset_sizes:
+        validate_training_size(n_train, training_pool_rows)
+
+    row_order = build_row_order(training_pool_rows, args.seed, args.dataset_order)
     posterior_path = Path(args.posterior_save_path).expanduser()
     base_output_dir = Path(args.output_dir).expanduser() if args.output_dir else posterior_path.parent
     base_output_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"available dataset rows: {theta.shape[0]}")
+    print(f"training pool rows: {training_pool_rows}")
+    print(f"excluded last rows from training: {exclude_last_n}")
     print(f"dataset sizes: {dataset_sizes}")
     print(f"dataset order: {args.dataset_order}")
+    print(f"x rescale mode: {args.x_rescale_mode}")
     print(f"base output directory: {base_output_dir}")
 
     run_summaries: list[dict[str, Any]] = []

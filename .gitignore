@@ -22,3 +22,4 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 *.ji
+Sobol_tSZ/battaglia_sobol_1048576.csv

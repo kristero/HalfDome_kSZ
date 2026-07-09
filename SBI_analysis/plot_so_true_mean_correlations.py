@@ -418,9 +418,9 @@ def make_true_vs_mean_gif(
     cmap: str,
 ) -> Path | None:
     try:
-        import imageio.v2 as imageio
+        from PIL import Image
     except ModuleNotFoundError:
-        print("imageio is not installed; skipping GIF creation.")
+        print("Pillow is not installed; skipping GIF creation.")
         return None
 
     frame_dir = output_dir / "gif_frames" / case
@@ -458,8 +458,19 @@ def make_true_vs_mean_gif(
         return None
 
     gif_path = output_dir / f"{case}_true_vs_mean_by_dataset_size.gif"
-    frames = [imageio.imread(path) for path in frame_paths]
-    imageio.mimsave(gif_path, frames, duration=float(duration), loop=0)
+    frames = [Image.open(path).convert("P", palette=Image.ADAPTIVE) for path in frame_paths]
+    duration_ms = max(20, int(round(float(duration) * 1000.0)))
+    frames[0].save(
+        gif_path,
+        save_all=True,
+        append_images=frames[1:],
+        duration=duration_ms,
+        loop=0,
+        optimize=False,
+        disposal=2,
+    )
+    for frame in frames:
+        frame.close()
     print(f"Saved {gif_path}")
     return gif_path
 

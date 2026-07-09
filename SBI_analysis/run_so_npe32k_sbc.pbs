@@ -1,0 +1,177 @@
+#PBS -N so_npe32k_sbc
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=24:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR=${PBS_O_WORKDIR:-$PWD}
+cd "$WORK_DIR"
+
+: ${PYTHON:=python3}
+: ${PYTHON_ENV_SETUP:=}
+: ${LOG_DIR:=/home/kristero10/logs/SBI_runs}
+
+ALLOCATED_CPUS=${PBS_NCPUS:-${NCPUS:-}}
+if [ -z "$ALLOCATED_CPUS" ] && [ -n "${PBS_NODEFILE:-}" ] && [ -f "$PBS_NODEFILE" ]; then
+  ALLOCATED_CPUS=$(wc -l < "$PBS_NODEFILE")
+fi
+if [ -z "$ALLOCATED_CPUS" ]; then
+  ALLOCATED_CPUS=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
+fi
+
+: ${SO_NPE32_NUM_THREADS:=$ALLOCATED_CPUS}
+: ${OMP_NUM_THREADS:=$SO_NPE32_NUM_THREADS}
+: ${OPENBLAS_NUM_THREADS:=$SO_NPE32_NUM_THREADS}
+: ${MKL_NUM_THREADS:=$SO_NPE32_NUM_THREADS}
+: ${NUMEXPR_NUM_THREADS:=$SO_NPE32_NUM_THREADS}
+: ${TORCH_NUM_THREADS:=$SO_NPE32_NUM_THREADS}
+: ${TORCH_NUM_INTEROP_THREADS:=1}
+
+if [ -z "${PROJECT_ROOT:-}" ]; then
+  if [ -f "$WORK_DIR/SBI_analysis/train_so_npe32k_sbc.py" ]; then
+    PROJECT_ROOT=$WORK_DIR
+  elif [ -f "$WORK_DIR/train_so_npe32k_sbc.py" ] && [ "$(basename "$WORK_DIR")" = "SBI_analysis" ]; then
+    PROJECT_ROOT=$(cd "$WORK_DIR/.." && pwd)
+  else
+    PROJECT_ROOT=$WORK_DIR
+  fi
+fi
+
+: ${SO_NPE32_CASE_DATASET_DIR:=$PROJECT_ROOT/SBI_analysis/data_for_cluster/so_noise_sbi_cases_ell80_7979_battaglia12}
+: ${SO_NPE32_CASE_INDEX_JSON:=$SO_NPE32_CASE_DATASET_DIR/case_dataset_index.json}
+: ${SO_NPE32_CASES:=no_noise}
+SO_NPE32_CASE_TAG=$(printf '%s' "$SO_NPE32_CASES" | tr ' ,' '__')
+: ${SO_NPE32_OUTPUT_DIR:=$PROJECT_ROOT/SBI_analysis/outputs/cluster_outputs/SBI_SO_npe32k_sbc_hf64_nt6_rp0_${SO_NPE32_CASE_TAG}}
+: ${SO_NPE32_N_TRAIN:=32000}
+: ${SO_NPE32_DATASET_ORDER:=sequential}
+: ${SO_NPE32_HIDDEN_FEATURES:=64}
+: ${SO_NPE32_NUM_TRANSFORMS:=6}
+: ${SO_NPE32_RANDPERM:=false}
+: ${SO_NPE32_RANDPERM_KW:=use_random_permutations}
+: ${SO_NPE32_CONTEXT:=40}
+: ${SO_NPE32_STOP_AFTER_EPOCHS:=60}
+: ${SO_NPE32_NUM_POSTERIOR_SAMPLES:=2000}
+: ${SO_NPE32_MAX_SBC:=0}
+: ${SO_NPE32_SBC_STRIDE:=1}
+: ${SO_NPE32_RANK_BINS:=20}
+: ${SO_NPE32_SEED:=42}
+: ${SO_NPE32_DEVICE:=cpu}
+: ${SO_NPE32_ASINH_EPS:=1e-30}
+: ${SO_NPE32_PROGRESS_EVERY:=50}
+: ${SO_NPE32_DPI:=300}
+: ${SO_NPE32_SAVE_POSTERIOR_SAMPLES:=0}
+: ${SO_NPE32_RESUME:=1}
+
+if [ -f "$PROJECT_ROOT/SBI_analysis/train_so_npe32k_sbc.py" ]; then
+  SCRIPT=$PROJECT_ROOT/SBI_analysis/train_so_npe32k_sbc.py
+elif [ -f "$WORK_DIR/train_so_npe32k_sbc.py" ]; then
+  SCRIPT=$WORK_DIR/train_so_npe32k_sbc.py
+else
+  echo "Could not locate train_so_npe32k_sbc.py from PROJECT_ROOT=$PROJECT_ROOT or WORK_DIR=$WORK_DIR" >&2
+  exit 2
+fi
+
+mkdir -p "$LOG_DIR" "$SO_NPE32_OUTPUT_DIR"
+
+if [ -n "$PYTHON_ENV_SETUP" ]; then
+  eval "$PYTHON_ENV_SETUP"
+fi
+
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS NUMEXPR_NUM_THREADS
+export TORCH_NUM_THREADS TORCH_NUM_INTEROP_THREADS SO_NPE32_NUM_THREADS
+
+SAVE_SAMPLES_ARG=
+if [ "$SO_NPE32_SAVE_POSTERIOR_SAMPLES" = "1" ]; then
+  SAVE_SAMPLES_ARG=--save-posterior-samples
+fi
+
+RESUME_ARG=
+if [ "$SO_NPE32_RESUME" = "1" ]; then
+  RESUME_ARG=--resume
+fi
+
+PREPARED_DATASET_ARG=
+if [ -n "${SO_NPE32_PREPARED_DATASET_PATH:-}" ]; then
+  PREPARED_DATASET_ARG="--prepared-dataset-path $SO_NPE32_PREPARED_DATASET_PATH"
+fi
+
+JOB_ID=${PBS_JOBID:-manual}
+LOG_JOB_TAG=$(printf '%s' "$JOB_ID" | tr '[]' '__')
+CASE_TAG=$SO_NPE32_CASE_TAG
+RUN_LOG_BASE=so_npe32k_sbc_${LOG_JOB_TAG}_${CASE_TAG}
+
+echo "PBS job id: $JOB_ID"
+echo "Working directory: $WORK_DIR"
+echo "Project root: $PROJECT_ROOT"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Python script: $SCRIPT"
+echo "Python executable: $PYTHON"
+$PYTHON --version
+echo "Case dataset dir: $SO_NPE32_CASE_DATASET_DIR"
+echo "Case index json: $SO_NPE32_CASE_INDEX_JSON"
+echo "Cases: $SO_NPE32_CASES"
+echo "Output dir: $SO_NPE32_OUTPUT_DIR"
+echo "N train: $SO_NPE32_N_TRAIN"
+echo "Dataset order: $SO_NPE32_DATASET_ORDER"
+echo "MAF hidden features: $SO_NPE32_HIDDEN_FEATURES"
+echo "MAF num transforms: $SO_NPE32_NUM_TRANSFORMS"
+echo "MAF randperm: $SO_NPE32_RANDPERM"
+echo "Context: $SO_NPE32_CONTEXT"
+echo "Posterior samples per SBC observation: $SO_NPE32_NUM_POSTERIOR_SAMPLES"
+echo "Max SBC rows: $SO_NPE32_MAX_SBC"
+echo "SBC stride: $SO_NPE32_SBC_STRIDE"
+echo "Allocated CPUs: $ALLOCATED_CPUS"
+echo "SO_NPE32_NUM_THREADS: $SO_NPE32_NUM_THREADS"
+echo "OMP_NUM_THREADS: $OMP_NUM_THREADS"
+echo "OPENBLAS_NUM_THREADS: $OPENBLAS_NUM_THREADS"
+echo "MKL_NUM_THREADS: $MKL_NUM_THREADS"
+echo "TORCH_NUM_THREADS: $TORCH_NUM_THREADS"
+echo "TORCH_NUM_INTEROP_THREADS: $TORCH_NUM_INTEROP_THREADS"
+
+$PYTHON - <<'PY'
+import sys
+
+try:
+    import numpy
+    import torch
+    import sbi
+except Exception as exc:
+    print("Python/SBI environment import check failed:", repr(exc), file=sys.stderr)
+    raise SystemExit(1)
+PY
+
+$PYTHON "$SCRIPT" \
+  $PREPARED_DATASET_ARG \
+  --case-dataset-dir "$SO_NPE32_CASE_DATASET_DIR" \
+  --case-index-json "$SO_NPE32_CASE_INDEX_JSON" \
+  --cases $SO_NPE32_CASES \
+  --output-dir "$SO_NPE32_OUTPUT_DIR" \
+  --n-train "$SO_NPE32_N_TRAIN" \
+  --dataset-order "$SO_NPE32_DATASET_ORDER" \
+  --hidden-features "$SO_NPE32_HIDDEN_FEATURES" \
+  --num-transforms "$SO_NPE32_NUM_TRANSFORMS" \
+  --randperm "$SO_NPE32_RANDPERM" \
+  --randperm-kw "$SO_NPE32_RANDPERM_KW" \
+  --context "$SO_NPE32_CONTEXT" \
+  --stop-after-epochs "$SO_NPE32_STOP_AFTER_EPOCHS" \
+  --num-posterior-samples "$SO_NPE32_NUM_POSTERIOR_SAMPLES" \
+  --max-sbc "$SO_NPE32_MAX_SBC" \
+  --sbc-stride "$SO_NPE32_SBC_STRIDE" \
+  --rank-bins "$SO_NPE32_RANK_BINS" \
+  --seed "$SO_NPE32_SEED" \
+  --device "$SO_NPE32_DEVICE" \
+  --asinh-eps "$SO_NPE32_ASINH_EPS" \
+  --progress-every "$SO_NPE32_PROGRESS_EVERY" \
+  --dpi "$SO_NPE32_DPI" \
+  $SAVE_SAMPLES_ARG \
+  $RESUME_ARG \
+  > "$LOG_DIR/${RUN_LOG_BASE}.out" \
+  2> "$LOG_DIR/${RUN_LOG_BASE}.err"
+
+echo "Finished at $(date -Is)"
+echo "Outputs: $SO_NPE32_OUTPUT_DIR"

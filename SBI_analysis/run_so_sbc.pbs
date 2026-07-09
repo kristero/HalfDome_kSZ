@@ -76,14 +76,14 @@ fi
 export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS NUMEXPR_NUM_THREADS
 export TORCH_NUM_THREADS TORCH_NUM_INTEROP_THREADS
 
-ALLOW_MISSING_ARG=()
+ALLOW_MISSING_ARG=
 if [ "$SBC_ALLOW_MISSING" = "1" ]; then
-  ALLOW_MISSING_ARG=(--allow-missing)
+  ALLOW_MISSING_ARG=--allow-missing
 fi
 
-SAVE_SAMPLES_ARG=()
+SAVE_SAMPLES_ARG=
 if [ "$SBC_SAVE_POSTERIOR_SAMPLES" = "1" ]; then
-  SAVE_SAMPLES_ARG=(--save-posterior-samples)
+  SAVE_SAMPLES_ARG=--save-posterior-samples
 fi
 
 JOB_ID=${PBS_JOBID:-manual}
@@ -143,8 +143,8 @@ $PYTHON "$SCRIPT" \
   --seed "$SBC_SEED" \
   --device "$SBC_DEVICE" \
   --dpi "$SBC_DPI" \
-  "${ALLOW_MISSING_ARG[@]}" \
-  "${SAVE_SAMPLES_ARG[@]}" \
+  $ALLOW_MISSING_ARG \
+  $SAVE_SAMPLES_ARG \
   > "$LOG_DIR/${RUN_LOG_BASE}.out" \
   2> "$LOG_DIR/${RUN_LOG_BASE}.err"
 

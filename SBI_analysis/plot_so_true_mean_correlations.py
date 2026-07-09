@@ -277,6 +277,68 @@ def plot_final_true_vs_mean(
     return summary_rows
 
 
+def true_mean_arrays(rows: list[dict[str, str]], n_train: int, param: str) -> tuple[np.ndarray, np.ndarray]:
+    sub = rows_for(rows, n_train, param)
+    x_true = np.asarray([to_float(row["theta_true"]) for row in sub], dtype=float)
+    y_mean = np.asarray([to_float(row["posterior_mean"]) for row in sub], dtype=float)
+    mask = np.isfinite(x_true) & np.isfinite(y_mean)
+    return x_true[mask], y_mean[mask]
+
+
+def padded_equal_range(values: np.ndarray) -> tuple[float, float]:
+    values = np.asarray(values, dtype=float)
+    values = values[np.isfinite(values)]
+    if values.size == 0:
+        return 0.0, 1.0
+    lo = float(np.nanmin(values))
+    hi = float(np.nanmax(values))
+    pad = 0.06 * (hi - lo) if hi > lo else 0.1 * max(abs(hi), 1.0)
+    return lo - pad, hi + pad
+
+
+def gif_param_ranges(
+    rows: list[dict[str, str]],
+    dataset_sizes: list[int],
+    params: list[str],
+) -> dict[str, tuple[float, float]]:
+    ranges = {}
+    for param in params:
+        combined = []
+        for n_train in dataset_sizes:
+            x_true, y_mean = true_mean_arrays(rows, n_train, param)
+            if x_true.size:
+                combined.extend([x_true, y_mean])
+        if combined:
+            ranges[param] = padded_equal_range(np.concatenate(combined))
+        else:
+            ranges[param] = (0.0, 1.0)
+    return ranges
+
+
+def gif_density_vmax(
+    rows: list[dict[str, str]],
+    dataset_sizes: list[int],
+    params: list[str],
+    ranges: dict[str, tuple[float, float]],
+    bins: int,
+) -> float:
+    vmax = 1.0
+    for param in params:
+        lo, hi = ranges[param]
+        for n_train in dataset_sizes:
+            x_true, y_mean = true_mean_arrays(rows, n_train, param)
+            if x_true.size == 0:
+                continue
+            hist, _, _ = np.histogram2d(
+                x_true,
+                y_mean,
+                bins=int(bins),
+                range=[[lo, hi], [lo, hi]],
+            )
+            vmax = max(vmax, float(np.nanmax(hist)))
+    return vmax
+
+
 def plot_true_vs_mean_frame(
     *,
     case: str,
@@ -284,6 +346,10 @@ def plot_true_vs_mean_frame(
     n_train: int,
     output_path: Path,
     dpi: int,
+    param_ranges: dict[str, tuple[float, float]],
+    density_vmax: float,
+    density_bins: int,
+    cmap: str,
 ) -> None:
     params = param_order(rows)
     n_cols = 3
@@ -294,16 +360,12 @@ def plot_true_vs_mean_frame(
         figsize=(18.0 / 2.54, max(6.0, 5.4 * n_rows) / 2.54),
     )
     axes = np.asarray(axes).reshape(-1)
-    color = CASE_COLORS.get(case, "#1f77b4")
+    norm = matplotlib.colors.Normalize(vmin=0.0, vmax=float(density_vmax))
 
     for ax, param in zip(axes, params):
-        sub = rows_for(rows, n_train, param)
-        x_true = np.asarray([to_float(row["theta_true"]) for row in sub], dtype=float)
-        y_mean = np.asarray([to_float(row["posterior_mean"]) for row in sub], dtype=float)
-        mask = np.isfinite(x_true) & np.isfinite(y_mean)
-        x_true = x_true[mask]
-        y_mean = y_mean[mask]
+        x_true, y_mean = true_mean_arrays(rows, n_train, param)
         r = pearson_r(x_true, y_mean)
+        lo, hi = param_ranges.get(param, padded_equal_range(np.concatenate([x_true, y_mean]) if x_true.size else np.asarray([])))
 
         if x_true.size == 0:
             ax.text(0.5, 0.5, "no points", ha="center", va="center", transform=ax.transAxes)
@@ -311,13 +373,15 @@ def plot_true_vs_mean_frame(
             ax.axis("off")
             continue
 
-        ax.scatter(x_true, y_mean, s=13, color=color, alpha=0.72, edgecolor="none", zorder=2)
-
-        lo = float(np.nanmin(np.concatenate([x_true, y_mean])))
-        hi = float(np.nanmax(np.concatenate([x_true, y_mean])))
-        pad = 0.06 * (hi - lo) if hi > lo else 0.1 * max(abs(hi), 1.0)
-        lo -= pad
-        hi += pad
+        ax.hist2d(
+            x_true,
+            y_mean,
+            bins=int(density_bins),
+            range=[[lo, hi], [lo, hi]],
+            cmap=cmap,
+            norm=norm,
+            cmin=1,
+        )
 
         ax.plot([lo, hi], [lo, hi], color="black", lw=0.8, ls=":", zorder=0)
         ax.set_xlim(lo, hi)
@@ -331,7 +395,12 @@ def plot_true_vs_mean_frame(
         ax.axis("off")
 
     fig.suptitle(rf"{CASE_LABELS.get(case, case)}, $N={int(n_train):,}$", y=0.995, fontsize=8)
-    fig.tight_layout()
+    fig.tight_layout(rect=[0.0, 0.0, 0.91, 0.965])
+    cax = fig.add_axes([0.93, 0.16, 0.018, 0.70])
+    sm = matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, cax=cax)
+    cbar.set_label("Counts per bin")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path, dpi=dpi)
     plt.close(fig)
@@ -345,6 +414,8 @@ def make_true_vs_mean_gif(
     output_dir: Path,
     dpi: int,
     duration: float,
+    density_bins: int,
+    cmap: str,
 ) -> Path | None:
     try:
         import imageio.v2 as imageio
@@ -356,6 +427,11 @@ def make_true_vs_mean_gif(
     if frame_dir.exists():
         shutil.rmtree(frame_dir)
     frame_dir.mkdir(parents=True, exist_ok=True)
+
+    params = param_order(rows)
+    param_ranges = gif_param_ranges(rows, dataset_sizes, params)
+    density_vmax = gif_density_vmax(rows, dataset_sizes, params, param_ranges, bins=density_bins)
+    print(f"GIF density vmax for {case}: {density_vmax:g}")
 
     frame_paths = []
     for n_train in dataset_sizes:
@@ -370,6 +446,10 @@ def make_true_vs_mean_gif(
             n_train=int(n_train),
             output_path=frame_path,
             dpi=dpi,
+            param_ranges=param_ranges,
+            density_vmax=density_vmax,
+            density_bins=density_bins,
+            cmap=cmap,
         )
         frame_paths.append(frame_path)
 
@@ -432,7 +512,7 @@ def plot_correlation_vs_n(
     ax.set_ylabel(r"Pearson correlation $r(\theta_{\rm true}, \bar{\theta}_{\rm post})$")
     ax.set_title(CASE_LABELS.get(case, case), pad=3.0)
     ax.grid(True, which="both", alpha=0.25, lw=0.5)
-    ax.legend(ncols=3, frameon=False, fontsize=6)
+    ax.legend(ncol=3, frameon=False, fontsize=6)
     fig.tight_layout()
     output_dir.mkdir(parents=True, exist_ok=True)
     out = output_dir / f"{case}_correlation_vs_dataset_size_by_param.jpg"
@@ -479,6 +559,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--dpi", type=int, default=300)
     parser.add_argument("--gif-dpi", type=int, default=140)
     parser.add_argument("--gif-duration", type=float, default=3.0, help="Seconds per GIF frame.")
+    parser.add_argument("--gif-density-bins", type=int, default=18, help="Number of 2D histogram bins per axis for GIF frames.")
+    parser.add_argument("--gif-cmap", default="viridis", help="Matplotlib colormap for GIF density frames.")
     parser.add_argument("--no-gif", action="store_true", help="Disable true-vs-mean GIF creation.")
     return parser.parse_args()
 
@@ -527,6 +609,8 @@ def main() -> int:
                 output_dir=output_dir,
                 dpi=args.gif_dpi,
                 duration=args.gif_duration,
+                density_bins=args.gif_density_bins,
+                cmap=args.gif_cmap,
             )
 
     write_csv(

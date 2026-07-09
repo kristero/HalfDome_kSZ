@@ -426,10 +426,8 @@ def plot_correlation_vs_n(
             label=PARAM_LABELS.get(param, param),
         )
 
-    ax.axhline(1.0, color="black", lw=0.7, ls=":", alpha=0.6)
-    ax.axhline(0.0, color="black", lw=0.7, ls="--", alpha=0.35)
     ax.set_xscale("log")
-    ax.set_ylim(-1.05, 1.05)
+    ax.set_ylim(0.0, 1.0)
     ax.set_xlabel(r"Training set size")
     ax.set_ylabel(r"Pearson correlation $r(\theta_{\rm true}, \bar{\theta}_{\rm post})$")
     ax.set_title(CASE_LABELS.get(case, case), pad=3.0)
@@ -480,7 +478,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--dpi", type=int, default=300)
     parser.add_argument("--gif-dpi", type=int, default=140)
-    parser.add_argument("--gif-duration", type=float, default=0.9, help="Seconds per GIF frame.")
+    parser.add_argument("--gif-duration", type=float, default=3.0, help="Seconds per GIF frame.")
     parser.add_argument("--no-gif", action="store_true", help="Disable true-vs-mean GIF creation.")
     return parser.parse_args()
 

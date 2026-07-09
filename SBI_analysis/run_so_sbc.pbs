@@ -1,0 +1,152 @@
+#PBS -N so_sbc
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=12:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR=${PBS_O_WORKDIR:-$PWD}
+cd "$WORK_DIR"
+
+: ${PYTHON:=python3}
+: ${PYTHON_ENV_SETUP:=}
+: ${LOG_DIR:=/home/kristero10/logs/SBI_runs}
+
+ALLOCATED_CPUS=${PBS_NCPUS:-${NCPUS:-}}
+if [ -z "$ALLOCATED_CPUS" ] && [ -n "${PBS_NODEFILE:-}" ] && [ -f "$PBS_NODEFILE" ]; then
+  ALLOCATED_CPUS=$(wc -l < "$PBS_NODEFILE")
+fi
+if [ -z "$ALLOCATED_CPUS" ]; then
+  ALLOCATED_CPUS=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
+fi
+
+: ${SBC_NUM_THREADS:=$ALLOCATED_CPUS}
+: ${OMP_NUM_THREADS:=$SBC_NUM_THREADS}
+: ${OPENBLAS_NUM_THREADS:=$SBC_NUM_THREADS}
+: ${MKL_NUM_THREADS:=$SBC_NUM_THREADS}
+: ${NUMEXPR_NUM_THREADS:=$SBC_NUM_THREADS}
+: ${TORCH_NUM_THREADS:=$SBC_NUM_THREADS}
+: ${TORCH_NUM_INTEROP_THREADS:=1}
+
+if [ -z "${PROJECT_ROOT:-}" ]; then
+  if [ -f "$WORK_DIR/SBI_analysis/run_so_sbc.py" ]; then
+    PROJECT_ROOT=$WORK_DIR
+  elif [ -f "$WORK_DIR/run_so_sbc.py" ] && [ "$(basename "$WORK_DIR")" = "SBI_analysis" ]; then
+    PROJECT_ROOT=$(cd "$WORK_DIR/.." && pwd)
+  else
+    PROJECT_ROOT=$WORK_DIR
+  fi
+fi
+
+: ${SBC_RUN_ROOT:=$PROJECT_ROOT/SBI_analysis/outputs/cluster_outputs/SBI_SO_noise_dataset_size_ell80_7979_battaglia12_asinh}
+: ${SBC_CASE_DATASET_DIR:=$PROJECT_ROOT/SBI_analysis/data_for_cluster/so_noise_sbi_cases_ell80_7979_battaglia12}
+: ${SBC_CASE_INDEX_JSON:=$SBC_CASE_DATASET_DIR/case_dataset_index.json}
+: ${SBC_CASES:=no_noise goal_deproj0 baseline_deproj0 goal_deproj2 baseline_deproj2}
+: ${SBC_DATASET_SIZES:=256,512,1024,2048,4096,8192,16384,32600}
+: ${SBC_LAST_N_TEST:=100}
+: ${SBC_MAX_SBC:=100}
+: ${SBC_NUM_POSTERIOR_SAMPLES:=2000}
+: ${SBC_RANK_BINS:=20}
+: ${SBC_SEED:=42}
+: ${SBC_DEVICE:=cpu}
+: ${SBC_DPI:=300}
+: ${SBC_ALLOW_MISSING:=0}
+: ${SBC_SAVE_POSTERIOR_SAMPLES:=0}
+SBC_CASE_TAG=$(printf '%s' "$SBC_CASES" | tr ' ,' '__')
+: ${SBC_OUTPUT_DIR:=$SBC_RUN_ROOT/sbc_last${SBC_LAST_N_TEST}_max${SBC_MAX_SBC}_S${SBC_NUM_POSTERIOR_SAMPLES}_${SBC_CASE_TAG}}
+
+if [ -f "$PROJECT_ROOT/SBI_analysis/run_so_sbc.py" ]; then
+  SCRIPT=$PROJECT_ROOT/SBI_analysis/run_so_sbc.py
+elif [ -f "$WORK_DIR/run_so_sbc.py" ]; then
+  SCRIPT=$WORK_DIR/run_so_sbc.py
+else
+  echo "Could not locate run_so_sbc.py from PROJECT_ROOT=$PROJECT_ROOT or WORK_DIR=$WORK_DIR" >&2
+  exit 2
+fi
+
+mkdir -p "$LOG_DIR" "$SBC_OUTPUT_DIR"
+
+if [ -n "$PYTHON_ENV_SETUP" ]; then
+  eval "$PYTHON_ENV_SETUP"
+fi
+
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS NUMEXPR_NUM_THREADS
+export TORCH_NUM_THREADS TORCH_NUM_INTEROP_THREADS
+
+ALLOW_MISSING_ARG=()
+if [ "$SBC_ALLOW_MISSING" = "1" ]; then
+  ALLOW_MISSING_ARG=(--allow-missing)
+fi
+
+SAVE_SAMPLES_ARG=()
+if [ "$SBC_SAVE_POSTERIOR_SAMPLES" = "1" ]; then
+  SAVE_SAMPLES_ARG=(--save-posterior-samples)
+fi
+
+JOB_ID=${PBS_JOBID:-manual}
+LOG_JOB_TAG=$(printf '%s' "$JOB_ID" | tr '[]' '__')
+SAFE_CASE_TAG=$SBC_CASE_TAG
+RUN_LOG_BASE=so_sbc_${LOG_JOB_TAG}_${SAFE_CASE_TAG}
+
+echo "PBS job id: $JOB_ID"
+echo "Working directory: $WORK_DIR"
+echo "Project root: $PROJECT_ROOT"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Python script: $SCRIPT"
+echo "Python executable: $PYTHON"
+$PYTHON --version
+echo "SBC run root: $SBC_RUN_ROOT"
+echo "SBC case dataset dir: $SBC_CASE_DATASET_DIR"
+echo "SBC case index json: $SBC_CASE_INDEX_JSON"
+echo "SBC cases: $SBC_CASES"
+echo "SBC dataset sizes: $SBC_DATASET_SIZES"
+echo "SBC last N test: $SBC_LAST_N_TEST"
+echo "SBC max SBC: $SBC_MAX_SBC"
+echo "SBC posterior samples per observation: $SBC_NUM_POSTERIOR_SAMPLES"
+echo "SBC output dir: $SBC_OUTPUT_DIR"
+echo "SBC device: $SBC_DEVICE"
+echo "Allocated CPUs: $ALLOCATED_CPUS"
+echo "SBC_NUM_THREADS: $SBC_NUM_THREADS"
+echo "OMP_NUM_THREADS: $OMP_NUM_THREADS"
+echo "OPENBLAS_NUM_THREADS: $OPENBLAS_NUM_THREADS"
+echo "MKL_NUM_THREADS: $MKL_NUM_THREADS"
+echo "TORCH_NUM_THREADS: $TORCH_NUM_THREADS"
+echo "TORCH_NUM_INTEROP_THREADS: $TORCH_NUM_INTEROP_THREADS"
+
+$PYTHON - <<'PY'
+import sys
+
+try:
+    import numpy
+    import torch
+    import sbi
+except Exception as exc:
+    print("Python/SBI environment import check failed:", repr(exc), file=sys.stderr)
+    raise SystemExit(1)
+PY
+
+$PYTHON "$SCRIPT" \
+  --run-root "$SBC_RUN_ROOT" \
+  --case-dataset-dir "$SBC_CASE_DATASET_DIR" \
+  --case-index-json "$SBC_CASE_INDEX_JSON" \
+  --output-dir "$SBC_OUTPUT_DIR" \
+  --cases $SBC_CASES \
+  --dataset-sizes "$SBC_DATASET_SIZES" \
+  --last-n-test "$SBC_LAST_N_TEST" \
+  --max-sbc "$SBC_MAX_SBC" \
+  --num-posterior-samples "$SBC_NUM_POSTERIOR_SAMPLES" \
+  --rank-bins "$SBC_RANK_BINS" \
+  --seed "$SBC_SEED" \
+  --device "$SBC_DEVICE" \
+  --dpi "$SBC_DPI" \
+  "${ALLOW_MISSING_ARG[@]}" \
+  "${SAVE_SAMPLES_ARG[@]}" \
+  > "$LOG_DIR/${RUN_LOG_BASE}.out" \
+  2> "$LOG_DIR/${RUN_LOG_BASE}.err"
+
+echo "Finished at $(date -Is)"
+echo "SBC outputs: $SBC_OUTPUT_DIR"

@@ -87,6 +87,12 @@ def write_csv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str]) -> 
             writer.writerow(row)
 
 
+def write_json(path: Path, data: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        json.dump(data, handle, indent=2, sort_keys=True)
+
+
 def read_csv(path: Path) -> list[dict[str, Any]]:
     with path.open("r", newline="", encoding="utf-8") as handle:
         return list(csv.DictReader(handle))
@@ -537,7 +543,17 @@ def plot_true_vs_mean(
     dpi: int = 300,
 ) -> None:
     rows = [row for row in param_rows if row["case"] == case and to_int(row["n_train"]) == int(n_train)]
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    report: dict[str, Any] = {
+        "case": case,
+        "n_train": int(n_train),
+        "rows": int(len(rows)),
+        "params": {},
+        "output_path": str(output_path),
+    }
     if not rows:
+        print(f"Skipping true-vs-mean for case={case}, N={int(n_train)}: no metric rows.")
+        write_json(output_path.with_name(output_path.stem + "_summary.json"), report)
         return
 
     param_indices = sorted({to_int(row["param_index"]) for row in rows})
@@ -550,20 +566,61 @@ def plot_true_vs_mean(
 
     for ax, param_index in zip(axes, param_indices):
         sub = [row for row in rows if to_int(row["param_index"]) == param_index]
-        x_true = np.asarray([to_float(row["theta_true"]) for row in sub], dtype=float)
-        y_mean = np.asarray([to_float(row["posterior_mean"]) for row in sub], dtype=float)
+        x_true_all = np.asarray([to_float(row["theta_true"]) for row in sub], dtype=float)
+        y_mean_all = np.asarray([to_float(row["posterior_mean"]) for row in sub], dtype=float)
+        y_std_all = np.asarray([to_float(row["posterior_std"]) for row in sub], dtype=float)
+        finite = np.isfinite(x_true_all) & np.isfinite(y_mean_all)
         param = str(sub[0]["param"])
-        lo = float(np.nanmin([np.nanmin(x_true), np.nanmin(y_mean)]))
-        hi = float(np.nanmax([np.nanmax(x_true), np.nanmax(y_mean)]))
+
+        report["params"][param] = {
+            "param_index": int(param_index),
+            "rows": int(len(sub)),
+            "finite_points": int(np.count_nonzero(finite)),
+            "nonfinite_points": int(len(sub) - np.count_nonzero(finite)),
+        }
+
+        if not np.any(finite):
+            ax.text(
+                0.5,
+                0.5,
+                "no finite\nposterior means",
+                ha="center",
+                va="center",
+                transform=ax.transAxes,
+                fontsize=7,
+            )
+            ax.set_title(PARAM_LABELS.get(param, param), pad=2.0)
+            ax.axis("off")
+            continue
+
+        x_true = x_true_all[finite]
+        y_mean = y_mean_all[finite]
+        y_std = y_std_all[finite]
+
+        lo = float(np.nanmin(np.concatenate([x_true, y_mean])))
+        hi = float(np.nanmax(np.concatenate([x_true, y_mean])))
         pad = 0.06 * (hi - lo) if hi > lo else 0.1 * max(abs(hi), 1.0)
         lo -= pad
         hi += pad
 
-        ax.scatter(x_true, y_mean, s=11, alpha=0.55, color=color, edgecolor="none")
+        finite_std = np.isfinite(y_std) & (y_std > 0.0)
+        if np.any(finite_std):
+            ax.errorbar(
+                x_true[finite_std],
+                y_mean[finite_std],
+                yerr=y_std[finite_std],
+                fmt="none",
+                ecolor=color,
+                alpha=0.12,
+                elinewidth=0.45,
+                capsize=0.0,
+                zorder=1,
+            )
+        ax.scatter(x_true, y_mean, s=13, alpha=0.7, color=color, edgecolor="none", zorder=2)
         ax.plot([lo, hi], [lo, hi], color="black", lw=0.8, ls=":")
         ax.set_xlim(lo, hi)
         ax.set_ylim(lo, hi)
-        ax.set_title(PARAM_LABELS.get(param, param), pad=2.0)
+        ax.set_title(f"{PARAM_LABELS.get(param, param)}  ($n={x_true.size}$)", pad=2.0)
         ax.set_xlabel(r"True")
         ax.set_ylabel(r"Posterior mean")
         ax.grid(True, alpha=0.25, lw=0.5)
@@ -573,9 +630,16 @@ def plot_true_vs_mean(
 
     fig.suptitle(rf"{CASE_LABELS.get(case, case)}, $N={int(n_train):,}$", y=0.995, fontsize=8)
     fig.tight_layout()
-    output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path, dpi=dpi)
     plt.close(fig)
+    report["finite_points_total"] = int(
+        sum(int(value["finite_points"]) for value in report["params"].values())
+    )
+    write_json(output_path.with_name(output_path.stem + "_summary.json"), report)
+    print(
+        f"Saved true-vs-mean for case={case}, N={int(n_train)}: "
+        f"{report['finite_points_total']} finite points -> {output_path}"
+    )
 
 
 def make_plots(

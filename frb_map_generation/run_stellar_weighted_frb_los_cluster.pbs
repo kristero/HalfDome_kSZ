@@ -1,0 +1,125 @@
+#!/bin/bash
+#PBS -N frb_los_dm
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+# Simple PBS launcher. Edit this block for your cluster.
+
+: "${PROJECT_DIR:=${PBS_O_WORKDIR:-$PWD}}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${ENV_SETUP:=}"  # example: 'module load julia'
+: "${LIGHTCONE_ID:=100}"
+: "${CLUSTER_USER:=${USER:-kristero10}}"
+
+# Input catalog on the cluster.
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
+
+# Output location on the cluster.
+: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/stellar_weighted_frb_los_dm/y${LIGHTCONE_ID}}"
+: "${LOG_DIR:=/home/${CLUSTER_USER}/logs/frb_los_dm}"
+
+# Science settings.
+: "${NFRB:=10000}"
+: "${ZSOURCE:=1.0}"
+: "${DZ:=0.02}"
+: "${SOURCE_SELECTION_MODE:=shell}"
+: "${SOURCE_Z_MIN:=0.0}"
+: "${SOURCE_Z_MAX:=Inf}"
+: "${SOURCE_HALO_MASS_MIN:=0.0}"
+: "${SOURCE_HALO_MASS_MAX:=Inf}"
+: "${ALPHA_STAR_LIST:=1.0 0.0}"  # 1.0 = stellar weighted, 0.0 = random host control
+: "${SEED:=42}"
+: "${NSIDE:=4096}"
+: "${STELLAR_MASS_FIELD:=computed}"
+
+# Foreground settings.
+: "${Z_MIN_FOREGROUND:=0.0}"
+case "${SOURCE_SELECTION_MODE}" in
+  all|all_redshifts|allredshifts|full) DEFAULT_Z_MAX_FOREGROUND="Inf" ;;
+  *) DEFAULT_Z_MAX_FOREGROUND="${ZSOURCE}" ;;
+esac
+: "${Z_MAX_FOREGROUND:=${DEFAULT_Z_MAX_FOREGROUND}}"
+: "${HALO_MASS_MIN:=0.0}"
+: "${HALO_MASS_MAX:=Inf}"
+
+# Runtime settings.
+: "${THREADS_PER_TASK:=26}"
+: "${CHUNKN:=1000000}"
+: "${DM_HIST_BINS:=60}"
+: "${SAVE_SHELL_PROBABILITIES:=false}"
+: "${SAVE_FOREGROUND_MAP:=true}"
+: "${FOREGROUND_PROGRESS_EVERY:=5}"
+: "${SAVE_POWER_SPECTRUM:=true}"
+: "${CL_LMAX:=$((3 * NSIDE - 1))}"
+: "${CL_NITER:=0}"
+: "${SUBTRACT_CL_MEAN:=true}"
+: "${SAVE_FRB_CORRECTED_ESTIMATOR:=true}"
+: "${FRB_CORRECTED_LMAX:=${CL_LMAX}}"
+: "${FRB_CORRECTED_SHOT_NOISE:=shuffle}"
+: "${FRB_CORRECTED_N_SHUFFLE:=5}"
+: "${FRB_CORRECTED_SUBTRACT_SAMPLE_MEAN:=true}"
+: "${FRB_CORRECTED_SEED:=${SEED}}"
+
+# BLAS/OpenMP controls.
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+
+cd "${PROJECT_DIR}"
+
+RUNNER="${PROJECT_DIR}/frb_map_generation/run_stellar_weighted_frb_los_cluster.sh"
+if [[ ! -f "${RUNNER}" ]]; then
+  echo "Could not find runner: ${RUNNER}" >&2
+  exit 2
+fi
+
+mkdir -p "${OUTPUT_BASE}" "${LOG_DIR}"
+
+export PROJECT_DIR JULIA ENV_SETUP LIGHTCONE_ID HALFDOME_PATH OUTPUT_BASE LOG_DIR
+export NFRB ZSOURCE DZ SOURCE_SELECTION_MODE SOURCE_Z_MIN SOURCE_Z_MAX SOURCE_HALO_MASS_MIN SOURCE_HALO_MASS_MAX
+export ALPHA_STAR_LIST SEED NSIDE STELLAR_MASS_FIELD
+export Z_MIN_FOREGROUND Z_MAX_FOREGROUND HALO_MASS_MIN HALO_MASS_MAX
+export THREADS_PER_TASK CHUNKN DM_HIST_BINS SAVE_SHELL_PROBABILITIES
+export SAVE_FOREGROUND_MAP FOREGROUND_PROGRESS_EVERY
+export SAVE_POWER_SPECTRUM CL_LMAX CL_NITER SUBTRACT_CL_MEAN
+export SAVE_FRB_CORRECTED_ESTIMATOR FRB_CORRECTED_LMAX FRB_CORRECTED_SHOT_NOISE
+export FRB_CORRECTED_N_SHUFFLE FRB_CORRECTED_SUBTRACT_SAMPLE_MEAN FRB_CORRECTED_SEED
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS
+
+echo "======================================="
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Project dir: ${PROJECT_DIR}"
+echo "Runner: ${RUNNER}"
+echo "Julia: ${JULIA}"
+echo "HalfDome path: ${HALFDOME_PATH}"
+echo "Output base: ${OUTPUT_BASE}"
+echo "Log dir: ${LOG_DIR}"
+echo "NFRB: ${NFRB}"
+echo "ZSOURCE: ${ZSOURCE}"
+echo "DZ: ${DZ}"
+echo "SOURCE_SELECTION_MODE: ${SOURCE_SELECTION_MODE}"
+echo "SOURCE_Z_MIN/MAX: [${SOURCE_Z_MIN}, ${SOURCE_Z_MAX})"
+echo "SOURCE_HALO_MASS_MIN/MAX: [${SOURCE_HALO_MASS_MIN}, ${SOURCE_HALO_MASS_MAX})"
+echo "ALPHA_STAR_LIST: ${ALPHA_STAR_LIST}"
+echo "NSIDE: ${NSIDE}"
+echo "THREADS_PER_TASK: ${THREADS_PER_TASK}"
+echo "CHUNKN: ${CHUNKN}"
+echo "SAVE_FOREGROUND_MAP: ${SAVE_FOREGROUND_MAP}"
+echo "FOREGROUND_PROGRESS_EVERY: ${FOREGROUND_PROGRESS_EVERY}"
+echo "SAVE_POWER_SPECTRUM: ${SAVE_POWER_SPECTRUM}"
+echo "CL_LMAX: ${CL_LMAX}"
+echo "CL_NITER: ${CL_NITER}"
+echo "SUBTRACT_CL_MEAN: ${SUBTRACT_CL_MEAN}"
+echo "SAVE_FRB_CORRECTED_ESTIMATOR: ${SAVE_FRB_CORRECTED_ESTIMATOR}"
+echo "FRB_CORRECTED_LMAX: ${FRB_CORRECTED_LMAX}"
+echo "FRB_CORRECTED_SHOT_NOISE: ${FRB_CORRECTED_SHOT_NOISE}"
+echo "FRB_CORRECTED_N_SHUFFLE: ${FRB_CORRECTED_N_SHUFFLE}"
+echo "======================================="
+
+bash "${RUNNER}"

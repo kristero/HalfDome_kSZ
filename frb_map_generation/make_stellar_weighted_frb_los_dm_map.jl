@@ -16,6 +16,10 @@ end
 #
 # The stellar-mass weight is used only for source/host selection. It never
 # weights the foreground gas profile.
+#
+# Computed stellar masses support:
+#   stellar_mass_relation=moster2013   # default, old behavior
+#   stellar_mass_relation=cosmos2020   # COSMOS2020 central SHMR with M200c -> Mvir conversion
 
 using XGPaint
 using HDF5
@@ -28,8 +32,29 @@ using Plots
 const H_VALUE = 0.68
 const OMEGAB = 0.049
 const OMEGAC = 0.31 - OMEGAB
+const OMEGAM = OMEGAB + OMEGAC
+const OMEGAL = 1.0 - OMEGAM
 const DEFAULT_SOURCE_REDSHIFT = 1.0
 const COMPUTED_STELLAR_MASS_FIELD = "computed_smhm_moster_like"
+const DEFAULT_STELLAR_MASS_RELATION = "moster2013"
+
+const COSMOS2020_H0_REFERENCE = 70.0
+const COSMOS2020_H0_TARGET = 100.0 * H_VALUE
+const COSMOS2020_LOG_MHALO_SHIFT = log10(COSMOS2020_H0_REFERENCE / COSMOS2020_H0_TARGET)
+const COSMOS2020_LOG_MSTAR_SHIFT = 2.0 * log10(COSMOS2020_H0_REFERENCE / COSMOS2020_H0_TARGET)
+const COSMOS2020_PARAMS = [
+    0.2 0.5 12.629 10.855 0.487 0.935 1.939;
+    0.5 0.8 12.793 10.927 0.502 0.802 3.132;
+    0.8 1.1 12.730 11.013 0.454 1.109 1.925;
+    1.1 1.5 12.673 10.967 0.393 0.746 0.335;
+    1.5 2.0 12.787 11.040 0.410 0.716 1.312;
+    2.0 2.5 13.097 11.254 0.495 0.668 1.077;
+    2.5 3.0 12.627 10.920 0.393 0.274 0.446;
+    3.0 3.5 12.820 11.067 0.465 0.354 0.741;
+    3.5 4.5 13.638 12.222 0.551 1.557 3.149;
+    4.5 5.5 13.547 12.105 0.567 1.427 3.225;
+]
+const COSMOS2020_TABLE = Ref{Any}(nothing)
 
 const compute_theta_max_local =
     isdefined(XGPaint, Symbol("compute_", Char(0x03b8), "max")) ?
@@ -164,11 +189,25 @@ function is_computed_stellar_mass_field(field::AbstractString)
         "relation",
         "computed_smhm",
         "moster",
+        "moster2013",
+        "cosmos",
+        "cosmos2020",
+        "shuntov",
+        "shuntov2022",
     )
 end
 
-function stellar_mass_from_halo_mass(mhalo_msun::Real, z::Real)
-    mhalo = Float64(mhalo_msun)
+function normalize_stellar_mass_relation(relation::AbstractString)
+    value = lowercase(strip(String(relation)))
+    value in ("", "auto", "computed", "moster", "moster2013", "moster_like", "moster-like") &&
+        return "moster2013"
+    value in ("cosmos", "cosmos2020", "shuntov", "shuntov2022") &&
+        return "cosmos2020"
+    error("stellar_mass_relation must be moster2013 or cosmos2020, got $(repr(relation)).")
+end
+
+function moster2013_stellar_mass_from_m200c(m200c_msun::Real, z::Real)
+    mhalo = Float64(m200c_msun)
     redshift = Float64(z)
     if !isfinite(mhalo) || mhalo <= 0.0 || !isfinite(redshift) || redshift <= -1.0
         return NaN
@@ -188,6 +227,215 @@ function stellar_mass_from_halo_mass(mhalo_msun::Real, z::Real)
     end
 
     return 2.0 * n * mhalo / denom
+end
+
+stellar_mass_from_halo_mass(mhalo_msun::Real, z::Real) =
+    moster2013_stellar_mass_from_m200c(mhalo_msun, z)
+
+omega_m_z(z::Real) = OMEGAM * (1.0 + Float64(z))^3 / (OMEGAM * (1.0 + Float64(z))^3 + OMEGAL)
+
+function bryan_norman_delta_vir_critical(z::Real)
+    x = omega_m_z(z) - 1.0
+    return 18.0 * pi^2 + 82.0 * x - 39.0 * x^2
+end
+
+nfw_mass_fraction(c::Real) = log1p(Float64(c)) - Float64(c) / (1.0 + Float64(c))
+
+function duffy2008_c200c(m200c_msun::Real, z::Real)
+    mass_hinv_msun = Float64(m200c_msun) * H_VALUE
+    c = 5.71 * (mass_hinv_msun / 2.0e12)^(-0.084) * (1.0 + Float64(z))^(-0.47)
+    return isfinite(c) && c > 0.0 ? c : NaN
+end
+
+function log_mvir_from_log_m200c_direct(log_m200c::Real, z::Real)
+    redshift = Float64(z)
+    m200c = 10.0^Float64(log_m200c)
+    if !isfinite(m200c) || m200c <= 0.0 || !isfinite(redshift) || redshift <= -1.0
+        return NaN
+    end
+
+    c200c = duffy2008_c200c(m200c, redshift)
+    if !isfinite(c200c) || c200c <= 0.0
+        return NaN
+    end
+
+    delta_target = bryan_norman_delta_vir_critical(redshift)
+    if !isfinite(delta_target) || delta_target <= 0.0
+        return NaN
+    end
+
+    f_c = nfw_mass_fraction(c200c)
+    target = delta_target / 200.0
+    g(x) = nfw_mass_fraction(c200c * x) / f_c / x^3 - target
+
+    lo = 0.05
+    hi = 20.0
+    g_lo = g(lo)
+    g_hi = g(hi)
+    if !isfinite(g_lo) || !isfinite(g_hi)
+        return NaN
+    end
+    while g_hi > 0.0 && hi < 1.0e4
+        hi *= 2.0
+        g_hi = g(hi)
+    end
+    if g_lo < 0.0 || g_hi > 0.0
+        return NaN
+    end
+
+    for _ in 1:60
+        mid = 0.5 * (lo + hi)
+        if g(mid) > 0.0
+            lo = mid
+        else
+            hi = mid
+        end
+    end
+
+    x = 0.5 * (lo + hi)
+    mass_ratio = nfw_mass_fraction(c200c * x) / f_c
+    return Float64(log_m200c) + log10(mass_ratio)
+end
+
+function cosmos2020_log_mhalo_from_log_mstar(log_mstar::Real, row)
+    log_m1 = Float64(row[3]) + COSMOS2020_LOG_MHALO_SHIFT
+    log_mstar0 = Float64(row[4]) + COSMOS2020_LOG_MSTAR_SHIFT
+    beta = Float64(row[5])
+    delta = Float64(row[6])
+    gamma = Float64(row[7])
+
+    x = 10.0^(Float64(log_mstar) - log_mstar0)
+    return log_m1 + beta * log10(x) + x^delta / (1.0 + x^(-gamma)) - 0.5
+end
+
+function interp1_sorted(xs, ys, x::Real)
+    value = Float64(x)
+    if !isfinite(value) || value < first(xs) || value > last(xs)
+        return NaN
+    end
+    idx = searchsortedlast(xs, value)
+    idx <= 0 && return first(ys)
+    idx >= length(xs) && return last(ys)
+    x0 = xs[idx]
+    x1 = xs[idx + 1]
+    y0 = ys[idx]
+    y1 = ys[idx + 1]
+    t = (value - x0) / (x1 - x0)
+    return y0 + t * (y1 - y0)
+end
+
+function cosmos2020_row_index(z::Real)
+    redshift = Float64(z)
+    redshift < COSMOS2020_PARAMS[1, 2] && return 1
+    for i in 2:size(COSMOS2020_PARAMS, 1)
+        if redshift >= COSMOS2020_PARAMS[i, 1] && redshift < COSMOS2020_PARAMS[i, 2]
+            return i
+        end
+    end
+    redshift >= COSMOS2020_PARAMS[end, 1] && return size(COSMOS2020_PARAMS, 1)
+    return 1
+end
+
+function build_cosmos2020_inverse_tables()
+    log_mstar_grid = collect(range(3.0, 14.0; length=6000))
+    tables = Vector{NamedTuple}(undef, size(COSMOS2020_PARAMS, 1))
+    for row_idx in 1:size(COSMOS2020_PARAMS, 1)
+        row = @view COSMOS2020_PARAMS[row_idx, :]
+        log_mhalo_grid = [cosmos2020_log_mhalo_from_log_mstar(log_mstar, row) for log_mstar in log_mstar_grid]
+        order = sortperm(log_mhalo_grid)
+        tables[row_idx] = (
+            z_min=Float64(row[1]),
+            z_max=Float64(row[2]),
+            log_mhalo=Float64.(log_mhalo_grid[order]),
+            log_mstar=Float64.(log_mstar_grid[order]),
+        )
+    end
+    return tables
+end
+
+function build_cosmos2020_m200c_to_mstar_table()
+    inverse_tables = build_cosmos2020_inverse_tables()
+    z_grid = collect(range(0.0, 6.0; length=481))
+    log_m200c_grid = collect(range(9.0, 16.7; length=501))
+    log_mstar_table = Matrix{Float64}(undef, length(log_m200c_grid), length(z_grid))
+
+    for iz in eachindex(z_grid)
+        redshift = z_grid[iz]
+        inv_table = inverse_tables[cosmos2020_row_index(redshift)]
+        for im in eachindex(log_m200c_grid)
+            log_mvir = log_mvir_from_log_m200c_direct(log_m200c_grid[im], redshift)
+            log_mstar_table[im, iz] = interp1_sorted(inv_table.log_mhalo, inv_table.log_mstar, log_mvir)
+        end
+    end
+
+    return (
+        z_grid=z_grid,
+        log_m200c_grid=log_m200c_grid,
+        log_mstar_table=log_mstar_table,
+    )
+end
+
+function ensure_cosmos2020_table!()
+    if COSMOS2020_TABLE[] === nothing
+        println("Building COSMOS2020 M200c -> Mvir -> Mstar interpolation table...")
+        flush(stdout)
+        COSMOS2020_TABLE[] = build_cosmos2020_m200c_to_mstar_table()
+    end
+    return COSMOS2020_TABLE[]
+end
+
+function cosmos2020_log_mstar_from_m200c(m200c_msun::Real, z::Real)
+    m200c = Float64(m200c_msun)
+    redshift = Float64(z)
+    if !isfinite(m200c) || m200c <= 0.0 || !isfinite(redshift)
+        return NaN
+    end
+
+    table = ensure_cosmos2020_table!()
+    log_m200c = log10(m200c)
+    logm_grid = table.log_m200c_grid
+    z_grid = table.z_grid
+    values = table.log_mstar_table
+
+    if log_m200c < first(logm_grid) || log_m200c > last(logm_grid) ||
+       redshift < first(z_grid) || redshift > last(z_grid)
+        return NaN
+    end
+
+    im = searchsortedlast(logm_grid, log_m200c)
+    iz = searchsortedlast(z_grid, redshift)
+    im = clamp(im, 1, length(logm_grid) - 1)
+    iz = clamp(iz, 1, length(z_grid) - 1)
+
+    x0 = logm_grid[im]
+    x1 = logm_grid[im + 1]
+    z0 = z_grid[iz]
+    z1 = z_grid[iz + 1]
+    tx = (log_m200c - x0) / (x1 - x0)
+    tz = (redshift - z0) / (z1 - z0)
+
+    v00 = values[im, iz]
+    v10 = values[im + 1, iz]
+    v01 = values[im, iz + 1]
+    v11 = values[im + 1, iz + 1]
+    any(!isfinite, (v00, v10, v01, v11)) && return NaN
+
+    return (1.0 - tx) * (1.0 - tz) * v00 +
+           tx * (1.0 - tz) * v10 +
+           (1.0 - tx) * tz * v01 +
+           tx * tz * v11
+end
+
+function cosmos2020_stellar_mass_from_m200c(m200c_msun::Real, z::Real)
+    log_mstar = cosmos2020_log_mstar_from_m200c(m200c_msun, z)
+    return isfinite(log_mstar) ? 10.0^log_mstar : NaN
+end
+
+function computed_stellar_mass_from_m200c(m200c_msun::Real, z::Real, relation::AbstractString)
+    relation_name = normalize_stellar_mass_relation(relation)
+    relation_name == "moster2013" && return moster2013_stellar_mass_from_m200c(m200c_msun, z)
+    relation_name == "cosmos2020" && return cosmos2020_stellar_mass_from_m200c(m200c_msun, z)
+    error("Unsupported stellar_mass_relation=$(relation_name).")
 end
 
 function resolve_stellar_mass_field(h5, requested::AbstractString)
@@ -371,6 +619,7 @@ end
 function collect_shell_host_candidates(
     catalog_path::AbstractString;
     stellar_mass_field::AbstractString,
+    stellar_mass_relation::AbstractString,
     z_source::Float64,
     dz::Float64,
     chunkN::Int,
@@ -417,7 +666,7 @@ function collect_shell_host_candidates(
             masses = Float64.(mass_ds[idx]) ./ H_VALUE
             redshifts = Float64.(redshift_ds[idx])
             if use_computed_mstar
-                mstar = stellar_mass_from_halo_mass.(masses, redshifts)
+                mstar = computed_stellar_mass_from_m200c.(masses, redshifts, Ref(stellar_mass_relation))
             else
                 mstar = Float64.(mstar_ds[idx])
                 stellar_mass_divide_by_h && (mstar ./= H_VALUE)
@@ -484,6 +733,7 @@ end
 function sample_stellar_mass_weighted_hosts_all_redshifts(
     catalog_path::AbstractString;
     stellar_mass_field::AbstractString,
+    stellar_mass_relation::AbstractString,
     n_frb::Int,
     alpha_star::Float64,
     eps::Float64,
@@ -535,7 +785,7 @@ function sample_stellar_mass_weighted_hosts_all_redshifts(
             masses = Float64.(mass_ds[idx]) ./ H_VALUE
             redshifts = Float64.(redshift_ds[idx])
             if use_computed_mstar
-                mstar = stellar_mass_from_halo_mass.(masses, redshifts)
+                mstar = computed_stellar_mass_from_m200c.(masses, redshifts, Ref(stellar_mass_relation))
             else
                 mstar = Float64.(mstar_ds[idx])
                 stellar_mass_divide_by_h && (mstar ./= H_VALUE)
@@ -624,7 +874,7 @@ function sample_stellar_mass_weighted_hosts_all_redshifts(
             masses = Float64.(mass_ds[idx]) ./ H_VALUE
             redshifts = Float64.(redshift_ds[idx])
             if use_computed_mstar
-                mstar = stellar_mass_from_halo_mass.(masses, redshifts)
+                mstar = computed_stellar_mass_from_m200c.(masses, redshifts, Ref(stellar_mass_relation))
             else
                 mstar = Float64.(mstar_ds[idx])
                 stellar_mass_divide_by_h && (mstar ./= H_VALUE)
@@ -1060,6 +1310,7 @@ function paint_full_foreground_map!(
                 selected_redshifts[perm],
                 ras[perm],
                 decs[perm],
+                zerobeforepainting=false,
             )
 
             halos_painted += selected_count
@@ -1476,6 +1727,7 @@ function write_summary(
     output_dir,
     dm_cache_file,
     stellar_mass_field,
+    stellar_mass_relation,
     stellar_mass_divide_by_h,
     source_selection_mode,
     source_z_min,
@@ -1531,13 +1783,14 @@ function write_summary(
         println(io, "output_dir=$(output_dir)")
         println(io, "dm_cache_file=$(dm_cache_file)")
         println(io, "stellar_mass_field=$(stellar_mass_field)")
+        println(io, "stellar_mass_relation=$(stellar_mass_relation)")
         println(io, "stellar_mass_divide_by_h=$(stellar_mass_divide_by_h)")
         println(io, "source_selection_mode=$(source_selection_mode)")
         println(io, "source_z_min=$(source_z_min)")
         println(io, "source_z_max=$(source_z_max)")
         println(io, "source_halo_mass_min=$(source_halo_mass_min)")
         println(io, "source_halo_mass_max=$(source_halo_mass_max)")
-        if stellar_mass_field == COMPUTED_STELLAR_MASS_FIELD
+        if stellar_mass_field == COMPUTED_STELLAR_MASS_FIELD && stellar_mass_relation == "moster2013"
             println(io, "stellar_mass_relation=Mstar=2*N(z)*Mh/((Mh/M1(z))^(-beta(z))+(Mh/M1(z))^gamma(z))")
             println(io, "stellar_mass_relation_M10=11.590")
             println(io, "stellar_mass_relation_M11=1.195")
@@ -1547,6 +1800,17 @@ function write_summary(
             println(io, "stellar_mass_relation_beta11=-0.826")
             println(io, "stellar_mass_relation_gamma10=0.608")
             println(io, "stellar_mass_relation_gamma11=0.329")
+        elseif stellar_mass_field == COMPUTED_STELLAR_MASS_FIELD && stellar_mass_relation == "cosmos2020"
+            println(io, "stellar_mass_relation_formula=COSMOS2020 central SHMR, inverted from Mvir to Mstar")
+            println(io, "stellar_mass_relation_reference=Shuntov et al. 2022 / COSMOS2020")
+            println(io, "stellar_mass_relation_input_mass=HalfDome halo_mass_m200c / h")
+            println(io, "stellar_mass_relation_mass_conversion=M200c_to_Mvir_NFW")
+            println(io, "stellar_mass_relation_delta_vir=BryanNorman1998_flat_LCDM_relative_to_critical")
+            println(io, "stellar_mass_relation_concentration=Duffy2008_c200c_full_sample")
+            println(io, "stellar_mass_relation_H0_reference=$(COSMOS2020_H0_REFERENCE)")
+            println(io, "stellar_mass_relation_H0_target=$(COSMOS2020_H0_TARGET)")
+            println(io, "stellar_mass_relation_log_mhalo_shift=$(COSMOS2020_LOG_MHALO_SHIFT)")
+            println(io, "stellar_mass_relation_log_mstar_shift=$(COSMOS2020_LOG_MSTAR_SHIFT)")
         end
         println(io, "nside=$(nside)")
         println(io, "N=$(n_frb)")
@@ -1670,6 +1934,14 @@ function main()
     alpha_star = get_float_arg("alpha_star", 1.0; env="STELLAR_FRB_ALPHA_STAR")
     eps = get_float_arg("eps", 1.0e-30; env="STELLAR_FRB_EPS")
     stellar_mass_field = get_string_arg("stellar_mass_field", "auto"; env="STELLAR_FRB_MSTAR_FIELD")
+    stellar_mass_relation = normalize_stellar_mass_relation(get_string_arg(
+        "stellar_mass_relation",
+        DEFAULT_STELLAR_MASS_RELATION;
+        env="STELLAR_FRB_MSTAR_RELATION",
+    ))
+    if lowercase(strip(stellar_mass_field)) in ("cosmos", "cosmos2020", "shuntov", "shuntov2022")
+        stellar_mass_relation = "cosmos2020"
+    end
     stellar_mass_divide_by_h = get_bool_arg("stellar_mass_divide_by_h", false; env="STELLAR_FRB_MSTAR_DIVIDE_BY_H")
     z_min_foreground = get_float_arg("z_min_foreground", 0.0; env="STELLAR_FRB_FOREGROUND_Z_MIN")
     z_max_foreground = get_float_arg("z_max_foreground", source_mode_is_all ? Inf : z_source; env="STELLAR_FRB_FOREGROUND_Z_MAX")
@@ -1728,11 +2000,14 @@ function main()
     frb_corrected_shot_noise == "shuffle" && frb_corrected_n_shuffle == 0 &&
         error("frb_corrected_n_shuffle must be positive when frb_corrected_shot_noise=shuffle.")
 
+    stellar_mass_relation == "cosmos2020" && ensure_cosmos2020_table!()
+
     source_tag =
         source_mode_is_all ?
         "allredshifts_zsrcmin$(fmt_param_value(source_z_min))_zsrcmax$(fmt_param_value(source_z_max))" :
         "zsource$(fmt_param_value(z_source))_dz$(fmt_param_value(dz))"
-    tag = "stellar_weighted_frb_los_$(source_tag)_alpha$(fmt_param_value(alpha_star))_nside$(nside)_nfrb$(n_frb)_seed$(seed)"
+    relation_tag = stellar_mass_relation == DEFAULT_STELLAR_MASS_RELATION ? "" : "_$(stellar_mass_relation)"
+    tag = "stellar_weighted_frb_los_$(source_tag)$(relation_tag)_alpha$(fmt_param_value(alpha_star))_nside$(nside)_nfrb$(n_frb)_seed$(seed)"
     foreground_map_path = joinpath(output_dir, "$(tag)_foreground_dm_map.fits")
     los_map_path = joinpath(output_dir, "$(tag)_dm_map.fits")
     count_map_path = joinpath(output_dir, "$(tag)_count_map.fits")
@@ -1757,7 +2032,7 @@ function main()
     else
         println("  host shell: abs(z_halo - $(z_source)) < $(0.5 * dz)")
     end
-    println("  stellar_mass_field=$(stellar_mass_field), stellar_mass_divide_by_h=$(stellar_mass_divide_by_h)")
+    println("  stellar_mass_field=$(stellar_mass_field), stellar_mass_relation=$(stellar_mass_relation), stellar_mass_divide_by_h=$(stellar_mass_divide_by_h)")
     println("  alpha_star=$(alpha_star), eps=$(eps)")
     println("  foreground halo cut: $(z_min_foreground) <= z_halo < $(z_max_foreground), mass in [$(halo_mass_min), $(halo_mass_max))")
     println("  dm_cache_file=$(dm_cache_file), dm_cache_overwrite=$(dm_cache_overwrite)")
@@ -1772,6 +2047,7 @@ function main()
         hosts, shell = sample_stellar_mass_weighted_hosts_all_redshifts(
             catalog_path;
             stellar_mass_field=stellar_mass_field,
+            stellar_mass_relation=stellar_mass_relation,
             n_frb=n_frb,
             alpha_star=alpha_star,
             eps=eps,
@@ -1790,6 +2066,7 @@ function main()
         shell = collect_shell_host_candidates(
             catalog_path;
             stellar_mass_field=stellar_mass_field,
+            stellar_mass_relation=stellar_mass_relation,
             z_source=z_source,
             dz=dz,
             chunkN=chunkN,
@@ -1979,6 +2256,7 @@ function main()
         output_dir=output_dir,
         dm_cache_file=dm_cache_file,
         stellar_mass_field=shell.stellar_mass_field,
+        stellar_mass_relation=stellar_mass_relation,
         stellar_mass_divide_by_h=stellar_mass_divide_by_h,
         source_selection_mode=source_selection_mode,
         source_z_min=source_z_min,

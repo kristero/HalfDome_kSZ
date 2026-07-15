@@ -26,7 +26,30 @@ DEFAULT_CASES = [
     "goal_deproj2",
     "baseline_deproj2",
 ]
-DEFAULT_DATASET_SIZES = [256, 512, 1024, 2048, 4096, 8192, 16384, 32600]
+DEFAULT_DATASET_SIZES = [
+    256,
+    512,
+    1024,
+    2048,
+    4096,
+    8192,
+    16384,
+    32768,
+    49152,
+    65536,
+    81920,
+    98304,
+    114688,
+    131072,
+    163840,
+    196608,
+    229376,
+    262144,
+    327680,
+    393216,
+    458752,
+    524288,
+]
 
 PARAM_LABELS = {
     "P0": r"$P_0$",
@@ -46,6 +69,12 @@ CASE_LABELS = {
     "baseline_deproj0": r"baseline, deproj. 0",
     "goal_deproj2": r"goal, deproj. 2",
     "baseline_deproj2": r"baseline, deproj. 2",
+    "unmasked_no_noise": r"unmasked no noise",
+    "masked_no_noise": r"no noise",
+    "masked_goal_noise_cross_deproj0": r"goal deproj0",
+    "masked_baseline_noise_cross_deproj0": r"baseline deproj0",
+    "masked_goal_noise_cross_deproj2": r"goal deproj2",
+    "masked_baseline_noise_cross_deproj2": r"baseline deproj2",
 }
 
 CASE_COLORS = {
@@ -54,6 +83,12 @@ CASE_COLORS = {
     "baseline_deproj0": "#d62728",
     "goal_deproj2": "#2ca02c",
     "baseline_deproj2": "#9467bd",
+    "unmasked_no_noise": "#666666",
+    "masked_no_noise": "#222222",
+    "masked_goal_noise_cross_deproj0": "#1f77b4",
+    "masked_baseline_noise_cross_deproj0": "#d62728",
+    "masked_goal_noise_cross_deproj2": "#2ca02c",
+    "masked_baseline_noise_cross_deproj2": "#9467bd",
 }
 
 
@@ -237,6 +272,7 @@ def summarize_profile_rows(profile_rows: list[dict[str, Any]]) -> list[dict[str,
         key = (str(row["case"]), to_int(row["n_train"]))
         grouped[key]["mse"].append(to_float(row["mse"]))
         grouped[key]["rmse"].append(to_float(row["rmse"]))
+        grouped[key]["rmse_over_prior_range"].append(to_float(row["rmse_over_prior_range"]))
         grouped[key]["rmse_over_std"].append(to_float(row["rmse_over_std"]))
         grouped[key]["mean_posterior_std"].append(to_float(row["mean_posterior_std"]))
         grouped[key]["mean_abs_pull"].append(to_float(row["mean_abs_pull"]))
@@ -252,6 +288,8 @@ def summarize_profile_rows(profile_rows: list[dict[str, Any]]) -> list[dict[str,
                 "mean_mse_err": sem(values["mse"]),
                 "mean_rmse": float(np.nanmean(values["rmse"])),
                 "mean_rmse_err": sem(values["rmse"]),
+                "mean_rmse_over_prior_range": float(np.nanmean(values["rmse_over_prior_range"])),
+                "mean_rmse_over_prior_range_err": sem(values["rmse_over_prior_range"]),
                 "mean_rmse_over_std": float(np.nanmean(values["rmse_over_std"])),
                 "mean_rmse_over_std_err": sem(values["rmse_over_std"]),
                 "mean_posterior_std": float(np.nanmean(values["mean_posterior_std"])),
@@ -361,6 +399,8 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
         print(f"\nCase {case}: dataset={dataset_path}")
         with np.load(dataset_path, allow_pickle=True) as data:
             param_names = [str(v) for v in data["param_names"]]
+            prior_low = np.asarray(data["prior_low"], dtype=np.float64)
+            prior_high = np.asarray(data["prior_high"], dtype=np.float64)
             x_eval, theta_eval, eval_labels, eval_tag = evaluation_set_from_dataset(
                 data,
                 args.analysis_target,
@@ -384,12 +424,17 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
                 n_params = min(samples.shape[1], theta_eval.shape[1], len(param_names))
                 samples = samples[:, :n_params]
                 theta_true = theta_eval[eval_idx, :n_params]
+                prior_low_eval = prior_low[:n_params]
+                prior_high_eval = prior_high[:n_params]
+                prior_width = prior_high_eval - prior_low_eval
+                prior_width = np.where(prior_width > 0.0, prior_width, np.nan)
 
                 mean = np.nanmean(samples, axis=0)
                 std = np.nanstd(samples, axis=0, ddof=1)
                 std = np.where(std > 0.0, std, np.nan)
                 error = mean - theta_true
                 error_over_std = error / std
+                error_over_prior_range = error / prior_width
                 mse = float(np.nanmean(error**2))
 
                 profile_rows.append(
@@ -401,6 +446,7 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
                         "x_rescale_mode": x_rescale_mode,
                         "mse": mse,
                         "rmse": float(np.sqrt(mse)),
+                        "rmse_over_prior_range": float(np.sqrt(np.nanmean(error_over_prior_range**2))),
                         "rmse_over_std": float(np.sqrt(np.nanmean(error_over_std**2))),
                         "mean_posterior_std": float(np.nanmean(std)),
                         "mean_abs_pull": float(np.nanmean(np.abs(error_over_std))),
@@ -420,7 +466,11 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
                             "theta_true": float(theta_true[j]),
                             "posterior_mean": float(mean[j]),
                             "posterior_std": float(std[j]),
+                            "prior_low": float(prior_low_eval[j]),
+                            "prior_high": float(prior_high_eval[j]),
+                            "prior_width": float(prior_width[j]),
                             "error": float(error[j]),
+                            "error_over_prior_range": float(error_over_prior_range[j]),
                             "pull": float(error_over_std[j]),
                             "abs_pull": float(abs(error_over_std[j])),
                             "num_posterior_samples": int(args.num_posterior_samples),
@@ -682,6 +732,17 @@ def make_plots(
             profile_rows,
             summary_rows,
             case,
+            metric="rmse_over_prior_range",
+            summary_metric="mean_rmse_over_prior_range",
+            err_metric="mean_rmse_over_prior_range_err",
+            ylabel=r"$\sqrt{\langle[(\bar{\theta}-\theta_{\rm true})/\Delta\theta_{\rm prior}]^2\rangle}$",
+            output_path=plot_dir / f"{case}_{tag}_rmse_over_prior_range_vs_dataset_size.jpg",
+            dpi=args.dpi,
+        )
+        plot_profile_metric(
+            profile_rows,
+            summary_rows,
+            case,
             metric="rmse_over_std",
             summary_metric="mean_rmse_over_std",
             err_metric="mean_rmse_over_std_err",
@@ -716,6 +777,15 @@ def make_plots(
         err_metric="mean_rmse_err",
         ylabel=r"$\sqrt{\langle(\bar{\theta}-\theta_{\rm true})^2\rangle}$",
         output_path=plot_dir / f"all_cases_{tag}_rmse_vs_dataset_size.jpg",
+        dpi=args.dpi,
+    )
+    plot_case_comparison(
+        summary_rows,
+        cases,
+        summary_metric="mean_rmse_over_prior_range",
+        err_metric="mean_rmse_over_prior_range_err",
+        ylabel=r"$\sqrt{\langle[(\bar{\theta}-\theta_{\rm true})/\Delta\theta_{\rm prior}]^2\rangle}$",
+        output_path=plot_dir / f"all_cases_{tag}_rmse_over_prior_range_vs_dataset_size.jpg",
         dpi=args.dpi,
     )
     plot_case_comparison(
@@ -814,7 +884,11 @@ def main() -> int:
                 "theta_true",
                 "posterior_mean",
                 "posterior_std",
+                "prior_low",
+                "prior_high",
+                "prior_width",
                 "error",
+                "error_over_prior_range",
                 "pull",
                 "abs_pull",
                 "num_posterior_samples",
@@ -832,6 +906,7 @@ def main() -> int:
                 "x_rescale_mode",
                 "mse",
                 "rmse",
+                "rmse_over_prior_range",
                 "rmse_over_std",
                 "mean_posterior_std",
                 "mean_abs_pull",
@@ -848,6 +923,8 @@ def main() -> int:
                 "mean_mse_err",
                 "mean_rmse",
                 "mean_rmse_err",
+                "mean_rmse_over_prior_range",
+                "mean_rmse_over_prior_range_err",
                 "mean_rmse_over_std",
                 "mean_rmse_over_std_err",
                 "mean_posterior_std",

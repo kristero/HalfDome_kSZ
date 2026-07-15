@@ -1,0 +1,125 @@
+#PBS -N prep_adrian_sbi
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mpiprocs=1:mem=96gb
+#PBS -l walltime=06:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR=${PBS_O_WORKDIR:-$PWD}
+cd "$WORK_DIR"
+
+: ${PYTHON:=python3}
+: ${PYTHON_ENV_SETUP:=}
+: ${LOG_DIR:=/home/kristero10/logs/SBI_runs}
+
+if [ -z "${PROJECT_ROOT:-}" ]; then
+  if [ -f "$WORK_DIR/SBI_analysis/prepare_adrian_so_sbi_case_datasets.py" ]; then
+    PROJECT_ROOT=$WORK_DIR
+  elif [ -f "$WORK_DIR/prepare_adrian_so_sbi_case_datasets.py" ] && [ "$(basename "$WORK_DIR")" = "SBI_analysis" ]; then
+    PROJECT_ROOT=$(cd "$WORK_DIR/.." && pwd)
+  else
+    PROJECT_ROOT=$WORK_DIR
+  fi
+fi
+
+: ${ADRIAN_DATASET_DIR:=/lustre/work/kristero10/adrian_dataset}
+: ${ELL_MIN:=80}
+: ${ELL_MAX:=7979}
+: ${ELL_SELECTION:=center}
+: ${BIN_WEIGHTING:=2ell_plus_1}
+: ${OBS_INDEX:=-1}
+: ${LAST_N_TEST:=100}
+: ${CHUNK_ROWS:=2048}
+: ${MAX_ROWS:=0}
+: ${NO_COMPRESS:=1}
+: ${ALLOW_MISSING_PRODUCTS:=1}
+: ${SBI_CASES:=unmasked_no_noise,masked_no_noise,masked_baseline_noise_cross_deproj0,masked_baseline_noise_cross_deproj2,masked_goal_noise_cross_deproj0,masked_goal_noise_cross_deproj2}
+
+ELL_TAG=$("$PYTHON" - "$ELL_MIN" "$ELL_MAX" <<'PY'
+import sys
+
+def fmt(value):
+    value = float(value)
+    text = str(int(value)) if value.is_integer() else f"{value:g}"
+    return text.replace("-", "m").replace(".", "p")
+
+print(f"ell{fmt(sys.argv[1])}_{fmt(sys.argv[2])}")
+PY
+)
+
+: ${CASE_DATASET_DIR:=$PROJECT_ROOT/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_${ELL_TAG}_dataset_row}
+
+if [ -f "$PROJECT_ROOT/SBI_analysis/prepare_adrian_so_sbi_case_datasets.py" ]; then
+  SCRIPT=$PROJECT_ROOT/SBI_analysis/prepare_adrian_so_sbi_case_datasets.py
+elif [ -f "$WORK_DIR/prepare_adrian_so_sbi_case_datasets.py" ]; then
+  SCRIPT=$WORK_DIR/prepare_adrian_so_sbi_case_datasets.py
+else
+  echo "Could not locate prepare_adrian_so_sbi_case_datasets.py" >&2
+  exit 2
+fi
+
+mkdir -p "$LOG_DIR" "$CASE_DATASET_DIR"
+
+if [ -n "$PYTHON_ENV_SETUP" ]; then
+  eval "$PYTHON_ENV_SETUP"
+fi
+
+NO_COMPRESS_ARG=
+if [ "$NO_COMPRESS" = "1" ]; then
+  NO_COMPRESS_ARG=--no-compress
+fi
+
+ALLOW_MISSING_ARG=
+if [ "$ALLOW_MISSING_PRODUCTS" = "1" ]; then
+  ALLOW_MISSING_ARG=--allow-missing
+fi
+
+METADATA_ARG=
+if [ -n "${ADRIAN_METADATA_NPZ:-}" ]; then
+  METADATA_ARG="--metadata-npz $ADRIAN_METADATA_NPZ"
+fi
+
+THETA_ARG=
+if [ -n "${ADRIAN_THETA_PATH:-}" ]; then
+  THETA_ARG="--theta-path $ADRIAN_THETA_PATH"
+fi
+
+echo "PBS job id: ${PBS_JOBID:-manual}"
+echo "Working directory: $WORK_DIR"
+echo "Project root: $PROJECT_ROOT"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Python script: $SCRIPT"
+echo "Input dir: $ADRIAN_DATASET_DIR"
+echo "Output dir: $CASE_DATASET_DIR"
+echo "Products: $SBI_CASES"
+echo "ell range: $ELL_MIN - $ELL_MAX"
+echo "obs index: $OBS_INDEX"
+echo "last N test: $LAST_N_TEST"
+echo "chunk rows: $CHUNK_ROWS"
+echo "max rows: $MAX_ROWS"
+echo "no compress: $NO_COMPRESS"
+echo "allow missing products: $ALLOW_MISSING_PRODUCTS"
+
+"$PYTHON" "$SCRIPT" \
+  --input-dir "$ADRIAN_DATASET_DIR" \
+  $METADATA_ARG \
+  $THETA_ARG \
+  --output-dir "$CASE_DATASET_DIR" \
+  --products ${SBI_CASES//,/ } \
+  --ell-min "$ELL_MIN" \
+  --ell-max "$ELL_MAX" \
+  --ell-selection "$ELL_SELECTION" \
+  --bin-weighting "$BIN_WEIGHTING" \
+  --obs-index "$OBS_INDEX" \
+  --test-last-n "$LAST_N_TEST" \
+  --chunk-rows "$CHUNK_ROWS" \
+  --max-rows "$MAX_ROWS" \
+  $NO_COMPRESS_ARG \
+  $ALLOW_MISSING_ARG
+
+echo "Finished at $(date -Is)"
+echo "Prepared case datasets: $CASE_DATASET_DIR"

@@ -26,8 +26,11 @@ if [ -z "${PROJECT_ROOT:-}" ]; then
 fi
 
 : ${ADRIAN_DATASET_DIR:=/lustre/work/kristero10/adrian_dataset}
+: ${ADRIAN_SOBOL_CSV:=/home/kristero10/tSZ_data/battaglia_sobol_1048576.csv}
 : ${ELL_MIN:=80}
 : ${ELL_MAX:=7979}
+: ${ELL_START:=80}
+: ${ELL_STOP:=7979}
 : ${ELL_SELECTION:=center}
 : ${BIN_WEIGHTING:=2ell_plus_1}
 : ${OBS_INDEX:=-1}
@@ -82,9 +85,19 @@ if [ -n "${ADRIAN_METADATA_NPZ:-}" ]; then
   METADATA_ARG="--metadata-npz $ADRIAN_METADATA_NPZ"
 fi
 
+METADATA_DIR_ARG=
+if [ -n "${ADRIAN_METADATA_DIR:-}" ]; then
+  METADATA_DIR_ARG="--metadata-dir $ADRIAN_METADATA_DIR"
+fi
+
 THETA_ARG=
 if [ -n "${ADRIAN_THETA_PATH:-}" ]; then
   THETA_ARG="--theta-path $ADRIAN_THETA_PATH"
+fi
+
+SOBOL_ARG=
+if [ -n "${ADRIAN_SOBOL_CSV:-}" ]; then
+  SOBOL_ARG="--sobol-csv $ADRIAN_SOBOL_CSV"
 fi
 
 echo "PBS job id: ${PBS_JOBID:-manual}"
@@ -94,9 +107,11 @@ echo "Host: $(hostname)"
 echo "Date: $(date -Is)"
 echo "Python script: $SCRIPT"
 echo "Input dir: $ADRIAN_DATASET_DIR"
+echo "Sobol CSV: ${ADRIAN_SOBOL_CSV:-not_set}"
 echo "Output dir: $CASE_DATASET_DIR"
 echo "Products: $SBI_CASES"
 echo "ell range: $ELL_MIN - $ELL_MAX"
+echo "fallback unbinned ell range: $ELL_START - $ELL_STOP"
 echo "obs index: $OBS_INDEX"
 echo "last N test: $LAST_N_TEST"
 echo "chunk rows: $CHUNK_ROWS"
@@ -106,12 +121,16 @@ echo "allow missing products: $ALLOW_MISSING_PRODUCTS"
 
 "$PYTHON" "$SCRIPT" \
   --input-dir "$ADRIAN_DATASET_DIR" \
+  $METADATA_DIR_ARG \
   $METADATA_ARG \
   $THETA_ARG \
+  $SOBOL_ARG \
   --output-dir "$CASE_DATASET_DIR" \
   --products ${SBI_CASES//,/ } \
   --ell-min "$ELL_MIN" \
   --ell-max "$ELL_MAX" \
+  --ell-start "$ELL_START" \
+  --ell-stop "$ELL_STOP" \
   --ell-selection "$ELL_SELECTION" \
   --bin-weighting "$BIN_WEIGHTING" \
   --obs-index "$OBS_INDEX" \

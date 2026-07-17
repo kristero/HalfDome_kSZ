@@ -1,0 +1,188 @@
+#PBS -N adrian_so_post
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mpiprocs=1:mem=96gb
+#PBS -l walltime=24:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR=${PBS_O_WORKDIR:-$PWD}
+cd "$WORK_DIR"
+
+: ${PYTHON:=python3}
+: ${PYTHON_ENV_SETUP:=}
+: ${LOG_DIR:=/home/kristero10/logs/SBI_runs}
+
+ALLOCATED_CPUS=${PBS_NCPUS:-${NCPUS:-}}
+if [ -z "$ALLOCATED_CPUS" ] && [ -n "${PBS_NODEFILE:-}" ] && [ -f "$PBS_NODEFILE" ]; then
+  ALLOCATED_CPUS=$(wc -l < "$PBS_NODEFILE")
+fi
+if [ -z "$ALLOCATED_CPUS" ]; then
+  ALLOCATED_CPUS=$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1)
+fi
+
+: ${POST_NUM_THREADS:=$ALLOCATED_CPUS}
+: ${OMP_NUM_THREADS:=$POST_NUM_THREADS}
+: ${OPENBLAS_NUM_THREADS:=$POST_NUM_THREADS}
+: ${MKL_NUM_THREADS:=$POST_NUM_THREADS}
+: ${NUMEXPR_NUM_THREADS:=$POST_NUM_THREADS}
+: ${TORCH_NUM_THREADS:=$POST_NUM_THREADS}
+: ${TORCH_NUM_INTEROP_THREADS:=1}
+
+if [ -z "${PROJECT_ROOT:-}" ]; then
+  if [ -f "$WORK_DIR/SBI_analysis/analyze_so_sbi_dataset_size.py" ]; then
+    PROJECT_ROOT=$WORK_DIR
+  elif [ -f "$WORK_DIR/analyze_so_sbi_dataset_size.py" ] && [ "$(basename "$WORK_DIR")" = "SBI_analysis" ]; then
+    PROJECT_ROOT=$(cd "$WORK_DIR/.." && pwd)
+  else
+    PROJECT_ROOT=$WORK_DIR
+  fi
+fi
+
+: ${RUN_ROOT:=$PROJECT_ROOT/SBI_analysis/outputs/cluster_outputs/SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_asinh}
+: ${CASE_DATASET_DIR:=$PROJECT_ROOT/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row}
+: ${POST_CASES:=masked_no_noise masked_baseline_noise_cross_deproj0 masked_baseline_noise_cross_deproj2 masked_goal_noise_cross_deproj0}
+: ${POST_SIZES:=256,512,1024,2048,4096,8192,16384,32768,49152,65536,81920,98304,114688,131072,163840,196608,229376,262144,327680,393216,458752,524288}
+POST_CASES=${POST_CASES//,/ }
+
+: ${RUN_DATASET_DIAGNOSTICS:=1}
+: ${RUN_GETDIST:=1}
+: ${ANALYSIS_TARGET:=last_n}
+: ${ANALYSIS_TAG:=last100}
+: ${LAST_N_TEST:=100}
+: ${DIAG_NUM_POSTERIOR_SAMPLES:=5000}
+: ${REUSE_METRICS:=0}
+
+: ${GETDIST_N_TRAIN:=32768,65536,131072,262144,327680,393216,458752,524288}
+: ${GETDIST_NUM_POSTERIOR_SAMPLES:=100000}
+: ${GETDIST_REUSE_SAMPLES:=1}
+: ${GETDIST_FILLED_LAST_ONLY:=1}
+: ${TRUE_VS_MEAN_LAST_N:=500}
+: ${TRUE_VS_MEAN_NUM_POSTERIOR_SAMPLES:=5000}
+: ${TRUE_VS_MEAN_N_TRAIN:=0}
+: ${SKIP_TRUE_VS_MEAN:=0}
+: ${POST_DPI:=300}
+: ${POST_DEVICE:=cpu}
+
+ANALYZE_SCRIPT=$PROJECT_ROOT/SBI_analysis/analyze_so_sbi_dataset_size.py
+GETDIST_SCRIPT=$PROJECT_ROOT/SBI_analysis/plot_battaglia12_so_getdist.py
+
+if [ ! -f "$ANALYZE_SCRIPT" ]; then
+  echo "Missing analysis script: $ANALYZE_SCRIPT" >&2
+  exit 2
+fi
+if [ ! -f "$GETDIST_SCRIPT" ]; then
+  echo "Missing GetDist script: $GETDIST_SCRIPT" >&2
+  exit 2
+fi
+if [ ! -d "$RUN_ROOT" ]; then
+  echo "Run root not found: $RUN_ROOT" >&2
+  exit 2
+fi
+if [ ! -d "$CASE_DATASET_DIR" ]; then
+  echo "Case dataset dir not found: $CASE_DATASET_DIR" >&2
+  exit 2
+fi
+
+mkdir -p "$LOG_DIR"
+
+if [ -n "$PYTHON_ENV_SETUP" ]; then
+  eval "$PYTHON_ENV_SETUP"
+fi
+
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS NUMEXPR_NUM_THREADS
+export TORCH_NUM_THREADS TORCH_NUM_INTEROP_THREADS
+
+REUSE_METRICS_ARG=
+if [ "$REUSE_METRICS" = "1" ]; then
+  REUSE_METRICS_ARG=--reuse-metrics
+fi
+
+GETDIST_REUSE_ARG=
+if [ "$GETDIST_REUSE_SAMPLES" = "1" ]; then
+  GETDIST_REUSE_ARG=--reuse-samples
+else
+  GETDIST_REUSE_ARG=
+fi
+
+GETDIST_FILLED_ARG=
+if [ "$GETDIST_FILLED_LAST_ONLY" = "1" ]; then
+  GETDIST_FILLED_ARG=--filled-last-only
+else
+  GETDIST_FILLED_ARG=
+fi
+
+SKIP_TVM_ARG=
+if [ "$SKIP_TRUE_VS_MEAN" = "1" ]; then
+  SKIP_TVM_ARG=--skip-true-vs-mean
+else
+  SKIP_TVM_ARG=
+fi
+
+echo "PBS job id: ${PBS_JOBID:-manual}"
+echo "Working directory: $WORK_DIR"
+echo "Project root: $PROJECT_ROOT"
+echo "Host: $(hostname)"
+echo "Date: $(date -Is)"
+echo "Python: $PYTHON"
+$PYTHON --version
+echo "Run root: $RUN_ROOT"
+echo "Case dataset dir: $CASE_DATASET_DIR"
+echo "Cases: $POST_CASES"
+echo "Sizes: $POST_SIZES"
+echo "Run dataset diagnostics: $RUN_DATASET_DIAGNOSTICS"
+echo "Run GetDist/true-vs-mean: $RUN_GETDIST"
+echo "Allocated CPUs: $ALLOCATED_CPUS"
+echo "POST_NUM_THREADS: $POST_NUM_THREADS"
+echo "OMP_NUM_THREADS: $OMP_NUM_THREADS"
+echo "OPENBLAS_NUM_THREADS: $OPENBLAS_NUM_THREADS"
+echo "MKL_NUM_THREADS: $MKL_NUM_THREADS"
+echo "TORCH_NUM_THREADS: $TORCH_NUM_THREADS"
+echo "TORCH_NUM_INTEROP_THREADS: $TORCH_NUM_INTEROP_THREADS"
+
+if [ "$RUN_DATASET_DIAGNOSTICS" = "1" ]; then
+  echo ""
+  echo "=== Running dataset-size diagnostics ==="
+  "$PYTHON" "$ANALYZE_SCRIPT" \
+    --run-root "$RUN_ROOT" \
+    --case-dataset-dir "$CASE_DATASET_DIR" \
+    --cases $POST_CASES \
+    --dataset-sizes "$POST_SIZES" \
+    --analysis-target "$ANALYSIS_TARGET" \
+    --last-n-test "$LAST_N_TEST" \
+    --analysis-tag "$ANALYSIS_TAG" \
+    --num-posterior-samples "$DIAG_NUM_POSTERIOR_SAMPLES" \
+    --device "$POST_DEVICE" \
+    --allow-missing \
+    --dpi "$POST_DPI" \
+    $REUSE_METRICS_ARG
+fi
+
+if [ "$RUN_GETDIST" = "1" ]; then
+  echo ""
+  echo "=== Running Battaglia12 GetDist and true-vs-mean diagnostics ==="
+  for CASE in $POST_CASES; do
+    echo ""
+    echo "--- Case: $CASE ---"
+    "$PYTHON" "$GETDIST_SCRIPT" \
+      --run-root "$RUN_ROOT" \
+      --case-dataset-dir "$CASE_DATASET_DIR" \
+      --case "$CASE" \
+      --n-train "$GETDIST_N_TRAIN" \
+      --num-posterior-samples "$GETDIST_NUM_POSTERIOR_SAMPLES" \
+      --true-vs-mean-last-n "$TRUE_VS_MEAN_LAST_N" \
+      --true-vs-mean-n-train "$TRUE_VS_MEAN_N_TRAIN" \
+      --true-vs-mean-num-posterior-samples "$TRUE_VS_MEAN_NUM_POSTERIOR_SAMPLES" \
+      --device "$POST_DEVICE" \
+      --dpi "$POST_DPI" \
+      $GETDIST_REUSE_ARG \
+      $GETDIST_FILLED_ARG \
+      $SKIP_TVM_ARG
+  done
+fi
+
+echo ""
+echo "Finished at $(date -Is)"
+echo "Diagnostics output root: $RUN_ROOT"

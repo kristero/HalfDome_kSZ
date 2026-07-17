@@ -44,7 +44,7 @@ fi
 : ${RUN_ROOT:=$PROJECT_ROOT/SBI_analysis/outputs/cluster_outputs/SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_asinh}
 : ${CASE_DATASET_DIR:=$PROJECT_ROOT/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row}
 : ${POST_CASES:=masked_no_noise masked_baseline_noise_cross_deproj0 masked_baseline_noise_cross_deproj2 masked_goal_noise_cross_deproj0}
-: ${POST_SIZES:=256,512,1024,2048,4096,8192,16384,32768,49152,65536,81920,98304,114688,131072,163840,196608,229376,262144,327680,393216,458752,524288}
+: ${POST_SIZES:=256,512,1024,2048,4096,8192,16384,32768,49152,65536,81920,98304,114688,131072,163840,196608,229376,262144,327680,393216,458752,523788}
 POST_CASES=${POST_CASES//,/ }
 
 : ${RUN_DATASET_DIAGNOSTICS:=1}
@@ -55,7 +55,7 @@ POST_CASES=${POST_CASES//,/ }
 : ${DIAG_NUM_POSTERIOR_SAMPLES:=5000}
 : ${REUSE_METRICS:=0}
 
-: ${GETDIST_N_TRAIN:=32768,65536,131072,262144,327680,393216,458752,524288}
+: ${GETDIST_N_TRAIN:=32768,65536,131072,262144,327680,393216,458752,523788}
 : ${GETDIST_NUM_POSTERIOR_SAMPLES:=100000}
 : ${GETDIST_REUSE_SAMPLES:=1}
 : ${GETDIST_FILLED_LAST_ONLY:=1}
@@ -63,6 +63,7 @@ POST_CASES=${POST_CASES//,/ }
 : ${TRUE_VS_MEAN_NUM_POSTERIOR_SAMPLES:=5000}
 : ${TRUE_VS_MEAN_N_TRAIN:=0}
 : ${SKIP_TRUE_VS_MEAN:=0}
+: ${ALLOW_TRAIN_EVAL_OVERLAP:=0}
 : ${POST_DPI:=300}
 : ${POST_DEVICE:=cpu}
 
@@ -121,6 +122,11 @@ else
   SKIP_TVM_ARG=
 fi
 
+ALLOW_OVERLAP_ARG=
+if [ "$ALLOW_TRAIN_EVAL_OVERLAP" = "1" ]; then
+  ALLOW_OVERLAP_ARG=--allow-train-eval-overlap
+fi
+
 echo "PBS job id: ${PBS_JOBID:-manual}"
 echo "Working directory: $WORK_DIR"
 echo "Project root: $PROJECT_ROOT"
@@ -134,6 +140,7 @@ echo "Cases: $POST_CASES"
 echo "Sizes: $POST_SIZES"
 echo "Run dataset diagnostics: $RUN_DATASET_DIAGNOSTICS"
 echo "Run GetDist/true-vs-mean: $RUN_GETDIST"
+echo "Allow train/eval overlap: $ALLOW_TRAIN_EVAL_OVERLAP"
 echo "Allocated CPUs: $ALLOCATED_CPUS"
 echo "POST_NUM_THREADS: $POST_NUM_THREADS"
 echo "OMP_NUM_THREADS: $OMP_NUM_THREADS"
@@ -157,7 +164,8 @@ if [ "$RUN_DATASET_DIAGNOSTICS" = "1" ]; then
     --device "$POST_DEVICE" \
     --allow-missing \
     --dpi "$POST_DPI" \
-    $REUSE_METRICS_ARG
+    $REUSE_METRICS_ARG \
+    $ALLOW_OVERLAP_ARG
 fi
 
 if [ "$RUN_GETDIST" = "1" ]; then
@@ -179,7 +187,8 @@ if [ "$RUN_GETDIST" = "1" ]; then
       --dpi "$POST_DPI" \
       $GETDIST_REUSE_ARG \
       $GETDIST_FILLED_ARG \
-      $SKIP_TVM_ARG
+      $SKIP_TVM_ARG \
+      $ALLOW_OVERLAP_ARG
   done
 fi
 

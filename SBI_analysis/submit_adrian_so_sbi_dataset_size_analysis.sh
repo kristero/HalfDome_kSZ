@@ -9,8 +9,8 @@ BASE_PBS="$SCRIPT_DIR/run_sbi_for_cluster.pbs"
 : "${ELL_MIN:=80}"
 : "${ELL_MAX:=7979}"
 : "${OBS_SOURCE:=dataset_row}"
-: "${LAST_N_TEST:=100}"
-: "${TRAIN_EXCLUDE_LAST_N:=0}"
+: "${LAST_N_TEST:=500}"
+: "${TRAIN_EXCLUDE_LAST_N:=$LAST_N_TEST}"
 : "${SBI_DATASET_SIZES_ALL:=256,512,1024,2048,4096,8192,16384,32768,49152,65536,81920,98304,114688,131072,163840,196608,229376,262144,327680,393216,458752,524288}"
 : "${SBI_NUM_GROUPS:=4}"
 : "${SUBMIT_MODE:=per_size}" # groups or per_size
@@ -99,12 +99,67 @@ else:
 PY
 )
 read -r -a CASE_ARRAY <<< "$CASE_LIST"
-read -r -a SIZE_ARRAY <<< "${SBI_DATASET_SIZES_ALL//,/ }"
 
 if [ "${#CASE_ARRAY[@]}" -eq 0 ]; then
   echo "No prepared cases found in $CASE_INDEX_JSON" >&2
   exit 2
 fi
+
+SBI_DATASET_SIZES_ALL=$("$PYTHON" - "$CASE_INDEX_JSON" "$CASE_LIST" "$SBI_DATASET_SIZES_ALL" "$TRAIN_EXCLUDE_LAST_N" <<'PY'
+import json
+import math
+import sys
+from pathlib import Path
+
+
+def parse_size(value):
+    raw = str(value).strip().lower().replace("_", "")
+    if not raw:
+        raise ValueError("empty dataset size")
+    if raw.endswith("k"):
+        number = float(raw[:-1]) * 1000.0
+    else:
+        number = float(raw)
+    rounded = int(round(number))
+    if rounded <= 0 or not math.isclose(number, rounded):
+        raise ValueError(f"dataset size must be a positive integer count: {value!r}")
+    return rounded
+
+
+index = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+cases = [part for part in sys.argv[2].split() if part]
+requested = [part for part in sys.argv[3].replace(";", ",").replace(" ", ",").split(",") if part]
+exclude_last_n = int(sys.argv[4])
+if exclude_last_n < 0:
+    raise SystemExit("TRAIN_EXCLUDE_LAST_N must be non-negative")
+rows = [int(index["cases"][case]["n_rows"]) for case in cases]
+max_train = min(rows) - exclude_last_n
+if max_train <= 0:
+    raise SystemExit(
+        f"TRAIN_EXCLUDE_LAST_N={exclude_last_n} leaves no training rows for cases={cases} with row counts={rows}"
+    )
+
+sizes = []
+adjusted = []
+for part in requested:
+    size = parse_size(part)
+    if size > max_train:
+        adjusted.append((size, max_train))
+        size = max_train
+    if size not in sizes:
+        sizes.append(size)
+
+if adjusted:
+    unique_adjusted = sorted(set(adjusted))
+    print(
+        "Adjusted oversized dataset sizes for the held-out diagnostic rows: "
+        + ", ".join(f"{old}->{new}" for old, new in unique_adjusted),
+        file=sys.stderr,
+    )
+print(",".join(str(size) for size in sizes))
+PY
+)
+read -r -a SIZE_ARRAY <<< "${SBI_DATASET_SIZES_ALL//,/ }"
 
 BALANCED_GROUP_ASSIGNMENTS=$("$PYTHON" - "$SBI_DATASET_SIZES_ALL" <<'PY'
 import math

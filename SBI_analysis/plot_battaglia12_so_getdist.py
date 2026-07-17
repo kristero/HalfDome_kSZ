@@ -111,16 +111,16 @@ def load_pickle(path: Path) -> Any:
 
 
 def load_posterior(run_dir: Path) -> Any:
-    posterior_path = run_dir / "posterior.pkl"
-    if posterior_path.is_file():
-        return load_pickle(posterior_path)
-
     inference_path = run_dir / "inference.pkl"
     density_path = run_dir / "density_estimator.pkl"
     if inference_path.is_file() and density_path.is_file():
         inference = load_pickle(inference_path)
         density_estimator = load_pickle(density_path)
         return inference.build_posterior(density_estimator)
+
+    posterior_path = run_dir / "posterior.pkl"
+    if posterior_path.is_file():
+        return load_pickle(posterior_path)
 
     raise FileNotFoundError(f"No posterior.pkl or inference.pkl+density_estimator.pkl found in {run_dir}")
 
@@ -309,15 +309,21 @@ def sample_posterior_at_x(posterior: Any, x_obs: np.ndarray, num_samples: int, d
     import torch
 
     x_t = torch.as_tensor(np.asarray(x_obs, dtype=np.float32), dtype=torch.float32, device=device)
+    posterior_x = posterior
+    if hasattr(posterior, "set_default_x"):
+        try:
+            maybe_posterior = posterior.set_default_x(x_t)
+            if maybe_posterior is not None:
+                posterior_x = maybe_posterior
+        except Exception:
+            posterior_x = posterior
+
     try:
-        samples = posterior.sample((int(num_samples),), x=x_t, show_progress_bars=False)
+        samples = posterior_x.sample((int(num_samples),), x=x_t, show_progress_bars=False)
     except TypeError:
         try:
-            samples = posterior.sample((int(num_samples),), x=x_t)
+            samples = posterior_x.sample((int(num_samples),), x=x_t)
         except TypeError:
-            posterior_x = posterior.set_default_x(x_t)
-            if posterior_x is None:
-                posterior_x = posterior
             try:
                 samples = posterior_x.sample((int(num_samples),), show_progress_bars=False)
             except TypeError:
@@ -469,6 +475,39 @@ def last_n_dataset_profiles(dataset_path: Path, last_n: int) -> tuple[np.ndarray
     )
 
 
+def train_eval_overlap(transform: dict[str, Any], eval_indices: np.ndarray) -> np.ndarray:
+    if "train_indices" not in transform:
+        return np.empty(0, dtype=np.int64)
+    train_indices = np.asarray(transform["train_indices"], dtype=np.int64).reshape(-1)
+    eval_indices = np.asarray(eval_indices, dtype=np.int64).reshape(-1)
+    if train_indices.size == 0 or eval_indices.size == 0:
+        return np.empty(0, dtype=np.int64)
+    return np.intersect1d(train_indices, eval_indices, assume_unique=False)
+
+
+def require_no_train_eval_overlap(
+    *,
+    transform: dict[str, Any],
+    eval_indices: np.ndarray,
+    run_dir: Path,
+    allow_overlap: bool,
+    diagnostic_name: str,
+) -> None:
+    overlap = train_eval_overlap(transform, eval_indices)
+    if overlap.size == 0:
+        return
+    message = (
+        f"{diagnostic_name} would evaluate {overlap.size} rows that were used for training in {run_dir}. "
+        f"Examples: {overlap[:10].tolist()}. Rerun training with SBI_EXCLUDE_LAST_N_FROM_TRAINING "
+        "at least as large as the diagnostic last-N value, or pass --allow-train-eval-overlap "
+        "only if you intentionally want an in-training diagnostic."
+    )
+    if allow_overlap:
+        print(f"Warning: {message}")
+    else:
+        raise ValueError(message)
+
+
 def compute_true_vs_mean_rows(
     *,
     posterior: Any,
@@ -598,7 +637,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--case-index-json", default="")
     parser.add_argument("--case", default="masked_no_noise")
-    parser.add_argument("--n-train", default="524288", help="One or more N values, comma or space separated.")
+    parser.add_argument("--n-train", default="523788", help="One or more N values, comma or space separated.")
     parser.add_argument(
         "--battaglia12-dir",
         default=str(root / "tSZ_visuals" / "outputs" / "so_noise_battaglia12_fiducial_local"),
@@ -621,6 +660,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--true-vs-mean-num-posterior-samples", type=int, default=5000)
     parser.add_argument("--true-vs-mean-progress-every", type=int, default=50)
+    parser.add_argument(
+        "--allow-train-eval-overlap",
+        action="store_true",
+        help="Allow true-vs-mean rows to overlap with train_indices saved in x_transform.npz.",
+    )
     parser.add_argument("--dpi", type=int, default=300)
     return parser.parse_args()
 
@@ -711,6 +755,13 @@ def main() -> int:
         )
         tvm_posterior = load_posterior(tvm_run_dir)
         tvm_transform = load_x_transform(tvm_run_dir)
+        require_no_train_eval_overlap(
+            transform=tvm_transform,
+            eval_indices=indices,
+            run_dir=tvm_run_dir,
+            allow_overlap=bool(args.allow_train_eval_overlap),
+            diagnostic_name="true-vs-mean",
+        )
         tvm_rows = compute_true_vs_mean_rows(
             posterior=tvm_posterior,
             x_values=x_last,

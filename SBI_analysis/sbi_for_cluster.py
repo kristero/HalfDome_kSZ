@@ -622,15 +622,21 @@ def train_one_size(
     training_output = training_stdout.getvalue()
     validation_losses = parse_validation_losses_from_training_output(training_output)
 
-    posterior = inference.build_posterior(density_estimator)
-    samples = sample_posterior(posterior, obs_t, args.num_posterior_samples)
+    posterior_for_sampling = inference.build_posterior(density_estimator)
+    samples = sample_posterior(posterior_for_sampling, obs_t, args.num_posterior_samples)
 
     posterior_save_path.parent.mkdir(parents=True, exist_ok=True)
     np.save(posterior_save_path, samples)
     print(f"Saved posterior samples to {posterior_save_path}")
 
+    try:
+        posterior_for_save = inference.build_posterior(density_estimator)
+    except Exception as exc:
+        print(f"Warning: could not rebuild clean posterior for saving: {exc!r}")
+        posterior_for_save = posterior_for_sampling
+
     save_pickle(output_dir / "density_estimator.pkl", density_estimator, "density estimator")
-    save_pickle(output_dir / "posterior.pkl", posterior, "posterior")
+    save_pickle(output_dir / "posterior.pkl", posterior_for_save, "posterior")
     maybe_save_pickle(output_dir / "inference.pkl", inference, "inference")
     maybe_save_pickle(output_dir / "prior.pkl", prior, "prior")
     if hasattr(density_estimator, "state_dict"):
@@ -668,7 +674,7 @@ def train_one_size(
     }
     write_json(output_dir / "run_metadata.json", metadata)
 
-    del theta_t, x_t, obs_t, inference, density_estimator, posterior
+    del theta_t, x_t, obs_t, inference, density_estimator, posterior_for_sampling, posterior_for_save
     gc.collect()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()

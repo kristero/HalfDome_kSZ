@@ -48,7 +48,7 @@ DEFAULT_DATASET_SIZES = [
     327680,
     393216,
     458752,
-    524288,
+    523788,
 ]
 
 PARAM_LABELS = {
@@ -189,15 +189,21 @@ def sample_posterior_at_x(posterior: Any, x_obs: np.ndarray, num_samples: int, d
     import torch
 
     x_t = torch.as_tensor(np.asarray(x_obs, dtype=np.float32), dtype=torch.float32, device=device)
+    posterior_x = posterior
+    if hasattr(posterior, "set_default_x"):
+        try:
+            maybe_posterior = posterior.set_default_x(x_t)
+            if maybe_posterior is not None:
+                posterior_x = maybe_posterior
+        except Exception:
+            posterior_x = posterior
+
     try:
-        samples = posterior.sample((int(num_samples),), x=x_t, show_progress_bars=False)
+        samples = posterior_x.sample((int(num_samples),), x=x_t, show_progress_bars=False)
     except TypeError:
         try:
-            samples = posterior.sample((int(num_samples),), x=x_t)
+            samples = posterior_x.sample((int(num_samples),), x=x_t)
         except TypeError:
-            posterior_x = posterior.set_default_x(x_t)
-            if posterior_x is None:
-                posterior_x = posterior
             try:
                 samples = posterior_x.sample((int(num_samples),), show_progress_bars=False)
             except TypeError:
@@ -349,7 +355,7 @@ def evaluation_set_from_dataset(
     data: Any,
     analysis_target: str,
     last_n_test: int,
-) -> tuple[np.ndarray, np.ndarray, list[str], str]:
+) -> tuple[np.ndarray, np.ndarray, list[str], str, np.ndarray | None]:
     theta = np.asarray(data["theta"], dtype=np.float64)
     x = np.asarray(data["x"], dtype=np.float32)
 
@@ -357,23 +363,28 @@ def evaluation_set_from_dataset(
         if "obs" not in data.files or "obs_theta" not in data.files:
             raise KeyError("analysis-target=obs requires obs and obs_theta in the case dataset.")
         obs_source = scalar_string(data["obs_source"], "obs") if "obs_source" in data.files else "obs"
+        obs_index = None
+        if "obs_index" in data.files:
+            obs_index = np.asarray([int(np.asarray(data["obs_index"]).reshape(()))], dtype=np.int64)
         return (
             np.asarray(data["obs"], dtype=np.float32).reshape(1, -1),
             np.asarray(data["obs_theta"], dtype=np.float64).reshape(1, -1),
             [obs_source],
             obs_source,
+            obs_index,
         )
 
     if analysis_target != "last_n":
         raise ValueError(f"Unsupported analysis_target={analysis_target!r}")
 
-    if "test_indices" in data.files and np.asarray(data["test_indices"]).size:
+    if int(last_n_test) > 0:
+        if int(last_n_test) > theta.shape[0]:
+            raise ValueError(f"last_n_test={last_n_test} exceeds dataset rows={theta.shape[0]}")
+        test_indices = np.arange(theta.shape[0] - int(last_n_test), theta.shape[0], dtype=np.int64)
+    elif "test_indices" in data.files and np.asarray(data["test_indices"]).size:
         test_indices = np.asarray(data["test_indices"], dtype=np.int64)
     else:
-        test_indices = np.arange(theta.shape[0] - int(last_n_test), theta.shape[0], dtype=np.int64)
-
-    if int(last_n_test) > 0:
-        test_indices = test_indices[-int(last_n_test) :]
+        raise ValueError("analysis-target=last_n requires --last-n-test > 0 or non-empty test_indices in the dataset")
     if test_indices.size == 0:
         raise ValueError("No test indices available for analysis-target=last_n")
 
@@ -382,7 +393,43 @@ def evaluation_set_from_dataset(
         np.asarray(theta[test_indices], dtype=np.float64),
         [str(int(idx)) for idx in test_indices],
         f"last{int(test_indices.size)}",
+        test_indices,
     )
+
+
+def train_eval_overlap(transform: dict[str, Any], eval_indices: np.ndarray | None) -> np.ndarray:
+    if eval_indices is None or "train_indices" not in transform:
+        return np.empty(0, dtype=np.int64)
+    train_indices = np.asarray(transform["train_indices"], dtype=np.int64).reshape(-1)
+    eval_indices = np.asarray(eval_indices, dtype=np.int64).reshape(-1)
+    if train_indices.size == 0 or eval_indices.size == 0:
+        return np.empty(0, dtype=np.int64)
+    return np.intersect1d(train_indices, eval_indices, assume_unique=False)
+
+
+def require_no_train_eval_overlap(
+    *,
+    transform: dict[str, Any],
+    eval_indices: np.ndarray | None,
+    run_dir: Path,
+    allow_overlap: bool,
+    analysis_target: str,
+) -> None:
+    if analysis_target != "last_n":
+        return
+    overlap = train_eval_overlap(transform, eval_indices)
+    if overlap.size == 0:
+        return
+    message = (
+        f"analysis-target=last_n would evaluate {overlap.size} rows that were used for training in {run_dir}. "
+        f"Examples: {overlap[:10].tolist()}. Rerun training with SBI_EXCLUDE_LAST_N_FROM_TRAINING "
+        "at least as large as --last-n-test, or pass --allow-train-eval-overlap only for an "
+        "intentional in-training diagnostic."
+    )
+    if allow_overlap:
+        print(f"Warning: {message}")
+    else:
+        raise ValueError(message)
 
 
 def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
@@ -401,7 +448,7 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
             param_names = [str(v) for v in data["param_names"]]
             prior_low = np.asarray(data["prior_low"], dtype=np.float64)
             prior_high = np.asarray(data["prior_high"], dtype=np.float64)
-            x_eval, theta_eval, eval_labels, eval_tag = evaluation_set_from_dataset(
+            x_eval, theta_eval, eval_labels, eval_tag, eval_indices = evaluation_set_from_dataset(
                 data,
                 args.analysis_target,
                 args.last_n_test,
@@ -417,6 +464,13 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
             x_transform = load_x_transform(run_dir)
             x_rescale_mode = str(x_transform.get("mode", "none"))
             print(f"    x rescale mode: {x_rescale_mode}")
+            require_no_train_eval_overlap(
+                transform=x_transform,
+                eval_indices=eval_indices,
+                run_dir=run_dir,
+                allow_overlap=bool(args.allow_train_eval_overlap),
+                analysis_target=args.analysis_target,
+            )
 
             for eval_idx, eval_label in enumerate(eval_labels):
                 x_condition = apply_x_transform(x_eval[eval_idx], x_transform)
@@ -841,6 +895,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-posterior-samples", type=int, default=50000)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--allow-missing", action="store_true")
+    parser.add_argument(
+        "--allow-train-eval-overlap",
+        action="store_true",
+        help="Allow last-N diagnostic rows to overlap with train_indices saved in x_transform.npz.",
+    )
     parser.add_argument("--reuse-metrics", action="store_true", help="Read existing CSV metrics instead of resampling posteriors.")
     parser.add_argument("--usetex", action="store_true", help="Use external LaTeX for matplotlib text if available.")
     parser.add_argument("--dpi", type=int, default=300)

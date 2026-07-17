@@ -274,6 +274,109 @@ def battaglia12_obs_from_case_dataset(
     return np.ascontiguousarray(obs, dtype=np.float32), theta_true, param_names, str(battaglia_profile_path)
 
 
+def plot_dell_density_with_reference(
+    *,
+    dataset_path: Path,
+    reference_dell: np.ndarray,
+    output_path: Path,
+    title: str,
+    max_rows: int,
+    n_y_bins: int,
+    percentile_range: tuple[float, float],
+    dpi: int,
+) -> None:
+    from matplotlib.colors import LogNorm
+
+    with np.load(dataset_path, allow_pickle=True) as data:
+        x = np.asarray(data["x"], dtype=np.float32)
+        ell = np.asarray(data["ell"], dtype=np.float32) if "ell" in data.files else np.arange(x.shape[1], dtype=np.float32)
+
+    if x.ndim != 2:
+        raise ValueError(f"Expected dataset x to be 2D, got {x.shape} in {dataset_path}")
+    if ell.size != x.shape[1]:
+        raise ValueError(f"ell length {ell.size} does not match x dimension {x.shape[1]} in {dataset_path}")
+
+    if int(max_rows) > 0 and int(max_rows) < x.shape[0]:
+        rng = np.random.default_rng(12345)
+        row_idx = np.sort(rng.choice(x.shape[0], size=int(max_rows), replace=False))
+        x_plot = np.asarray(x[row_idx], dtype=np.float32)
+    else:
+        x_plot = x
+
+    reference_dell = np.asarray(reference_dell, dtype=np.float32).reshape(-1)
+    if reference_dell.size != x.shape[1]:
+        raise ValueError(f"Reference D_ell length {reference_dell.size} does not match x dimension {x.shape[1]}")
+
+    finite_values = x_plot[np.isfinite(x_plot)]
+    if finite_values.size == 0:
+        raise ValueError(f"No finite D_ell values found in {dataset_path}")
+
+    p_low, p_high = percentile_range
+    y_low, y_high = np.nanpercentile(finite_values, [float(p_low), float(p_high)])
+    ref_finite = reference_dell[np.isfinite(reference_dell)]
+    if ref_finite.size:
+        y_low = min(float(y_low), float(np.nanmin(ref_finite)))
+        y_high = max(float(y_high), float(np.nanmax(ref_finite)))
+    if not np.isfinite(y_low) or not np.isfinite(y_high) or y_low == y_high:
+        center = 0.0 if not np.isfinite(y_low) else float(y_low)
+        pad = max(abs(center), 1.0) * 0.1
+        y_low = center - pad
+        y_high = center + pad
+
+    y_edges = np.linspace(float(y_low), float(y_high), int(n_y_bins) + 1, dtype=np.float64)
+    density = np.zeros((int(n_y_bins), x.shape[1]), dtype=np.float64)
+    for i in range(x.shape[1]):
+        vals = np.asarray(x_plot[:, i], dtype=np.float64)
+        vals = vals[np.isfinite(vals)]
+        if vals.size == 0:
+            continue
+        hist, _ = np.histogram(vals, bins=y_edges, density=True)
+        density[:, i] = hist
+
+    nonzero = density[density > 0.0]
+    if nonzero.size:
+        vmin = max(float(np.nanpercentile(nonzero, 1.0)), np.finfo(float).tiny)
+        vmax = float(np.nanpercentile(nonzero, 99.5))
+        norm = LogNorm(vmin=vmin, vmax=max(vmax, vmin * 1.01))
+    else:
+        norm = None
+
+    plt.rcParams.update(
+        {
+            "font.family": "serif",
+            "font.size": 8,
+            "axes.labelsize": 8,
+            "xtick.labelsize": 7,
+            "ytick.labelsize": 7,
+            "legend.fontsize": 7,
+            "savefig.bbox": "tight",
+        }
+    )
+
+    fig, ax = plt.subplots(figsize=(8.8 / 2.54, 6.2 / 2.54))
+    mesh = ax.pcolormesh(
+        ell,
+        y_edges,
+        density,
+        shading="auto",
+        cmap="magma",
+        norm=norm,
+    )
+    ax.plot(ell, reference_dell, color="cyan", lw=1.15, label="Battaglia12", zorder=3)
+    ax.set_xlabel(r"$\ell$")
+    ax.set_ylabel(r"$D_\ell$")
+    ax.set_title(title, pad=2.0)
+    ax.grid(True, alpha=0.18, lw=0.4)
+    ax.legend(frameon=False, loc="best")
+    colorbar = fig.colorbar(mesh, ax=ax, pad=0.02)
+    colorbar.set_label(r"Density")
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=int(dpi))
+    plt.close(fig)
+    print(f"Saved {output_path}")
+
+
 def load_x_transform(run_dir: Path) -> dict[str, Any]:
     path = run_dir / "x_transform.npz"
     if not path.is_file():
@@ -550,18 +653,63 @@ def compute_true_vs_mean_rows(
     return rows
 
 
+def compute_true_vs_mean_reference_rows(
+    *,
+    posterior: Any,
+    x_obs: np.ndarray,
+    theta_true: np.ndarray,
+    param_names: list[str],
+    transform: dict[str, Any],
+    num_samples: int,
+    device: str,
+    case: str,
+    n_train: int,
+    reference_label: str,
+) -> list[dict[str, Any]]:
+    print(f"  true-vs-mean reference: {reference_label}")
+    x_condition = apply_x_transform(x_obs, transform)
+    samples = sample_posterior_at_x(posterior, x_condition, int(num_samples), device)
+    n_params = min(samples.shape[1], theta_true.size, len(param_names))
+    mean = np.nanmean(samples[:, :n_params], axis=0)
+    std = np.nanstd(samples[:, :n_params], axis=0, ddof=1)
+    truth = np.asarray(theta_true[:n_params], dtype=float)
+
+    rows: list[dict[str, Any]] = []
+    for j in range(n_params):
+        rows.append(
+            {
+                "case": case,
+                "n_train": int(n_train),
+                "dataset_index": reference_label,
+                "reference_label": reference_label,
+                "is_reference": 1,
+                "param": param_names[j],
+                "param_index": int(j),
+                "theta_true": float(truth[j]),
+                "posterior_mean": float(mean[j]),
+                "posterior_std": float(std[j]),
+                "error": float(mean[j] - truth[j]),
+                "num_posterior_samples": int(samples.shape[0]),
+            }
+        )
+    return rows
+
+
 def plot_true_vs_mean_rows(
     rows: list[dict[str, Any]],
     param_names: list[str],
     output_path: Path,
     title: str,
     dpi: int,
+    reference_rows: list[dict[str, Any]] | None = None,
 ) -> None:
     if not rows:
         print(f"No rows for true-vs-mean plot: {output_path}")
         return
 
-    n_params = min(len(param_names), max(int(row["param_index"]) for row in rows) + 1)
+    reference_rows = reference_rows or []
+    all_rows = rows + reference_rows
+    n_params = min(len(param_names), max(int(row["param_index"]) for row in all_rows) + 1)
     n_cols = 3
     n_rows = int(np.ceil(n_params / n_cols))
     fig, axes = plt.subplots(n_rows, n_cols, figsize=(18.0 / 2.54, max(6.0, 5.4 * n_rows) / 2.54))
@@ -578,13 +726,26 @@ def plot_true_vs_mean_rows(
         mean = mean[finite]
         std = std[finite]
         param = param_names[j]
+        ref_sub = [row for row in reference_rows if int(row["param_index"]) == j]
+        ref_true = np.asarray([float(row["theta_true"]) for row in ref_sub], dtype=float)
+        ref_mean = np.asarray([float(row["posterior_mean"]) for row in ref_sub], dtype=float)
+        ref_std = np.asarray([float(row["posterior_std"]) for row in ref_sub], dtype=float)
+        ref_finite = np.isfinite(ref_true) & np.isfinite(ref_mean)
+        ref_true = ref_true[ref_finite]
+        ref_mean = ref_mean[ref_finite]
+        ref_std = ref_std[ref_finite]
 
-        if true.size == 0:
+        if true.size == 0 and ref_true.size == 0:
             ax.axis("off")
             continue
 
-        lo = float(np.nanmin(np.concatenate([true, mean])))
-        hi = float(np.nanmax(np.concatenate([true, mean])))
+        limits_payload = []
+        if true.size:
+            limits_payload.extend([true, mean])
+        if ref_true.size:
+            limits_payload.extend([ref_true, ref_mean])
+        lo = float(np.nanmin(np.concatenate(limits_payload)))
+        hi = float(np.nanmax(np.concatenate(limits_payload)))
         pad = 0.06 * (hi - lo) if hi > lo else 0.1 * max(abs(hi), 1.0)
         lo -= pad
         hi += pad
@@ -603,6 +764,31 @@ def plot_true_vs_mean_rows(
                 zorder=1,
             )
         ax.scatter(true, mean, s=10, alpha=0.62, color="#1f77b4", edgecolor="none", zorder=2)
+        if ref_true.size:
+            ref_finite_std = np.isfinite(ref_std) & (ref_std > 0.0)
+            if np.any(ref_finite_std):
+                ax.errorbar(
+                    ref_true[ref_finite_std],
+                    ref_mean[ref_finite_std],
+                    yerr=ref_std[ref_finite_std],
+                    fmt="none",
+                    ecolor="#d62728",
+                    alpha=0.65,
+                    elinewidth=0.75,
+                    capsize=1.8,
+                    zorder=4,
+                )
+            ax.scatter(
+                ref_true,
+                ref_mean,
+                s=28,
+                marker="D",
+                color="#d62728",
+                edgecolor="black",
+                linewidth=0.35,
+                label="Battaglia12" if j == 0 else None,
+                zorder=5,
+            )
         ax.plot([lo, hi], [lo, hi], color="black", lw=0.8, ls=":", zorder=3)
         ax.set_xlim(lo, hi)
         ax.set_ylim(lo, hi)
@@ -610,6 +796,8 @@ def plot_true_vs_mean_rows(
         ax.set_xlabel(r"True")
         ax.set_ylabel(r"Posterior mean")
         ax.grid(True, alpha=0.25, lw=0.5)
+        if j == 0 and ref_true.size:
+            ax.legend(frameon=False, loc="best", fontsize=6.5)
 
     for ax in axes[n_params:]:
         ax.axis("off")
@@ -650,6 +838,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-name", default="")
     parser.add_argument("--reuse-samples", action="store_true")
     parser.add_argument("--filled-last-only", action="store_true")
+    parser.add_argument("--skip-dell-density", action="store_true")
+    parser.add_argument("--only-dell-density", action="store_true")
+    parser.add_argument("--dell-density-max-rows", type=int, default=0, help="Rows to use for D_ell density; 0 uses all rows.")
+    parser.add_argument("--dell-density-y-bins", type=int, default=220)
+    parser.add_argument("--dell-density-percentile-low", type=float, default=0.5)
+    parser.add_argument("--dell-density-percentile-high", type=float, default=99.5)
     parser.add_argument("--skip-true-vs-mean", action="store_true")
     parser.add_argument("--true-vs-mean-last-n", type=int, default=500)
     parser.add_argument(
@@ -660,6 +854,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--true-vs-mean-num-posterior-samples", type=int, default=5000)
     parser.add_argument("--true-vs-mean-progress-every", type=int, default=50)
+    parser.add_argument(
+        "--skip-battaglia12-true-vs-mean-reference",
+        action="store_true",
+        help="Do not add the Battaglia12 observation as a red reference point in the true-vs-mean plot.",
+    )
     parser.add_argument(
         "--allow-train-eval-overlap",
         action="store_true",
@@ -696,6 +895,23 @@ def main() -> int:
     print(f"Battaglia12 obs source: {obs_source}")
     print(f"obs shape: {obs.shape}")
     print(f"truth: {theta_true}")
+
+    if not args.skip_dell_density:
+        plot_dell_density_with_reference(
+            dataset_path=dataset_path,
+            reference_dell=obs,
+            output_path=output_dir / f"{args.case}_dell_density_battaglia12_reference.jpg",
+            title=rf"{args.case}: $D_\ell$ density",
+            max_rows=int(args.dell_density_max_rows),
+            n_y_bins=int(args.dell_density_y_bins),
+            percentile_range=(
+                float(args.dell_density_percentile_low),
+                float(args.dell_density_percentile_high),
+            ),
+            dpi=int(args.dpi),
+        )
+    if args.only_dell_density:
+        return 0
 
     sample_sets = []
     for n_train in n_values:
@@ -775,13 +991,29 @@ def main() -> int:
             n_train=int(tvm_n_train),
             progress_every=int(args.true_vs_mean_progress_every),
         )
+        tvm_reference_rows: list[dict[str, Any]] = []
+        if not args.skip_battaglia12_true_vs_mean_reference:
+            tvm_reference_rows = compute_true_vs_mean_reference_rows(
+                posterior=tvm_posterior,
+                x_obs=obs,
+                theta_true=theta_true,
+                param_names=tvm_param_names,
+                transform=tvm_transform,
+                num_samples=int(args.true_vs_mean_num_posterior_samples),
+                device=args.device,
+                case=args.case,
+                n_train=int(tvm_n_train),
+                reference_label="Battaglia12",
+            )
         write_csv(
             tvm_csv,
-            tvm_rows,
+            tvm_rows + tvm_reference_rows,
             [
                 "case",
                 "n_train",
                 "dataset_index",
+                "reference_label",
+                "is_reference",
                 "param",
                 "param_index",
                 "theta_true",
@@ -797,6 +1029,7 @@ def main() -> int:
             tvm_plot,
             title=rf"{args.case}, $N={int(tvm_n_train):,}$, last {int(args.true_vs_mean_last_n)} profiles",
             dpi=int(args.dpi),
+            reference_rows=tvm_reference_rows,
         )
     return 0
 

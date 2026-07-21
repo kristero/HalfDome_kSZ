@@ -34,12 +34,14 @@ fi
 : ${ELL_SELECTION:=center}
 : ${BIN_WEIGHTING:=2ell_plus_1}
 : ${OBS_INDEX:=-1}
-: ${LAST_N_TEST:=100}
+: ${LAST_N_TEST:=500}
 : ${CHUNK_ROWS:=2048}
 : ${MAX_ROWS:=0}
 : ${NO_COMPRESS:=1}
 : ${ALLOW_MISSING_PRODUCTS:=1}
-: ${SBI_CASES:=unmasked_no_noise,masked_no_noise,masked_baseline_noise_cross_deproj0,masked_baseline_noise_cross_deproj2,masked_goal_noise_cross_deproj0,masked_goal_noise_cross_deproj2}
+: ${ALLOW_SOBOL_IDENTITY_FALLBACK:=0}
+: ${CASE_DATASET_TAG:=dataset_row_sobolrow}
+: ${SBI_CASES:=masked_no_noise,masked_baseline_noise_cross_deproj0}
 
 ELL_TAG=$("$PYTHON" - "$ELL_MIN" "$ELL_MAX" <<'PY'
 import sys
@@ -53,7 +55,7 @@ print(f"ell{fmt(sys.argv[1])}_{fmt(sys.argv[2])}")
 PY
 )
 
-: ${CASE_DATASET_DIR:=$PROJECT_ROOT/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_${ELL_TAG}_dataset_row}
+: ${CASE_DATASET_DIR:=$PROJECT_ROOT/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_${ELL_TAG}_${CASE_DATASET_TAG}}
 
 if [ -f "$PROJECT_ROOT/SBI_analysis/prepare_adrian_so_sbi_case_datasets.py" ]; then
   SCRIPT=$PROJECT_ROOT/SBI_analysis/prepare_adrian_so_sbi_case_datasets.py
@@ -78,6 +80,11 @@ fi
 ALLOW_MISSING_ARG=
 if [ "$ALLOW_MISSING_PRODUCTS" = "1" ]; then
   ALLOW_MISSING_ARG=--allow-missing
+fi
+
+ALLOW_SOBOL_IDENTITY_ARG=
+if [ "$ALLOW_SOBOL_IDENTITY_FALLBACK" = "1" ]; then
+  ALLOW_SOBOL_IDENTITY_ARG=--allow-sobol-identity-fallback
 fi
 
 METADATA_ARG=
@@ -118,6 +125,8 @@ echo "chunk rows: $CHUNK_ROWS"
 echo "max rows: $MAX_ROWS"
 echo "no compress: $NO_COMPRESS"
 echo "allow missing products: $ALLOW_MISSING_PRODUCTS"
+echo "allow Sobol identity fallback: $ALLOW_SOBOL_IDENTITY_FALLBACK"
+echo "case dataset tag: $CASE_DATASET_TAG"
 
 "$PYTHON" "$SCRIPT" \
   --input-dir "$ADRIAN_DATASET_DIR" \
@@ -138,7 +147,8 @@ echo "allow missing products: $ALLOW_MISSING_PRODUCTS"
   --chunk-rows "$CHUNK_ROWS" \
   --max-rows "$MAX_ROWS" \
   $NO_COMPRESS_ARG \
-  $ALLOW_MISSING_ARG
+  $ALLOW_MISSING_ARG \
+  $ALLOW_SOBOL_IDENTITY_ARG
 
 echo "Finished at $(date -Is)"
 echo "Prepared case datasets: $CASE_DATASET_DIR"

@@ -817,11 +817,11 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--run-root",
-        default=str(root / "SBI_analysis" / "outputs" / "cluster_outputs" / "SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_asinh"),
+        default=str(root / "SBI_analysis" / "outputs" / "cluster_outputs" / "SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_sobolrow_asinh"),
     )
     parser.add_argument(
         "--case-dataset-dir",
-        default=str(root / "SBI_analysis" / "data_for_cluster" / "adrian_so_sbi_cases_ell80_7979_dataset_row"),
+        default=str(root / "SBI_analysis" / "data_for_cluster" / "adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow"),
     )
     parser.add_argument("--case-index-json", default="")
     parser.add_argument("--case", default="masked_no_noise")

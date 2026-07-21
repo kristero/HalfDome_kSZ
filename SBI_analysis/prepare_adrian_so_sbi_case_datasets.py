@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from pathlib import Path
 from typing import Any
@@ -223,6 +224,138 @@ def product_metadata_path(
     return None
 
 
+def product_metadata_csv_path(input_dir: Path, product: str, metadata_dir: Path | None) -> Path | None:
+    candidates: list[Path] = []
+    if metadata_dir is not None:
+        candidates.append(metadata_dir / f"sbi_{product}_metadata.csv")
+    candidates.append(input_dir / f"sbi_{product}_metadata.csv")
+    for path in candidates:
+        if path.is_file():
+            return path
+    return None
+
+
+def sobol_csv_columns(path: Path) -> dict[str, int]:
+    with path.open("r", encoding="utf-8") as handle:
+        header = handle.readline().strip().split(",")
+    col_to_idx = {name: idx for idx, name in enumerate(header)}
+    missing = [str(name) for name in PARAM_NAMES if str(name) not in col_to_idx]
+    if missing:
+        raise KeyError(f"Sobol CSV {path} is missing columns {missing}; header={header}")
+    return col_to_idx
+
+
+def load_sobol_theta_for_global_rows(path: Path, sobol_global_row: np.ndarray) -> np.ndarray:
+    if not path.is_file():
+        raise FileNotFoundError(f"Sobol CSV not found: {path}")
+    rows = np.asarray(sobol_global_row, dtype=np.int64).reshape(-1)
+    if rows.size == 0:
+        raise ValueError("Cannot load Sobol theta for empty sobol_global_row")
+    if np.any(rows <= 0):
+        raise ValueError("sobol_global_row must be 1-based positive row numbers")
+
+    col_to_idx = sobol_csv_columns(path)
+    max_row = int(np.max(rows))
+    theta_table = np.loadtxt(
+        path,
+        delimiter=",",
+        skiprows=1,
+        max_rows=max_row,
+        usecols=[col_to_idx[str(name)] for name in PARAM_NAMES],
+        dtype=np.float32,
+    )
+    theta_table = np.asarray(theta_table, dtype=np.float32)
+    if theta_table.ndim == 1:
+        theta_table = theta_table.reshape(1, -1)
+    if theta_table.shape[0] < max_row:
+        raise ValueError(f"Sobol CSV {path} has only {theta_table.shape[0]} rows, need row {max_row}")
+    return np.ascontiguousarray(theta_table[rows - 1], dtype=np.float32)
+
+
+def read_metadata_csv(
+    path: Path,
+    n_rows: int,
+    n_ell: int,
+    ell_start: int,
+    ell_stop: int,
+    sobol_csv: Path | None,
+) -> dict[str, Any]:
+    if not path.is_file():
+        raise FileNotFoundError(f"Metadata CSV not found: {path}")
+
+    rows: list[dict[str, str]] = []
+    with path.open("r", newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        fieldnames = list(reader.fieldnames or [])
+        for idx, row in enumerate(reader):
+            if idx >= int(n_rows):
+                break
+            rows.append(row)
+
+    if len(rows) != int(n_rows):
+        raise ValueError(f"Metadata CSV {path} has {len(rows)} rows, expected {n_rows}")
+
+    theta_columns_present = all(str(name) in fieldnames for name in PARAM_NAMES)
+    row_col = next(
+        (
+            name
+            for name in (
+                "sobol_global_row",
+                "Sobol_global_row",
+                "sobol_row",
+                "global_row",
+                "row",
+            )
+            if name in fieldnames
+        ),
+        None,
+    )
+
+    sobol_global_row = (
+        np.asarray([int(float(row[row_col])) for row in rows], dtype=np.int64)
+        if row_col is not None
+        else np.arange(1, int(n_rows) + 1, dtype=np.int64)
+    )
+
+    if theta_columns_present:
+        theta = np.asarray(
+            [[float(row[str(name)]) for name in PARAM_NAMES] for row in rows],
+            dtype=np.float32,
+        )
+        theta_source = "metadata_csv_theta_columns"
+    elif sobol_csv is not None and row_col is not None:
+        theta = load_sobol_theta_for_global_rows(sobol_csv, sobol_global_row)
+        theta_source = "metadata_csv_sobol_global_row_plus_sobol_csv"
+    else:
+        raise KeyError(
+            f"Metadata CSV {path} does not contain all theta columns {PARAM_NAMES.tolist()}. "
+            "Pass --sobol-csv and make sure the CSV contains sobol_global_row."
+        )
+
+    ell = np.arange(int(ell_start), int(ell_stop) + 1, dtype=np.float32)
+    if ell.size != int(n_ell):
+        raise ValueError(
+            f"Fallback ell range {ell_start}..{ell_stop} has {ell.size} values, "
+            f"but C_ell arrays have {n_ell} columns."
+        )
+
+    prior_low = np.asarray([SOBOL_PRIOR_BOUNDS[str(name)][0] for name in PARAM_NAMES], dtype=np.float32)
+    prior_high = np.asarray([SOBOL_PRIOR_BOUNDS[str(name)][1] for name in PARAM_NAMES], dtype=np.float32)
+    return {
+        "theta": np.ascontiguousarray(theta, dtype=np.float32),
+        "ell_unbinned": np.ascontiguousarray(ell, dtype=np.float32),
+        "param_names": np.ascontiguousarray(PARAM_NAMES, dtype=str),
+        "theta_columns": np.ascontiguousarray(PARAM_NAMES, dtype=str),
+        "prior_low": prior_low,
+        "prior_high": prior_high,
+        "sobol_global_row": np.ascontiguousarray(sobol_global_row, dtype=np.int64),
+        "metadata_path": "",
+        "metadata_csv_path": str(path),
+        "sobol_csv_path": str(sobol_csv) if sobol_csv is not None else "",
+        "theta_source": theta_source,
+    }
+
+
 def read_sobol_csv_metadata(
     path: Path,
     n_rows: int,
@@ -235,12 +368,7 @@ def read_sobol_csv_metadata(
     if int(n_rows) <= 0:
         raise ValueError(f"n_rows must be positive, got {n_rows}")
 
-    with path.open("r", encoding="utf-8") as handle:
-        header = handle.readline().strip().split(",")
-    col_to_idx = {name: idx for idx, name in enumerate(header)}
-    missing = [str(name) for name in PARAM_NAMES if str(name) not in col_to_idx]
-    if missing:
-        raise KeyError(f"Sobol CSV {path} is missing columns {missing}; header={header}")
+    col_to_idx = sobol_csv_columns(path)
 
     theta = np.loadtxt(
         path,
@@ -274,7 +402,9 @@ def read_sobol_csv_metadata(
         "prior_high": prior_high,
         "sobol_global_row": np.arange(1, int(n_rows) + 1, dtype=np.int64),
         "metadata_path": "",
+        "metadata_csv_path": "",
         "sobol_csv_path": str(path),
+        "theta_source": "sobol_csv_identity_row_order",
     }
 
 
@@ -323,6 +453,9 @@ def read_metadata(path: Path, theta_path: Path | None) -> dict[str, Any]:
         "prior_high": np.ascontiguousarray(prior_high, dtype=np.float32),
         "sobol_global_row": sobol_global_row,
         "metadata_path": str(path),
+        "metadata_csv_path": "",
+        "sobol_csv_path": "",
+        "theta_source": "metadata_npz_theta",
     }
 
 
@@ -367,6 +500,14 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Fallback CSV containing the 9 Battaglia theta columns. Used when metadata NPZ files are absent; "
             "only the rows needed to match the C_ell file are read."
+        ),
+    )
+    parser.add_argument(
+        "--allow-sobol-identity-fallback",
+        action="store_true",
+        help=(
+            "Allow the unsafe fallback theta[i] = Sobol CSV row i when no metadata NPZ/CSV is present. "
+            "Do not use this for Adrian consolidated files unless sobol_global_row[i] == i + 1 has been verified."
         ),
     )
     parser.add_argument("--ell-start", type=int, default=80, help="Fallback first unbinned ell when using --sobol-csv.")
@@ -453,14 +594,29 @@ def main() -> int:
 
         n_rows = min(int(args.max_rows), cl_n_rows) if int(args.max_rows) > 0 else cl_n_rows
         metadata_path = product_metadata_path(input_dir, product, metadata_npz, metadata_dir)
+        metadata_csv_path = product_metadata_csv_path(input_dir, product, metadata_dir)
         if metadata_path is not None:
             metadata = read_metadata(metadata_path, theta_path)
-        elif sobol_csv is not None:
+        elif metadata_csv_path is not None:
+            print(
+                f"No metadata NPZ found for {product}; using metadata CSV {metadata_csv_path} "
+                "for theta/sobol_global_row."
+            )
+            metadata = read_metadata_csv(
+                metadata_csv_path,
+                n_rows=n_rows,
+                n_ell=cl_n_ell,
+                ell_start=int(args.ell_start),
+                ell_stop=int(args.ell_stop),
+                sobol_csv=sobol_csv,
+            )
+        elif sobol_csv is not None and args.allow_sobol_identity_fallback:
             cache_key = (n_rows, cl_n_ell)
             if cache_key not in fallback_metadata_cache:
                 print(
                     f"No metadata NPZ found for {product}; using Sobol CSV {sobol_csv} "
-                    f"and fallback ell={args.ell_start}..{args.ell_stop}."
+                    f"and fallback ell={args.ell_start}..{args.ell_stop}. "
+                    "This assumes C_ell row i corresponds to Sobol CSV row i."
                 )
                 fallback_metadata_cache[cache_key] = read_sobol_csv_metadata(
                     sobol_csv,
@@ -473,8 +629,11 @@ def main() -> int:
         else:
             raise FileNotFoundError(
                 f"Could not find metadata NPZ for product={product!r}. Expected "
-                f"{input_dir / f'sbi_{product}.npz'} or pass --metadata-npz / --metadata-dir. "
-                "Since you only have *_cl.npy files, pass --sobol-csv /home/kristero10/tSZ_data/battaglia_sobol_1048576.csv."
+                f"{input_dir / f'sbi_{product}.npz'} or metadata CSV "
+                f"{input_dir / f'sbi_{product}_metadata.csv'}. "
+                "Pass --metadata-npz / --metadata-dir. The old Sobol CSV identity-row fallback is disabled "
+                "by default because Adrian's consolidated arrays are filesystem-scan ordered; use "
+                "--allow-sobol-identity-fallback only after verifying sobol_global_row[i] == i + 1."
             )
 
         if reference_metadata is None:
@@ -510,8 +669,10 @@ def main() -> int:
         print(f"Preparing product: {product}")
         print(f"  C_ell path: {cl_path}")
         print(f"  metadata: {metadata_path if metadata_path is not None else 'none'}")
+        print(f"  metadata CSV: {metadata_csv_path if metadata_csv_path is not None else 'none'}")
         if metadata_path is None and sobol_csv is not None:
             print(f"  Sobol CSV: {sobol_csv}")
+        print(f"  theta source: {metadata.get('theta_source', 'unknown')}")
         print(f"  rows: {n_rows}")
         print(f"  unbinned ell: {ell_unbinned.size}")
         print(f"  selected bins: {selected.size}")
@@ -541,7 +702,9 @@ def main() -> int:
             "product": product,
             "source_cl_path": str(cl_path),
             "source_metadata_path": str(metadata_path) if metadata_path is not None else "",
+            "source_metadata_csv_path": str(metadata_csv_path) if metadata_csv_path is not None else "",
             "source_sobol_csv_path": str(sobol_csv) if metadata_path is None and sobol_csv is not None else "",
+            "theta_source": metadata.get("theta_source", "unknown"),
             "n_rows": n_rows,
             "n_ell_unbinned": int(ell_unbinned.size),
             "n_selected_bins": int(selected.size),
@@ -581,7 +744,9 @@ def main() -> int:
             "product": np.asarray(product),
             "source_cl_path": np.asarray(str(cl_path)),
             "source_metadata_path": np.asarray(str(metadata_path) if metadata_path is not None else ""),
+            "source_metadata_csv_path": np.asarray(str(metadata_csv_path) if metadata_csv_path is not None else ""),
             "source_sobol_csv_path": np.asarray(str(sobol_csv) if metadata_path is None and sobol_csv is not None else ""),
+            "theta_source": np.asarray(str(metadata.get("theta_source", "unknown"))),
             "ell_min": np.asarray(float(args.ell_min), dtype=np.float32),
             "ell_max": np.asarray(float(args.ell_max), dtype=np.float32),
             "ell_selection": np.asarray(args.ell_selection),
@@ -594,7 +759,9 @@ def main() -> int:
             "product": product,
             "source_cl_path": str(cl_path),
             "source_metadata_path": str(metadata_path) if metadata_path is not None else "",
+            "source_metadata_csv_path": str(metadata_csv_path) if metadata_csv_path is not None else "",
             "source_sobol_csv_path": str(sobol_csv) if metadata_path is None and sobol_csv is not None else "",
+            "theta_source": metadata.get("theta_source", "unknown"),
             "n_rows": n_rows,
             "x_shape": list(x.shape),
             "obs_index": int(obs_index),

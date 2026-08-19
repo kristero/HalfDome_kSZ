@@ -320,10 +320,10 @@ Production example:
     --output=batched_data/frb_z1_mass_windows/halfdome_z1_dm_mass_windows.h5
 
 Catalogue-sightline example (the CSV is streamed once, not loaded in memory):
-  JULIA_NUM_THREADS=16 julia +1.8.5 --project=julia_env \
-    frb_map_generation/generate_halfdome_z1_dm_mass_windows.jl \
-    --sightline-catalog=path/to/COSMOS2020_hosts.csv \
-    --sightline-redshift-width=0.05 --nfrb=120000 \
+  JULIA_NUM_THREADS=16 julia +1.8.5 --project=julia_env \\
+    frb_map_generation/generate_halfdome_z1_dm_mass_windows.jl \\
+    --sightline-catalog=path/to/COSMOS2020_hosts.csv \\
+    --sightline-redshift-width=0.05 --nfrb=120000 \\
     --output=batched_data/frb_z1_mass_windows/cosmos2020_z1_dm_mass_windows.h5
 
 Python/h5py extraction (multidimensional datasets are Python-oriented on disk):

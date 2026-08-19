@@ -1,0 +1,161 @@
+#!/bin/bash
+#PBS -N frb_dm_masspdf_120k
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+#PBS -o /dev/null
+
+set -euo pipefail
+
+# One HalfDome halo-catalog pass, one shared reservoir sample of 120,000
+# catalogue sightlines, and eight foreground-halo mass windows. The Julia
+# output contains histogram data only: no sky map, ray coordinates, or
+# per-ray DM matrix is written.
+
+: "${PROJECT_DIR:=${PBS_O_WORKDIR:-$PWD}}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${PYTHON:=python3}"
+: "${ENV_SETUP:=}"  # example: 'module load julia/1.8.5 python'
+: "${LIGHTCONE_ID:=100}"
+: "${CLUSTER_USER:=${USER:-kristero10}}"
+
+# Inputs. Override either path with qsub -v when the cluster copy differs.
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
+: "${FRB_CATALOG:=${PROJECT_DIR}/frb_map_generation/outputs/stellar_weighted_allz_frb_los_COSMO20_n10M/stellar_weighted_frb_los_allredshifts_zsrcmin0p0_zsrcmax6p0_cosmos2020_alpha1p0_nside4096_nfrb10000000_seed42_hosts.csv}"
+: "${DM_CACHE:=${PROJECT_DIR}/frb_map_generation/outputs/shared_xgpaint_dm_cache.jld2}"
+
+# Dedicated output tree; this does not reuse any previous output directory.
+: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_z1_120k_foreground_mass_histograms}"
+: "${RUN_TAG:=zsrc1p0_dz0p05_n120000_seed42}"
+OUTPUT_DIR="${OUTPUT_BASE}/${RUN_TAG}"
+LOG_DIR="${OUTPUT_DIR}/logs"
+HISTOGRAM_HDF5="${OUTPUT_DIR}/halfdome_z1_120k_foreground_mass_histograms.h5"
+SUMMARY_CSV="${OUTPUT_DIR}/halfdome_z1_120k_foreground_mass_histograms_summary.csv"
+PROVENANCE_TXT="${OUTPUT_DIR}/halfdome_z1_120k_foreground_mass_histograms_provenance.txt"
+
+# Science settings.
+: "${NFRB:=120000}"
+: "${ZSOURCE:=1.0}"
+: "${SIGHTLINE_REDSHIFT_WIDTH:=0.05}"
+: "${SEED:=42}"
+: "${NSIDE:=4096}"
+: "${DM_APERTURE_R200_MULTIPLIER:=1.0}"
+: "${MASS_WINDOWS:=m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16}"
+
+# Runtime and histogram settings.
+: "${THREADS_PER_TASK:=26}"
+: "${CHUNK_SIZE:=1000000}"
+: "${SIGHTLINE_PROGRESS_EVERY_ROWS:=1000000}"
+: "${PROGRESS_EVERY_BATCHES:=5}"
+: "${PDF_EDGE_COUNT:=300}"
+: "${PDF_DM_MIN:=0.1}"
+: "${PDF_DM_MAX:=30000}"
+: "${OVERWRITE:=false}"
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+
+GENERATOR="${PROJECT_DIR}/frb_map_generation/generate_halfdome_z1_dm_mass_windows.jl"
+PLOTTER="${PROJECT_DIR}/frb_map_generation/plot_halfdome_mass_window_histograms.py"
+: "${JULIA_PROJECT:=${PROJECT_DIR}/julia_env}"
+
+mkdir -p "${OUTPUT_DIR}" "${LOG_DIR}"
+JOB_TAG="${PBS_JOBID:-manual}"
+JOB_TAG="${JOB_TAG//[/_}"
+JOB_TAG="${JOB_TAG//]/_}"
+LOG_FILE="${LOG_DIR}/mass_histograms_${JOB_TAG}.log"
+exec > >(tee -a "${LOG_FILE}") 2>&1
+
+cd "${PROJECT_DIR}"
+if [[ -n "${ENV_SETUP}" ]]; then
+  echo "Running environment setup: ${ENV_SETUP}"
+  eval "${ENV_SETUP}"
+fi
+
+for required_file in "${HALFDOME_PATH}" "${FRB_CATALOG}" "${DM_CACHE}" "${GENERATOR}" "${PLOTTER}" "${JULIA_PROJECT}/Project.toml"; do
+  if [[ ! -f "${required_file}" ]]; then
+    echo "Required file not found: ${required_file}" >&2
+    exit 2
+  fi
+done
+
+export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS
+
+echo "============================================================"
+echo "HalfDome 120k foreground-mass histogram job"
+echo "Date: $(date -Is)"
+echo "Host: $(hostname)"
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Project: ${PROJECT_DIR}"
+echo "Julia: ${JULIA}"
+"${JULIA}" --version
+"${JULIA}" -e 'VERSION.major == 1 && VERSION.minor == 8 || error("This project requires Julia 1.8.x; got $(VERSION)")'
+echo "Python: ${PYTHON}"
+"${PYTHON}" --version
+echo "HalfDome catalog: ${HALFDOME_PATH}"
+echo "FRB sightline catalog: ${FRB_CATALOG}"
+echo "DM cache: ${DM_CACHE}"
+echo "Output directory: ${OUTPUT_DIR}"
+echo "Shared rays: ${NFRB}; z_source=${ZSOURCE} +/- ${SIGHTLINE_REDSHIFT_WIDTH}"
+echo "Mass windows: ${MASS_WINDOWS}"
+echo "Histogram: ${PDF_EDGE_COUNT} log edges over [${PDF_DM_MIN}, ${PDF_DM_MAX}] pc cm^-3"
+echo "Per-ray DM output: false"
+echo "============================================================"
+
+# Fail before the expensive halo pass if the plotting environment is absent.
+"${PYTHON}" -c 'import h5py, matplotlib, numpy'
+
+"${JULIA}" --threads="${THREADS_PER_TASK}" --project="${JULIA_PROJECT}" "${GENERATOR}" \
+  --catalog="${HALFDOME_PATH}" \
+  --sightline-mode=catalog \
+  --sightline-catalog="${FRB_CATALOG}" \
+  --sightline-redshift-width="${SIGHTLINE_REDSHIFT_WIDTH}" \
+  --sightline-progress-every-rows="${SIGHTLINE_PROGRESS_EVERY_ROWS}" \
+  --source-redshift="${ZSOURCE}" \
+  --nfrb="${NFRB}" \
+  --seed="${SEED}" \
+  --nside="${NSIDE}" \
+  --chunk-size="${CHUNK_SIZE}" \
+  --progress-every-batches="${PROGRESS_EVERY_BATCHES}" \
+  --mass-windows="${MASS_WINDOWS}" \
+  --dm-cache="${DM_CACHE}" \
+  --dm-cache-overwrite=false \
+  --dm-aperture-r200-multiplier="${DM_APERTURE_R200_MULTIPLIER}" \
+  --pdf-edge-count="${PDF_EDGE_COUNT}" \
+  --pdf-spacing=log \
+  --pdf-dm-min="${PDF_DM_MIN}" \
+  --pdf-dm-max="${PDF_DM_MAX}" \
+  --save-ray-dm=false \
+  --output="${HISTOGRAM_HDF5}" \
+  --summary="${SUMMARY_CSV}" \
+  --provenance="${PROVENANCE_TXT}" \
+  --overwrite="${OVERWRITE}"
+
+"${PYTHON}" "${PLOTTER}" "${HISTOGRAM_HDF5}" --output-dir "${OUTPUT_DIR}"
+
+# Assert that this is genuinely histogram-only and that all curves use the
+# same requested ray count.
+"${PYTHON}" - "${HISTOGRAM_HDF5}" "${NFRB}" <<'PY'
+import sys
+import h5py
+
+path, expected_text = sys.argv[1:]
+expected = int(expected_text)
+with h5py.File(path, "r") as handle:
+    assert "dm_pc_cm3" not in handle, "Histogram-only file unexpectedly contains per-ray DM"
+    assert "frb_pixel_ring_1based" not in handle, "Histogram-only file unexpectedly contains ray pixels"
+    actual = int(handle.attrs["n_rays"])
+    assert actual == expected, (actual, expected)
+    assert handle["pdf_count"].shape == (8, 299), handle["pdf_count"].shape
+    assert handle["pdf_density_per_pc_cm3"].shape == (8, 299)
+print(f"Validated histogram-only output for {expected:,} shared rays: {path}")
+PY
+
+echo "Completed successfully at $(date -Is)"
+echo "Histogram HDF5: ${HISTOGRAM_HDF5}"
+echo "Summary CSV: ${SUMMARY_CSV}"
+echo "Provenance: ${PROVENANCE_TXT}"
+echo "Figures and long-form bins: ${OUTPUT_DIR}"

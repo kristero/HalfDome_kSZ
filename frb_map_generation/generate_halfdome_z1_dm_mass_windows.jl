@@ -946,6 +946,24 @@ function histogram_columns(dm, edge_count::Int, lower::Float64, upper_option; sp
     return edges, centers, counts, density
 end
 
+"""
+Increment a fixed one-dimensional histogram.
+
+Returns -1 for underflow, 0 for an in-range value, and +1 for overflow.  The
+rightmost edge is included in the final bin so a source-redshift value exactly
+equal to the foreground limit is retained.
+"""
+function increment_histogram_count!(counts, edges, value::Real)
+    sample = Float64(value)
+    (!isfinite(sample) || sample < edges[1]) && return -1
+    sample > edges[end] && return 1
+    ibin = searchsortedlast(edges, sample)
+    ibin >= length(edges) && (ibin = length(edges) - 1)
+    ibin < 1 && return -1
+    counts[ibin] += 1
+    return 0
+end
+
 function atomic_write(writer::F, target::AbstractString; overwrite=false) where {F}
     parent = dirname(target)
     isdir(parent) || mkpath(parent)
@@ -1040,6 +1058,10 @@ function write_hdf5_output(
     pdf_centers,
     pdf_counts,
     pdf_density,
+    foreground_mass_edges,
+    foreground_mass_counts,
+    foreground_redshift_edges,
+    foreground_redshift_counts,
     provenance;
     overwrite=false,
     save_ray_dm=true,
@@ -1073,11 +1095,15 @@ function write_hdf5_output(
             h5["pdf_bin_centers_pc_cm3"] = pdf_centers
             h5["pdf_count"] = pdf_counts
             h5["pdf_density_per_pc_cm3"] = pdf_density
+            h5["foreground_halo_mass_bin_edges_msun"] = foreground_mass_edges
+            h5["foreground_halo_mass_histogram_count"] = Int64.(foreground_mass_counts)
+            h5["foreground_halo_redshift_bin_edges"] = foreground_redshift_edges
+            h5["foreground_halo_redshift_histogram_count"] = Int64.(foreground_redshift_counts)
 
             metadata = attrs(h5)
             metadata["schema_name"] = save_ray_dm ?
                 "halfdome_fixed_z_dm_mass_windows" : "halfdome_fixed_z_dm_mass_window_histograms"
-            metadata["schema_version"] = "1.1.0"
+            metadata["schema_version"] = "1.2.0"
             metadata["run_id"] = run_id
             metadata["created_utc"] = created_utc
             metadata["per_ray_dm_saved"] = save_ray_dm
@@ -1098,6 +1124,8 @@ function write_hdf5_output(
             metadata["catalog_passes"] = Int64(1)
             metadata["unique_halo_frb_intersection_count"] = Int64(unique_hits)
             metadata["window_labels_csv"] = join(getfield.(windows, :label), ',')
+            metadata["foreground_halo_histogram_population"] =
+                "all finite positive-mass catalog halos with 0 <= z_halo <= source_redshift before mass-window cuts"
             for (key, value) in provenance
                 value isa Union{Bool, Int, Int64, Float64, String} || continue
                 metadata["provenance_$(key)"] = value
@@ -1281,6 +1309,14 @@ function run_self_test()
     @assert sum(target_counts) == 3
     @assert isapprox(sum(target_density[:, 1] .* diff(target_edges)), 1.0; rtol=1e-14)
 
+    diagnostic_edges = [0.0, 1.0, 2.0]
+    diagnostic_counts = zeros(Int64, 2)
+    @assert increment_histogram_count!(diagnostic_counts, diagnostic_edges, -0.1) == -1
+    @assert increment_histogram_count!(diagnostic_counts, diagnostic_edges, 0.5) == 0
+    @assert increment_histogram_count!(diagnostic_counts, diagnostic_edges, 2.0) == 0
+    @assert increment_histogram_count!(diagnostic_counts, diagnostic_edges, 2.1) == 1
+    @assert diagnostic_counts == [1, 1]
+
     mktempdir() do directory
         summary = joinpath(directory, "summary.csv")
         provenance = joinpath(directory, "provenance.txt")
@@ -1419,6 +1455,14 @@ function main(options)
     below_floor_count = Ref(Int64(0))
     observed_foreground_min = Ref(Inf)
     observed_foreground_max = Ref(-Inf)
+    foreground_mass_edges = 10.0 .^ collect(range(8.0, 17.0; length=181))
+    foreground_mass_counts = zeros(Int64, length(foreground_mass_edges) - 1)
+    foreground_redshift_edges = collect(range(0.0, config.source_redshift; length=101))
+    foreground_redshift_counts = zeros(Int64, length(foreground_redshift_edges) - 1)
+    foreground_mass_underflow = Ref(Int64(0))
+    foreground_mass_overflow = Ref(Int64(0))
+    foreground_redshift_underflow = Ref(Int64(0))
+    foreground_redshift_overflow = Ref(Int64(0))
     streamed = stream_halfdome_batches(
         config.catalog,
         config.chunk_size;
@@ -1438,6 +1482,16 @@ function main(options)
             valid_foreground_count[] += 1
             observed_foreground_min[] = min(observed_foreground_min[], mass)
             observed_foreground_max[] = max(observed_foreground_max[], mass)
+            mass_histogram_status = increment_histogram_count!(
+                foreground_mass_counts, foreground_mass_edges, mass,
+            )
+            mass_histogram_status < 0 && (foreground_mass_underflow[] += 1)
+            mass_histogram_status > 0 && (foreground_mass_overflow[] += 1)
+            redshift_histogram_status = increment_histogram_count!(
+                foreground_redshift_counts, foreground_redshift_edges, redshift,
+            )
+            redshift_histogram_status < 0 && (foreground_redshift_underflow[] += 1)
+            redshift_histogram_status > 0 && (foreground_redshift_overflow[] += 1)
             mass < config.catalog_mass_floor && (below_floor_count[] += 1)
             mask = window_membership_mask(mass, config.windows)
             mask == 0 && continue
@@ -1463,6 +1517,11 @@ function main(options)
             println("  streamed through catalog row $(batch_start + length(masses) - 1); selected=$(selected_union_count[])")
         end
     end
+
+    sum(foreground_mass_counts) + foreground_mass_underflow[] + foreground_mass_overflow[] ==
+        valid_foreground_count[] || error("Foreground mass histogram does not account for every valid halo.")
+    sum(foreground_redshift_counts) + foreground_redshift_underflow[] + foreground_redshift_overflow[] ==
+        valid_foreground_count[] || error("Foreground redshift histogram does not account for every valid halo.")
 
     dm, unique_hits, window_hits = reduce_accumulator(accumulator)
     all(isfinite, dm) || error("Non-finite values found in the final DM matrix.")
@@ -1509,6 +1568,10 @@ function main(options)
         "foreground_below_declared_floor_count" => below_floor_count[],
         "foreground_observed_min_msun" => observed_foreground_min[],
         "foreground_observed_max_msun" => observed_foreground_max[],
+        "foreground_mass_histogram_underflow_count" => foreground_mass_underflow[],
+        "foreground_mass_histogram_overflow_count" => foreground_mass_overflow[],
+        "foreground_redshift_histogram_underflow_count" => foreground_redshift_underflow[],
+        "foreground_redshift_histogram_overflow_count" => foreground_redshift_overflow[],
         "selected_union_halo_count" => selected_union_count[],
         "source_redshift" => config.source_redshift,
         "nside" => config.nside,
@@ -1571,7 +1634,10 @@ function main(options)
         config.output, run_id, created_utc, config.windows, frb_pixels, frb_ra, frb_dec,
         frb_host_redshifts, frb_catalog_rows,
         config.source_redshift, dm, halo_counts, unique_hits, window_hits,
-        pdf_edges, pdf_centers, pdf_counts, pdf_density, provenance_entries;
+        pdf_edges, pdf_centers, pdf_counts, pdf_density,
+        foreground_mass_edges, foreground_mass_counts,
+        foreground_redshift_edges, foreground_redshift_counts,
+        provenance_entries;
         overwrite=config.overwrite,
         save_ray_dm=config.save_ray_dm,
     )

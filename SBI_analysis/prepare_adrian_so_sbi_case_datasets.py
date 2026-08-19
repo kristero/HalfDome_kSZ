@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -272,6 +273,154 @@ def load_sobol_theta_for_global_rows(path: Path, sobol_global_row: np.ndarray) -
     return np.ascontiguousarray(theta_table[rows - 1], dtype=np.float32)
 
 
+def parse_expected_sobol_prefix(value: str) -> np.ndarray:
+    parts = [part for part in str(value).replace(",", " ").split() if part]
+    return np.asarray([int(part) for part in parts], dtype=np.int64)
+
+
+def load_sobol_global_row(path: Path) -> np.ndarray:
+    """Load the array-index -> 1-based Sobol-row permutation from a small file."""
+    if not path.is_file():
+        raise FileNotFoundError(f"sobol_global_row file not found: {path}")
+
+    suffix = path.suffix.lower()
+    if suffix == ".npy":
+        values = np.load(path, allow_pickle=False)
+    elif suffix == ".npz":
+        with np.load(path, allow_pickle=False) as data:
+            if "sobol_global_row" in data.files:
+                values = data["sobol_global_row"]
+            elif len(data.files) == 1:
+                values = data[data.files[0]]
+            else:
+                raise KeyError(
+                    f"{path} must contain 'sobol_global_row'; available keys are {data.files}"
+                )
+    elif suffix == ".csv":
+        with path.open("r", newline="", encoding="utf-8") as handle:
+            reader = csv.reader(handle)
+            first = next(reader, None)
+        if first is None:
+            raise ValueError(f"sobol_global_row file is empty: {path}")
+        try:
+            float(first[0])
+            has_header = False
+        except ValueError:
+            has_header = True
+        values = np.loadtxt(
+            path,
+            delimiter=",",
+            skiprows=1 if has_header else 0,
+            usecols=0,
+            dtype=np.float64,
+        )
+    else:
+        values = np.loadtxt(path, dtype=np.float64)
+
+    raw = np.asarray(values).reshape(-1)
+    if raw.size == 0:
+        raise ValueError(f"sobol_global_row file is empty: {path}")
+    if not np.issubdtype(raw.dtype, np.number):
+        raise TypeError(f"sobol_global_row must be numeric, got dtype={raw.dtype} from {path}")
+    raw_float = np.asarray(raw, dtype=np.float64)
+    if not np.all(np.isfinite(raw_float)):
+        raise ValueError(f"sobol_global_row contains non-finite values: {path}")
+    if not np.all(raw_float == np.floor(raw_float)):
+        raise ValueError(f"sobol_global_row contains non-integer values: {path}")
+    return np.ascontiguousarray(raw_float, dtype=np.int64)
+
+
+def validate_sobol_global_row(
+    rows: np.ndarray,
+    expected_rows: int,
+    expected_prefix: np.ndarray | None = None,
+) -> dict[str, Any]:
+    """Validate the complete Adrian array-index -> Sobol-row permutation."""
+    rows = np.asarray(rows, dtype=np.int64).reshape(-1)
+    expected_rows = int(expected_rows)
+    if rows.size != expected_rows:
+        raise ValueError(
+            f"sobol_global_row has {rows.size} entries, but C_ell has {expected_rows} rows"
+        )
+    if np.any(rows < 1) or np.any(rows > expected_rows):
+        raise ValueError(
+            f"sobol_global_row must stay in 1..{expected_rows}; "
+            f"found min={int(rows.min())}, max={int(rows.max())}"
+        )
+
+    counts = np.bincount(rows, minlength=expected_rows + 1)[1:]
+    missing = np.flatnonzero(counts == 0) + 1
+    duplicate = np.flatnonzero(counts > 1) + 1
+    if missing.size or duplicate.size:
+        raise ValueError(
+            "sobol_global_row is not a permutation of the expected Sobol rows: "
+            f"missing(first 10)={missing[:10].tolist()}, "
+            f"duplicated(first 10)={duplicate[:10].tolist()}"
+        )
+
+    prefix = np.asarray(expected_prefix if expected_prefix is not None else [], dtype=np.int64)
+    if prefix.size:
+        actual = rows[: prefix.size]
+        if not np.array_equal(actual, prefix):
+            raise ValueError(
+                "sobol_global_row does not match the known source-machine prefix: "
+                f"expected={prefix.tolist()}, actual={actual.tolist()}"
+            )
+
+    canonical_bytes = np.ascontiguousarray(rows, dtype="<i8").tobytes()
+    return {
+        "n_rows": expected_rows,
+        "min": int(rows.min()),
+        "max": int(rows.max()),
+        "unique": int(np.unique(rows).size),
+        "known_prefix_checked": prefix.tolist(),
+        "sha256_int64_le": hashlib.sha256(canonical_bytes).hexdigest(),
+        "is_identity": bool(np.array_equal(rows, np.arange(1, expected_rows + 1, dtype=np.int64))),
+        "is_complete_permutation": True,
+    }
+
+
+def read_sobol_mapping_metadata(
+    sobol_csv: Path,
+    sobol_global_row_path: Path,
+    cl_n_rows: int,
+    n_rows: int,
+    n_ell: int,
+    ell_start: int,
+    ell_stop: int,
+    expected_prefix: np.ndarray,
+) -> dict[str, Any]:
+    full_mapping = load_sobol_global_row(sobol_global_row_path)
+    validation = validate_sobol_global_row(full_mapping, cl_n_rows, expected_prefix)
+    selected_mapping = np.ascontiguousarray(full_mapping[:n_rows], dtype=np.int64)
+    theta = load_sobol_theta_for_global_rows(sobol_csv, selected_mapping)
+
+    ell = np.arange(int(ell_start), int(ell_stop) + 1, dtype=np.float32)
+    if ell.size != int(n_ell):
+        raise ValueError(
+            f"Fallback ell range {ell_start}..{ell_stop} has {ell.size} values, "
+            f"but C_ell arrays have {n_ell} columns."
+        )
+
+    prior_low = np.asarray([SOBOL_PRIOR_BOUNDS[str(name)][0] for name in PARAM_NAMES], dtype=np.float32)
+    prior_high = np.asarray([SOBOL_PRIOR_BOUNDS[str(name)][1] for name in PARAM_NAMES], dtype=np.float32)
+    return {
+        "theta": np.ascontiguousarray(theta, dtype=np.float32),
+        "ell_unbinned": np.ascontiguousarray(ell, dtype=np.float32),
+        "param_names": np.ascontiguousarray(PARAM_NAMES, dtype=str),
+        "theta_columns": np.ascontiguousarray(PARAM_NAMES, dtype=str),
+        "prior_low": prior_low,
+        "prior_high": prior_high,
+        "sobol_global_row": selected_mapping,
+        "metadata_path": "",
+        "metadata_csv_path": "",
+        "sobol_csv_path": str(sobol_csv),
+        "sobol_global_row_path": str(sobol_global_row_path),
+        "sobol_global_row_validation": validation,
+        "theta_source": "sobol_global_row_mapping_plus_sobol_csv",
+    }
+
+
 def read_metadata_csv(
     path: Path,
     n_rows: int,
@@ -503,6 +652,22 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--sobol-global-row-path",
+        default="",
+        help=(
+            "Small .npy/.npz/.csv/.txt file containing the complete 1-based sobol_global_row "
+            "permutation in C_ell array order. Together with --sobol-csv this replaces the large metadata files."
+        ),
+    )
+    parser.add_argument(
+        "--expected-sobol-prefix",
+        default="",
+        help=(
+            "Optional comma/space-separated source-machine prefix, for example "
+            "108566,634,163005,417786. Preparation fails if the mapping does not match it."
+        ),
+    )
+    parser.add_argument(
         "--allow-sobol-identity-fallback",
         action="store_true",
         help=(
@@ -535,6 +700,10 @@ def main() -> int:
     metadata_npz = resolve_path(args.metadata_npz, root) if args.metadata_npz else None
     theta_path = resolve_path(args.theta_path, root) if args.theta_path else None
     sobol_csv = resolve_path(args.sobol_csv, root) if args.sobol_csv else None
+    sobol_global_row_path = (
+        resolve_path(args.sobol_global_row_path, root) if args.sobol_global_row_path else None
+    )
+    expected_sobol_prefix = parse_expected_sobol_prefix(args.expected_sobol_prefix)
     tag = ell_tag(args.ell_min, args.ell_max)
     output_dir = (
         resolve_path(args.output_dir, root)
@@ -553,6 +722,10 @@ def main() -> int:
         raise FileNotFoundError(f"Theta path not found: {theta_path}")
     if sobol_csv is not None and not sobol_csv.is_file():
         raise FileNotFoundError(f"Sobol CSV not found: {sobol_csv}")
+    if sobol_global_row_path is not None and not sobol_global_row_path.is_file():
+        raise FileNotFoundError(f"sobol_global_row path not found: {sobol_global_row_path}")
+    if sobol_global_row_path is not None and sobol_csv is None:
+        raise ValueError("--sobol-global-row-path requires --sobol-csv to reconstruct theta")
     if int(args.chunk_rows) <= 0:
         raise ValueError("--chunk-rows must be positive")
 
@@ -574,7 +747,7 @@ def main() -> int:
     }
 
     reference_metadata: dict[str, Any] | None = None
-    fallback_metadata_cache: dict[tuple[int, int], dict[str, Any]] = {}
+    fallback_metadata_cache: dict[tuple[int, ...], dict[str, Any]] = {}
     for product in products:
         cl_path = product_cl_path(input_dir, product)
         if not cl_path.is_file():
@@ -610,6 +783,24 @@ def main() -> int:
                 ell_stop=int(args.ell_stop),
                 sobol_csv=sobol_csv,
             )
+        elif sobol_csv is not None and sobol_global_row_path is not None:
+            cache_key = (cl_n_rows, n_rows, cl_n_ell)
+            if cache_key not in fallback_metadata_cache:
+                print(
+                    f"No metadata NPZ/CSV found for {product}; reconstructing theta from "
+                    f"{sobol_global_row_path} and {sobol_csv}."
+                )
+                fallback_metadata_cache[cache_key] = read_sobol_mapping_metadata(
+                    sobol_csv=sobol_csv,
+                    sobol_global_row_path=sobol_global_row_path,
+                    cl_n_rows=cl_n_rows,
+                    n_rows=n_rows,
+                    n_ell=cl_n_ell,
+                    ell_start=int(args.ell_start),
+                    ell_stop=int(args.ell_stop),
+                    expected_prefix=expected_sobol_prefix,
+                )
+            metadata = fallback_metadata_cache[cache_key]
         elif sobol_csv is not None and args.allow_sobol_identity_fallback:
             cache_key = (n_rows, cl_n_ell)
             if cache_key not in fallback_metadata_cache:
@@ -631,9 +822,10 @@ def main() -> int:
                 f"Could not find metadata NPZ for product={product!r}. Expected "
                 f"{input_dir / f'sbi_{product}.npz'} or metadata CSV "
                 f"{input_dir / f'sbi_{product}_metadata.csv'}. "
-                "Pass --metadata-npz / --metadata-dir. The old Sobol CSV identity-row fallback is disabled "
-                "by default because Adrian's consolidated arrays are filesystem-scan ordered; use "
-                "--allow-sobol-identity-fallback only after verifying sobol_global_row[i] == i + 1."
+                "Pass --sobol-global-row-path with the complete array-index -> Sobol-row permutation, "
+                "or pass --metadata-npz / --metadata-dir. The textual ordering rule and a Sobol CSV do "
+                "not contain that permutation. The identity-row fallback remains disabled because "
+                "Adrian's consolidated arrays are filesystem-scan ordered."
             )
 
         if reference_metadata is None:
@@ -645,6 +837,8 @@ def main() -> int:
                 raise ValueError(f"ell differs for {product}: {metadata_path}")
             if metadata["theta"].shape[1] != reference_metadata["theta"].shape[1]:
                 raise ValueError(f"theta shape differs for {product}: {metadata_path}")
+            if not np.array_equal(metadata["sobol_global_row"], reference_metadata["sobol_global_row"]):
+                raise ValueError(f"sobol_global_row ordering differs for {product}")
 
         theta_full = metadata["theta"]
         n_rows_full = int(theta_full.shape[0])
@@ -673,6 +867,8 @@ def main() -> int:
         if metadata_path is None and sobol_csv is not None:
             print(f"  Sobol CSV: {sobol_csv}")
         print(f"  theta source: {metadata.get('theta_source', 'unknown')}")
+        if metadata.get("sobol_global_row_validation"):
+            print(f"  ordering validation: {metadata['sobol_global_row_validation']}")
         print(f"  rows: {n_rows}")
         print(f"  unbinned ell: {ell_unbinned.size}")
         print(f"  selected bins: {selected.size}")
@@ -704,6 +900,8 @@ def main() -> int:
             "source_metadata_path": str(metadata_path) if metadata_path is not None else "",
             "source_metadata_csv_path": str(metadata_csv_path) if metadata_csv_path is not None else "",
             "source_sobol_csv_path": str(sobol_csv) if metadata_path is None and sobol_csv is not None else "",
+            "source_sobol_global_row_path": metadata.get("sobol_global_row_path", ""),
+            "sobol_global_row_validation": metadata.get("sobol_global_row_validation", {}),
             "theta_source": metadata.get("theta_source", "unknown"),
             "n_rows": n_rows,
             "n_ell_unbinned": int(ell_unbinned.size),
@@ -746,6 +944,10 @@ def main() -> int:
             "source_metadata_path": np.asarray(str(metadata_path) if metadata_path is not None else ""),
             "source_metadata_csv_path": np.asarray(str(metadata_csv_path) if metadata_csv_path is not None else ""),
             "source_sobol_csv_path": np.asarray(str(sobol_csv) if metadata_path is None and sobol_csv is not None else ""),
+            "source_sobol_global_row_path": np.asarray(str(metadata.get("sobol_global_row_path", ""))),
+            "sobol_global_row_validation_json": np.asarray(
+                json.dumps(jsonable(metadata.get("sobol_global_row_validation", {})), sort_keys=True)
+            ),
             "theta_source": np.asarray(str(metadata.get("theta_source", "unknown"))),
             "ell_min": np.asarray(float(args.ell_min), dtype=np.float32),
             "ell_max": np.asarray(float(args.ell_max), dtype=np.float32),
@@ -761,6 +963,8 @@ def main() -> int:
             "source_metadata_path": str(metadata_path) if metadata_path is not None else "",
             "source_metadata_csv_path": str(metadata_csv_path) if metadata_csv_path is not None else "",
             "source_sobol_csv_path": str(sobol_csv) if metadata_path is None and sobol_csv is not None else "",
+            "source_sobol_global_row_path": metadata.get("sobol_global_row_path", ""),
+            "sobol_global_row_validation": metadata.get("sobol_global_row_validation", {}),
             "theta_source": metadata.get("theta_source", "unknown"),
             "n_rows": n_rows,
             "x_shape": list(x.shape),

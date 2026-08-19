@@ -111,12 +111,21 @@ fi
 
 SOBOL_GLOBAL_ROW_ARG=
 if [ -n "${ADRIAN_SOBOL_GLOBAL_ROW:-}" ]; then
-  SOBOL_GLOBAL_ROW_ARG="--sobol-global-row-path $ADRIAN_SOBOL_GLOBAL_ROW"
+  if "$PYTHON" "$SCRIPT" --help 2>&1 | grep -q -- "--sobol-global-row-path"; then
+    SOBOL_GLOBAL_ROW_ARG="--sobol-global-row-path $ADRIAN_SOBOL_GLOBAL_ROW"
+  else
+    echo "Warning: $SCRIPT does not support --sobol-global-row-path; not passing it." >&2
+  fi
 fi
 
 EXPECTED_SOBOL_PREFIX_ARG=
 if [ -n "${ADRIAN_EXPECTED_SOBOL_PREFIX:-}" ]; then
-  EXPECTED_SOBOL_PREFIX_ARG="--expected-sobol-prefix $ADRIAN_EXPECTED_SOBOL_PREFIX"
+  if "$PYTHON" "$SCRIPT" --help 2>&1 | grep -q -- "--expected-sobol-prefix"; then
+    EXPECTED_SOBOL_PREFIX_ARG="--expected-sobol-prefix $ADRIAN_EXPECTED_SOBOL_PREFIX"
+  else
+    echo "Warning: $SCRIPT does not support --expected-sobol-prefix; " \
+      "run validate_adrian_so_sbi_ordering.py separately." >&2
+  fi
 fi
 
 echo "PBS job id: ${PBS_JOBID:-manual}"

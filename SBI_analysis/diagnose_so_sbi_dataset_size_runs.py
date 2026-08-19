@@ -12,7 +12,6 @@ import numpy as np
 
 
 DEFAULT_CASES = [
-    "masked_no_noise",
     "masked_baseline_noise_cross_deproj0",
 ]
 
@@ -235,11 +234,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Inspect prepared SO SBI datasets and completed dataset-size runs.")
     parser.add_argument(
         "--run-root",
-        default=str(root / "SBI_analysis" / "outputs" / "cluster_outputs" / "SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_sobolrow_asinh"),
+        default=str(root / "SBI_analysis" / "outputs" / "cluster_outputs" / "SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_metadata_verified_asinh"),
     )
     parser.add_argument(
         "--case-dataset-dir",
-        default=str(root / "SBI_analysis" / "data_for_cluster" / "adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow"),
+        default=str(root / "SBI_analysis" / "data_for_cluster" / "adrian_so_sbi_cases_ell80_7979_dataset_row_metadata_verified"),
     )
     parser.add_argument("--case-index-json", default="")
     parser.add_argument("--cases", nargs="+", default=DEFAULT_CASES)

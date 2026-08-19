@@ -554,6 +554,32 @@ function cache_grid_value(model_grid, candidate_keys)
     error("Interpolator cache is missing all of $(candidate_keys); found keys $(collect(keys(model_grid))).")
 end
 
+function native_linear_axis(axis, expected_length::Int, label::AbstractString)
+    expected_length > 0 || error("$(label) must have positive length.")
+    if axis isa AbstractRange
+        axis_length = length(axis)
+        axis_start = Float64(first(axis))
+        axis_stop = Float64(last(axis))
+    elseif hasproperty(axis, :start) && hasproperty(axis, :stop) && hasproperty(axis, :len)
+        # JLD2 reconstructs LinRange as a field-bearing placeholder when a
+        # cache written by newer Julia is loaded by Julia 1.6.
+        axis_length = Int(getproperty(axis, :len))
+        axis_start = Float64(getproperty(axis, :start))
+        axis_stop = Float64(getproperty(axis, :stop))
+    elseif axis isa AbstractVector
+        axis_length = length(axis)
+        axis_start = Float64(first(axis))
+        axis_stop = Float64(last(axis))
+    else
+        error("Unsupported cached $(label) axis type $(typeof(axis)).")
+    end
+    axis_length == expected_length || error(
+        "Cached $(label) axis length $(axis_length) does not match profile dimension $(expected_length).",
+    )
+    isfinite(axis_start) && isfinite(axis_stop) || error("Cached $(label) axis endpoints are not finite.")
+    axis_start < axis_stop || error("Cached $(label) axis is not increasing.")
+    return range(axis_start, stop=axis_stop, length=axis_length)
+end
 """Load both the private-fork ASCII cache and official v0.4 Unicode cache."""
 function enforce_generated_cache_target_policy(cache_file, overwrite, generated_model_family)
     if overwrite && generated_model_family == "public_v0.4_tau_conversion" && isfile(cache_file)
@@ -607,6 +633,10 @@ function build_dm_interpolator_compatible(
     prof_redshift, _ = cache_grid_value(model_grid, ("prof_redshift",))
     prof_logMs, _ = cache_grid_value(model_grid, ("prof_logMs",))
     prof_y, _ = cache_grid_value(model_grid, ("prof_y",))
+    ndims(prof_y) == 3 || error("DM interpolator profile grid must be three-dimensional.")
+    native_logthetas = native_linear_axis(prof_logthetas, size(prof_y, 1), "logtheta")
+    native_redshift = native_linear_axis(prof_redshift, size(prof_y, 2), "redshift")
+    native_logMs = native_linear_axis(prof_logMs, size(prof_y, 3), "logM")
 
     all(isfinite, prof_y) || error("DM interpolator cache contains NaN or Inf values: $(cache_file)")
     nonpositive_count = count(value -> value <= zero(value), prof_y)
@@ -628,7 +658,7 @@ function build_dm_interpolator_compatible(
             Interpolations.Cubic(Interpolations.Line(Interpolations.OnGrid())),
         ),
     )
-    scaled = Interpolations.scale(interpolation, prof_logthetas, prof_redshift, prof_logMs)
+    scaled = Interpolations.scale(interpolation, native_logthetas, native_redshift, native_logMs)
     profile_type = getfield(XGPaint, :LogInterpolatorProfile)
     return (
         profile=profile_type(model, scaled),
@@ -1206,6 +1236,10 @@ function print_configuration(config)
 end
 
 function run_self_test()
+    reconstructed_axis = (start=-2.0, stop=2.0, len=5, lendiv=4)
+    native_axis = native_linear_axis(reconstructed_axis, 5, "self-test")
+    @assert native_axis isa AbstractRange
+    @assert collect(native_axis) == [-2.0, -1.0, 0.0, 1.0, 2.0]
     windows = default_mass_windows()
     @assert length(windows) == 10
     @assert windows[1].effective_min_msun == DEFAULT_HALFDOME_MASS_FLOOR_MSUN

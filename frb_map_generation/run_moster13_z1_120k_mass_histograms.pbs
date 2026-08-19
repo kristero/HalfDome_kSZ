@@ -19,7 +19,7 @@ set -euo pipefail
 : "${LIGHTCONE_ID:=100}"
 : "${CLUSTER_USER:=${USER:-kristero10}}"
 : "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
-: "${JULIA_PROJECT:=${PROJECT_DIR}/julia_env}"
+: "${JULIA_PROJECT:=}"  # empty reuses the cluster Julia environment that already works
 
 # All products from this workflow live below this new, isolated tree.
 : "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/moster13_z1_120k_foreground_mass_histograms}"
@@ -88,12 +88,16 @@ fi
 missing_inputs=0
 for required_file in \
   "${HALFDOME_PATH}" "${DM_CACHE}" "${MOSTER_GENERATOR}" "${MASS_GENERATOR}" \
-  "${PLOTTER}" "${JULIA_PROJECT}/Project.toml"; do
+  "${PLOTTER}"; do
   if [[ ! -f "${required_file}" ]]; then
     echo "Required file not found: ${required_file}" >&2
     missing_inputs=1
   fi
 done
+if [[ -n "${JULIA_PROJECT}" && ! -f "${JULIA_PROJECT}/Project.toml" ]]; then
+  echo "Required file not found: ${JULIA_PROJECT}/Project.toml" >&2
+  missing_inputs=1
+fi
 if (( missing_inputs != 0 )); then
   echo "One or more required inputs are missing; no catalogue or halo processing was started." >&2
   exit 2
@@ -101,6 +105,10 @@ fi
 
 export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
 export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS
+JULIA_PROJECT_ARGS=()
+if [[ -n "${JULIA_PROJECT}" ]]; then
+  JULIA_PROJECT_ARGS=(--project="${JULIA_PROJECT}")
+fi
 
 echo "============================================================"
 echo "Moster13 120k FRB catalogue + foreground-mass histogram job"
@@ -117,10 +125,10 @@ echo "Mass windows: ${MASS_WINDOWS}"
 echo "============================================================"
 
 "${JULIA}" --version
-"${JULIA}" -e 'VERSION.major == 1 && VERSION.minor == 8 || error("This project requires Julia 1.8.x; got $(VERSION)")'
+"${JULIA}" -e 'VERSION >= v"1.6" || error("This workflow requires Julia 1.6 or newer; got $(VERSION)")'
 "${PYTHON}" --version
 "${PYTHON}" -c 'import h5py, matplotlib, numpy'
-"${JULIA}" --project="${JULIA_PROJECT}" -e 'using HDF5, Healpix, XGPaint'
+"${JULIA}" "${JULIA_PROJECT_ARGS[@]}" -e 'using HDF5, Healpix, XGPaint'
 
 # Reuse only a previously completed and subsequently validated catalogue in
 # this same isolated run directory. Otherwise generate it from HalfDome now.
@@ -129,7 +137,7 @@ catalog_matches=("${CATALOG_DIR}"/*_hosts.csv)
 shopt -u nullglob
 if (( ${#catalog_matches[@]} == 0 )); then
   echo "Generating a fresh Moster13 FRB host catalogue..."
-  "${JULIA}" --threads="${THREADS_PER_TASK}" --project="${JULIA_PROJECT}" "${MOSTER_GENERATOR}" \
+  "${JULIA}" --threads="${THREADS_PER_TASK}" "${JULIA_PROJECT_ARGS[@]}" "${MOSTER_GENERATOR}" \
     halfdome_path="${HALFDOME_PATH}" \
     output_dir="${CATALOG_DIR}" \
     N="${NFRB}" \
@@ -214,7 +222,7 @@ print(
 PY
 
 echo "Computing all eight foreground-mass histograms with the same ${NFRB} catalogue rows..."
-"${JULIA}" --threads="${THREADS_PER_TASK}" --project="${JULIA_PROJECT}" "${MASS_GENERATOR}" \
+"${JULIA}" --threads="${THREADS_PER_TASK}" "${JULIA_PROJECT_ARGS[@]}" "${MASS_GENERATOR}" \
   --catalog="${HALFDOME_PATH}" \
   --sightline-mode=catalog \
   --sightline-catalog="${FRB_CATALOG}" \

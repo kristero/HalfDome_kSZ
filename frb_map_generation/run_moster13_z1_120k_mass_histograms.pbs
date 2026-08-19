@@ -105,10 +105,13 @@ fi
 
 export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
 export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS
-JULIA_PROJECT_ARGS=()
-if [[ -n "${JULIA_PROJECT}" ]]; then
-  JULIA_PROJECT_ARGS=(--project="${JULIA_PROJECT}")
-fi
+run_julia() {
+  if [[ -n "${JULIA_PROJECT}" ]]; then
+    "${JULIA}" --project="${JULIA_PROJECT}" "$@"
+  else
+    "${JULIA}" "$@"
+  fi
+}
 
 echo "============================================================"
 echo "Moster13 120k FRB catalogue + foreground-mass histogram job"
@@ -128,7 +131,7 @@ echo "============================================================"
 "${JULIA}" -e 'VERSION >= v"1.6" || error("This workflow requires Julia 1.6 or newer; got $(VERSION)")'
 "${PYTHON}" --version
 "${PYTHON}" -c 'import h5py, matplotlib, numpy'
-"${JULIA}" "${JULIA_PROJECT_ARGS[@]}" -e 'using HDF5, Healpix, XGPaint'
+run_julia -e 'using HDF5, Healpix, XGPaint'
 
 # Reuse only a previously completed and subsequently validated catalogue in
 # this same isolated run directory. Otherwise generate it from HalfDome now.
@@ -137,7 +140,7 @@ catalog_matches=("${CATALOG_DIR}"/*_hosts.csv)
 shopt -u nullglob
 if (( ${#catalog_matches[@]} == 0 )); then
   echo "Generating a fresh Moster13 FRB host catalogue..."
-  "${JULIA}" --threads="${THREADS_PER_TASK}" "${JULIA_PROJECT_ARGS[@]}" "${MOSTER_GENERATOR}" \
+  run_julia --threads="${THREADS_PER_TASK}" "${MOSTER_GENERATOR}" \
     halfdome_path="${HALFDOME_PATH}" \
     output_dir="${CATALOG_DIR}" \
     N="${NFRB}" \
@@ -222,7 +225,7 @@ print(
 PY
 
 echo "Computing all eight foreground-mass histograms with the same ${NFRB} catalogue rows..."
-"${JULIA}" --threads="${THREADS_PER_TASK}" "${JULIA_PROJECT_ARGS[@]}" "${MASS_GENERATOR}" \
+run_julia --threads="${THREADS_PER_TASK}" "${MASS_GENERATOR}" \
   --catalog="${HALFDOME_PATH}" \
   --sightline-mode=catalog \
   --sightline-catalog="${FRB_CATALOG}" \

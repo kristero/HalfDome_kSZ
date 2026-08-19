@@ -1,0 +1,263 @@
+#!/bin/bash
+#PBS -N frb_m13_masspdf
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+set -euo pipefail
+
+# Build a fresh 120,000-source, Moster13 stellar-mass-weighted FRB catalogue
+# in a z=1 shell, then use those exact catalogue rows for all eight foreground
+# halo-mass PDFs. No sky maps or per-ray DM matrix are written.
+
+: "${PROJECT_DIR:=${PBS_O_WORKDIR:-$PWD}}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${PYTHON:=python3}"
+: "${ENV_SETUP:=}"
+: "${LIGHTCONE_ID:=100}"
+: "${CLUSTER_USER:=${USER:-kristero10}}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
+: "${JULIA_PROJECT:=${PROJECT_DIR}/julia_env}"
+
+# All products from this workflow live below this new, isolated tree.
+: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/moster13_z1_120k_foreground_mass_histograms}"
+: "${RUN_TAG:=zsrc1p0_dz0p1_n120000_seed42}"
+OUTPUT_DIR="${OUTPUT_BASE}/${RUN_TAG}"
+CATALOG_DIR="${OUTPUT_DIR}/catalog"
+HISTOGRAM_DIR="${OUTPUT_DIR}/histograms"
+LOG_DIR="${OUTPUT_DIR}/logs"
+
+# Source-catalogue settings. DZ=0.1 means |z_host - 1| < 0.05.
+: "${NFRB:=120000}"
+: "${ZSOURCE:=1.0}"
+: "${CATALOG_DZ:=0.1}"
+: "${SIGHTLINE_REDSHIFT_WIDTH:=0.05}"
+: "${ALPHA_STAR:=1.0}"
+: "${SEED:=42}"
+: "${NSIDE:=4096}"
+: "${CHUNK_SIZE:=1000000}"
+
+# Foreground halo windows in physical Msun, lower-inclusive/upper-exclusive.
+: "${MASS_WINDOWS:=m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16}"
+: "${DM_APERTURE_R200_MULTIPLIER:=1.0}"
+: "${PDF_EDGE_COUNT:=300}"
+: "${PDF_DM_MIN:=0.1}"
+: "${PDF_DM_MAX:=30000}"
+: "${THREADS_PER_TASK:=26}"
+: "${PROGRESS_EVERY_BATCHES:=5}"
+: "${OVERWRITE:=false}"
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+
+MOSTER_GENERATOR="${PROJECT_DIR}/frb_map_generation/make_stellar_weighted_frb_los_dm_map.jl"
+MASS_GENERATOR="${PROJECT_DIR}/frb_map_generation/generate_halfdome_z1_dm_mass_windows.jl"
+PLOTTER="${PROJECT_DIR}/frb_map_generation/plot_halfdome_mass_window_histograms.py"
+HISTOGRAM_HDF5="${HISTOGRAM_DIR}/halfdome_moster13_z1_120k_mass_histograms.h5"
+SUMMARY_CSV="${HISTOGRAM_DIR}/halfdome_moster13_z1_120k_mass_histograms_summary.csv"
+PROVENANCE_TXT="${HISTOGRAM_DIR}/halfdome_moster13_z1_120k_mass_histograms_provenance.txt"
+
+# Prefer an explicitly supplied cache, then an existing project or Lustre copy.
+if [[ -z "${DM_CACHE:-}" ]]; then
+  for cache_candidate in \
+    "${PROJECT_DIR}/frb_map_generation/outputs/shared_xgpaint_dm_cache.jld2" \
+    "/lustre/work/${CLUSTER_USER}/frb_data/halfdome_frb_inputs/shared_xgpaint_dm_cache.jld2"; do
+    if [[ -f "${cache_candidate}" ]]; then
+      DM_CACHE="${cache_candidate}"
+      break
+    fi
+  done
+fi
+: "${DM_CACHE:=${PROJECT_DIR}/frb_map_generation/outputs/shared_xgpaint_dm_cache.jld2}"
+
+mkdir -p "${CATALOG_DIR}" "${HISTOGRAM_DIR}" "${LOG_DIR}"
+JOB_TAG="${PBS_JOBID:-manual}"
+JOB_TAG="${JOB_TAG//[/_}"
+JOB_TAG="${JOB_TAG//]/_}"
+LOG_FILE="${LOG_DIR}/moster13_mass_histograms_${JOB_TAG}.log"
+exec > >(tee -a "${LOG_FILE}") 2>&1
+
+cd "${PROJECT_DIR}"
+if [[ -n "${ENV_SETUP}" ]]; then
+  echo "Running environment setup: ${ENV_SETUP}"
+  eval "${ENV_SETUP}"
+fi
+
+missing_inputs=0
+for required_file in \
+  "${HALFDOME_PATH}" "${DM_CACHE}" "${MOSTER_GENERATOR}" "${MASS_GENERATOR}" \
+  "${PLOTTER}" "${JULIA_PROJECT}/Project.toml"; do
+  if [[ ! -f "${required_file}" ]]; then
+    echo "Required file not found: ${required_file}" >&2
+    missing_inputs=1
+  fi
+done
+if (( missing_inputs != 0 )); then
+  echo "One or more required inputs are missing; no catalogue or halo processing was started." >&2
+  exit 2
+fi
+
+export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS
+
+echo "============================================================"
+echo "Moster13 120k FRB catalogue + foreground-mass histogram job"
+echo "Date: $(date -Is)"
+echo "Host: $(hostname)"
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Project: ${PROJECT_DIR}"
+echo "HalfDome catalogue: ${HALFDOME_PATH}"
+echo "DM cache: ${DM_CACHE}"
+echo "Output directory: ${OUTPUT_DIR}"
+echo "Sources: N=${NFRB}, |z_host-${ZSOURCE}| < $(awk -v dz="${CATALOG_DZ}" 'BEGIN {print dz/2}')"
+echo "Host weighting: Moster13 Mstar(M200c,z)^${ALPHA_STAR}"
+echo "Mass windows: ${MASS_WINDOWS}"
+echo "============================================================"
+
+"${JULIA}" --version
+"${JULIA}" -e 'VERSION.major == 1 && VERSION.minor == 8 || error("This project requires Julia 1.8.x; got $(VERSION)")'
+"${PYTHON}" --version
+"${PYTHON}" -c 'import h5py, matplotlib, numpy'
+"${JULIA}" --project="${JULIA_PROJECT}" -e 'using HDF5, Healpix, XGPaint'
+
+# Reuse only a previously completed and subsequently validated catalogue in
+# this same isolated run directory. Otherwise generate it from HalfDome now.
+shopt -s nullglob
+catalog_matches=("${CATALOG_DIR}"/*_hosts.csv)
+shopt -u nullglob
+if (( ${#catalog_matches[@]} == 0 )); then
+  echo "Generating a fresh Moster13 FRB host catalogue..."
+  "${JULIA}" --threads="${THREADS_PER_TASK}" --project="${JULIA_PROJECT}" "${MOSTER_GENERATOR}" \
+    halfdome_path="${HALFDOME_PATH}" \
+    output_dir="${CATALOG_DIR}" \
+    N="${NFRB}" \
+    z_source="${ZSOURCE}" \
+    dz="${CATALOG_DZ}" \
+    source_selection_mode=shell \
+    alpha_star="${ALPHA_STAR}" \
+    seed="${SEED}" \
+    nside="${NSIDE}" \
+    chunkN="${CHUNK_SIZE}" \
+    stellar_mass_field=computed \
+    stellar_mass_relation=moster2013 \
+    stellar_mass_divide_by_h=false \
+    catalog_only=true \
+    catalog_overwrite=false \
+    save_shell_probabilities=false \
+    save_foreground_map=false \
+    save_power_spectrum=false \
+    save_frb_corrected_estimator=false
+
+  shopt -s nullglob
+  catalog_matches=("${CATALOG_DIR}"/*_hosts.csv)
+  shopt -u nullglob
+fi
+if (( ${#catalog_matches[@]} != 1 )); then
+  echo "Expected exactly one *_hosts.csv in ${CATALOG_DIR}; found ${#catalog_matches[@]}." >&2
+  exit 3
+fi
+FRB_CATALOG="${catalog_matches[0]}"
+
+# Validate the count, z shell, and every stored Moster13 stellar mass before
+# starting the substantially more expensive foreground-halo pass.
+"${PYTHON}" - "${FRB_CATALOG}" "${NFRB}" "${ZSOURCE}" "${CATALOG_DZ}" <<'PY'
+import csv
+import math
+import sys
+
+path, expected_text, z_source_text, dz_text = sys.argv[1:]
+expected_rows = int(expected_text)
+z_source = float(z_source_text)
+half_width = 0.5 * float(dz_text)
+required = {
+    "frb_index", "host_catalog_index", "ra_rad", "dec_rad", "host_redshift",
+    "host_halo_mass_msun", "host_stellar_mass_msun", "selection_probability", "dm_pc_cm3",
+}
+rows = 0
+unique_hosts = set()
+unique_pixels = set()
+with open(path, newline="") as handle:
+    reader = csv.DictReader(handle)
+    missing = required.difference(reader.fieldnames or ())
+    assert not missing, f"Missing catalogue columns: {sorted(missing)}"
+    for row in reader:
+        rows += 1
+        z = float(row["host_redshift"])
+        halo_mass = float(row["host_halo_mass_msun"])
+        stellar_mass = float(row["host_stellar_mass_msun"])
+        probability = float(row["selection_probability"])
+        ra = float(row["ra_rad"])
+        dec = float(row["dec_rad"])
+        assert abs(z - z_source) < half_width + 1.0e-12, (rows, z)
+        assert math.isfinite(halo_mass) and halo_mass > 0.0
+        assert math.isfinite(stellar_mass) and stellar_mass > 0.0
+        assert math.isfinite(probability) and probability > 0.0
+        assert 0.0 <= ra < 2.0 * math.pi and -0.5 * math.pi <= dec <= 0.5 * math.pi
+        zfrac = z / (1.0 + z)
+        m1 = 10.0 ** (11.590 + 1.195 * zfrac)
+        n = 0.0351 - 0.0247 * zfrac
+        beta = 1.376 - 0.826 * zfrac
+        gamma = 0.608 + 0.329 * zfrac
+        ratio = halo_mass / m1
+        moster13 = 2.0 * n * halo_mass / (ratio ** (-beta) + ratio ** gamma)
+        assert math.isclose(stellar_mass, moster13, rel_tol=2.0e-12), (rows, stellar_mass, moster13)
+        assert math.isnan(float(row["dm_pc_cm3"]))
+        unique_hosts.add(row["host_catalog_index"])
+        unique_pixels.add(row.get("host_pixel_ring_1based", ""))
+assert rows == expected_rows, (rows, expected_rows)
+print(
+    f"Validated {rows:,} Moster13 sources: "
+    f"{len(unique_hosts):,} unique hosts, {len(unique_pixels):,} unique NSIDE pixels."
+)
+PY
+
+echo "Computing all eight foreground-mass histograms with the same ${NFRB} catalogue rows..."
+"${JULIA}" --threads="${THREADS_PER_TASK}" --project="${JULIA_PROJECT}" "${MASS_GENERATOR}" \
+  --catalog="${HALFDOME_PATH}" \
+  --sightline-mode=catalog \
+  --sightline-catalog="${FRB_CATALOG}" \
+  --sightline-redshift-width="${SIGHTLINE_REDSHIFT_WIDTH}" \
+  --source-redshift="${ZSOURCE}" \
+  --nfrb="${NFRB}" \
+  --seed="${SEED}" \
+  --nside="${NSIDE}" \
+  --chunk-size="${CHUNK_SIZE}" \
+  --progress-every-batches="${PROGRESS_EVERY_BATCHES}" \
+  --mass-windows="${MASS_WINDOWS}" \
+  --dm-cache="${DM_CACHE}" \
+  --dm-cache-overwrite=false \
+  --dm-aperture-r200-multiplier="${DM_APERTURE_R200_MULTIPLIER}" \
+  --pdf-edge-count="${PDF_EDGE_COUNT}" \
+  --pdf-spacing=log \
+  --pdf-dm-min="${PDF_DM_MIN}" \
+  --pdf-dm-max="${PDF_DM_MAX}" \
+  --save-ray-dm=false \
+  --output="${HISTOGRAM_HDF5}" \
+  --summary="${SUMMARY_CSV}" \
+  --provenance="${PROVENANCE_TXT}" \
+  --overwrite="${OVERWRITE}"
+
+"${PYTHON}" "${PLOTTER}" "${HISTOGRAM_HDF5}" --output-dir "${HISTOGRAM_DIR}"
+
+"${PYTHON}" - "${HISTOGRAM_HDF5}" "${NFRB}" <<'PY'
+import sys
+import h5py
+
+path, expected_text = sys.argv[1:]
+expected = int(expected_text)
+with h5py.File(path, "r") as handle:
+    assert "dm_pc_cm3" not in handle
+    assert "frb_pixel_ring_1based" not in handle
+    assert int(handle.attrs["n_rays"]) == expected
+    assert not bool(handle.attrs["per_ray_dm_saved"])
+    assert handle["pdf_count"].shape == (8, 299)
+    assert handle["pdf_density_per_pc_cm3"].shape == (8, 299)
+print(f"Validated histogram-only output for {expected:,} shared Moster13 catalogue sources.")
+PY
+
+echo "Completed successfully at $(date -Is)"
+echo "FRB catalogue: ${FRB_CATALOG}"
+echo "Histogram products: ${HISTOGRAM_DIR}"
+echo "Complete log: ${LOG_FILE}"

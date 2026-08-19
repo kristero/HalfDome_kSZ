@@ -27,7 +27,20 @@ using Healpix
 using Random
 using Statistics
 using Base.Threads
-using Plots
+
+function catalog_only_requested_early()
+    values = String[]
+    haskey(ENV, "STELLAR_FRB_CATALOG_ONLY") && push!(values, ENV["STELLAR_FRB_CATALOG_ONLY"])
+    for argument in ARGS
+        for prefix in ("catalog_only=", "--catalog_only=")
+            startswith(argument, prefix) && push!(values, split(argument, "="; limit=2)[2])
+        end
+    end
+    return any(value -> lowercase(strip(value)) in ("1", "true", "t", "yes", "y", "on"), values)
+end
+
+const CATALOG_ONLY_REQUESTED_EARLY = catalog_only_requested_early()
+CATALOG_ONLY_REQUESTED_EARLY || (@eval using Plots)
 
 const H_VALUE = 0.68
 const OMEGAB = 0.049
@@ -1949,6 +1962,8 @@ function main()
     halo_mass_max = get_float_arg("halo_mass_max", Inf; env="STELLAR_FRB_FOREGROUND_MASS_MAX")
     frb_overlap_mode = lowercase(get_string_arg("frb_overlap_mode", "mean"; env="STELLAR_FRB_OVERLAP_MODE"))
     save_shell_probabilities = get_bool_arg("save_shell_probabilities", false; env="STELLAR_FRB_SAVE_SHELL_PROBABILITIES")
+    catalog_only = get_bool_arg("catalog_only", false; env="STELLAR_FRB_CATALOG_ONLY")
+    catalog_overwrite = get_bool_arg("catalog_overwrite", false; env="STELLAR_FRB_CATALOG_OVERWRITE")
     dm_value_sanity_max = get_float_arg("dm_value_sanity_max", 1.0e8; env="STELLAR_FRB_DM_VALUE_SANITY_MAX")
     dm_cleanup_nonpositive = get_bool_arg("dm_cleanup_nonpositive", true; env="STELLAR_FRB_DM_CLEANUP_NONPOSITIVE")
     dm_cache_file = resolve_project_path(get_string_arg(
@@ -2014,6 +2029,11 @@ function main()
     host_catalog_path = joinpath(output_dir, "$(tag)_hosts.csv")
     shell_prob_path = joinpath(output_dir, "$(tag)_shell_probabilities.csv")
     summary_path = joinpath(output_dir, "$(tag)_summary.txt")
+    if catalog_only && !catalog_overwrite
+        for path in (host_catalog_path, summary_path)
+            ispath(path) && error("Catalogue-only output exists: $(path). Pass catalog_overwrite=true to replace it.")
+        end
+    end
     dm_hist_path = joinpath(output_dir, "$(tag)_dm_pdf_loglog.png")
     mstar_hist_path = joinpath(output_dir, "$(tag)_stellar_mass_host_histogram_loglog.png")
     cl_table_path = joinpath(output_dir, "$(tag)_foreground_dm_power_spectrum.csv")
@@ -2034,6 +2054,7 @@ function main()
     end
     println("  stellar_mass_field=$(stellar_mass_field), stellar_mass_relation=$(stellar_mass_relation), stellar_mass_divide_by_h=$(stellar_mass_divide_by_h)")
     println("  alpha_star=$(alpha_star), eps=$(eps)")
+    println("  catalog_only=$(catalog_only), catalog_overwrite=$(catalog_overwrite)")
     println("  foreground halo cut: $(z_min_foreground) <= z_halo < $(z_max_foreground), mass in [$(halo_mass_min), $(halo_mass_max))")
     println("  dm_cache_file=$(dm_cache_file), dm_cache_overwrite=$(dm_cache_overwrite)")
     println("  save_foreground_map=$(save_foreground_map), foreground_progress_every=$(foreground_progress_every)")
@@ -2087,6 +2108,50 @@ function main()
 
     res = Healpix.Resolution(nside)
     frb_pixels = ra_dec_to_ring_pixels(res, hosts.ras, hosts.decs)
+    if catalog_only
+        frb_dm = fill(NaN, n_frb)
+        write_host_catalog(
+            host_catalog_path,
+            hosts,
+            frb_pixels,
+            frb_dm,
+            source_mode_is_all ? hosts.redshifts : z_source,
+        )
+        if save_shell_probabilities && !source_mode_is_all
+            write_shell_probability_table(shell_prob_path, shell, hosts.p_shell)
+        end
+        open(summary_path, "w") do io
+            println(io, "Moster13 stellar-mass-weighted FRB host catalogue")
+            println(io, "catalog_only=true")
+            println(io, "halfdome_path=$(catalog_path)")
+            println(io, "stellar_mass_relation=$(stellar_mass_relation)")
+            println(io, "stellar_mass_field=$(shell.stellar_mass_field)")
+            println(io, "alpha_star=$(alpha_star)")
+            println(io, "seed=$(seed)")
+            println(io, "nside=$(nside)")
+            println(io, "n_frb=$(n_frb)")
+            println(io, "source_selection_mode=$(source_selection_mode)")
+            println(io, "z_source=$(z_source)")
+            println(io, "dz=$(dz)")
+            println(io, "candidate_host_count=$(source_mode_is_all ? shell.candidate_count : length(shell.indices))")
+            println(io, "unique_selected_host_count=$(length(unique(hosts.catalog_indices)))")
+            println(io, "unique_selected_pixel_count=$(length(unique(frb_pixels)))")
+            println(io, "selected_redshift_min=$(minimum(hosts.redshifts))")
+            println(io, "selected_redshift_max=$(maximum(hosts.redshifts))")
+            println(io, "selected_halo_mass_min_msun=$(minimum(hosts.masses))")
+            println(io, "selected_halo_mass_max_msun=$(maximum(hosts.masses))")
+            println(io, "selected_stellar_mass_min_msun=$(minimum(hosts.mstar))")
+            println(io, "selected_stellar_mass_max_msun=$(maximum(hosts.mstar))")
+            println(io, "dm_pc_cm3=NaN (not computed in catalogue-only mode)")
+            println(io, "host_catalog_path=$(host_catalog_path)")
+        end
+        println("Wrote catalogue-only Moster13 FRB hosts:")
+        println("  $(host_catalog_path)")
+        println("Wrote catalogue-only summary:")
+        println("  $(summary_path)")
+        println("Catalogue-only mode complete; no foreground DM or maps were computed.")
+        return nothing
+    end
     frb_ux, frb_uy, frb_uz = ra_dec_to_unit_vectors(hosts.ras, hosts.decs)
     sorted_frb_pixels, sorted_frb_indices = build_frb_pixel_lookup(frb_pixels)
     frb_dm = zeros(Float64, n_frb)

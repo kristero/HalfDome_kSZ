@@ -17,7 +17,7 @@ set -euo pipefail
 : "${SEED:=42}"
 : "${SUBMIT_CATALOG_CAP_TEST:=true}"
 : "${CATALOG_CAP:=120000}"
-: "${CAP_TEST_NSIDE:=2048}"
+: "${CAP_TEST_NSIDE:=4096}"
 : "${CAP_TEST_ZSOURCE:=1.0}"
 : "${DRY_RUN:=false}"
 

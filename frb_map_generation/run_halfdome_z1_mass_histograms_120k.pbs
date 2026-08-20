@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N frb_uniform_masspdf_120k
 #PBS -q mini
-#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l select=1:ncpus=52:mpiprocs=1:mem=128gb
 #PBS -l walltime=23:59:00
 #PBS -S /bin/bash
 #PBS -j oe
@@ -28,7 +28,7 @@ set -euo pipefail
 : "${NFRB:=120000}"
 : "${ZSOURCE:=1.0}"
 : "${SEED:=42}"
-: "${NSIDE:=2048}"
+: "${NSIDE:=4096}"
 : "${MAX_CATALOG_HALOS:=0}"  # 0 means the complete catalogue
 : "${DM_APERTURE_R200_MULTIPLIER:=1.0}"
 : "${MASS_WINDOWS:=m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16}"

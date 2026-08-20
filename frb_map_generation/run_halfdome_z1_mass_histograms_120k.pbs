@@ -8,10 +8,10 @@
 
 set -euo pipefail
 
-# Draw 120,000 uniformly random HEALPix sightlines to a fixed source plane at
-# z=1, then stream the complete HalfDome catalogue once. Every finite halo with
-# 0 <= z_halo <= 1 is eligible for the requested foreground mass windows. The
-# output is histogram-only: no sky map or per-ray DM matrix is written.
+# Draw uniformly random HEALPix sightlines to one exact fixed source plane,
+# then stream the HalfDome catalogue once. Every finite halo with
+# 0 <= z_halo <= z_source is eligible for the requested foreground mass
+# windows. The output is histogram-only: no sky map or per-ray DM matrix.
 
 : "${PROJECT_DIR:=${PBS_O_WORKDIR:-$PWD}}"
 : "${JULIA:=/usr/local/bin/julia}"
@@ -24,22 +24,29 @@ set -euo pipefail
 : "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
 : "${DM_CACHE:=${PROJECT_DIR}/frb_map_generation/outputs/shared_xgpaint_dm_cache.jld2}"
 
-# Dedicated output tree; this does not reuse any previous output directory.
-: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_uniform_z1_120k_foreground_mass_histograms}"
-: "${RUN_TAG:=zsrc1p0_n120000_seed42}"
-OUTPUT_DIR="${OUTPUT_BASE}/${RUN_TAG}"
-LOG_DIR="${OUTPUT_DIR}/logs"
-HISTOGRAM_HDF5="${OUTPUT_DIR}/halfdome_uniform_z1_120k_foreground_mass_histograms.h5"
-SUMMARY_CSV="${OUTPUT_DIR}/halfdome_uniform_z1_120k_foreground_mass_histograms_summary.csv"
-PROVENANCE_TXT="${OUTPUT_DIR}/halfdome_uniform_z1_120k_foreground_mass_histograms_provenance.txt"
-
 # Science settings.
 : "${NFRB:=120000}"
 : "${ZSOURCE:=1.0}"
 : "${SEED:=42}"
-: "${NSIDE:=4096}"
+: "${NSIDE:=2048}"
+: "${MAX_CATALOG_HALOS:=0}"  # 0 means the complete catalogue
 : "${DM_APERTURE_R200_MULTIPLIER:=1.0}"
 : "${MASS_WINDOWS:=m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16}"
+
+# Each parameter combination receives an isolated directory automatically.
+ZSOURCE_TAG="${ZSOURCE//./p}"
+if (( MAX_CATALOG_HALOS > 0 )); then
+  HALO_TAG="catalogcap${MAX_CATALOG_HALOS}"
+else
+  HALO_TAG="allhalos"
+fi
+: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_uniform_fixedz_foreground_mass_histograms}"
+: "${RUN_TAG:=zsrc${ZSOURCE_TAG}_nside${NSIDE}_nrays${NFRB}_${HALO_TAG}_seed${SEED}}"
+OUTPUT_DIR="${OUTPUT_BASE}/${RUN_TAG}"
+LOG_DIR="${OUTPUT_DIR}/logs"
+HISTOGRAM_HDF5="${OUTPUT_DIR}/halfdome_uniform_fixedz_foreground_mass_histograms.h5"
+SUMMARY_CSV="${OUTPUT_DIR}/halfdome_uniform_fixedz_foreground_mass_histograms_summary.csv"
+PROVENANCE_TXT="${OUTPUT_DIR}/halfdome_uniform_fixedz_foreground_mass_histograms_provenance.txt"
 
 # Runtime and histogram settings.
 : "${THREADS_PER_TASK:=26}"
@@ -112,7 +119,9 @@ echo "HalfDome catalog: ${HALFDOME_PATH}"
 echo "DM cache: ${DM_CACHE}"
 echo "Output directory: ${OUTPUT_DIR}"
 echo "Shared rays: ${NFRB} unique uniform HEALPix pixels at z_source=${ZSOURCE}"
+echo "NSIDE: ${NSIDE}"
 echo "Foreground halo interval: 0 <= z_halo <= ${ZSOURCE}"
+echo "Maximum catalogue rows: ${MAX_CATALOG_HALOS} (0 means complete catalogue)"
 echo "Mass windows (${MASS_WINDOW_COUNT}): ${MASS_WINDOWS}"
 echo "Histogram: ${PDF_EDGE_COUNT} log edges over [${PDF_DM_MIN}, ${PDF_DM_MAX}] pc cm^-3"
 echo "Per-ray DM output: false"
@@ -131,6 +140,7 @@ run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
   --seed="${SEED}" \
   --nside="${NSIDE}" \
   --chunk-size="${CHUNK_SIZE}" \
+  --max-catalog-halos="${MAX_CATALOG_HALOS}" \
   --progress-every-batches="${PROGRESS_EVERY_BATCHES}" \
   --mass-windows="${MASS_WINDOWS}" \
   --dm-cache="${DM_CACHE}" \
@@ -150,13 +160,25 @@ run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
 
 # Assert that this is genuinely histogram-only and that all curves use the
 # same requested ray count.
-"${PYTHON}" - "${HISTOGRAM_HDF5}" "${NFRB}" "${MASS_WINDOW_COUNT}" <<'PY'
+"${PYTHON}" - \
+  "${HISTOGRAM_HDF5}" "${NFRB}" "${MASS_WINDOW_COUNT}" \
+  "${ZSOURCE}" "${NSIDE}" "${MAX_CATALOG_HALOS}" <<'PY'
 import sys
 import h5py
 
-path, expected_text, expected_windows_text = sys.argv[1:]
+(
+    path,
+    expected_text,
+    expected_windows_text,
+    expected_redshift_text,
+    expected_nside_text,
+    catalog_cap_text,
+) = sys.argv[1:]
 expected = int(expected_text)
 expected_windows = int(expected_windows_text)
+expected_redshift = float(expected_redshift_text)
+expected_nside = int(expected_nside_text)
+catalog_cap = int(catalog_cap_text)
 with h5py.File(path, "r") as handle:
     assert "dm_pc_cm3" not in handle, "Histogram-only file unexpectedly contains per-ray DM"
     assert "frb_pixel_ring_1based" not in handle, "Histogram-only file unexpectedly contains ray pixels"
@@ -170,6 +192,12 @@ with h5py.File(path, "r") as handle:
     if isinstance(sightline_mode, bytes):
         sightline_mode = sightline_mode.decode()
     assert str(sightline_mode) == "uniform"
+    assert float(handle.attrs["provenance_source_redshift"]) == expected_redshift
+    assert int(handle.attrs["provenance_nside"]) == expected_nside
+    total_halos = int(handle.attrs["provenance_catalog_total_halos"])
+    streamed_halos = int(handle.attrs["provenance_catalog_streamed_halos"])
+    expected_streamed = total_halos if catalog_cap == 0 else min(total_halos, catalog_cap)
+    assert streamed_halos == expected_streamed, (streamed_halos, expected_streamed)
     foreground = int(handle.attrs["provenance_foreground_valid_halo_count"])
     mass_accounted = (
         int(handle["foreground_halo_mass_histogram_count"][:].sum())
@@ -184,8 +212,9 @@ with h5py.File(path, "r") as handle:
     assert mass_accounted == foreground, (mass_accounted, foreground)
     assert redshift_accounted == foreground, (redshift_accounted, foreground)
 print(
-    f"Validated {expected_windows} mass windows, {expected:,} uniform z=1 rays, "
-    f"and {foreground:,} foreground halos: {path}"
+    f"Validated {expected_windows} mass windows, {expected:,} uniform rays at "
+    f"z={expected_redshift:g}, NSIDE={expected_nside}, {streamed_halos:,} streamed "
+    f"catalogue rows, and {foreground:,} foreground halos: {path}"
 )
 PY
 

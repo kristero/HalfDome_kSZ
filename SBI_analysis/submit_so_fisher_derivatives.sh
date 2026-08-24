@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -eo pipefail
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 DEFAULT_PROJECT_DIR=$(cd "${SCRIPT_DIR}/.." && pwd)
@@ -30,65 +30,83 @@ if [[ ! "${SUBMIT_BATCH_SIZE}" =~ ^[0-9]+$ ]] || (( SUBMIT_BATCH_SIZE < 1 )); th
   echo "SUBMIT_BATCH_SIZE must be a positive integer; got ${SUBMIT_BATCH_SIZE}." >&2
   exit 2
 fi
+if (( SUBMIT_BATCH_SIZE > 4 )); then
+  echo "Clamping SUBMIT_BATCH_SIZE=${SUBMIT_BATCH_SIZE} to the four-job limit."
+  SUBMIT_BATCH_SIZE=4
+fi
 
 job_is_active() {
   local job_id="$1"
   qstat "${job_id}" >/dev/null 2>&1
 }
 
-logged_job_ids=()
+cancel_job_ids() {
+  local ids_text="$1"
+  local reason="$2"
+  local job_id
+  local cancelled=0
+
+  while IFS= read -r job_id; do
+    [[ -n "${job_id}" ]] || continue
+    if job_is_active "${job_id}"; then
+      echo "Cancelling ${reason}: ${job_id}"
+      qdel "${job_id}"
+      cancelled=$((cancelled + 1))
+    fi
+  done <<< "${ids_text}"
+
+  return 0
+}
+
+logged_job_ids_text=""
 if [[ -f "${CURRENT_JOBS_LOG}" ]]; then
-  mapfile -t logged_job_ids < <(
+  logged_job_ids_text="$(
     awk -F, 'NR > 1 && $NF != "" {gsub(/\r/, "", $NF); print $NF}' "${CURRENT_JOBS_LOG}"
-  )
+  )"
 fi
 
-old_array_ids=()
+old_array_ids_text=""
 if command -v qselect >/dev/null 2>&1; then
-  mapfile -t old_array_ids < <(
+  old_array_ids_text="$(
     qselect -u "${USER}" -N SO_fisher_deriv 2>/dev/null || true
-  )
+  )"
+fi
+
+# Array jobs belong to the obsolete implementation and are always removed.
+if [[ -n "${old_array_ids_text}" ]]; then
+  cancel_job_ids "${old_array_ids_text}" "obsolete Fisher array job"
+fi
+
+obsolete_submission_log=0
+if [[ -f "${CURRENT_JOBS_LOG}" ]] && head -n 1 "${CURRENT_JOBS_LOG}" | grep -q 'lane,depends_on'; then
+  obsolete_submission_log=1
+fi
+
+# The old helper submitted 37 dependent jobs at once. Remove those automatically.
+if [[ "${obsolete_submission_log}" == "1" ]] && [[ -n "${logged_job_ids_text}" ]]; then
+  cancel_job_ids "${logged_job_ids_text}" "obsolete Fisher dependency job"
+  logged_job_ids_text=""
 fi
 
 if [[ "${CANCEL_EXISTING}" == "1" ]]; then
-  cancellation_ids=("${old_array_ids[@]}" "${logged_job_ids[@]}")
-  unique_cancellation_ids=()
-  for job_id in "${cancellation_ids[@]}"; do
-    [[ -n "${job_id}" ]] || continue
-    seen=0
-    for existing in "${unique_cancellation_ids[@]}"; do
-      if [[ "${existing}" == "${job_id}" ]]; then
-        seen=1
-        break
-      fi
-    done
-    if (( seen == 0 )); then
-      unique_cancellation_ids+=("${job_id}")
-    fi
-  done
-
-  if (( ${#unique_cancellation_ids[@]} > 0 )); then
-    echo "Cancelling previous Fisher jobs: ${unique_cancellation_ids[*]}"
-    for job_id in "${unique_cancellation_ids[@]}"; do
-      if job_is_active "${job_id}"; then
-        qdel "${job_id}"
-      fi
-    done
+  if [[ -n "${logged_job_ids_text}" ]]; then
+    cancel_job_ids "${logged_job_ids_text}" "current Fisher batch job"
   else
-    echo "No previous Fisher jobs were found."
+    echo "No current separate-job batch was found."
   fi
-  old_array_ids=()
-  logged_job_ids=()
+  logged_job_ids_text=""
 else
-  active_job_ids=()
-  for job_id in "${old_array_ids[@]}" "${logged_job_ids[@]}"; do
+  active_job_ids_text=""
+  while IFS= read -r job_id; do
     [[ -n "${job_id}" ]] || continue
     if job_is_active "${job_id}"; then
-      active_job_ids+=("${job_id}")
+      active_job_ids_text+="${job_id}"$'\n'
     fi
-  done
-  if (( ${#active_job_ids[@]} > 0 )); then
-    echo "A Fisher batch is still active: ${active_job_ids[*]}" >&2
+  done <<< "${logged_job_ids_text}"
+
+  if [[ -n "${active_job_ids_text}" ]]; then
+    echo "A four-job Fisher batch is still active:" >&2
+    printf '%s' "${active_job_ids_text}" >&2
     echo "Wait for it to finish, or rerun with CANCEL_EXISTING=1." >&2
     exit 3
   fi
@@ -154,7 +172,7 @@ fi
 printf 'submitted_utc,row_1based,label,job_id\n' > "${CURRENT_JOBS_LOG}"
 
 echo "Completed derivative rows: ${completed_count}/${N_ROWS}"
-echo "Submitting only ${batch_count} separate jobs to queue ${FISHER_QUEUE}."
+echo "Submitting only ${batch_count} separate, non-array jobs to queue ${FISHER_QUEUE}."
 
 for ((index=0; index<batch_count; index++)); do
   row="${pending_rows[index]}"
@@ -173,11 +191,16 @@ for ((index=0; index<batch_count; index++)); do
     echo "qsub returned no job ID for row ${row}: ${submission_output}" >&2
     exit 2
   fi
+  if [[ "${job_id}" == *"["* ]] || [[ "${job_id}" == *"]"* ]]; then
+    echo "Refusing array job ID returned for row ${row}: ${job_id}" >&2
+    qdel "${job_id}" >/dev/null 2>&1 || true
+    exit 2
+  fi
 
   printf '%s,%s,%s,%s\n' \
     "${timestamp}" "${row}" "${label}" "${job_id}" \
     >> "${CURRENT_JOBS_LOG}"
-  echo "Submitted row ${row} (${label}) as ${job_id}."
+  echo "Submitted separate row ${row} (${label}) as ${job_id}."
 done
 
 remaining_after_batch=$(( ${#pending_rows[@]} - batch_count ))

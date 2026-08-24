@@ -1,7 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)`nDEFAULT_PROJECT_DIR=$(cd "${SCRIPT_DIR}/.." && pwd)`n: "${PROJECT_DIR:=${DEFAULT_PROJECT_DIR}}"
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+DEFAULT_PROJECT_DIR=$(cd "${SCRIPT_DIR}/.." && pwd)
+: "${PROJECT_DIR:=${DEFAULT_PROJECT_DIR}}"
 : "${FISHER_ROOT:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0}"
 : "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
 : "${MAX_CONCURRENT_JOBS:=5}"

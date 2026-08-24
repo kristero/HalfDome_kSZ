@@ -1,0 +1,72 @@
+#!/bin/bash
+#PBS -N SO2p_train
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=24:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -eo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+: "${PROJECT_ROOT:=${WORK_DIR}}"
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+: "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+: "${TWO_PARAM_ROOT:=/lustre/work/kristero10/adrian_two_param_npe_baseline_deproj0}"
+: "${X_RESCALE_MODE:=asinh}"
+: "${HOLDOUT_LAST_N:=1000}"
+: "${NUM_BATTAGLIA_SAMPLES:=100000}"
+: "${STOP_AFTER_EPOCHS:=60}"
+: "${SBI_SEED:=42}"
+: "${SBI_DEVICE:=cpu}"
+: "${OVERWRITE:=0}"
+: "${VALIDATE_ONLY:=0}"
+
+case "${X_RESCALE_MODE}" in
+  asinh|none) ;;
+  *) echo "X_RESCALE_MODE must be asinh or none; got ${X_RESCALE_MODE}." >&2; exit 2 ;;
+esac
+
+SCRIPT="${PROJECT_ROOT}/SBI_analysis/train_so_two_param_npe.py"
+OUTPUT_DIR="${TWO_PARAM_ROOT}/${X_RESCALE_MODE}"
+for path in "${SCRIPT}" "${PREPARED_DATASET}"; do
+  [[ -e "${path}" ]] || { echo "Required input not found: ${path}" >&2; exit 2; }
+done
+mkdir -p /home/kristero10/logs/SBI_runs "${OUTPUT_DIR}"
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  eval "${PYTHON_ENV_SETUP}"
+fi
+
+ALLOCATED_CPUS="${PBS_NCPUS:-26}"
+export OMP_NUM_THREADS="${ALLOCATED_CPUS}"
+export OPENBLAS_NUM_THREADS="${ALLOCATED_CPUS}"
+export MKL_NUM_THREADS="${ALLOCATED_CPUS}"
+export NUMEXPR_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_INTEROP_THREADS=1
+
+EXTRA_ARGS=()
+[[ "${OVERWRITE}" == "1" ]] && EXTRA_ARGS+=(--overwrite)
+[[ "${VALIDATE_ONLY}" == "1" ]] && EXTRA_ARGS+=(--validate-only)
+
+echo "Started: $(date -Is)"
+echo "Mode: ${X_RESCALE_MODE}"
+echo "Dataset: ${PREPARED_DATASET}"
+echo "Output: ${OUTPUT_DIR}"
+"${PYTHON}" "${SCRIPT}" \
+  --prepared-dataset "${PREPARED_DATASET}" \
+  --output-dir "${OUTPUT_DIR}" \
+  --target-params P0,beta \
+  --holdout-last-n "${HOLDOUT_LAST_N}" \
+  --x-rescale-mode "${X_RESCALE_MODE}" \
+  --density-estimator maf \
+  --stop-after-epochs "${STOP_AFTER_EPOCHS}" \
+  --num-battaglia-samples "${NUM_BATTAGLIA_SAMPLES}" \
+  --seed "${SBI_SEED}" \
+  --device "${SBI_DEVICE}" \
+  "${EXTRA_ARGS[@]}"
+echo "Finished: $(date -Is)"

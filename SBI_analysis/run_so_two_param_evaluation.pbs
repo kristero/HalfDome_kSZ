@@ -1,0 +1,64 @@
+#!/bin/bash
+#PBS -N SO2p_eval
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mpiprocs=1:mem=96gb
+#PBS -l walltime=24:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -eo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+: "${PROJECT_ROOT:=${WORK_DIR}}"
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+: "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+: "${TWO_PARAM_ROOT:=/lustre/work/kristero10/adrian_two_param_npe_baseline_deproj0}"
+: "${LAST_N_TEST:=1000}"
+: "${NUM_POSTERIOR_SAMPLES:=2000}"
+: "${RANK_BINS:=20}"
+: "${EVAL_SEED:=42}"
+: "${EVAL_DEVICE:=cpu}"
+: "${EVAL_DPI:=300}"
+: "${REUSE_SAMPLES:=0}"
+: "${VALIDATE_ONLY:=0}"
+
+SCRIPT="${PROJECT_ROOT}/SBI_analysis/evaluate_so_two_param_npe.py"
+for path in "${SCRIPT}" "${PREPARED_DATASET}" \
+  "${TWO_PARAM_ROOT}/none/density_estimator.pkl" \
+  "${TWO_PARAM_ROOT}/asinh/density_estimator.pkl"; do
+  [[ -e "${path}" ]] || { echo "Required input not found: ${path}" >&2; exit 2; }
+done
+mkdir -p /home/kristero10/logs/SBI_runs
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  eval "${PYTHON_ENV_SETUP}"
+fi
+
+ALLOCATED_CPUS="${PBS_NCPUS:-8}"
+export OMP_NUM_THREADS="${ALLOCATED_CPUS}"
+export OPENBLAS_NUM_THREADS="${ALLOCATED_CPUS}"
+export MKL_NUM_THREADS="${ALLOCATED_CPUS}"
+export NUMEXPR_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_INTEROP_THREADS=1
+
+EXTRA_ARGS=()
+[[ "${REUSE_SAMPLES}" == "1" ]] && EXTRA_ARGS+=(--reuse-samples)
+[[ "${VALIDATE_ONLY}" == "1" ]] && EXTRA_ARGS+=(--validate-only)
+
+echo "Started: $(date -Is)"
+"${PYTHON}" "${SCRIPT}" \
+  --prepared-dataset "${PREPARED_DATASET}" \
+  --run-root "${TWO_PARAM_ROOT}" \
+  --last-n-test "${LAST_N_TEST}" \
+  --num-posterior-samples "${NUM_POSTERIOR_SAMPLES}" \
+  --rank-bins "${RANK_BINS}" \
+  --seed "${EVAL_SEED}" \
+  --device "${EVAL_DEVICE}" \
+  --dpi "${EVAL_DPI}" \
+  "${EXTRA_ARGS[@]}"
+echo "Finished: $(date -Is)"
+echo "Outputs: ${TWO_PARAM_ROOT}/comparison_last1000"

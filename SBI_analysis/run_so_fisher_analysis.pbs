@@ -1,0 +1,84 @@
+#!/bin/bash
+#PBS -N SO_fisher_analysis
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mpiprocs=1:mem=96gb
+#PBS -l walltime=24:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+
+: "${PROJECT_ROOT:=${WORK_DIR}}"
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+: "${FISHER_ROOT:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0}"
+: "${RAW_DIR:=/lustre/work/kristero10/adrian_dataset}"
+: "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+: "${SBI_RUN_ROOT:=/home/kristero10/HalfDome_kSZ/SBI_analysis/outputs/cluster_outputs/SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_metadata_verified_asinh}"
+: "${SBI_CASE:=masked_baseline_noise_cross_deproj0}"
+: "${NPE_N_TRAIN:=0}"
+: "${COVARIANCE_ROWS:=20000}"
+: "${COVARIANCE_RANDOM_ROWS:=20000}"
+: "${CHUNK_ROWS:=256}"
+: "${SHRINKAGE:=0.05}"
+: "${FISHER_SAMPLES:=100000}"
+: "${SBI_SAMPLES:=100000}"
+: "${DEVICE:=cpu}"
+: "${DPI:=300}"
+
+if [[ ! -f "${PROJECT_ROOT}/SBI_analysis/run_so_fisher_analysis.py" ]] && [[ -f "${WORK_DIR}/run_so_fisher_analysis.py" ]]; then
+  PROJECT_ROOT="$(cd "${WORK_DIR}/.." && pwd)"
+fi
+SCRIPT="${PROJECT_ROOT}/SBI_analysis/run_so_fisher_analysis.py"
+
+for path in "${SCRIPT}" "${PREPARED_DATASET}" "${RAW_DIR}/sbi_masked_no_noise_cl.npy" "${RAW_DIR}/sbi_masked_baseline_noise_cross_deproj0_cl.npy" "${FISHER_ROOT}/fisher_variations_manifest.csv"; do
+  if [[ ! -e "${path}" ]]; then
+    echo "Required input does not exist: ${path}" >&2
+    exit 2
+  fi
+done
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  eval "${PYTHON_ENV_SETUP}"
+fi
+
+ALLOCATED_CPUS="${PBS_NCPUS:-8}"
+export OMP_NUM_THREADS="${ALLOCATED_CPUS}"
+export OPENBLAS_NUM_THREADS="${ALLOCATED_CPUS}"
+export MKL_NUM_THREADS="${ALLOCATED_CPUS}"
+export NUMEXPR_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_INTEROP_THREADS=1
+
+echo "Started: $(date -Is)"
+echo "Project root: ${PROJECT_ROOT}"
+echo "Fisher root: ${FISHER_ROOT}"
+echo "Raw data: ${RAW_DIR}"
+echo "Prepared dataset: ${PREPARED_DATASET}"
+echo "SBI run root: ${SBI_RUN_ROOT}"
+echo "NPE N train: ${NPE_N_TRAIN} (0 means largest)"
+"${PYTHON}" --version
+
+"${PYTHON}" "${SCRIPT}" \
+  --prepared-dataset "${PREPARED_DATASET}" \
+  --raw-dir "${RAW_DIR}" \
+  --fisher-root "${FISHER_ROOT}" \
+  --sbi-run-root "${SBI_RUN_ROOT}" \
+  --case "${SBI_CASE}" \
+  --npe-n-train "${NPE_N_TRAIN}" \
+  --covariance-rows "${COVARIANCE_ROWS}" \
+  --covariance-random-rows "${COVARIANCE_RANDOM_ROWS}" \
+  --chunk-rows "${CHUNK_ROWS}" \
+  --bin-weighting 2ell_plus_1 \
+  --shrinkage "${SHRINKAGE}" \
+  --fisher-samples "${FISHER_SAMPLES}" \
+  --sbi-samples "${SBI_SAMPLES}" \
+  --device "${DEVICE}" \
+  --dpi "${DPI}"
+
+echo "Finished: $(date -Is)"
+echo "Outputs: ${FISHER_ROOT}/analysis"

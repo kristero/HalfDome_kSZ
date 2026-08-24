@@ -1,0 +1,125 @@
+#!/bin/bash
+#PBS -N SO_fisher_deriv
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+: "${PROJECT_DIR:=${PBS_O_WORKDIR:-$PWD}}"
+: "${FISHER_ROOT:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${LIGHTCONE_ID:=100}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
+: "${BASELINE_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt}"
+: "${GOAL_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt}"
+: "${CACHE_DIR:=/lustre/work/kristero10/tSZ_data/cache}"
+: "${THREADS_PER_TASK:=26}"
+: "${SKIP_EXISTING:=1}"
+
+VARIATION_CSV="${FISHER_ROOT}/fisher_variations.csv"
+MANIFEST_CSV="${FISHER_ROOT}/fisher_variations_manifest.csv"
+ROW="${PBS_ARRAY_INDEX:-${PBS_ARRAYID:-${FISHER_ROW:-}}}"
+
+if [[ -z "${ROW}" || ! "${ROW}" =~ ^[0-9]+$ ]]; then
+  echo "Set PBS_ARRAY_INDEX/PBS_ARRAYID or FISHER_ROW to a positive integer." >&2
+  exit 2
+fi
+
+cd "${PROJECT_DIR}"
+
+SCRIPT="${PROJECT_DIR}/tSZ_visuals/run_halfdome_fullsky_so_noise.jl"
+for path in "${SCRIPT}" "${VARIATION_CSV}" "${MANIFEST_CSV}" "${HALFDOME_PATH}" "${BASELINE_NOISE_PATH}" "${GOAL_NOISE_PATH}"; do
+  if [[ ! -e "${path}" ]]; then
+    echo "Required path does not exist: ${path}" >&2
+    exit 2
+  fi
+done
+
+N_ROWS=$(( $(wc -l < "${VARIATION_CSV}") - 1 ))
+if (( ROW < 1 || ROW > N_ROWS )); then
+  echo "Fisher row ${ROW} is outside 1..${N_ROWS}." >&2
+  exit 2
+fi
+
+LABEL="$(awk -F, -v row="${ROW}" 'NR == row + 1 {gsub(/\r/, "", $2); print $2}' "${MANIFEST_CSV}")"
+if [[ -z "${LABEL}" ]]; then
+  echo "Could not read label for row ${ROW} from ${MANIFEST_CSV}." >&2
+  exit 2
+fi
+
+ROW_TAG="$(printf 'row%03d_%s' "${ROW}" "${LABEL}")"
+OUTPUT_DIR="${FISHER_ROOT}/variations/${ROW_TAG}"
+LOG_DIR="${FISHER_ROOT}/logs"
+mkdir -p "${OUTPUT_DIR}" "${LOG_DIR}" "${CACHE_DIR}"
+
+if [[ "${SKIP_EXISTING}" == "1" ]] && find "${OUTPUT_DIR}" -maxdepth 1 -type f -name '*masked_no_noise_cl*.npy' -print -quit | grep -q .; then
+  echo "Clean spectrum already exists for ${ROW_TAG}; skipping."
+  exit 0
+fi
+
+export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export ENFORCE_BATTAGLIA_GUARDRAILS=true
+export SKIP_INVALID_BATTAGLIA_ROWS=false
+
+STDOUT_PATH="${LOG_DIR}/${ROW_TAG}_${PBS_JOBID:-manual}.out"
+STDERR_PATH="${LOG_DIR}/${ROW_TAG}_${PBS_JOBID:-manual}.err"
+
+{
+  echo "started_utc=$(date -u +%FT%TZ)"
+  echo "pbs_jobid=${PBS_JOBID:-manual}"
+  echo "host=$(hostname)"
+  echo "row=${ROW}"
+  echo "label=${LABEL}"
+  echo "variation_csv=${VARIATION_CSV}"
+  echo "output_dir=${OUTPUT_DIR}"
+} > "${OUTPUT_DIR}/job_config.txt"
+
+echo "Running Fisher derivative ${ROW}/${N_ROWS}: ${LABEL}"
+echo "Output: ${OUTPUT_DIR}"
+
+"${JULIA}" --threads="${THREADS_PER_TASK}" "${SCRIPT}" \
+  simulation_name="halfdome_lightcone_${LIGHTCONE_ID}" \
+  halfdome_path="${HALFDOME_PATH}" \
+  output_dir="${OUTPUT_DIR}" \
+  cache_dir="${CACHE_DIR}" \
+  sobol_csv_path="${VARIATION_CSV}" \
+  sobol_row="${ROW}" \
+  baseline_noise_path="${BASELINE_NOISE_PATH}" \
+  goal_noise_path="${GOAL_NOISE_PATH}" \
+  nside=4096 \
+  cl_lmax=7979 \
+  so_noise_lmax=7979 \
+  cl_niter=0 \
+  so_noise_deprojections=0 \
+  so_noise_is_dl=false \
+  apply_gaussian_beam=true \
+  gaussian_beam_fwhm_arcmin=2.0 \
+  mask_fsky=0.4 \
+  mask_apodization_arcmin=60.0 \
+  seed=12345 \
+  model_exists=false \
+  reuse_existing_cache=true \
+  cache_wait_seconds=0 \
+  cache_poll_seconds=30 \
+  interpolator_pad=256 \
+  interpolator_logM_max=15.7 \
+  save_no_noise_cl=true \
+  save_baseline_noise_cross_cl=false \
+  save_goal_noise_cross_cl=false \
+  save_unmasked_no_noise_cl=false \
+  save_noise_maps=false \
+  save_noisy_maps=false \
+  save_mask_map=false \
+  save_signal_map=false \
+  save_masked_signal_map=false \
+  > "${STDOUT_PATH}" 2> "${STDERR_PATH}"
+
+echo "finished_utc=$(date -u +%FT%TZ)" >> "${OUTPUT_DIR}/job_config.txt"
+echo "Finished ${ROW_TAG}."

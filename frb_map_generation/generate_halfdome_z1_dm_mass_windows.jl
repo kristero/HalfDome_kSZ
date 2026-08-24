@@ -1278,9 +1278,12 @@ function configuration(options; require_catalog=true)
     catalog_mass_floor = get_float_option(options, ("catalog_mass_floor",), DEFAULT_HALFDOME_MASS_FLOOR_MSUN)
     apply_catalog_mass_floor = get_bool_option(options, ("apply_catalog_mass_floor",), true)
     catalog_masses_are_msun_h = get_bool_option(options, ("catalog_masses_are_msun_h",), true)
-    profile_mass_option = lowercase(replace(strip(get_string_option(
+    profile_mass_option_raw = String(strip(get_string_option(
         options, ("xgpaint_profile_mass_definition",), "m200m",
-    )), "_" => "", "-" => ""))
+    )))
+    profile_mass_option = lowercase(replace(replace(
+        profile_mass_option_raw, "_" => "",
+    ), "-" => ""))
     profile_mass_option == "m200m" || error(
         "xgpaint_profile_mass_definition must be m200m for the current authoritative DM cache; " *
         "got $(repr(profile_mass_option)).",

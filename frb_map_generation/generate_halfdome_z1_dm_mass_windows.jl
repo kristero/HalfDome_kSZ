@@ -114,6 +114,13 @@ const OMEGAC = 0.31 - OMEGAB
 const OMEGAM = OMEGAB + OMEGAC
 const DEFAULT_SOURCE_REDSHIFT = 1.0
 const DEFAULT_HALFDOME_MASS_FLOOR_MSUN = 7.327e12
+const CATALOG_M200C_DATASET = "halo_mass_m200c"
+const CATALOG_M200M_DATASET = "halo_mass_m200m"
+const HALO_MASS_DEFINITION = "M200c"
+const HALO_RADIUS_DEFINITION = "R200c"
+const HALO_REFERENCE_DENSITY = "critical"
+const HALO_OVERDENSITY = 200
+const XGPAINT_PROFILE_MASS_DEFINITION = "M200m"
 
 struct MassWindow
     label::String
@@ -224,6 +231,7 @@ function validate_known_options(options)
         "sightline_redshift_column", "sightline_redshift_width", "sightline_max_rows",
         "sightline_progress_every_rows",
         "apply_catalog_mass_floor", "catalog_masses_are_msun_h", "dm_cache", "dm_cache_file",
+        "xgpaint_profile_mass_definition",
         "dm_cache_overwrite", "dm_cleanup_nonpositive", "dm_value_sanity_max",
         "halo_extension_r200_multiplier", "halo_extension_r200",
         "dm_aperture_r200_multiplier", "pdf_bins",
@@ -284,8 +292,10 @@ Core options (both --key=value and key=value are accepted):
   --dm-cache-overwrite=false          Existing DM cache is authoritative; a missing cache is an error
                                       Public-v0.4 rebuilds require a NEW, non-existing --dm-cache path
                                       Example: --dm-cache=.../public_v04_dm_cache.jld2 --dm-cache-overwrite=true
+  --xgpaint-profile-mass-definition=m200m
+                                      Declare the existing cache's mass coordinate; this workflow requires M200m
   --halo-extension-r200-multiplier=4.0
-                                      Maximum projected halo radius in units of R200
+                                      Maximum projected halo radius in units of R200c
                                       (use 3 for the IllustrisTNG comparison; any positive value is valid)
   --dm-aperture-r200-multiplier=VALUE Legacy alias for --halo-extension-r200-multiplier
   --mass-windows=SPEC                 Comma/semicolon-separated label:min_msun:max_msun entries
@@ -304,7 +314,8 @@ Sightline selection (uniform is the default):
 HalfDome resolution options:
   --catalog-mass-floor=7.327e12      Observed physical-Msun floor after the catalog's /h conversion
   --apply-catalog-mass-floor=true    Enforce and record effective lower bounds
-  --catalog-masses-are-msun-h=true   Divide halo_mass_m200c by h=0.68, matching existing scripts
+  --catalog-masses-are-msun-h=true   Divide both catalog masses by h=0.68
+                                      M200c selects bins/apertures; M200m enters the unchanged XGPaint cache
 
 Output/control options:
   --summary=PATH --provenance=PATH   Defaults are sidecars beside the HDF5 output
@@ -543,10 +554,63 @@ function compute_theta_min_local(model)
     return eps(Float64)
 end
 
-function compute_theta_max_local(model, mass, redshift, aperture_r200_multiplier::Float64)
-    function_name = Symbol("compute_", Char(0x03b8), "max")
-    isdefined(XGPaint, function_name) || error("XGPaint does not define compute_theta_max.")
-    return getfield(XGPaint, function_name)(model, mass, redshift; mult=aperture_r200_multiplier)
+radius_200c_from_mass_density(mass, rho_critical) =
+    ∛(mass / (4pi / 3 * HALO_OVERDENSITY * rho_critical))
+
+function compute_theta_max_r200c_external(
+    model,
+    m200c_msun::Real,
+    redshift::Real,
+    aperture_r200c_multiplier::Real,
+)
+    mass = Float64(m200c_msun)
+    z = Float64(redshift)
+    multiplier = Float64(aperture_r200c_multiplier)
+    isfinite(mass) && mass > 0.0 || error("M200c must be finite and positive; got $(mass).")
+    isfinite(z) && z >= 0.0 || error("Halo redshift must be finite and nonnegative; got $(z).")
+    isfinite(multiplier) && multiplier > 0.0 || error(
+        "R200c aperture multiplier must be finite and positive; got $(multiplier).",
+    )
+
+    rho_crit_name = Symbol(Char(0x03c1), "_crit")
+    isdefined(XGPaint, rho_crit_name) || error("XGPaint does not expose its cosmology critical-density helper.")
+    isdefined(XGPaint, :angular_size) || error("XGPaint does not expose its angular-size helper.")
+    rho_critical = getfield(XGPaint, rho_crit_name)(model, z)
+    r200c = radius_200c_from_mass_density(mass * XGPaint.M_sun, rho_critical)
+    theta_max = getfield(XGPaint, :angular_size)(model, multiplier * r200c, z)
+    return Float64(theta_max)
+end
+
+function interpolator_logmass_bounds(model)
+    hasproperty(model, :itp) || error("DM interpolator has no interpolation grid.")
+    interpolation = getproperty(model, :itp)
+    hasproperty(interpolation, :ranges) || error("DM interpolator exposes no coordinate ranges.")
+    ranges = getproperty(interpolation, :ranges)
+    length(ranges) >= 3 || error("DM interpolator has fewer than three coordinate axes.")
+    lower = Float64(first(ranges[3]))
+    upper = Float64(last(ranges[3]))
+    isfinite(lower) && isfinite(upper) && lower < upper || error(
+        "DM interpolator has invalid log10(M200m/Msun) bounds $(lower), $(upper).",
+    )
+    return (lower, upper)
+end
+
+function validate_profile_masses_in_cache(masses_m200m, logmass_bounds)
+    isempty(masses_m200m) && return nothing
+    lower, upper = logmass_bounds
+    tolerance = 32eps(Float64) * max(1.0, abs(lower), abs(upper))
+    for mass_value in masses_m200m
+        mass = Float64(mass_value)
+        isfinite(mass) && mass > 0.0 || error(
+            "XGPaint profile M200m must be finite and positive; got $(mass).",
+        )
+        logmass = log10(mass)
+        lower - tolerance <= logmass <= upper + tolerance || error(
+            "XGPaint profile M200m=$(mass) Msun (log10=$(logmass)) is outside the " *
+            "cache mass axis [$(lower), $(upper)].",
+        )
+    end
+    return nothing
 end
 
 function cache_grid_value(model_grid, candidate_keys)
@@ -675,7 +739,7 @@ function build_dm_interpolator_compatible(
     )
 end
 
-function validate_dm_interpolator_scale(interpolated_model, direct_model)
+function validate_dm_interpolator_spot_value(interpolated_model)
     interpolation = getproperty(interpolated_model, :itp)
     ranges = getproperty(interpolation, :ranges)
     logtheta = clamp(log(1e-4), Float64(first(ranges[1])), Float64(last(ranges[1])))
@@ -684,15 +748,11 @@ function validate_dm_interpolator_scale(interpolated_model, direct_model)
     logmass = clamp(14.0, Float64(first(ranges[3])), Float64(last(ranges[3])))
     mass_msun = 10.0^logmass
     cached_value = Float64(interpolated_model(theta, mass_msun, redshift))
-    direct_value = Float64(direct_model(theta, mass_msun, redshift))
-    isfinite(cached_value) && cached_value > 0.0 || error("DM cache scale check returned $(cached_value).")
-    isfinite(direct_value) && direct_value > 0.0 || error("Direct DM scale check returned $(direct_value).")
-    ratio = cached_value / direct_value
-    0.01 <= ratio <= 100.0 || error(
-        "Cache is $(ratio)x the direct HaloDM profile at the scale-check point. " *
-        "This is probably a tau/tSZ cache rather than a DM cache; pass a DM cache or rebuild explicitly.",
+    isfinite(cached_value) && cached_value > 0.0 || error(
+        "DM cache spot check returned $(cached_value) at theta=$(theta), " *
+        "M200m=$(mass_msun) Msun, z=$(redshift).",
     )
-    return ratio
+    return (value=cached_value, theta=theta, redshift=redshift, mass_m200m_msun=mass_msun)
 end
 
 struct ReusableDiscQueryWorkspace{R,I}
@@ -755,7 +815,7 @@ function add_if_frb_pixel_windows!(
     frb_uz,
     theta_min::Float64,
     theta_max::Float64,
-    mass_msun::Float64,
+    profile_mass_m200m_msun::Float64,
     redshift::Float64,
     membership_mask::UInt16,
     nwindow::Int,
@@ -773,8 +833,13 @@ function add_if_frb_pixel_windows!(
         )
         theta = acos(cosine)
         theta <= theta_max || continue
-        contribution = Float64(dm_model_interp(max(theta, theta_min), mass_msun, redshift))
-        isfinite(contribution) || error("Non-finite XGPaint DM at mass=$(mass_msun), z=$(redshift), theta=$(theta).")
+        contribution = Float64(dm_model_interp(
+            max(theta, theta_min), profile_mass_m200m_msun, redshift,
+        ))
+        isfinite(contribution) || error(
+            "Non-finite XGPaint DM at M200m=$(profile_mass_m200m_msun), " *
+            "z=$(redshift), theta=$(theta).",
+        )
         unique_hits += 1
         for iw in 1:nwindow
             if (membership_mask & (UInt16(1) << (iw - 1))) != 0
@@ -801,12 +866,14 @@ function accumulate_batch_windows!(
     x,
     y,
     z,
-    masses,
+    masses_m200c,
+    masses_m200m,
     redshifts,
     membership_masks,
     nwindow::Int,
 )
-    Threads.@threads :static for i in eachindex(masses)
+    length(masses_m200c) == length(masses_m200m) || error("M200c/M200m batch lengths differ.")
+    Threads.@threads :static for i in eachindex(masses_m200c)
         tid = Threads.threadid()
         local_dm = accumulator.thread_dm[tid]
         local_window_hits = accumulator.thread_window_hits[tid]
@@ -819,11 +886,12 @@ function accumulate_batch_windows!(
         halo_uy = yi / radius
         halo_uz = zi / radius
         center_theta, center_phi = Healpix.vec2ang(halo_ux, halo_uy, halo_uz)
-        mass_msun = Float64(masses[i])
+        selection_mass_m200c_msun = Float64(masses_m200c[i])
+        profile_mass_m200m_msun = Float64(masses_m200m[i])
         redshift = Float64(redshifts[i])
-        theta_max = Float64(compute_theta_max_local(
-            dm_model_interp, mass_msun * XGPaint.M_sun, redshift, aperture_r200_multiplier,
-        ))
+        theta_max = compute_theta_max_r200c_external(
+            dm_model_interp, selection_mass_m200c_msun, redshift, aperture_r200_multiplier,
+        )
         isfinite(theta_max) && theta_max > 0.0 || continue
         candidate_theta_max = min(pi, theta_max + candidate_pixel_margin)
 
@@ -837,7 +905,7 @@ function accumulate_batch_windows!(
                 halo_hits += add_if_frb_pixel_windows!(
                     local_dm, local_window_hits, sorted_frb_pixels, sorted_frb_indices,
                     global_pixel, halo_ux, halo_uy, halo_uz,
-                    frb_ux, frb_uy, frb_uz, theta_min, theta_max, mass_msun, redshift,
+                    frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200m_msun, redshift,
                     membership_masks[i], nwindow, dm_model_interp,
                 )
             end
@@ -852,7 +920,7 @@ function accumulate_batch_windows!(
                     halo_hits += add_if_frb_pixel_windows!(
                         local_dm, local_window_hits, sorted_frb_pixels, sorted_frb_indices,
                         first_pixel + local_pixel_index - 1, halo_ux, halo_uy, halo_uz,
-                        frb_ux, frb_uy, frb_uz, theta_min, theta_max, mass_msun, redshift,
+                        frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200m_msun, redshift,
                         membership_masks[i], nwindow, dm_model_interp,
                     )
                 end
@@ -875,19 +943,50 @@ function reduce_accumulator(accumulator::WindowDMAccumulator)
     return dm, sum(accumulator.thread_unique_hits), window_hits
 end
 
+function validate_catalog_m200c_pair(m200c_dataset, m200m_dataset, total_halos::Int)
+    total_halos > 0 || error("HalfDome catalog contains no halos.")
+    sample_width = min(total_halos, 4096)
+    sample_ranges = total_halos <= sample_width ?
+        (1:sample_width,) : (1:sample_width, (total_halos - sample_width + 1):total_halos)
+    ratio_min = Inf
+    ratio_max = -Inf
+    sample_count = 0
+    for indices in sample_ranges
+        m200c = Float64.(m200c_dataset[indices])
+        m200m = Float64.(m200m_dataset[indices])
+        all(isfinite, m200c) && all(>(0.0), m200c) || error(
+            "$(CATALOG_M200C_DATASET) contains non-finite or non-positive validation samples.",
+        )
+        all(isfinite, m200m) && all(>(0.0), m200m) || error(
+            "$(CATALOG_M200M_DATASET) contains non-finite or non-positive validation samples.",
+        )
+        ratios = m200c ./ m200m
+        all(ratios .<= 1.0 + 1.0e-6) || error(
+            "Catalog M200c validation failed: expected M200c <= M200m in sampled halos.",
+        )
+        ratio_min = min(ratio_min, minimum(ratios))
+        ratio_max = max(ratio_max, maximum(ratios))
+        sample_count += length(indices)
+    end
+    return (sample_count=sample_count, ratio_min=ratio_min, ratio_max=ratio_max)
+end
+
 function stream_halfdome_batches(process_batch!::F, catalog_path::AbstractString, chunk_size::Int;
                                  masses_are_msun_h=true, max_catalog_halos=0) where {F}
     return h5open(catalog_path, "r") do h5
-        for dataset in ("Position", "halo_mass_m200c", "redshift")
+        for dataset in ("Position", CATALOG_M200C_DATASET, CATALOG_M200M_DATASET, "redshift")
             haskey(h5, dataset) || error("HalfDome catalog is missing dataset $(dataset).")
         end
         position_dataset = h5["Position"]
-        mass_dataset = h5["halo_mass_m200c"]
+        m200c_dataset = h5[CATALOG_M200C_DATASET]
+        m200m_dataset = h5[CATALOG_M200M_DATASET]
         redshift_dataset = h5["redshift"]
         size(position_dataset, 1) == 3 || error("Position must have shape (3, N).")
         total_halos = size(position_dataset, 2)
-        length(mass_dataset) == total_halos || error("halo_mass_m200c length does not match Position.")
+        length(m200c_dataset) == total_halos || error("$(CATALOG_M200C_DATASET) length does not match Position.")
+        length(m200m_dataset) == total_halos || error("$(CATALOG_M200M_DATASET) length does not match Position.")
         length(redshift_dataset) == total_halos || error("redshift length does not match Position.")
+        validation = validate_catalog_m200c_pair(m200c_dataset, m200m_dataset, total_halos)
         streamed_halos = max_catalog_halos > 0 ? min(total_halos, max_catalog_halos) : total_halos
 
         batch_number = 0
@@ -896,8 +995,12 @@ function stream_halfdome_batches(process_batch!::F, catalog_path::AbstractString
             batch_stop = min(batch_start + chunk_size - 1, streamed_halos)
             indices = batch_start:batch_stop
             positions = position_dataset[:, indices]
-            masses = Float64.(mass_dataset[indices])
-            masses_are_msun_h && (masses ./= H_VALUE)
+            masses_m200c = Float64.(m200c_dataset[indices])
+            masses_m200m = Float64.(m200m_dataset[indices])
+            if masses_are_msun_h
+                masses_m200c ./= H_VALUE
+                masses_m200m ./= H_VALUE
+            end
             redshifts = Float64.(redshift_dataset[indices])
             process_batch!(
                 batch_number,
@@ -905,11 +1008,18 @@ function stream_halfdome_batches(process_batch!::F, catalog_path::AbstractString
                 @view(positions[1, :]),
                 @view(positions[2, :]),
                 @view(positions[3, :]),
-                masses,
+                masses_m200c,
+                masses_m200m,
                 redshifts,
             )
         end
-        return (catalog_halos=total_halos, streamed_halos=streamed_halos)
+        return (;
+            catalog_halos=total_halos,
+            streamed_halos=streamed_halos,
+            m200c_validation_sample_count=validation.sample_count,
+            m200c_to_m200m_ratio_min=validation.ratio_min,
+            m200c_to_m200m_ratio_max=validation.ratio_max,
+        )
     end
 end
 
@@ -1107,7 +1217,7 @@ function write_hdf5_output(
             metadata = attrs(h5)
             metadata["schema_name"] = save_ray_dm ?
                 "halfdome_fixed_z_dm_mass_windows" : "halfdome_fixed_z_dm_mass_window_histograms"
-            metadata["schema_version"] = "1.2.0"
+            metadata["schema_version"] = "1.3.0"
             metadata["run_id"] = run_id
             metadata["created_utc"] = created_utc
             metadata["per_ray_dm_saved"] = save_ray_dm
@@ -1120,6 +1230,14 @@ function write_hdf5_output(
             metadata["pdf_matrix_axes"] = "window,bin"
             metadata["pdf_matrix_axes_hdf5_jl"] = "bin,window"
             metadata["mass_unit"] = "Msun"
+            metadata["halo_mass_definition"] = HALO_MASS_DEFINITION
+            metadata["halo_radius_definition"] = HALO_RADIUS_DEFINITION
+            metadata["halo_reference_density"] = HALO_REFERENCE_DENSITY
+            metadata["halo_overdensity"] = Int64(HALO_OVERDENSITY)
+            metadata["mass_window_selection_definition"] = HALO_MASS_DEFINITION
+            metadata["xgpaint_profile_input_mass_definition"] = XGPAINT_PROFILE_MASS_DEFINITION
+            metadata["aperture_radius_definition"] = HALO_RADIUS_DEFINITION
+            metadata["xgpaint_default_theta_max_used"] = false
             metadata["dm_unit"] = "pc cm^-3"
             metadata["mass_interval_convention"] = "lower-inclusive, upper-exclusive"
             metadata["healpix_ordering"] = "RING"
@@ -1160,6 +1278,14 @@ function configuration(options; require_catalog=true)
     catalog_mass_floor = get_float_option(options, ("catalog_mass_floor",), DEFAULT_HALFDOME_MASS_FLOOR_MSUN)
     apply_catalog_mass_floor = get_bool_option(options, ("apply_catalog_mass_floor",), true)
     catalog_masses_are_msun_h = get_bool_option(options, ("catalog_masses_are_msun_h",), true)
+    profile_mass_option = lowercase(replace(strip(get_string_option(
+        options, ("xgpaint_profile_mass_definition",), "m200m",
+    )), "_" => "", "-" => ""))
+    profile_mass_option == "m200m" || error(
+        "xgpaint_profile_mass_definition must be m200m for the current authoritative DM cache; " *
+        "got $(repr(profile_mass_option)).",
+    )
+    xgpaint_profile_mass_definition = XGPAINT_PROFILE_MASS_DEFINITION
     catalog = resolve_halfdome_catalog(
         get_string_option(options, ("catalog", "halfdome_path"), "lightcone_100.hdf5");
         require_exists=require_catalog,
@@ -1235,7 +1361,8 @@ function configuration(options; require_catalog=true)
         sightline_ra_column, sightline_dec_column, sightline_redshift_column,
         sightline_redshift_width, sightline_max_rows, sightline_progress_every_rows,
         chunk_size, max_catalog_halos,
-        catalog_mass_floor, apply_catalog_mass_floor, catalog_masses_are_msun_h, catalog,
+        catalog_mass_floor, apply_catalog_mass_floor, catalog_masses_are_msun_h,
+        xgpaint_profile_mass_definition, catalog,
         output, summary, provenance, dm_cache, dm_cache_overwrite, dm_cleanup_nonpositive,
         dm_value_sanity_max, dm_aperture_r200_multiplier, pdf_edge_count, pdf_spacing,
         pdf_dm_min, pdf_dm_max, progress_every_batches,
@@ -1263,7 +1390,13 @@ function print_configuration(config)
     println("  chunk_size=$(config.chunk_size), max_catalog_halos=$(config.max_catalog_halos)")
     println("  catalog_mass_floor_msun=$(config.catalog_mass_floor), apply=$(config.apply_catalog_mass_floor)")
     println("  catalog_masses_are_msun_h=$(config.catalog_masses_are_msun_h), h=$(H_VALUE)")
-    println("  dm_cache=$(config.dm_cache), halo_extension=$(config.dm_aperture_r200_multiplier) R200, JULIA_NUM_THREADS=$(Threads.nthreads())")
+    println("  mass-window selection=$(HALO_MASS_DEFINITION) from $(CATALOG_M200C_DATASET)")
+    println("  XGPaint profile input=$(config.xgpaint_profile_mass_definition) from $(CATALOG_M200M_DATASET)")
+    println(
+        "  aperture=$(config.dm_aperture_r200_multiplier) $(HALO_RADIUS_DEFINITION), " *
+        "computed externally from $(CATALOG_M200C_DATASET); XGPaint default theta_max is bypassed",
+    )
+    println("  dm_cache=$(config.dm_cache), JULIA_NUM_THREADS=$(Threads.nthreads())")
     println("  save_ray_dm=$(config.save_ray_dm), custom_mass_windows=$(!isempty(config.mass_windows_specification))")
     print_window_table(config.windows)
     for (bounds, labels) in equivalent_effective_window_groups(config.windows)
@@ -1272,6 +1405,30 @@ function print_configuration(config)
 end
 
 function run_self_test()
+    catalog_validation = validate_catalog_m200c_pair(
+        [8.0e11, 9.0e12, 9.8e13],
+        [1.0e12, 1.0e13, 1.0e14],
+        3,
+    )
+    @assert catalog_validation.sample_count == 3
+    @assert catalog_validation.ratio_min == 0.8
+    @assert catalog_validation.ratio_max == 0.98
+    synthetic_rho_critical = 5.0
+    synthetic_r200c = 2.0
+    synthetic_m200c = 4pi / 3 * HALO_OVERDENSITY * synthetic_rho_critical * synthetic_r200c^3
+    @assert isapprox(
+        radius_200c_from_mass_density(synthetic_m200c, synthetic_rho_critical),
+        synthetic_r200c;
+        rtol=8eps(Float64),
+    )
+    validate_profile_masses_in_cache([1.0e10, 1.0e13, 1.0e16], (10.0, 16.0))
+    profile_range_error = false
+    try
+        validate_profile_masses_in_cache([1.0e17], (10.0, 16.0))
+    catch
+        profile_range_error = true
+    end
+    @assert profile_range_error
     reconstructed_axis = (start=-2.0, stop=2.0, len=5, lendiv=4)
     native_axis = native_linear_axis(reconstructed_axis, 5, "self-test")
     @assert native_axis isa AbstractRange
@@ -1451,8 +1608,9 @@ function main(options)
         cleanup_nonpositive=config.dm_cleanup_nonpositive,
     )
     dm_model_interp = interpolator_build.profile
-    dm_cache_public_profile_spot_ratio = validate_dm_interpolator_scale(dm_model_interp, dm_model)
+    dm_cache_spot = validate_dm_interpolator_spot_value(dm_model_interp)
     theta_min = compute_theta_min_local(dm_model_interp)
+    profile_logmass_bounds = interpolator_logmass_bounds(dm_model_interp)
     workspace, sparse_disc_backend = make_sparse_disc_workspace(resolution)
     candidate_pixel_margin = config.sightline_mode == "catalog" ? Float64(Healpix.max_pixrad(resolution)) : 0.0
     accumulator = WindowDMAccumulator(actual_nfrb, length(config.windows))
@@ -1463,6 +1621,8 @@ function main(options)
     below_floor_count = Ref(Int64(0))
     observed_foreground_min = Ref(Inf)
     observed_foreground_max = Ref(-Inf)
+    observed_profile_m200m_min = Ref(Inf)
+    observed_profile_m200m_max = Ref(-Inf)
     foreground_mass_edges = 10.0 .^ collect(range(8.0, 17.0; length=181))
     foreground_mass_counts = zeros(Int64, length(foreground_mass_edges) - 1)
     foreground_redshift_edges = collect(range(0.0, config.source_redshift; length=101))
@@ -1476,22 +1636,27 @@ function main(options)
         config.chunk_size;
         masses_are_msun_h=config.catalog_masses_are_msun_h,
         max_catalog_halos=config.max_catalog_halos,
-    ) do batch_number, batch_start, x, y, z, masses, redshifts
+    ) do batch_number, batch_start, x, y, z, masses_m200c, masses_m200m, redshifts
         selected_indices = Int[]
         membership_masks = UInt16[]
-        sizehint!(selected_indices, length(masses))
-        sizehint!(membership_masks, length(masses))
-        @inbounds for i in eachindex(masses)
-            mass = Float64(masses[i])
+        sizehint!(selected_indices, length(masses_m200c))
+        sizehint!(membership_masks, length(masses_m200c))
+        @inbounds for i in eachindex(masses_m200c)
+            selection_mass_m200c = Float64(masses_m200c[i])
+            profile_mass_m200m = Float64(masses_m200m[i])
             redshift = Float64(redshifts[i])
-            if !isfinite(mass) || mass <= 0.0 || !isfinite(redshift) || redshift < 0.0 || redshift > config.source_redshift
+            if !isfinite(selection_mass_m200c) || selection_mass_m200c <= 0.0 ||
+               !isfinite(profile_mass_m200m) || profile_mass_m200m <= 0.0 ||
+               !isfinite(redshift) || redshift < 0.0 || redshift > config.source_redshift
                 continue
             end
             valid_foreground_count[] += 1
-            observed_foreground_min[] = min(observed_foreground_min[], mass)
-            observed_foreground_max[] = max(observed_foreground_max[], mass)
+            observed_foreground_min[] = min(observed_foreground_min[], selection_mass_m200c)
+            observed_foreground_max[] = max(observed_foreground_max[], selection_mass_m200c)
+            observed_profile_m200m_min[] = min(observed_profile_m200m_min[], profile_mass_m200m)
+            observed_profile_m200m_max[] = max(observed_profile_m200m_max[], profile_mass_m200m)
             mass_histogram_status = increment_histogram_count!(
-                foreground_mass_counts, foreground_mass_edges, mass,
+                foreground_mass_counts, foreground_mass_edges, selection_mass_m200c,
             )
             mass_histogram_status < 0 && (foreground_mass_underflow[] += 1)
             mass_histogram_status > 0 && (foreground_mass_overflow[] += 1)
@@ -1500,8 +1665,8 @@ function main(options)
             )
             redshift_histogram_status < 0 && (foreground_redshift_underflow[] += 1)
             redshift_histogram_status > 0 && (foreground_redshift_overflow[] += 1)
-            mass < config.catalog_mass_floor && (below_floor_count[] += 1)
-            mask = window_membership_mask(mass, config.windows)
+            selection_mass_m200c < config.catalog_mass_floor && (below_floor_count[] += 1)
+            mask = window_membership_mask(selection_mass_m200c, config.windows)
             mask == 0 && continue
             selected_union_count[] += 1
             push!(selected_indices, i)
@@ -1512,17 +1677,19 @@ function main(options)
         end
 
         if !isempty(selected_indices)
+            selected_m200m = masses_m200m[selected_indices]
+            validate_profile_masses_in_cache(selected_m200m, profile_logmass_bounds)
             accumulate_batch_windows!(
                 accumulator, workspace, dm_model_interp, theta_min, config.dm_aperture_r200_multiplier,
                 candidate_pixel_margin,
                 sorted_frb_pixels, sorted_frb_indices, frb_ux, frb_uy, frb_uz,
                 Float64.(x[selected_indices]), Float64.(y[selected_indices]), Float64.(z[selected_indices]),
-                masses[selected_indices], redshifts[selected_indices], membership_masks,
+                masses_m200c[selected_indices], selected_m200m, redshifts[selected_indices], membership_masks,
                 length(config.windows),
             )
         end
         if config.progress_every_batches > 0 && batch_number % config.progress_every_batches == 0
-            println("  streamed through catalog row $(batch_start + length(masses) - 1); selected=$(selected_union_count[])")
+            println("  streamed through catalog row $(batch_start + length(masses_m200c) - 1); selected=$(selected_union_count[])")
         end
     end
 
@@ -1566,9 +1733,33 @@ function main(options)
         "catalog_streamed_halos" => streamed.streamed_halos,
         "catalog_truncated" => streamed.streamed_halos < streamed.catalog_halos,
         "catalog_passes" => 1,
-        "catalog_mass_dataset" => "halo_mass_m200c",
+        "catalog_mass_dataset" => CATALOG_M200C_DATASET,
+        "catalog_mass_window_dataset" => CATALOG_M200C_DATASET,
+        "catalog_native_mass_dataset" => CATALOG_M200M_DATASET,
+        "catalog_xgpaint_profile_mass_dataset" => CATALOG_M200M_DATASET,
         "catalog_mass_input_unit" => config.catalog_masses_are_msun_h ? "Msun/h" : "Msun",
         "catalog_mass_conversion" => config.catalog_masses_are_msun_h ? "divide by h=0.68" : "none",
+        "catalog_m200c_validation_sample_count" => streamed.m200c_validation_sample_count,
+        "catalog_m200c_to_m200m_ratio_min" => streamed.m200c_to_m200m_ratio_min,
+        "catalog_m200c_to_m200m_ratio_max" => streamed.m200c_to_m200m_ratio_max,
+        "halo_mass_definition" => HALO_MASS_DEFINITION,
+        "halo_radius_definition" => HALO_RADIUS_DEFINITION,
+        "halo_reference_density" => HALO_REFERENCE_DENSITY,
+        "halo_overdensity" => HALO_OVERDENSITY,
+        "mass_window_selection_definition" => HALO_MASS_DEFINITION,
+        "xgpaint_input_mass_definition" => config.xgpaint_profile_mass_definition,
+        "xgpaint_profile_input_mass_definition" => config.xgpaint_profile_mass_definition,
+        "xgpaint_profile_input_mass_dataset" => CATALOG_M200M_DATASET,
+        "xgpaint_aperture_radius_definition" => HALO_RADIUS_DEFINITION,
+        "aperture_mass_definition" => HALO_MASS_DEFINITION,
+        "aperture_mass_dataset" => CATALOG_M200C_DATASET,
+        "aperture_radius_definition" => HALO_RADIUS_DEFINITION,
+        "aperture_radius_calculation" => "generator external spherical-overdensity radius from M200c and critical density",
+        "aperture_geometry_owner" => "generator",
+        "xgpaint_default_theta_max_used" => false,
+        "xgpaint_paint_function_used" => false,
+        "xgpaint_profile_internal_mass_definition" => config.xgpaint_profile_mass_definition,
+        "xgpaint_profile_internal_radius_definition" => "R200m",
         "catalog_resolution_floor_msun" => config.catalog_mass_floor,
         "catalog_resolution_floor_is_approximate" => true,
         "apply_catalog_mass_floor" => config.apply_catalog_mass_floor,
@@ -1576,6 +1767,8 @@ function main(options)
         "foreground_below_declared_floor_count" => below_floor_count[],
         "foreground_observed_min_msun" => observed_foreground_min[],
         "foreground_observed_max_msun" => observed_foreground_max[],
+        "foreground_observed_profile_m200m_min_msun" => observed_profile_m200m_min[],
+        "foreground_observed_profile_m200m_max_msun" => observed_profile_m200m_max[],
         "foreground_mass_histogram_underflow_count" => foreground_mass_underflow[],
         "foreground_mass_histogram_overflow_count" => foreground_mass_overflow[],
         "foreground_redshift_histogram_underflow_count" => foreground_redshift_underflow[],
@@ -1612,7 +1805,9 @@ function main(options)
         "dm_observer_frame_redshift_dilution" => "1/(1+z_halo)",
         "halo_extension_r200_multiplier" => config.dm_aperture_r200_multiplier,
         "dm_aperture_r200_multiplier" => config.dm_aperture_r200_multiplier,
-        "profile_angular_support" => "XGPaint compute_theta_max with explicit mult=$(config.dm_aperture_r200_multiplier)",
+        "profile_angular_support" => "generator exact angular filter at angular_size($(config.dm_aperture_r200_multiplier)*R200c); XGPaint compute_theta_max and paint! bypassed",
+        "dm_cache_profile_log10_m200m_min" => profile_logmass_bounds[1],
+        "dm_cache_profile_log10_m200m_max" => profile_logmass_bounds[2],
         "xgpaint_version" => xgpaint_version,
         "dm_cache_file" => abspath(config.dm_cache),
         "dm_cache_exists_after_interpolator_build" => dm_cache_exists,
@@ -1625,8 +1820,11 @@ function main(options)
         "dm_cache_logtheta_key" => interpolator_build.logtheta_key,
         "dm_cache_nonpositive_replaced" => interpolator_build.nonpositive_replaced,
         "dm_model_family" => interpolator_build.model_family,
-        "dm_cache_to_public_v0p4_profile_spot_ratio" => dm_cache_public_profile_spot_ratio,
-        "dm_cache_to_public_v0p4_profile_spot_ratio_point" => "theta=1e-4 rad, mass=1e14 Msun, z=1 (clamped to cache axes)",
+        "dm_cache_spot_value_pc_cm3" => dm_cache_spot.value,
+        "dm_cache_spot_theta_rad" => dm_cache_spot.theta,
+        "dm_cache_spot_redshift" => dm_cache_spot.redshift,
+        "dm_cache_spot_m200m_msun" => dm_cache_spot.mass_m200m_msun,
+        "dm_cache_spot_check_policy" => "positive finite cached DM only; no comparison to a differently configured direct profile",
         "sparse_disc_backend" => sparse_disc_backend,
         "pdf_edge_count" => config.pdf_edge_count,
         "pdf_spacing" => config.pdf_spacing,

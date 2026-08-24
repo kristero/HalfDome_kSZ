@@ -67,6 +67,7 @@ def _plot_group(
     density: np.ndarray,
     n_rays: int,
     source_redshift: float,
+    halo_extension_r200: float,
 ) -> bool:
     index_by_label = {label: index for index, label in enumerate(labels)}
     available_labels = tuple(label for label in requested_labels if label in index_by_label)
@@ -100,7 +101,8 @@ def _plot_group(
     ax.set_xlabel(r"Foreground-halo DM [pc cm$^{-3}$]", fontsize=15)
     ax.set_ylabel(r"$p({\rm DM}\mid z)$", fontsize=15)
     ax.set_title(
-        rf"HalfDome {group_description}, $z_{{src}}={source_redshift:g}$"
+        rf"HalfDome {group_description}, $z_{{src}}={source_redshift:g}$, "
+        rf"$R_{{\rm max}}={halo_extension_r200:g}R_{{200}}$"
         + f"\nSame {n_rays:,} rays in every curve; zero-DM rays are outside log bins",
         fontsize=13,
     )
@@ -181,6 +183,12 @@ def main() -> None:
         )
         n_rays = int(h5.attrs.get("n_rays", h5.attrs.get("provenance_nfrb_actual", -1)))
         source_redshift = float(np.asarray(h5["source_redshift_grid"][:]).ravel()[0])
+        halo_extension_r200 = float(
+            h5.attrs.get(
+                "provenance_halo_extension_r200_multiplier",
+                h5.attrs.get("provenance_dm_aperture_r200_multiplier", 4.0),
+            )
+        )
         per_ray_saved = bool(h5.attrs.get("per_ray_dm_saved", "dm_pc_cm3" in h5))
         diagnostic_names = (
             "foreground_halo_mass_bin_edges_msun",
@@ -271,6 +279,7 @@ def main() -> None:
         density,
         n_rays,
         source_redshift,
+        halo_extension_r200,
     ):
         saved_plots.append(upper_png)
     if _plot_group(
@@ -285,6 +294,7 @@ def main() -> None:
         density,
         n_rays,
         source_redshift,
+        halo_extension_r200,
     ):
         saved_plots.append(to_1e14_png)
     if _plot_group(
@@ -299,6 +309,7 @@ def main() -> None:
         density,
         n_rays,
         source_redshift,
+        halo_extension_r200,
     ):
         saved_plots.append(lower_png)
 
@@ -313,7 +324,7 @@ def main() -> None:
             foreground_mass_edges,
             foreground_mass_counts,
             r"Foreground halo mass $M_{200c}$ [$M_\odot$]",
-            rf"All HalfDome foreground halos with $0\leq z\leq {source_redshift:g}$",
+            rf"All streamed HalfDome foreground halos with $0\leq z\leq {source_redshift:g}$",
             log_x=True,
         )
         _plot_catalog_histogram(
@@ -322,7 +333,7 @@ def main() -> None:
             foreground_redshift_counts,
             "Foreground halo redshift",
             (
-                f"Redshift distribution of {foreground_count:,} HalfDome foreground halos "
+                f"Redshift distribution of {foreground_count:,} streamed HalfDome foreground halos "
                 rf"with $0\leq z\leq {source_redshift:g}$"
             ),
             log_x=False,

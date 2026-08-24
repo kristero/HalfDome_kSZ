@@ -225,6 +225,7 @@ function validate_known_options(options)
         "sightline_progress_every_rows",
         "apply_catalog_mass_floor", "catalog_masses_are_msun_h", "dm_cache", "dm_cache_file",
         "dm_cache_overwrite", "dm_cleanup_nonpositive", "dm_value_sanity_max",
+        "halo_extension_r200_multiplier", "halo_extension_r200",
         "dm_aperture_r200_multiplier", "pdf_bins",
         "pdf_edge_count", "pdf_spacing", "pdf_dm_min", "pdf_dm_max", "progress_every_batches", "overwrite",
         "mass_windows", "save_ray_dm",
@@ -283,7 +284,10 @@ Core options (both --key=value and key=value are accepted):
   --dm-cache-overwrite=false          Existing DM cache is authoritative; a missing cache is an error
                                       Public-v0.4 rebuilds require a NEW, non-existing --dm-cache path
                                       Example: --dm-cache=.../public_v04_dm_cache.jld2 --dm-cache-overwrite=true
-  --dm-aperture-r200-multiplier=1.0  Truncate at R200, matching DMhalo_r200 reference names
+  --halo-extension-r200-multiplier=4.0
+                                      Maximum projected halo radius in units of R200
+                                      (use 3 for the IllustrisTNG comparison; any positive value is valid)
+  --dm-aperture-r200-multiplier=VALUE Legacy alias for --halo-extension-r200-multiplier
   --mass-windows=SPEC                 Comma/semicolon-separated label:min_msun:max_msun entries
                                        Example: m1e10_to_1e13:1e10:1e13,m1e10_to_1e16:1e10:1e16
 
@@ -1178,7 +1182,11 @@ function configuration(options; require_catalog=true)
     dm_cache_overwrite = get_bool_option(options, ("dm_cache_overwrite",), false)
     dm_cleanup_nonpositive = get_bool_option(options, ("dm_cleanup_nonpositive",), true)
     dm_value_sanity_max = get_float_option(options, ("dm_value_sanity_max",), 1.0e8)
-    dm_aperture_r200_multiplier = get_float_option(options, ("dm_aperture_r200_multiplier",), 1.0)
+    dm_aperture_r200_multiplier = get_float_option(
+        options,
+        ("halo_extension_r200_multiplier", "halo_extension_r200", "dm_aperture_r200_multiplier"),
+        4.0,
+    )
     pdf_edge_count = get_int_option(options, ("pdf_edge_count", "pdf_bins"), 300)
     pdf_spacing = lowercase(strip(get_string_option(options, ("pdf_spacing",), "log")))
     pdf_dm_min = get_float_option(options, ("pdf_dm_min",), 0.1)
@@ -1209,7 +1217,7 @@ function configuration(options; require_catalog=true)
     max_catalog_halos >= 0 || error("max_catalog_halos must be nonnegative.")
     catalog_mass_floor >= 0.0 || error("catalog_mass_floor must be nonnegative.")
     isfinite(dm_aperture_r200_multiplier) && dm_aperture_r200_multiplier > 0.0 || error(
-        "dm_aperture_r200_multiplier must be finite and positive.",
+        "halo_extension_r200_multiplier must be finite and positive.",
     )
     pdf_edge_count >= 2 || error("pdf_edge_count must be at least 2.")
     pdf_spacing in ("log", "linear") || error("pdf_spacing must be log or linear.")
@@ -1255,7 +1263,7 @@ function print_configuration(config)
     println("  chunk_size=$(config.chunk_size), max_catalog_halos=$(config.max_catalog_halos)")
     println("  catalog_mass_floor_msun=$(config.catalog_mass_floor), apply=$(config.apply_catalog_mass_floor)")
     println("  catalog_masses_are_msun_h=$(config.catalog_masses_are_msun_h), h=$(H_VALUE)")
-    println("  dm_cache=$(config.dm_cache), aperture=$(config.dm_aperture_r200_multiplier) R200, JULIA_NUM_THREADS=$(Threads.nthreads())")
+    println("  dm_cache=$(config.dm_cache), halo_extension=$(config.dm_aperture_r200_multiplier) R200, JULIA_NUM_THREADS=$(Threads.nthreads())")
     println("  save_ray_dm=$(config.save_ray_dm), custom_mass_windows=$(!isempty(config.mass_windows_specification))")
     print_window_table(config.windows)
     for (bounds, labels) in equivalent_effective_window_groups(config.windows)
@@ -1602,6 +1610,7 @@ function main(options)
         "profile" => "HaloDMProfile(BattagliaTauProfile(Omega_c=0.261, Omega_b=0.049, h=0.68))",
         "halo_dm_profile_source" => HALO_DM_PROFILE_SOURCE,
         "dm_observer_frame_redshift_dilution" => "1/(1+z_halo)",
+        "halo_extension_r200_multiplier" => config.dm_aperture_r200_multiplier,
         "dm_aperture_r200_multiplier" => config.dm_aperture_r200_multiplier,
         "profile_angular_support" => "XGPaint compute_theta_max with explicit mult=$(config.dm_aperture_r200_multiplier)",
         "xgpaint_version" => xgpaint_version,

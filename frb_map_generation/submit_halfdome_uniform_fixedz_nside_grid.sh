@@ -15,6 +15,7 @@ set -euo pipefail
 : "${SOURCE_REDSHIFTS:=1.0 2.0 3.0 4.0}"
 : "${NFRB:=120000}"
 : "${SEED:=42}"
+: "${HALO_EXTENSION_R200_MULTIPLIER:=3.0}"  # IllustrisTNG comparison aperture
 : "${SUBMIT_CATALOG_CAP_TEST:=true}"
 : "${CATALOG_CAP:=120000}"
 : "${CAP_TEST_NSIDE:=4096}"
@@ -42,21 +43,22 @@ submit_one() {
   local catalog_cap="$3"
   local job_name="$4"
   local variables
-  variables="PROJECT_DIR=${PROJECT_DIR},DM_CACHE=${DM_CACHE},NSIDE=${nside},ZSOURCE=${source_redshift},NFRB=${NFRB},SEED=${SEED},MAX_CATALOG_HALOS=${catalog_cap}"
+  variables="PROJECT_DIR=${PROJECT_DIR},DM_CACHE=${DM_CACHE},NSIDE=${nside},ZSOURCE=${source_redshift},NFRB=${NFRB},SEED=${SEED},MAX_CATALOG_HALOS=${catalog_cap},HALO_EXTENSION_R200_MULTIPLIER=${HALO_EXTENSION_R200_MULTIPLIER}"
 
   if [[ "${DRY_RUN}" == "true" ]]; then
     echo "qsub -N ${job_name} -v ${variables} ${PBS_FILE}"
   else
     local job_id
     job_id="$(qsub -N "${job_name}" -v "${variables}" "${PBS_FILE}")"
-    echo "Submitted ${job_id}: NSIDE=${nside}, z_source=${source_redshift}, rays=${NFRB}, catalog_cap=${catalog_cap}"
+    echo "Submitted ${job_id}: NSIDE=${nside}, z_source=${source_redshift}, rays=${NFRB}, catalog_cap=${catalog_cap}, halo_extension=${HALO_EXTENSION_R200_MULTIPLIER}R200"
   fi
 }
 
+halo_extension_tag="${HALO_EXTENSION_R200_MULTIPLIER//./p}"
 for nside in ${NSIDES}; do
   for source_redshift in ${SOURCE_REDSHIFTS}; do
     redshift_tag="${source_redshift//./p}"
-    submit_one "${nside}" "${source_redshift}" 0 "u${nside}z${redshift_tag}"
+    submit_one "${nside}" "${source_redshift}" 0 "u${nside}z${redshift_tag}r${halo_extension_tag}"
   done
 done
 
@@ -66,5 +68,5 @@ if [[ "${SUBMIT_CATALOG_CAP_TEST}" == "true" ]]; then
     "${CAP_TEST_NSIDE}" \
     "${CAP_TEST_ZSOURCE}" \
     "${CATALOG_CAP}" \
-    "c120kz${cap_redshift_tag}"
+    "c120kz${cap_redshift_tag}r${halo_extension_tag}"
 fi

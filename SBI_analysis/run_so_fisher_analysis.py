@@ -309,6 +309,51 @@ def load_derivative_profiles(
     )
 
 
+def theta_array_diagnostics(
+    candidate: np.ndarray,
+    reference: np.ndarray,
+    param_names: list[str],
+) -> dict[str, Any]:
+    candidate = np.asarray(candidate, dtype=np.float64)
+    reference = np.asarray(reference, dtype=np.float64)
+    diagnostics: dict[str, Any] = {
+        "candidate_shape": list(candidate.shape),
+        "reference_shape": list(reference.shape),
+        "float32_representation_equal": False,
+    }
+    if candidate.shape != reference.shape:
+        return diagnostics
+
+    candidate32 = candidate.astype(np.float32)
+    reference32 = reference.astype(np.float32)
+    finite = np.isfinite(candidate) & np.isfinite(reference)
+    diagnostics["all_finite"] = bool(np.all(finite))
+    diagnostics["float32_representation_equal"] = bool(
+        np.all(finite) and np.array_equal(candidate32, reference32)
+    )
+
+    difference = np.abs(candidate - reference)
+    difference = np.where(np.isfinite(difference), difference, np.inf)
+    flat_index = int(np.argmax(difference))
+    row_index, parameter_index = np.unravel_index(
+        flat_index,
+        difference.shape,
+    )
+    diagnostics.update(
+        {
+            "max_absolute_difference": float(difference[row_index, parameter_index]),
+            "worst_row_index": int(row_index),
+            "worst_parameter_index": int(parameter_index),
+            "worst_parameter": param_names[parameter_index],
+            "candidate_value": float(candidate[row_index, parameter_index]),
+            "reference_value": float(reference[row_index, parameter_index]),
+            "candidate_float32": float(candidate32[row_index, parameter_index]),
+            "reference_float32": float(reference32[row_index, parameter_index]),
+        }
+    )
+    return diagnostics
+
+
 def validate_raw_alignment(
     prepared_dataset: Path,
     raw_dir: Path,
@@ -375,6 +420,18 @@ def validate_raw_alignment(
         if array.shape[0] != n_rows:
             raise ValueError(f"{name} has {array.shape[0]} rows; C_ell has {n_rows}.")
 
+    theta_diagnostics = {
+        "clean_noisy": theta_array_diagnostics(
+            clean_theta,
+            theta,
+            param_names,
+        ),
+        "prepared_raw": theta_array_diagnostics(
+            prepared_theta,
+            theta,
+            param_names,
+        ),
+    }
     checks = {
         "clean_noisy_sobol_global_row_equal": bool(
             np.array_equal(clean_global, noisy_global)
@@ -383,11 +440,13 @@ def validate_raw_alignment(
             np.array_equal(prepared_global, noisy_global)
         ),
         "clean_noisy_theta_equal": bool(
-            np.allclose(clean_theta, theta, rtol=0.0, atol=1.0e-7)
+            theta_diagnostics["clean_noisy"]["float32_representation_equal"]
         ),
         "prepared_raw_theta_equal": bool(
-            np.allclose(prepared_theta, theta, rtol=0.0, atol=1.0e-7)
+            theta_diagnostics["prepared_raw"]["float32_representation_equal"]
         ),
+        "theta_comparison": "exact after conversion to float32",
+        "theta_diagnostics": theta_diagnostics,
         "n_rows": int(n_rows),
         "mapping_prefix": noisy_global[:10].tolist(),
         "clean_cl_path": str(clean_cl_path),
@@ -396,13 +455,46 @@ def validate_raw_alignment(
         "noisy_metadata_path": str(noisy_metadata_path),
     }
     failed = [
-        name for name, passed in checks.items()
-        if name.endswith("_equal") and not passed
+        name
+        for name in (
+            "clean_noisy_sobol_global_row_equal",
+            "prepared_raw_sobol_global_row_equal",
+            "clean_noisy_theta_equal",
+            "prepared_raw_theta_equal",
+        )
+        if not checks[name]
     ]
     if failed:
+        details = []
+        diagnostic_key_by_check = {
+            "clean_noisy_theta_equal": "clean_noisy",
+            "prepared_raw_theta_equal": "prepared_raw",
+        }
+        for name in failed:
+            diagnostic_key = diagnostic_key_by_check.get(name)
+            if diagnostic_key is None:
+                details.append(name)
+                continue
+            diagnostic = theta_diagnostics[diagnostic_key]
+            row_index = diagnostic.get("worst_row_index")
+            global_row = (
+                int(noisy_global[row_index])
+                if row_index is not None and row_index < noisy_global.size
+                else None
+            )
+            details.append(
+                f"{name} "
+                f"(max_abs={diagnostic.get('max_absolute_difference')}, "
+                f"array_row={row_index}, sobol_global_row={global_row}, "
+                f"parameter={diagnostic.get('worst_parameter')}, "
+                f"candidate={diagnostic.get('candidate_value')}, "
+                f"raw={diagnostic.get('reference_value')}, "
+                f"candidate_float32={diagnostic.get('candidate_float32')}, "
+                f"raw_float32={diagnostic.get('reference_float32')})"
+            )
         raise ValueError(
             "Row-alignment validation failed, so noisy-clean subtraction is unsafe: "
-            + ", ".join(failed)
+            + "; ".join(details)
         )
 
     metadata = {

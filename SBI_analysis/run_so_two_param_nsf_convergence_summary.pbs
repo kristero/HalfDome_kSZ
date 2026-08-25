@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -N SO2p_NSF_sum
-#PBS -q mini2
+#PBS -q mini
 #PBS -l select=1:ncpus=4:mpiprocs=1:mem=32gb
 #PBS -l walltime=12:00:00
 #PBS -o /home/kristero10/logs/SBI_runs/

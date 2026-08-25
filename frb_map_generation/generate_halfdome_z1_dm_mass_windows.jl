@@ -120,7 +120,7 @@ const HALO_MASS_DEFINITION = "M200c"
 const HALO_RADIUS_DEFINITION = "R200c"
 const HALO_REFERENCE_DENSITY = "critical"
 const HALO_OVERDENSITY = 200
-const XGPAINT_PROFILE_MASS_DEFINITION = "M200m"
+const XGPAINT_PROFILE_MASS_DEFINITION = "M200c"
 
 struct MassWindow
     label::String
@@ -292,8 +292,8 @@ Core options (both --key=value and key=value are accepted):
   --dm-cache-overwrite=false          Existing DM cache is authoritative; a missing cache is an error
                                       Public-v0.4 rebuilds require a NEW, non-existing --dm-cache path
                                       Example: --dm-cache=.../public_v04_dm_cache.jld2 --dm-cache-overwrite=true
-  --xgpaint-profile-mass-definition=m200m
-                                      Declare the existing cache's mass coordinate; this workflow requires M200m
+  --xgpaint-profile-mass-definition=m200c
+                                      Declare the existing cache's mass coordinate; this workflow requires M200c
   --halo-extension-r200-multiplier=4.0
                                       Maximum projected halo radius in units of R200c
                                       (use 3 for the IllustrisTNG comparison; any positive value is valid)
@@ -315,7 +315,7 @@ HalfDome resolution options:
   --catalog-mass-floor=7.327e12      Observed physical-Msun floor after the catalog's /h conversion
   --apply-catalog-mass-floor=true    Enforce and record effective lower bounds
   --catalog-masses-are-msun-h=true   Divide both catalog masses by h=0.68
-                                      M200c selects bins/apertures; M200m enters the unchanged XGPaint cache
+                                      M200c selects bins/apertures and enters the unchanged XGPaint cache
 
 Output/control options:
   --summary=PATH --provenance=PATH   Defaults are sidecars beside the HDF5 output
@@ -590,23 +590,23 @@ function interpolator_logmass_bounds(model)
     lower = Float64(first(ranges[3]))
     upper = Float64(last(ranges[3]))
     isfinite(lower) && isfinite(upper) && lower < upper || error(
-        "DM interpolator has invalid log10(M200m/Msun) bounds $(lower), $(upper).",
+        "DM interpolator has invalid log10(M200c/Msun) bounds $(lower), $(upper).",
     )
     return (lower, upper)
 end
 
-function validate_profile_masses_in_cache(masses_m200m, logmass_bounds)
-    isempty(masses_m200m) && return nothing
+function validate_profile_masses_in_cache(masses_m200c, logmass_bounds)
+    isempty(masses_m200c) && return nothing
     lower, upper = logmass_bounds
     tolerance = 32eps(Float64) * max(1.0, abs(lower), abs(upper))
-    for mass_value in masses_m200m
+    for mass_value in masses_m200c
         mass = Float64(mass_value)
         isfinite(mass) && mass > 0.0 || error(
-            "XGPaint profile M200m must be finite and positive; got $(mass).",
+            "XGPaint profile M200c must be finite and positive; got $(mass).",
         )
         logmass = log10(mass)
         lower - tolerance <= logmass <= upper + tolerance || error(
-            "XGPaint profile M200m=$(mass) Msun (log10=$(logmass)) is outside the " *
+            "XGPaint profile M200c=$(mass) Msun (log10=$(logmass)) is outside the " *
             "cache mass axis [$(lower), $(upper)].",
         )
     end
@@ -750,9 +750,9 @@ function validate_dm_interpolator_spot_value(interpolated_model)
     cached_value = Float64(interpolated_model(theta, mass_msun, redshift))
     isfinite(cached_value) && cached_value > 0.0 || error(
         "DM cache spot check returned $(cached_value) at theta=$(theta), " *
-        "M200m=$(mass_msun) Msun, z=$(redshift).",
+        "M200c=$(mass_msun) Msun, z=$(redshift).",
     )
-    return (value=cached_value, theta=theta, redshift=redshift, mass_m200m_msun=mass_msun)
+    return (value=cached_value, theta=theta, redshift=redshift, mass_m200c_msun=mass_msun)
 end
 
 struct ReusableDiscQueryWorkspace{R,I}
@@ -815,7 +815,7 @@ function add_if_frb_pixel_windows!(
     frb_uz,
     theta_min::Float64,
     theta_max::Float64,
-    profile_mass_m200m_msun::Float64,
+    profile_mass_m200c_msun::Float64,
     redshift::Float64,
     membership_mask::UInt16,
     nwindow::Int,
@@ -834,10 +834,10 @@ function add_if_frb_pixel_windows!(
         theta = acos(cosine)
         theta <= theta_max || continue
         contribution = Float64(dm_model_interp(
-            max(theta, theta_min), profile_mass_m200m_msun, redshift,
+            max(theta, theta_min), profile_mass_m200c_msun, redshift,
         ))
         isfinite(contribution) || error(
-            "Non-finite XGPaint DM at M200m=$(profile_mass_m200m_msun), " *
+            "Non-finite XGPaint DM at M200c=$(profile_mass_m200c_msun), " *
             "z=$(redshift), theta=$(theta).",
         )
         unique_hits += 1
@@ -867,12 +867,10 @@ function accumulate_batch_windows!(
     y,
     z,
     masses_m200c,
-    masses_m200m,
     redshifts,
     membership_masks,
     nwindow::Int,
 )
-    length(masses_m200c) == length(masses_m200m) || error("M200c/M200m batch lengths differ.")
     Threads.@threads :static for i in eachindex(masses_m200c)
         tid = Threads.threadid()
         local_dm = accumulator.thread_dm[tid]
@@ -887,7 +885,7 @@ function accumulate_batch_windows!(
         halo_uz = zi / radius
         center_theta, center_phi = Healpix.vec2ang(halo_ux, halo_uy, halo_uz)
         selection_mass_m200c_msun = Float64(masses_m200c[i])
-        profile_mass_m200m_msun = Float64(masses_m200m[i])
+        profile_mass_m200c_msun = selection_mass_m200c_msun
         redshift = Float64(redshifts[i])
         theta_max = compute_theta_max_r200c_external(
             dm_model_interp, selection_mass_m200c_msun, redshift, aperture_r200_multiplier,
@@ -905,7 +903,7 @@ function accumulate_batch_windows!(
                 halo_hits += add_if_frb_pixel_windows!(
                     local_dm, local_window_hits, sorted_frb_pixels, sorted_frb_indices,
                     global_pixel, halo_ux, halo_uy, halo_uz,
-                    frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200m_msun, redshift,
+                    frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200c_msun, redshift,
                     membership_masks[i], nwindow, dm_model_interp,
                 )
             end
@@ -920,7 +918,7 @@ function accumulate_batch_windows!(
                     halo_hits += add_if_frb_pixel_windows!(
                         local_dm, local_window_hits, sorted_frb_pixels, sorted_frb_indices,
                         first_pixel + local_pixel_index - 1, halo_ux, halo_uy, halo_uz,
-                        frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200m_msun, redshift,
+                        frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200c_msun, redshift,
                         membership_masks[i], nwindow, dm_model_interp,
                     )
                 end
@@ -1279,13 +1277,13 @@ function configuration(options; require_catalog=true)
     apply_catalog_mass_floor = get_bool_option(options, ("apply_catalog_mass_floor",), true)
     catalog_masses_are_msun_h = get_bool_option(options, ("catalog_masses_are_msun_h",), true)
     profile_mass_option_raw = String(strip(get_string_option(
-        options, ("xgpaint_profile_mass_definition",), "m200m",
+        options, ("xgpaint_profile_mass_definition",), "m200c",
     )))
     profile_mass_option = lowercase(replace(replace(
         profile_mass_option_raw, "_" => "",
     ), "-" => ""))
-    profile_mass_option == "m200m" || error(
-        "xgpaint_profile_mass_definition must be m200m for the current authoritative DM cache; " *
+    profile_mass_option == "m200c" || error(
+        "xgpaint_profile_mass_definition must be m200c for the installed XGPaint Battaglia profile; " *
         "got $(repr(profile_mass_option)).",
     )
     xgpaint_profile_mass_definition = XGPAINT_PROFILE_MASS_DEFINITION
@@ -1394,7 +1392,7 @@ function print_configuration(config)
     println("  catalog_mass_floor_msun=$(config.catalog_mass_floor), apply=$(config.apply_catalog_mass_floor)")
     println("  catalog_masses_are_msun_h=$(config.catalog_masses_are_msun_h), h=$(H_VALUE)")
     println("  mass-window selection=$(HALO_MASS_DEFINITION) from $(CATALOG_M200C_DATASET)")
-    println("  XGPaint profile input=$(config.xgpaint_profile_mass_definition) from $(CATALOG_M200M_DATASET)")
+    println("  XGPaint profile input=$(config.xgpaint_profile_mass_definition) from $(CATALOG_M200C_DATASET)")
     println(
         "  aperture=$(config.dm_aperture_r200_multiplier) $(HALO_RADIUS_DEFINITION), " *
         "computed externally from $(CATALOG_M200C_DATASET); XGPaint default theta_max is bypassed",
@@ -1624,8 +1622,8 @@ function main(options)
     below_floor_count = Ref(Int64(0))
     observed_foreground_min = Ref(Inf)
     observed_foreground_max = Ref(-Inf)
-    observed_profile_m200m_min = Ref(Inf)
-    observed_profile_m200m_max = Ref(-Inf)
+    observed_catalog_m200m_min = Ref(Inf)
+    observed_catalog_m200m_max = Ref(-Inf)
     foreground_mass_edges = 10.0 .^ collect(range(8.0, 17.0; length=181))
     foreground_mass_counts = zeros(Int64, length(foreground_mass_edges) - 1)
     foreground_redshift_edges = collect(range(0.0, config.source_redshift; length=101))
@@ -1646,18 +1644,18 @@ function main(options)
         sizehint!(membership_masks, length(masses_m200c))
         @inbounds for i in eachindex(masses_m200c)
             selection_mass_m200c = Float64(masses_m200c[i])
-            profile_mass_m200m = Float64(masses_m200m[i])
+            paired_mass_m200m = Float64(masses_m200m[i])
             redshift = Float64(redshifts[i])
             if !isfinite(selection_mass_m200c) || selection_mass_m200c <= 0.0 ||
-               !isfinite(profile_mass_m200m) || profile_mass_m200m <= 0.0 ||
+               !isfinite(paired_mass_m200m) || paired_mass_m200m <= 0.0 ||
                !isfinite(redshift) || redshift < 0.0 || redshift > config.source_redshift
                 continue
             end
             valid_foreground_count[] += 1
             observed_foreground_min[] = min(observed_foreground_min[], selection_mass_m200c)
             observed_foreground_max[] = max(observed_foreground_max[], selection_mass_m200c)
-            observed_profile_m200m_min[] = min(observed_profile_m200m_min[], profile_mass_m200m)
-            observed_profile_m200m_max[] = max(observed_profile_m200m_max[], profile_mass_m200m)
+            observed_catalog_m200m_min[] = min(observed_catalog_m200m_min[], paired_mass_m200m)
+            observed_catalog_m200m_max[] = max(observed_catalog_m200m_max[], paired_mass_m200m)
             mass_histogram_status = increment_histogram_count!(
                 foreground_mass_counts, foreground_mass_edges, selection_mass_m200c,
             )
@@ -1680,14 +1678,14 @@ function main(options)
         end
 
         if !isempty(selected_indices)
-            selected_m200m = masses_m200m[selected_indices]
-            validate_profile_masses_in_cache(selected_m200m, profile_logmass_bounds)
+            selected_m200c = masses_m200c[selected_indices]
+            validate_profile_masses_in_cache(selected_m200c, profile_logmass_bounds)
             accumulate_batch_windows!(
                 accumulator, workspace, dm_model_interp, theta_min, config.dm_aperture_r200_multiplier,
                 candidate_pixel_margin,
                 sorted_frb_pixels, sorted_frb_indices, frb_ux, frb_uy, frb_uz,
                 Float64.(x[selected_indices]), Float64.(y[selected_indices]), Float64.(z[selected_indices]),
-                masses_m200c[selected_indices], selected_m200m, redshifts[selected_indices], membership_masks,
+                selected_m200c, redshifts[selected_indices], membership_masks,
                 length(config.windows),
             )
         end
@@ -1738,8 +1736,8 @@ function main(options)
         "catalog_passes" => 1,
         "catalog_mass_dataset" => CATALOG_M200C_DATASET,
         "catalog_mass_window_dataset" => CATALOG_M200C_DATASET,
-        "catalog_native_mass_dataset" => CATALOG_M200M_DATASET,
-        "catalog_xgpaint_profile_mass_dataset" => CATALOG_M200M_DATASET,
+        "catalog_auxiliary_mass_dataset" => CATALOG_M200M_DATASET,
+        "catalog_xgpaint_profile_mass_dataset" => CATALOG_M200C_DATASET,
         "catalog_mass_input_unit" => config.catalog_masses_are_msun_h ? "Msun/h" : "Msun",
         "catalog_mass_conversion" => config.catalog_masses_are_msun_h ? "divide by h=0.68" : "none",
         "catalog_m200c_validation_sample_count" => streamed.m200c_validation_sample_count,
@@ -1752,7 +1750,7 @@ function main(options)
         "mass_window_selection_definition" => HALO_MASS_DEFINITION,
         "xgpaint_input_mass_definition" => config.xgpaint_profile_mass_definition,
         "xgpaint_profile_input_mass_definition" => config.xgpaint_profile_mass_definition,
-        "xgpaint_profile_input_mass_dataset" => CATALOG_M200M_DATASET,
+        "xgpaint_profile_input_mass_dataset" => CATALOG_M200C_DATASET,
         "xgpaint_aperture_radius_definition" => HALO_RADIUS_DEFINITION,
         "aperture_mass_definition" => HALO_MASS_DEFINITION,
         "aperture_mass_dataset" => CATALOG_M200C_DATASET,
@@ -1762,7 +1760,7 @@ function main(options)
         "xgpaint_default_theta_max_used" => false,
         "xgpaint_paint_function_used" => false,
         "xgpaint_profile_internal_mass_definition" => config.xgpaint_profile_mass_definition,
-        "xgpaint_profile_internal_radius_definition" => "R200m",
+        "xgpaint_profile_internal_radius_definition" => "R200c",
         "catalog_resolution_floor_msun" => config.catalog_mass_floor,
         "catalog_resolution_floor_is_approximate" => true,
         "apply_catalog_mass_floor" => config.apply_catalog_mass_floor,
@@ -1770,8 +1768,10 @@ function main(options)
         "foreground_below_declared_floor_count" => below_floor_count[],
         "foreground_observed_min_msun" => observed_foreground_min[],
         "foreground_observed_max_msun" => observed_foreground_max[],
-        "foreground_observed_profile_m200m_min_msun" => observed_profile_m200m_min[],
-        "foreground_observed_profile_m200m_max_msun" => observed_profile_m200m_max[],
+        "foreground_observed_profile_m200c_min_msun" => observed_foreground_min[],
+        "foreground_observed_profile_m200c_max_msun" => observed_foreground_max[],
+        "foreground_observed_auxiliary_m200m_min_msun" => observed_catalog_m200m_min[],
+        "foreground_observed_auxiliary_m200m_max_msun" => observed_catalog_m200m_max[],
         "foreground_mass_histogram_underflow_count" => foreground_mass_underflow[],
         "foreground_mass_histogram_overflow_count" => foreground_mass_overflow[],
         "foreground_redshift_histogram_underflow_count" => foreground_redshift_underflow[],
@@ -1809,8 +1809,8 @@ function main(options)
         "halo_extension_r200_multiplier" => config.dm_aperture_r200_multiplier,
         "dm_aperture_r200_multiplier" => config.dm_aperture_r200_multiplier,
         "profile_angular_support" => "generator exact angular filter at angular_size($(config.dm_aperture_r200_multiplier)*R200c); XGPaint compute_theta_max and paint! bypassed",
-        "dm_cache_profile_log10_m200m_min" => profile_logmass_bounds[1],
-        "dm_cache_profile_log10_m200m_max" => profile_logmass_bounds[2],
+        "dm_cache_profile_log10_m200c_min" => profile_logmass_bounds[1],
+        "dm_cache_profile_log10_m200c_max" => profile_logmass_bounds[2],
         "xgpaint_version" => xgpaint_version,
         "dm_cache_file" => abspath(config.dm_cache),
         "dm_cache_exists_after_interpolator_build" => dm_cache_exists,
@@ -1826,7 +1826,7 @@ function main(options)
         "dm_cache_spot_value_pc_cm3" => dm_cache_spot.value,
         "dm_cache_spot_theta_rad" => dm_cache_spot.theta,
         "dm_cache_spot_redshift" => dm_cache_spot.redshift,
-        "dm_cache_spot_m200m_msun" => dm_cache_spot.mass_m200m_msun,
+        "dm_cache_spot_m200c_msun" => dm_cache_spot.mass_m200c_msun,
         "dm_cache_spot_check_policy" => "positive finite cached DM only; no comparison to a differently configured direct profile",
         "sparse_disc_backend" => sparse_disc_backend,
         "pdf_edge_count" => config.pdf_edge_count,

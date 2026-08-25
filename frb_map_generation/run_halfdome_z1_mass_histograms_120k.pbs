@@ -33,7 +33,7 @@ set -euo pipefail
 # The generator owns the outer aperture geometry. XGPaint supplies only the
 # cached profile value at each accepted ray separation.
 : "${HALO_EXTENSION_R200_MULTIPLIER:=${DM_APERTURE_R200_MULTIPLIER:-4.0}}"
-: "${XGPAINT_PROFILE_MASS_DEFINITION:=m200m}"
+: "${XGPAINT_PROFILE_MASS_DEFINITION:=m200c}"
 : "${MASS_WINDOWS:=m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16}"
 
 # Each parameter combination receives an isolated directory automatically.
@@ -125,7 +125,7 @@ echo "Output directory: ${OUTPUT_DIR}"
 echo "Shared rays: ${NFRB} unique uniform HEALPix pixels at z_source=${ZSOURCE}"
 echo "NSIDE: ${NSIDE}"
 echo "Halo extension: ${HALO_EXTENSION_R200_MULTIPLIER} R200c (generator-owned aperture)"
-echo "Mass conventions: M200c bins/aperture; ${XGPAINT_PROFILE_MASS_DEFINITION} XGPaint profile input"
+echo "Mass conventions: M200c bins, aperture, and XGPaint profile input"
 echo "Foreground halo interval: 0 <= z_halo <= ${ZSOURCE}"
 echo "Maximum catalogue rows: ${MAX_CATALOG_HALOS} (0 means complete catalogue)"
 echo "Mass windows (${MASS_WINDOW_COUNT}): ${MASS_WINDOWS}"
@@ -136,6 +136,7 @@ echo "============================================================"
 # Fail before the expensive halo pass if the plotting environment is absent.
 "${PYTHON}" -c 'import h5py, matplotlib, numpy'
 run_julia -e 'using HDF5, Healpix, XGPaint'
+run_julia --threads=1 "${GENERATOR}" --self-test
 
 run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
   --catalog="${HALFDOME_PATH}" \

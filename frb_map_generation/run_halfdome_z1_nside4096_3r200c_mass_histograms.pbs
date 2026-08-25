@@ -12,7 +12,7 @@ set -euo pipefail
 #   - 120,000 unique uniform rays on the exact z_source=1 plane
 #   - complete HalfDome lightcone, with every foreground halo at 0 <= z <= 1
 #   - M200c selects the TNG-compatible mass windows and defines 3R200c
-#   - paired M200m is passed to the unchanged M200m-configured XGPaint cache
+#   - the same M200c is passed to the unchanged M200c XGPaint Battaglia profile
 #   - the generator computes the critical-density R200c aperture externally
 #   - histogram-only output, with all requested M200c windows accumulated together
 
@@ -34,10 +34,10 @@ export SEED=42
 export NSIDE=4096
 export MAX_CATALOG_HALOS=0
 export HALO_EXTENSION_R200_MULTIPLIER=3.0
-export XGPAINT_PROFILE_MASS_DEFINITION=m200m
+export XGPAINT_PROFILE_MASS_DEFINITION=m200c
 export MASS_WINDOWS="m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16"
-export OUTPUT_BASE="/lustre/work/${CLUSTER_USER}/frb_data/halfdome_m200c_bins_m200m_profiles_r200c_z1_120k_foreground_mass_histograms"
-export RUN_TAG="zsrc1p0_nside4096_nrays120000_allhalos_r200cx3p0_m200mprofile_seed42"
+export OUTPUT_BASE="/lustre/work/${CLUSTER_USER}/frb_data/halfdome_m200c_r200c_z1_120k_foreground_mass_histograms"
+export RUN_TAG="zsrc1p0_nside4096_nrays120000_allhalos_r200cx3p0_m200cprofile_seed42"
 export HDF5_USE_FILE_LOCKING=FALSE
 
 /bin/bash "${GENERIC_PBS}"
@@ -63,15 +63,15 @@ with h5py.File(path, "r") as handle:
         "provenance_halo_radius_definition": "R200c",
         "provenance_halo_reference_density": "critical",
         "provenance_mass_window_selection_definition": "M200c",
-        "provenance_xgpaint_input_mass_definition": "M200m",
-        "provenance_xgpaint_profile_input_mass_definition": "M200m",
-        "provenance_xgpaint_profile_input_mass_dataset": "halo_mass_m200m",
+        "provenance_xgpaint_input_mass_definition": "M200c",
+        "provenance_xgpaint_profile_input_mass_definition": "M200c",
+        "provenance_xgpaint_profile_input_mass_dataset": "halo_mass_m200c",
         "provenance_xgpaint_aperture_radius_definition": "R200c",
         "provenance_aperture_mass_definition": "M200c",
         "provenance_aperture_mass_dataset": "halo_mass_m200c",
         "provenance_aperture_radius_definition": "R200c",
         "provenance_aperture_geometry_owner": "generator",
-        "provenance_xgpaint_profile_internal_radius_definition": "R200m",
+        "provenance_xgpaint_profile_internal_radius_definition": "R200c",
     }
     for key, value in expected.items():
         actual = text(handle.attrs[key])

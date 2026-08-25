@@ -49,7 +49,7 @@ if [[ -f "${LOG}" ]]; then
       ACTIVE_IDS+=("${job_id}")
     fi
   done < "${LOG}"
-  if (( ${#ACTIVE_IDS[@]} > 0 )); then
+  if [[ -n "${ACTIVE_IDS[0]-}" ]]; then
     echo "This convergence submission still has active or queued jobs:" >&2
     printf '  %s\n' "${ACTIVE_IDS[@]}" >&2
     echo "Wait for them to finish before resubmitting missing runs." >&2
@@ -116,7 +116,7 @@ if [[ "${SUBMIT_SUMMARY}" == "1" ]]; then
     -v "PROJECT_ROOT=${PROJECT_ROOT},CONVERGENCE_ROOT=${CONVERGENCE_ROOT}"
   )
   summary_dependency=""
-  if (( ${#TAILS[@]} > 0 )); then
+  if [[ -n "${TAILS[0]-}" ]]; then
     summary_dependency=$(IFS=:; echo "${TAILS[*]}")
     SUMMARY_ARGS+=( -W "depend=afterany:${summary_dependency}" )
   fi

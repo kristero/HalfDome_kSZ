@@ -31,8 +31,10 @@ export OMP_NUM_THREADS="${PBS_NCPUS:-4}"
 export OPENBLAS_NUM_THREADS="${PBS_NCPUS:-4}"
 export MKL_NUM_THREADS="${PBS_NCPUS:-4}"
 
-EXTRA_ARGS=()
-[[ "${ALLOW_MISSING}" == "1" ]] && EXTRA_ARGS+=(--allow-missing)
+set --
+if [[ "${ALLOW_MISSING}" == "1" ]]; then
+  set -- --allow-missing
+fi
 
 echo "Started summary: $(date -Is)"
 "${PYTHON}" "${SCRIPT}" \
@@ -40,6 +42,6 @@ echo "Started summary: $(date -Is)"
   --dataset-sizes "${DATASET_SIZES}" \
   --corner-sizes "${CORNER_SIZES}" \
   --dpi "${DPI}" \
-  "${EXTRA_ARGS[@]}"
+  "$@"
 echo "Finished summary: $(date -Is)"
 echo "Figures: ${CONVERGENCE_ROOT}/summary"

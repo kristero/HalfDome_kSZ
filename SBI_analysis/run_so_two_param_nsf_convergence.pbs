@@ -66,9 +66,9 @@ echo "Run directory: ${RUN_DIR}"
 "${PYTHON}" --version
 
 if [[ "${OVERWRITE}" == "1" || ! -f "${RUN_DIR}/density_estimator.pkl" || ! -f "${RUN_DIR}/run_metadata.json" ]]; then
-  TRAIN_EXTRA=()
+  set --
   if [[ "${OVERWRITE}" == "1" || -f "${RUN_DIR}/density_estimator.pkl" ]]; then
-    TRAIN_EXTRA+=(--overwrite)
+    set -- --overwrite
   fi
   "${PYTHON}" "${TRAIN_SCRIPT}" \
     --prepared-dataset "${PREPARED_DATASET}" \
@@ -87,7 +87,7 @@ if [[ "${OVERWRITE}" == "1" || ! -f "${RUN_DIR}/density_estimator.pkl" || ! -f "
     --num-battaglia-samples 0 \
     --seed "${SBI_SEED}" \
     --device "${SBI_DEVICE}" \
-    "${TRAIN_EXTRA[@]}"
+    "$@"
 else
   echo "Reusing completed density estimator: ${RUN_DIR}/density_estimator.pkl"
 fi
@@ -97,8 +97,10 @@ case ",${BATTAGLIA_SIZES}," in
   *",${N_TRAIN},"*) BATTAGLIA_COUNT="${NUM_BATTAGLIA_SAMPLES}" ;;
 esac
 
-EVAL_EXTRA=()
-[[ "${OVERWRITE}" == "1" ]] && EVAL_EXTRA+=(--restart)
+set --
+if [[ "${OVERWRITE}" == "1" ]]; then
+  set -- --restart
+fi
 
 "${PYTHON}" "${EVAL_SCRIPT}" \
   --prepared-dataset "${PREPARED_DATASET}" \
@@ -113,7 +115,7 @@ EVAL_EXTRA=()
   --checkpoint-every 5 \
   --seed "${SBI_SEED}" \
   --device "${SBI_DEVICE}" \
-  "${EVAL_EXTRA[@]}"
+  "$@"
 
 echo "Finished: $(date -Is)"
 echo "Completion marker: ${EVALUATION_DIR}/evaluation_complete.json"

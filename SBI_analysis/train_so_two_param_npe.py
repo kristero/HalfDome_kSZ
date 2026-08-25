@@ -14,6 +14,11 @@ from typing import Any
 import numpy as np
 import torch
 
+try:
+    from sbi.neural_nets import posterior_nn
+except ImportError:
+    from sbi.utils.get_nn_models import posterior_nn
+
 from sbi_for_cluster import (
     ForwardingCapture,
     build_prior_from_bounds,
@@ -66,6 +71,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--target-params", default="P0,beta")
     parser.add_argument("--holdout-last-n", type=int, default=1000)
     parser.add_argument(
+        "--n-train",
+        type=int,
+        default=0,
+        help="Training rows to use; 0 uses every non-held-out row.",
+    )
+    parser.add_argument(
+        "--dataset-order",
+        choices=("sequential", "shuffle"),
+        default="sequential",
+        help="Shuffle is deterministic from --seed and gives nested subsets across runs.",
+    )
+    parser.add_argument(
         "--x-rescale-mode",
         choices=("asinh", "none"),
         default=os.environ.get("SBI_X_RESCALE_MODE", "asinh"),
@@ -73,6 +90,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--x-rescale-eps", type=float, default=1.0e-30)
     parser.add_argument("--x-standardize-eps", type=float, default=1.0e-8)
     parser.add_argument("--density-estimator", default="maf")
+    parser.add_argument(
+        "--internal-z-score-x",
+        choices=("none", "independent", "structured"),
+        default="none",
+    )
+    parser.add_argument("--hidden-features", type=int, default=0)
+    parser.add_argument("--num-transforms", type=int, default=0)
+    parser.add_argument("--num-bins", type=int, default=10)
     parser.add_argument("--stop-after-epochs", type=int, default=60)
     parser.add_argument("--num-battaglia-samples", type=int, default=100_000)
     parser.add_argument("--seed", type=int, default=42)
@@ -98,6 +123,35 @@ def write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
         json.dump(to_jsonable(payload), handle, indent=2, sort_keys=True)
+
+
+def make_configured_npe(prior: Any, args: argparse.Namespace) -> Any:
+    if args.hidden_features <= 0 and args.num_transforms <= 0:
+        return make_npe(prior, args.density_estimator, args.device)
+    if args.hidden_features <= 0 or args.num_transforms <= 0:
+        raise ValueError(
+            "--hidden-features and --num-transforms must either both be positive "
+            "or both be zero."
+        )
+
+    kwargs: dict[str, Any] = {
+        "model": str(args.density_estimator),
+        "hidden_features": int(args.hidden_features),
+        "num_transforms": int(args.num_transforms),
+        "z_score_x": str(args.internal_z_score_x),
+    }
+    if str(args.density_estimator).lower() == "nsf":
+        if args.num_bins <= 1:
+            raise ValueError("--num-bins must exceed one for NSF.")
+        kwargs["num_bins"] = int(args.num_bins)
+    try:
+        density_builder = posterior_nn(**kwargs)
+    except TypeError as exc:
+        raise TypeError(
+            "The installed sbi posterior_nn does not accept the requested "
+            f"density-estimator configuration {kwargs}."
+        ) from exc
+    return make_npe(prior, density_builder, args.device)
 
 
 def load_inputs(path: Path) -> dict[str, Any]:
@@ -261,21 +315,33 @@ def main() -> int:
             f"--holdout-last-n must be in 1..{n_rows - 1}; "
             f"got {holdout_n}"
         )
-    n_train = n_rows - holdout_n
-    train_indices = np.arange(n_train, dtype=np.int64)
-    heldout_indices = np.arange(n_train, n_rows, dtype=np.int64)
+    training_pool_n = n_rows - holdout_n
+    requested_n_train = int(args.n_train)
+    n_train = training_pool_n if requested_n_train == 0 else requested_n_train
+    if n_train <= 0 or n_train > training_pool_n:
+        raise ValueError(
+            f"--n-train must be 0 or in 1..{training_pool_n}; got {requested_n_train}"
+        )
+    if args.dataset_order == "shuffle":
+        row_order = np.random.default_rng(args.seed).permutation(training_pool_n)
+    else:
+        row_order = np.arange(training_pool_n, dtype=np.int64)
+    train_indices = np.asarray(row_order[:n_train], dtype=np.int64)
+    heldout_indices = np.arange(training_pool_n, n_rows, dtype=np.int64)
     if np.intersect1d(train_indices, heldout_indices).size:
         raise RuntimeError("Training and held-out indices overlap")
-    if train_indices.size + heldout_indices.size != n_rows:
-        raise RuntimeError(
-            "Training and held-out indices do not partition the dataset"
-        )
+    if train_indices.size != n_train or np.unique(train_indices).size != n_train:
+        raise RuntimeError("Training indices are not a unique N_train-sized subset")
+    if np.any(train_indices < 0) or np.any(train_indices >= training_pool_n):
+        raise RuntimeError("Training indices escape the non-held-out training pool")
+    if heldout_indices.size != holdout_n:
+        raise RuntimeError("Held-out indices do not match --holdout-last-n")
 
     nuisance_indices = [
         param_names.index(name) for name in nuisance_names
     ]
     nuisance_std = np.std(
-        theta_full[:n_train, nuisance_indices],
+        theta_full[np.ix_(train_indices, nuisance_indices)],
         axis=0,
         ddof=1,
     )
@@ -294,10 +360,12 @@ def main() -> int:
     split_report = {
         "prepared_dataset": str(dataset_path),
         "available_rows": n_rows,
+        "training_pool_rows": training_pool_n,
         "n_train": n_train,
         "holdout_last_n": holdout_n,
         "train_index_first": int(train_indices[0]),
         "train_index_last": int(train_indices[-1]),
+        "dataset_order": args.dataset_order,
         "heldout_index_first": int(heldout_indices[0]),
         "heldout_index_last": int(heldout_indices[-1]),
         "split_overlap_count": 0,
@@ -348,11 +416,11 @@ def main() -> int:
         )
 
     theta_train = np.ascontiguousarray(
-        theta_full[:n_train, target_indices],
+        theta_full[np.ix_(train_indices, target_indices)],
         dtype=np.float32,
     )
     x_train = np.ascontiguousarray(
-        x_full[:n_train],
+        x_full[train_indices],
         dtype=np.float32,
     )
     obs = np.ascontiguousarray(
@@ -403,11 +471,7 @@ def main() -> int:
         f"estimator: {args.density_estimator}"
     )
 
-    inference = make_npe(
-        prior,
-        args.density_estimator,
-        args.device,
-    )
+    inference = make_configured_npe(prior, args)
     captured = ForwardingCapture(stream=os.sys.stdout)
     with contextlib.redirect_stdout(captured):
         density_estimator = (
@@ -457,25 +521,32 @@ def main() -> int:
             output_dir / "density_estimator_state_dict.pt",
         )
 
-    battaglia_samples = sample_posterior(
-        posterior,
-        obs_t,
-        int(args.num_battaglia_samples),
-    )
-    battaglia_samples = np.asarray(
-        battaglia_samples,
-        dtype=np.float32,
-    ).reshape(-1, len(target_names))
-    np.save(
-        output_dir / "battaglia12_posterior_samples.npy",
-        battaglia_samples,
-    )
+    if int(args.num_battaglia_samples) > 0:
+        battaglia_samples = sample_posterior(
+            posterior,
+            obs_t,
+            int(args.num_battaglia_samples),
+        )
+        battaglia_samples = np.asarray(
+            battaglia_samples,
+            dtype=np.float32,
+        ).reshape(-1, len(target_names))
+        np.save(
+            output_dir / "battaglia12_posterior_samples.npy",
+            battaglia_samples,
+        )
+    else:
+        battaglia_samples = np.empty((0, len(target_names)), dtype=np.float32)
 
     metadata = {
         **split_report,
         "seed": int(args.seed),
         "device": args.device,
         "density_estimator": args.density_estimator,
+        "hidden_features": int(args.hidden_features),
+        "num_transforms": int(args.num_transforms),
+        "num_bins": int(args.num_bins),
+        "internal_z_score_x": args.internal_z_score_x,
         "stop_after_epochs": int(args.stop_after_epochs),
         "num_battaglia_samples": int(
             battaglia_samples.shape[0]

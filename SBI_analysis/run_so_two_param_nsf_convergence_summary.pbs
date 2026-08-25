@@ -1,0 +1,45 @@
+#!/bin/bash
+#PBS -N SO2p_NSF_sum
+#PBS -q mini2
+#PBS -l select=1:ncpus=4:mpiprocs=1:mem=32gb
+#PBS -l walltime=12:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+: "${PROJECT_ROOT:=${WORK_DIR}}"
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+: "${CONVERGENCE_ROOT:=/lustre/work/kristero10/adrian_two_param_nsf_convergence_baseline_deproj0}"
+: "${DATASET_SIZES:=256,512,1024,2048,4096,8192,16384,32768,65536,98304,131072,196608,262144,327680,393216,458752,523288}"
+: "${CORNER_SIZES:=256,32768,523288}"
+: "${DPI:=300}"
+: "${ALLOW_MISSING:=0}"
+
+SCRIPT="${PROJECT_ROOT}/SBI_analysis/summarize_so_two_param_nsf_convergence.py"
+[[ -f "${SCRIPT}" ]] || { echo "Summary script not found: ${SCRIPT}" >&2; exit 2; }
+mkdir -p /home/kristero10/logs/SBI_runs "${CONVERGENCE_ROOT}/summary"
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  eval "${PYTHON_ENV_SETUP}"
+fi
+export OMP_NUM_THREADS="${PBS_NCPUS:-4}"
+export OPENBLAS_NUM_THREADS="${PBS_NCPUS:-4}"
+export MKL_NUM_THREADS="${PBS_NCPUS:-4}"
+
+EXTRA_ARGS=()
+[[ "${ALLOW_MISSING}" == "1" ]] && EXTRA_ARGS+=(--allow-missing)
+
+echo "Started summary: $(date -Is)"
+"${PYTHON}" "${SCRIPT}" \
+  --run-root "${CONVERGENCE_ROOT}" \
+  --dataset-sizes "${DATASET_SIZES}" \
+  --corner-sizes "${CORNER_SIZES}" \
+  --dpi "${DPI}" \
+  "${EXTRA_ARGS[@]}"
+echo "Finished summary: $(date -Is)"
+echo "Figures: ${CONVERGENCE_ROOT}/summary"

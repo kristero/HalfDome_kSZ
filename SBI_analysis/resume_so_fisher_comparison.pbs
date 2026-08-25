@@ -1,0 +1,77 @@
+#!/bin/bash
+#PBS -N SO_fisher_finish
+#PBS -q mini2
+#PBS -l select=1:ncpus=8:mpiprocs=1:mem=32gb
+#PBS -l walltime=24:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+
+: "${PROJECT_ROOT:=${WORK_DIR}}"
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+: "${FISHER_ROOT:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0}"
+: "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+: "${SBI_RUN_ROOT:=/home/kristero10/HalfDome_kSZ/SBI_analysis/outputs/cluster_outputs/SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_metadata_verified_asinh}"
+: "${SBI_CASE:=masked_baseline_noise_cross_deproj0}"
+: "${NPE_N_TRAIN:=0}"
+: "${SBI_SAMPLES:=20000}"
+: "${SAMPLE_BATCH_SIZE:=2000}"
+: "${PLOT_SAMPLES:=20000}"
+: "${PLOT_MODE:=all}"
+: "${DEVICE:=cpu}"
+: "${DPI:=300}"
+
+SCRIPT="${PROJECT_ROOT}/SBI_analysis/resume_so_fisher_comparison.py"
+OUTPUT_DIR="${FISHER_ROOT}/analysis"
+
+for path in \
+  "${SCRIPT}" \
+  "${PREPARED_DATASET}" \
+  "${OUTPUT_DIR}/fiducial_battaglia12_dell.npy" \
+  "${OUTPUT_DIR}/fisher_samples_untruncated.npy" \
+  "${OUTPUT_DIR}/fisher_samples_prior_truncated.npy"; do
+  if [[ ! -f "${path}" ]]; then
+    echo "Required completed output does not exist: ${path}" >&2
+    exit 2
+  fi
+done
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  eval "${PYTHON_ENV_SETUP}"
+fi
+
+ALLOCATED_CPUS="${PBS_NCPUS:-8}"
+export OMP_NUM_THREADS="${ALLOCATED_CPUS}"
+export OPENBLAS_NUM_THREADS="${ALLOCATED_CPUS}"
+export MKL_NUM_THREADS="${ALLOCATED_CPUS}"
+export NUMEXPR_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_INTEROP_THREADS=1
+
+echo "Started: $(date -Is)"
+echo "Reusing Fisher outputs: ${OUTPUT_DIR}"
+echo "SBI samples: ${SBI_SAMPLES}, checkpoint batch: ${SAMPLE_BATCH_SIZE}"
+echo "Plot samples per chain: ${PLOT_SAMPLES}"
+"${PYTHON}" --version
+
+"${PYTHON}" "${SCRIPT}" \
+  --prepared-dataset "${PREPARED_DATASET}" \
+  --fisher-root "${FISHER_ROOT}" \
+  --sbi-run-root "${SBI_RUN_ROOT}" \
+  --case "${SBI_CASE}" \
+  --npe-n-train "${NPE_N_TRAIN}" \
+  --sbi-samples "${SBI_SAMPLES}" \
+  --sample-batch-size "${SAMPLE_BATCH_SIZE}" \
+  --plot-samples "${PLOT_SAMPLES}" \
+  --plot-mode "${PLOT_MODE}" \
+  --device "${DEVICE}" \
+  --dpi "${DPI}"
+
+echo "Finished: $(date -Is)"
+echo "Outputs: ${OUTPUT_DIR}"

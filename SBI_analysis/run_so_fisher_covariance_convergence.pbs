@@ -1,0 +1,80 @@
+#!/bin/bash
+#PBS -N SO_Fcov_conv
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=24:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+: "${PROJECT_ROOT:=${WORK_DIR}}"
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+: "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+: "${RAW_DIR:=/lustre/work/kristero10/adrian_dataset}"
+: "${FISHER_ANALYSIS_DIR:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/analysis}"
+: "${OUTPUT_DIR:=${FISHER_ANALYSIS_DIR}/covariance_convergence}"
+: "${COVARIANCE_SIZES:=500,1000,2000,5000,10000,20000}"
+: "${RANDOM_ROWS:=20000}"
+: "${CHUNK_ROWS:=256}"
+: "${BIN_WEIGHTING:=2ell_plus_1}"
+: "${FIXED_SHRINKAGE:=0.05}"
+: "${DETREND_DEGREE:=1}"
+: "${CROSSFIT_FOLDS:=5}"
+: "${REBUILD_CACHE:=0}"
+: "${ANALYSIS_ONLY:=0}"
+: "${CACHE_ONLY:=0}"
+: "${DPI:=300}"
+
+SCRIPT="${PROJECT_ROOT}/SBI_analysis/run_so_fisher_covariance_convergence.py"
+for path in "${SCRIPT}" "${PREPARED_DATASET}" "${FISHER_ANALYSIS_DIR}/derivatives_richardson.npy"; do
+  [[ -f "${path}" ]] || { echo "Required input not found: ${path}" >&2; exit 2; }
+done
+if [[ "${ANALYSIS_ONLY}" != "1" ]]; then
+  [[ -d "${RAW_DIR}" ]] || { echo "Raw dataset directory not found: ${RAW_DIR}" >&2; exit 2; }
+fi
+mkdir -p /home/kristero10/logs/SBI_runs "${OUTPUT_DIR}"
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  eval "${PYTHON_ENV_SETUP}"
+fi
+
+ALLOCATED_CPUS="${PBS_NCPUS:-26}"
+export OMP_NUM_THREADS="${ALLOCATED_CPUS}"
+export OPENBLAS_NUM_THREADS="${ALLOCATED_CPUS}"
+export MKL_NUM_THREADS="${ALLOCATED_CPUS}"
+export NUMEXPR_NUM_THREADS="${ALLOCATED_CPUS}"
+
+set --
+if [[ "${REBUILD_CACHE}" == "1" ]]; then
+  set -- "$@" --rebuild-cache
+fi
+if [[ "${ANALYSIS_ONLY}" == "1" ]]; then
+  set -- "$@" --analysis-only
+fi
+if [[ "${CACHE_ONLY}" == "1" ]]; then
+  set -- "$@" --cache-only
+fi
+
+printf 'Started covariance convergence: %s\n' "$(date -Is)"
+printf 'Output: %s\n' "${OUTPUT_DIR}"
+printf 'Nested covariance sizes: %s\n' "${COVARIANCE_SIZES}"
+"${PYTHON}" "${SCRIPT}" \
+  --prepared-dataset "${PREPARED_DATASET}" \
+  --raw-dir "${RAW_DIR}" \
+  --fisher-analysis-dir "${FISHER_ANALYSIS_DIR}" \
+  --output-dir "${OUTPUT_DIR}" \
+  --sizes "${COVARIANCE_SIZES}" \
+  --random-rows "${RANDOM_ROWS}" \
+  --chunk-rows "${CHUNK_ROWS}" \
+  --bin-weighting "${BIN_WEIGHTING}" \
+  --fixed-shrinkage "${FIXED_SHRINKAGE}" \
+  --detrend-degree "${DETREND_DEGREE}" \
+  --crossfit-folds "${CROSSFIT_FOLDS}" \
+  --dpi "${DPI}" \
+  "$@"
+printf 'Finished covariance convergence: %s\n' "$(date -Is)"

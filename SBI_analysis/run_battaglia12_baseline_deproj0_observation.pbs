@@ -1,0 +1,140 @@
+#!/bin/bash
+#PBS -N SO_B12_base0
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+: "${PROJECT_ROOT:=${PBS_O_WORKDIR:-$PWD}}"
+: "${PYTHON:=python3}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${LIGHTCONE_ID:=100}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
+: "${BASELINE_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt}"
+: "${GOAL_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt}"
+: "${CACHE_DIR:=/lustre/work/kristero10/tSZ_data/cache}"
+: "${OUTPUT_ROOT:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/battaglia12_baseline_deproj0_observation}"
+: "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+: "${TRAINING_RAW_CL:=/lustre/work/kristero10/adrian_dataset/sbi_masked_baseline_noise_cross_deproj0_cl.npy}"
+: "${SBI_RUN_ROOT:=/home/kristero10/HalfDome_kSZ/SBI_analysis/outputs/cluster_outputs/SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_metadata_verified_asinh}"
+: "${SBI_CASE:=masked_baseline_noise_cross_deproj0}"
+: "${NPE_N_TRAIN:=0}"
+: "${THREADS_PER_TASK:=26}"
+
+cd "${PROJECT_ROOT}"
+SIMULATOR="${PROJECT_ROOT}/tSZ_visuals/run_halfdome_fullsky_so_noise.jl"
+VALIDATOR="${PROJECT_ROOT}/SBI_analysis/prepare_validate_battaglia12_sbi_observation.py"
+RAW_DIR="${OUTPUT_ROOT}/raw"
+PREPARED_DIR="${OUTPUT_ROOT}/prepared"
+LOG_DIR="${OUTPUT_ROOT}/logs"
+
+required_paths=(
+  "${SIMULATOR}"
+  "${VALIDATOR}"
+  "${HALFDOME_PATH}"
+  "${BASELINE_NOISE_PATH}"
+  "${GOAL_NOISE_PATH}"
+  "${PREPARED_DATASET}"
+  "${TRAINING_RAW_CL}"
+)
+for path in "${required_paths[@]}"; do
+  if [[ ! -e "${path}" ]]; then
+    echo "Required path does not exist: ${path}" >&2
+    exit 2
+  fi
+done
+
+mkdir -p "${RAW_DIR}" "${PREPARED_DIR}" "${LOG_DIR}" "${CACHE_DIR}"
+export JULIA_NUM_THREADS="${THREADS_PER_TASK}"
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export ENFORCE_BATTAGLIA_GUARDRAILS=true
+export SKIP_INVALID_BATTAGLIA_ROWS=false
+
+existing_profile="$(find "${RAW_DIR}" -maxdepth 1 -type f -name '*masked_baseline_noise_cross_cl*gaussbeam_2arcmin*so_fsky0p4_apo60arcmin_seed12345_deproj0*lmax7979*.npy' -print -quit)"
+
+echo "Started: $(date -Is)"
+echo "Training product: ${SBI_CASE}"
+echo "Prepared training dataset: ${PREPARED_DATASET}"
+echo "Consolidated training C_ell: ${TRAINING_RAW_CL}"
+echo "Output root: ${OUTPUT_ROOT}"
+
+if [[ -z "${existing_profile}" ]]; then
+  echo "Generating matched Battaglia12 baseline-deproj0 split-noise cross C_ell."
+  julia_args=(
+    catalog_source=halfdome
+    simulation_name="halfdome_lightcone_${LIGHTCONE_ID}"
+    batching_mode=full
+    halfdome_path="${HALFDOME_PATH}"
+    output_dir="${RAW_DIR}"
+    cache_dir="${CACHE_DIR}"
+    baseline_noise_path="${BASELINE_NOISE_PATH}"
+    goal_noise_path="${GOAL_NOISE_PATH}"
+    nside=4096
+    cl_lmax=7979
+    so_noise_lmax=7979
+    cl_niter=0
+    so_noise_deprojections=0
+    so_noise_is_dl=false
+    apply_gaussian_beam=true
+    gaussian_beam_fwhm_arcmin=2.0
+    mask_fsky=0.4
+    mask_apodization_arcmin=60.0
+    seed=12345
+    model_exists=false
+    reuse_existing_cache=true
+    cache_wait_seconds=0
+    cache_poll_seconds=30
+    interpolator_pad=256
+    interpolator_logM_max=15.7
+    save_no_noise_cl=false
+    save_baseline_noise_cross_cl=true
+    save_goal_noise_cross_cl=false
+    save_unmasked_no_noise_cl=false
+    save_noise_maps=false
+    save_noisy_maps=false
+    save_mask_map=false
+    save_signal_map=false
+    save_masked_signal_map=false
+    battaglia_P0_amp=18.1
+    battaglia_x_c_amp=0.497
+    battaglia_beta_amp=4.35
+    battaglia_P0_alpha_m=0.154
+    battaglia_x_c_alpha_m=-0.00865
+    battaglia_beta_alpha_m=0.0393
+    battaglia_P0_alpha_z=-0.758
+    battaglia_x_c_alpha_z=0.731
+    battaglia_beta_alpha_z=0.415
+    battaglia_alpha_amp=1.0
+    battaglia_alpha_alpha_m=0.0
+    battaglia_alpha_alpha_z=0.0
+    battaglia_gamma_amp=-0.3
+    battaglia_gamma_alpha_m=0.0
+    battaglia_gamma_alpha_z=0.0
+  )
+  "${JULIA}" --threads="${THREADS_PER_TASK}" "${SIMULATOR}" "${julia_args[@]}" > "${LOG_DIR}/battaglia12_baseline_deproj0_simulation.out" 2> "${LOG_DIR}/battaglia12_baseline_deproj0_simulation.err"
+else
+  echo "Reusing existing matched raw profile: ${existing_profile}"
+fi
+
+echo "Validating type, C_ell -> D_ell binning, and saved NPE preprocessing."
+validator_args=(
+  --prepared-dataset "${PREPARED_DATASET}"
+  --raw-profile "${RAW_DIR}"
+  --training-raw-cl "${TRAINING_RAW_CL}"
+  --sbi-run-root "${SBI_RUN_ROOT}"
+  --case "${SBI_CASE}"
+  --n-train "${NPE_N_TRAIN}"
+  --expected-transform asinh
+  --output-dir "${PREPARED_DIR}"
+)
+"${PYTHON}" "${VALIDATOR}" "${validator_args[@]}"
+
+echo "Finished: $(date -Is)"
+echo "Validated observation: ${PREPARED_DIR}/battaglia12_masked_baseline_noise_cross_deproj0_binned_dell.npy"
+echo "Validation report: ${PREPARED_DIR}/battaglia12_baseline_deproj0_validation.json"

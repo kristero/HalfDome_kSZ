@@ -56,7 +56,7 @@ export MKL_NUM_THREADS=1
 export ENFORCE_BATTAGLIA_GUARDRAILS=true
 export SKIP_INVALID_BATTAGLIA_ROWS=false
 
-existing_profile="$(find "${RAW_DIR}" -maxdepth 1 -type f -name '*masked_baseline_noise_cross_cl*gaussbeam_2arcmin*so_fsky0p4_apo60arcmin_seed12345_deproj0*lmax7979*.npy' -print -quit)"
+existing_profile="$(find "${RAW_DIR}" -maxdepth 1 -type f -name '*masked_baseline_noise_cross_cl*.npy' -print -quit)"
 
 echo "Started: $(date -Is)"
 echo "Training product: ${SBI_CASE}"

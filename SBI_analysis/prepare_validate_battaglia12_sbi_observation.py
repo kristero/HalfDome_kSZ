@@ -13,11 +13,11 @@ import numpy as np
 
 
 EXPECTED_PRODUCT = "masked_baseline_noise_cross_deproj0"
-EXPECTED_TAGS = (
-    "masked_baseline_noise_cross_cl",
-    "gaussbeam_2arcmin",
-    "so_fsky0p4_apo60arcmin_seed12345_deproj0",
-    "lmax7979",
+EXPECTED_FILENAME_PATTERNS = (
+    r"masked_baseline_noise_cross_cl",
+    r"gaussbeam_2(?:p0+)?arcmin",
+    r"so_fsky0p4(?:0*)?_apo60(?:p0+)?arcmin_seed12345_deproj0",
+    r"lmax7979",
 )
 BATTAGLIA12 = {
     "P0": 18.1,
@@ -123,19 +123,27 @@ def discover_profile(path: Path) -> Path:
     if path.is_file():
         candidates = [path]
     elif path.is_dir():
-        candidates = [
-            item
-            for item in path.rglob("*masked_baseline_noise_cross_cl*.npy")
-            if all(tag in item.name for tag in EXPECTED_TAGS)
-        ]
+        candidates = sorted(path.rglob("*masked_baseline_noise_cross_cl*.npy"))
     else:
         raise FileNotFoundError(f"Raw Battaglia12 path does not exist: {path}")
     if len(candidates) != 1:
-        raise ValueError(f"Expected one matched raw profile under {path}; found {candidates}.")
+        all_npy = sorted(path.rglob("*.npy")) if path.is_dir() else candidates
+        raise ValueError(
+            f"Expected one baseline-noise cross profile under {path}; found {candidates}. "
+            f"All NPY files there are: {all_npy}"
+        )
     result = candidates[0].resolve()
-    missing = [tag for tag in EXPECTED_TAGS if tag not in result.name]
+    filename = result.name.lower()
+    missing = [
+        pattern
+        for pattern in EXPECTED_FILENAME_PATTERNS
+        if re.search(pattern, filename) is None
+    ]
     if missing:
-        raise ValueError(f"{result} does not encode required simulator tags: {missing}")
+        raise ValueError(
+            f"{result} does not encode the required beam/mask/seed/deprojection "
+            f"configuration. Missing filename patterns: {missing}"
+        )
     return result
 
 
@@ -216,6 +224,14 @@ def self_test() -> int:
         rtol=2e-7,
         atol=0.0,
     )
+    julia_filename = (
+        "halfdome_fullsky_masked_baseline_noise_cross_cl_m200c_nside4096_"
+        "base_planck18_gaussbeam_2p0arcmin_"
+        "so_fsky0p4_apo60p0arcmin_seed12345_deproj0_lmax7979.npy"
+    )
+    for pattern in EXPECTED_FILENAME_PATTERNS:
+        if re.search(pattern, julia_filename) is None:
+            raise AssertionError(f"Filename pattern does not match Julia formatting: {pattern}")
     print("Self-test passed: ell alignment, C_ell -> D_ell binning, and asinh.")
     return 0
 

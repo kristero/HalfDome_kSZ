@@ -72,8 +72,8 @@ if !EARLY_MODE
 
     if isdefined(XGPaint, :HaloDMProfile)
         const HaloDMProfile = getfield(XGPaint, :HaloDMProfile)
-        const HALO_DM_PROFILE_SOURCE = "XGPaint.HaloDMProfile"
-        const GENERATED_DM_MODEL_FAMILY = "xgpaint_native_halo_dm_profile"
+        const BATTAGLIA_DM_PROFILE_SOURCE = "XGPaint.HaloDMProfile"
+        const BATTAGLIA_GENERATED_DM_MODEL_FAMILY = "xgpaint_native_halo_dm_profile"
     else
         # Official XGPaint v0.4.0 provides BattagliaTauProfile but not the
         # small FRB wrapper used by the original local checkout.  The cached
@@ -83,8 +83,8 @@ if !EARLY_MODE
         # is distinct from the authoritative legacy private-XGPaint DM cache.
         const THOMSON_CROSS_SECTION_CM2 = 6.6524587321e-25
         const PARSEC_CM = 3.0856775814913673e18
-        const HALO_DM_PROFILE_SOURCE = "local wrapper around XGPaint.BattagliaTauProfile"
-        const GENERATED_DM_MODEL_FAMILY = "public_v0.4_tau_conversion"
+        const BATTAGLIA_DM_PROFILE_SOURCE = "local wrapper around XGPaint.BattagliaTauProfile"
+        const BATTAGLIA_GENERATED_DM_MODEL_FAMILY = "public_v0.4_tau_conversion"
 
         struct HaloDMProfile{T,P,C} <: XGPaint.AbstractGNFW{T}
             tau_model::P
@@ -106,6 +106,8 @@ if !EARLY_MODE
                    (model.tau_per_pc_cm3 * (one(redshift) + redshift))
         end
     end
+
+    include(joinpath(@__DIR__, "lee2022_frb_dm_profile.jl"))
 end
 
 const H_VALUE = 0.68
@@ -121,6 +123,59 @@ const HALO_RADIUS_DEFINITION = "R200c"
 const HALO_REFERENCE_DENSITY = "critical"
 const HALO_OVERDENSITY = 200
 const XGPAINT_PROFILE_MASS_DEFINITION = "M200c"
+
+function normalize_dm_profile_name(value::AbstractString)
+    normalized = lowercase(replace(replace(strip(String(value)), "_" => ""), "-" => ""))
+    normalized in ("battaglia", "battaglia16", "xgpaint") && return "battaglia16"
+    normalized in ("lee2022", "leeetal2022", "lee22") && return "lee2022"
+    error("dm_profile must be battaglia16 or lee2022; got $(repr(value)).")
+end
+
+function normalize_lee2022_concentration_mode(value::AbstractString)
+    normalized = lowercase(replace(replace(strip(String(value)), "_" => ""), "-" => ""))
+    normalized in ("none", "noconcentration") && return "none"
+    normalized in ("duffy", "duffy2008") && return "duffy2008"
+    error("lee2022_concentration_mode must be none or duffy2008; got $(repr(value)).")
+end
+
+if !EARLY_MODE
+    function dm_profile_runtime_configuration(config)
+        if config.dm_profile == "battaglia16"
+            model = HaloDMProfile(BattagliaTauProfile(
+                Omega_c=OMEGAC, Omega_b=OMEGAB, h=H_VALUE,
+            ))
+            return (
+                model=model,
+                source=BATTAGLIA_DM_PROFILE_SOURCE,
+                generated_model_family=BATTAGLIA_GENERATED_DM_MODEL_FAMILY,
+                cache_signature="",
+                description="HaloDMProfile(BattagliaTauProfile(Omega_c=0.261, Omega_b=0.049, h=0.68))",
+                implementation_path="",
+                provenance=Dict{String,Any}(),
+            )
+        elseif config.dm_profile == "lee2022"
+            config.lee2022_concentration_mode == "none" || error(
+                "lee2022_concentration_mode=duffy2008 is reserved for the future " *
+                "concentration-dependent Table-4 implementation. This run implements only " *
+                "the requested Appendix-A2 no-concentration profile.",
+            )
+            model = Lee2022NoConcentrationDMProfile(
+                Omega_c=OMEGAC, Omega_b=OMEGAB, h=H_VALUE,
+            )
+            implementation_path = joinpath(@__DIR__, "lee2022_frb_dm_profile.jl")
+            return (
+                model=model,
+                source="local Lee2022 Appendix-A2 no-concentration electron-density profile",
+                generated_model_family=LEE2022_NO_CONCENTRATION_MODEL_FAMILY,
+                cache_signature=LEE2022_NO_CONCENTRATION_CACHE_SIGNATURE,
+                description="Lee2022NoConcentrationDMProfile(Appendix A Table A2; M200c/R200c)",
+                implementation_path=implementation_path,
+                provenance=lee2022_no_concentration_provenance(model),
+            )
+        end
+        error("Unsupported dm_profile=$(repr(config.dm_profile)).")
+    end
+end
 
 struct MassWindow
     label::String
@@ -232,6 +287,7 @@ function validate_known_options(options)
         "sightline_progress_every_rows",
         "apply_catalog_mass_floor", "catalog_masses_are_msun_h", "dm_cache", "dm_cache_file",
         "xgpaint_profile_mass_definition",
+        "dm_profile", "lee2022_concentration_mode",
         "dm_cache_overwrite", "dm_cleanup_nonpositive", "dm_value_sanity_max",
         "halo_extension_r200_multiplier", "halo_extension_r200",
         "dm_aperture_r200_multiplier", "pdf_bins",
@@ -288,6 +344,14 @@ Core options (both --key=value and key=value are accepted):
   --nfrb=120000 --seed=42            Shared random HEALPix sightlines; matches the reference ray count
   --nside=4096 --unique-pixels=true
   --chunk-size=1000000               Catalog rows per HDF5 read
+  --dm-profile=battaglia16           Existing production profile (default)
+  --dm-profile=lee2022               Lee et al. 2022 Appendix-A2 electron-density fit
+  --lee2022-concentration-mode=none  Current implemented Lee2022 mode
+                                      duffy2008 is a reserved future Table-4 branch and fails
+                                      explicitly rather than silently substituting concentration
+                                      The Lee2022 fit covers 0.04-1.34R200c and
+                                      1e13-1e14.8 h^-1 Msun; the requested 3R200c/full-window
+                                      test is recorded as radial and low-mass extrapolation
   --dm-cache=frb_map_generation/outputs/shared_xgpaint_dm_cache.jld2
   --dm-cache-overwrite=false          Existing DM cache is authoritative; a missing cache is an error
                                       Public-v0.4 rebuilds require a NEW, non-existing --dm-cache path
@@ -648,6 +712,35 @@ function native_linear_axis(axis, expected_length::Int, label::AbstractString)
     axis_start < axis_stop || error("Cached $(label) axis is not increasing.")
     return range(axis_start, stop=axis_stop, length=axis_length)
 end
+
+cache_signature_path(cache_file::AbstractString) = String(cache_file) * ".profile_signature.txt"
+
+function validate_cache_signature(cache_file::AbstractString, expected_signature::AbstractString)
+    isempty(expected_signature) && return ""
+    signature_file = cache_signature_path(cache_file)
+    isfile(signature_file) || error(
+        "Profile cache signature is missing: $(signature_file). Refusing to load an " *
+        "unidentified cache for the selected DM profile.",
+    )
+    actual_signature = strip(read(signature_file, String))
+    actual_signature == expected_signature || error(
+        "Profile cache signature mismatch for $(cache_file): expected " *
+        "$(repr(expected_signature)), got $(repr(actual_signature)).",
+    )
+    return signature_file
+end
+
+function write_cache_signature(cache_file::AbstractString, signature::AbstractString)
+    isempty(signature) && return ""
+    signature_file = cache_signature_path(cache_file)
+    atomic_write(signature_file; overwrite=true) do temporary
+        open(temporary, "w") do io
+            write(io, signature * "\n")
+        end
+    end
+    return signature_file
+end
+
 """Load both the private-fork ASCII cache and official v0.4 Unicode cache."""
 function enforce_generated_cache_target_policy(cache_file, overwrite, generated_model_family)
     if overwrite && generated_model_family == "public_v0.4_tau_conversion" && isfile(cache_file)
@@ -666,8 +759,10 @@ function build_dm_interpolator_compatible(
     cache_file::String,
     overwrite::Bool,
     cleanup_nonpositive::Bool,
+    generated_model_family::String,
+    cache_signature::String="",
 )
-    enforce_generated_cache_target_policy(cache_file, overwrite, GENERATED_DM_MODEL_FAMILY)
+    enforce_generated_cache_target_policy(cache_file, overwrite, generated_model_family)
     if !isfile(cache_file) && !overwrite
         error(
             "Authoritative DM interpolator cache not found: $(cache_file). " *
@@ -679,15 +774,18 @@ function build_dm_interpolator_compatible(
     end
     if overwrite
         profile = build_interpolator(model; cache_file=cache_file, overwrite=overwrite)
+        signature_file = write_cache_signature(cache_file, cache_signature)
         return (
             profile=profile,
             loader="XGPaint.build_interpolator",
             logtheta_key="generated_overwrite",
             nonpositive_replaced=0,
-            model_family=GENERATED_DM_MODEL_FAMILY,
+            model_family=generated_model_family,
+            cache_signature_file=signature_file,
         )
     end
 
+    signature_file = validate_cache_signature(cache_file, cache_signature)
     isdefined(XGPaint, :load) || error(
         "XGPaint does not expose its FileIO loader; cannot read cache $(cache_file). " *
         "To build the public-v0.4 model, use a NEW, non-existing --dm-cache path together " *
@@ -733,9 +831,12 @@ function build_dm_interpolator_compatible(
         loader="generator ASCII/Unicode cache compatibility loader",
         logtheta_key=logtheta_key,
         nonpositive_replaced=nonpositive_count,
-        model_family=logtheta_key == "prof_logthetas" ?
-            "legacy_private_xgpaint_precomputed_dm_cache" :
-            "precomputed_dm_cache_model_family_unencoded",
+        model_family=isempty(cache_signature) ?
+            (logtheta_key == "prof_logthetas" ?
+                "legacy_private_xgpaint_precomputed_dm_cache" :
+                "precomputed_dm_cache_model_family_unencoded") :
+            generated_model_family,
+        cache_signature_file=signature_file,
     )
 end
 
@@ -1276,6 +1377,14 @@ function configuration(options; require_catalog=true)
     catalog_mass_floor = get_float_option(options, ("catalog_mass_floor",), DEFAULT_HALFDOME_MASS_FLOOR_MSUN)
     apply_catalog_mass_floor = get_bool_option(options, ("apply_catalog_mass_floor",), true)
     catalog_masses_are_msun_h = get_bool_option(options, ("catalog_masses_are_msun_h",), true)
+    dm_profile = normalize_dm_profile_name(get_string_option(options, ("dm_profile",), "battaglia16"))
+    lee2022_concentration_mode = normalize_lee2022_concentration_mode(get_string_option(
+        options, ("lee2022_concentration_mode",), "none",
+    ))
+    dm_profile == "lee2022" && lee2022_concentration_mode == "duffy2008" && error(
+        "lee2022_concentration_mode=duffy2008 is reserved for a future Table-4 " *
+        "implementation; use none for the current Appendix-A2 test.",
+    )
     profile_mass_option_raw = String(strip(get_string_option(
         options, ("xgpaint_profile_mass_definition",), "m200c",
     )))
@@ -1283,7 +1392,7 @@ function configuration(options; require_catalog=true)
         profile_mass_option_raw, "_" => "",
     ), "-" => ""))
     profile_mass_option == "m200c" || error(
-        "xgpaint_profile_mass_definition must be m200c for the installed XGPaint Battaglia profile; " *
+        "xgpaint_profile_mass_definition must be m200c for the supported FRB density profiles; " *
         "got $(repr(profile_mass_option)).",
     )
     xgpaint_profile_mass_definition = XGPAINT_PROFILE_MASS_DEFINITION
@@ -1363,7 +1472,7 @@ function configuration(options; require_catalog=true)
         sightline_redshift_width, sightline_max_rows, sightline_progress_every_rows,
         chunk_size, max_catalog_halos,
         catalog_mass_floor, apply_catalog_mass_floor, catalog_masses_are_msun_h,
-        xgpaint_profile_mass_definition, catalog,
+        dm_profile, lee2022_concentration_mode, xgpaint_profile_mass_definition, catalog,
         output, summary, provenance, dm_cache, dm_cache_overwrite, dm_cleanup_nonpositive,
         dm_value_sanity_max, dm_aperture_r200_multiplier, pdf_edge_count, pdf_spacing,
         pdf_dm_min, pdf_dm_max, progress_every_batches,
@@ -1392,6 +1501,8 @@ function print_configuration(config)
     println("  catalog_mass_floor_msun=$(config.catalog_mass_floor), apply=$(config.apply_catalog_mass_floor)")
     println("  catalog_masses_are_msun_h=$(config.catalog_masses_are_msun_h), h=$(H_VALUE)")
     println("  mass-window selection=$(HALO_MASS_DEFINITION) from $(CATALOG_M200C_DATASET)")
+    println("  dm_profile=$(config.dm_profile)")
+    println("  lee2022_concentration_mode=$(config.lee2022_concentration_mode)")
     println("  XGPaint profile input=$(config.xgpaint_profile_mass_definition) from $(CATALOG_M200C_DATASET)")
     println(
         "  aperture=$(config.dm_aperture_r200_multiplier) $(HALO_RADIUS_DEFINITION), " *
@@ -1601,12 +1712,15 @@ function main(options)
     ENV["XGPAINT_CLEANUP_NONPOSITIVE"] = config.dm_cleanup_nonpositive ? "true" : "false"
     cache_parent = dirname(config.dm_cache)
     isdir(cache_parent) || mkpath(cache_parent)
-    dm_model = HaloDMProfile(BattagliaTauProfile(Omega_c=OMEGAC, Omega_b=OMEGAB, h=H_VALUE))
+    profile_runtime = dm_profile_runtime_configuration(config)
+    dm_model = profile_runtime.model
     interpolator_build = build_dm_interpolator_compatible(
         dm_model;
         cache_file=config.dm_cache,
         overwrite=config.dm_cache_overwrite,
         cleanup_nonpositive=config.dm_cleanup_nonpositive,
+        generated_model_family=profile_runtime.generated_model_family,
+        cache_signature=profile_runtime.cache_signature,
     )
     dm_model_interp = interpolator_build.profile
     dm_cache_spot = validate_dm_interpolator_spot_value(dm_model_interp)
@@ -1803,8 +1917,16 @@ function main(options)
         "shared_sightlines_for_all_windows" => true,
         "save_ray_dm" => config.save_ray_dm,
         "mass_windows_specification" => isempty(config.mass_windows_specification) ? "legacy defaults" : config.mass_windows_specification,
-        "profile" => "HaloDMProfile(BattagliaTauProfile(Omega_c=0.261, Omega_b=0.049, h=0.68))",
-        "halo_dm_profile_source" => HALO_DM_PROFILE_SOURCE,
+        "dm_profile" => config.dm_profile,
+        "lee2022_concentration_mode" => config.lee2022_concentration_mode,
+        "profile" => profile_runtime.description,
+        "halo_dm_profile_source" => profile_runtime.source,
+        "dm_profile_implementation_path" => profile_runtime.implementation_path,
+        "dm_profile_implementation_sha256" =>
+            isempty(profile_runtime.implementation_path) ? "" :
+            file_sha256(profile_runtime.implementation_path),
+        "dm_cache_profile_signature" => profile_runtime.cache_signature,
+        "dm_cache_profile_signature_file" => interpolator_build.cache_signature_file,
         "dm_observer_frame_redshift_dilution" => "1/(1+z_halo)",
         "halo_extension_r200_multiplier" => config.dm_aperture_r200_multiplier,
         "dm_aperture_r200_multiplier" => config.dm_aperture_r200_multiplier,
@@ -1839,6 +1961,7 @@ function main(options)
         "summary_csv" => abspath(config.summary),
         "provenance_file" => abspath(config.provenance),
     )
+    merge!(provenance_entries, profile_runtime.provenance)
 
     write_hdf5_output(
         config.output, run_id, created_utc, config.windows, frb_pixels, frb_ra, frb_dec,

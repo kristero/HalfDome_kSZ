@@ -23,6 +23,7 @@ set -euo pipefail
 # Inputs. Override either path with qsub -v when the cluster copy differs.
 : "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
 : "${DM_CACHE:=${PROJECT_DIR}/frb_map_generation/outputs/shared_xgpaint_dm_cache.jld2}"
+: "${DM_CACHE_OVERWRITE:=false}"
 
 # Science settings.
 : "${NFRB:=120000}"
@@ -34,6 +35,8 @@ set -euo pipefail
 # cached profile value at each accepted ray separation.
 : "${HALO_EXTENSION_R200_MULTIPLIER:=${DM_APERTURE_R200_MULTIPLIER:-4.0}}"
 : "${XGPAINT_PROFILE_MASS_DEFINITION:=m200c}"
+: "${DM_PROFILE:=battaglia16}"
+: "${LEE2022_CONCENTRATION_MODE:=none}"
 : "${MASS_WINDOWS:=m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16}"
 
 # Each parameter combination receives an isolated directory automatically.
@@ -82,12 +85,17 @@ if [[ -n "${ENV_SETUP}" ]]; then
 fi
 
 missing_inputs=0
-for required_file in "${HALFDOME_PATH}" "${DM_CACHE}" "${GENERATOR}" "${PLOTTER}"; do
+for required_file in "${HALFDOME_PATH}" "${GENERATOR}" "${PLOTTER}"; do
   if [[ ! -f "${required_file}" ]]; then
     echo "Required file not found: ${required_file}" >&2
     missing_inputs=1
   fi
 done
+if [[ "${DM_CACHE_OVERWRITE}" != "true" && ! -f "${DM_CACHE}" ]]; then
+  echo "Required existing DM cache not found: ${DM_CACHE}" >&2
+  echo "Use a new cache path with DM_CACHE_OVERWRITE=true only when intentionally building a new profile cache." >&2
+  missing_inputs=1
+fi
 if [[ -n "${JULIA_PROJECT}" && ! -f "${JULIA_PROJECT}/Project.toml" ]]; then
   echo "Required file not found: ${JULIA_PROJECT}/Project.toml" >&2
   missing_inputs=1
@@ -120,7 +128,10 @@ echo "Julia: ${JULIA}"
 echo "Python: ${PYTHON}"
 "${PYTHON}" --version
 echo "HalfDome catalog: ${HALFDOME_PATH}"
+echo "DM profile: ${DM_PROFILE}"
+echo "Lee2022 concentration mode: ${LEE2022_CONCENTRATION_MODE}"
 echo "DM cache: ${DM_CACHE}"
+echo "DM cache overwrite/build: ${DM_CACHE_OVERWRITE}"
 echo "Output directory: ${OUTPUT_DIR}"
 echo "Shared rays: ${NFRB} unique uniform HEALPix pixels at z_source=${ZSOURCE}"
 echo "NSIDE: ${NSIDE}"
@@ -137,6 +148,11 @@ echo "============================================================"
 "${PYTHON}" -c 'import h5py, matplotlib, numpy'
 run_julia -e 'using HDF5, Healpix, XGPaint'
 run_julia --threads=1 "${GENERATOR}" --self-test
+if [[ "${DM_PROFILE}" == "lee2022" ]]; then
+  run_julia --threads=1 -e \
+    'using XGPaint; include(ARGS[1]); run_lee2022_no_concentration_profile_self_test()' \
+    "${PROJECT_DIR}/frb_map_generation/lee2022_frb_dm_profile.jl"
+fi
 
 run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
   --catalog="${HALFDOME_PATH}" \
@@ -150,8 +166,10 @@ run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
   --max-catalog-halos="${MAX_CATALOG_HALOS}" \
   --progress-every-batches="${PROGRESS_EVERY_BATCHES}" \
   --mass-windows="${MASS_WINDOWS}" \
+  --dm-profile="${DM_PROFILE}" \
+  --lee2022-concentration-mode="${LEE2022_CONCENTRATION_MODE}" \
   --dm-cache="${DM_CACHE}" \
-  --dm-cache-overwrite=false \
+  --dm-cache-overwrite="${DM_CACHE_OVERWRITE}" \
   --xgpaint-profile-mass-definition="${XGPAINT_PROFILE_MASS_DEFINITION}" \
   --halo-extension-r200-multiplier="${HALO_EXTENSION_R200_MULTIPLIER}" \
   --pdf-edge-count="${PDF_EDGE_COUNT}" \
@@ -171,7 +189,8 @@ run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
 "${PYTHON}" - \
   "${HISTOGRAM_HDF5}" "${NFRB}" "${MASS_WINDOW_COUNT}" \
   "${ZSOURCE}" "${NSIDE}" "${MAX_CATALOG_HALOS}" \
-  "${HALO_EXTENSION_R200_MULTIPLIER}" <<'PY'
+  "${HALO_EXTENSION_R200_MULTIPLIER}" "${DM_PROFILE}" \
+  "${LEE2022_CONCENTRATION_MODE}" <<'PY'
 import sys
 import h5py
 
@@ -183,6 +202,8 @@ import h5py
     expected_nside_text,
     catalog_cap_text,
     expected_halo_extension_text,
+    expected_dm_profile,
+    expected_concentration_mode,
 ) = sys.argv[1:]
 expected = int(expected_text)
 expected_windows = int(expected_windows_text)
@@ -203,6 +224,17 @@ with h5py.File(path, "r") as handle:
     if isinstance(sightline_mode, bytes):
         sightline_mode = sightline_mode.decode()
     assert str(sightline_mode) == "uniform"
+    dm_profile = handle.attrs["provenance_dm_profile"]
+    concentration_mode = handle.attrs["provenance_lee2022_concentration_mode"]
+    if isinstance(dm_profile, bytes):
+        dm_profile = dm_profile.decode()
+    if isinstance(concentration_mode, bytes):
+        concentration_mode = concentration_mode.decode()
+    assert str(dm_profile) == expected_dm_profile, (dm_profile, expected_dm_profile)
+    assert str(concentration_mode) == expected_concentration_mode, (
+        concentration_mode,
+        expected_concentration_mode,
+    )
     assert float(handle.attrs["provenance_source_redshift"]) == expected_redshift
     assert int(handle.attrs["provenance_nside"]) == expected_nside
     actual_halo_extension = float(handle.attrs["provenance_halo_extension_r200_multiplier"])

@@ -38,6 +38,12 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path("/lustre/work/kristero10/adrian_fisher_baseline_deproj0"),
     )
+    parser.add_argument(
+        "--section",
+        choices=("all", "two-param", "fisher"),
+        default="all",
+        help="Check all outputs, only the two-parameter convergence, or only Fisher.",
+    )
     return parser.parse_args()
 
 
@@ -277,10 +283,12 @@ def main() -> int:
     warnings: list[str] = []
     two_param_root = args.two_param_root.expanduser().resolve()
     fisher_root = args.fisher_root.expanduser().resolve()
-    check_two_param(two_param_root, errors, warnings)
-    check_fisher(fisher_root, errors, warnings)
-    print(f"Two-parameter root: {two_param_root}")
-    print(f"Fisher root: {fisher_root}")
+    if args.section in ("all", "two-param"):
+        check_two_param(two_param_root, errors, warnings)
+        print(f"Two-parameter root: {two_param_root}")
+    if args.section in ("all", "fisher"):
+        check_fisher(fisher_root, errors, warnings)
+        print(f"Fisher root: {fisher_root}")
     if errors:
         print("\nCOMPLETION/NUMERICAL ERRORS:")
         for item in errors:

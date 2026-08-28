@@ -1,0 +1,110 @@
+#!/bin/bash
+#PBS -N SO2pNSF_large4
+#PBS -q large
+#PBS -l select=4:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l place=scatter
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+
+: "${PROJECT_ROOT:=${WORK_DIR}}"
+: "${CONVERGENCE_ROOT:=/lustre/work/kristero10/adrian_two_param_nsf_convergence_baseline_deproj0}"
+: "${TARGET_SIZES:=196608:262144:327680:458752:523288}"
+: "${CPUS_PER_TASK:=26}"
+: "${X_RESCALE_MODE:=asinh}"
+: "${OVERWRITE:=0}"
+: "${REFRESH_BATTAGLIA:=1}"
+
+WORKER="${PROJECT_ROOT}/SBI_analysis/run_so_two_param_nsf_convergence.pbs"
+[[ -f "${WORKER}" ]] || { echo "Missing worker: ${WORKER}" >&2; exit 2; }
+command -v pbsdsh >/dev/null 2>&1 || {
+  echo "pbsdsh is required to place one evaluation on each PBS chunk." >&2
+  exit 2
+}
+
+IFS=':' read -r -a CANDIDATES <<< "${TARGET_SIZES}"
+MISSING=()
+for n_train in "${CANDIDATES[@]}"; do
+  [[ "${n_train}" =~ ^[0-9]+$ ]] || {
+    echo "Invalid N_train in TARGET_SIZES: ${n_train}" >&2
+    exit 2
+  }
+  completion="${CONVERGENCE_ROOT}/${X_RESCALE_MODE}/N${n_train}/evaluation/evaluation_complete.json"
+  if [[ "${OVERWRITE}" == "1" || ! -f "${completion}" ]]; then
+    MISSING+=("${n_train}")
+  else
+    echo "Already complete, skipping N=${n_train}: ${completion}"
+  fi
+done
+
+if (( ${#MISSING[@]} == 0 )); then
+  echo "All requested convergence evaluations are already complete."
+  exit 0
+fi
+if (( ${#MISSING[@]} > 4 )); then
+  echo "Found ${#MISSING[@]} unfinished runs, but this allocation has four workers." >&2
+  echo "Unfinished N values: ${MISSING[*]}" >&2
+  echo "Set TARGET_SIZES to at most four colon-separated values, or finish one run first." >&2
+  exit 2
+fi
+
+echo "Started: $(date -Is)"
+echo "Large-queue allocation: ${PBS_JOBID:-unknown}"
+echo "Launching ${#MISSING[@]} independent evaluations: ${MISSING[*]}"
+echo "Each evaluation receives ${CPUS_PER_TASK} application threads."
+
+PIDS=()
+TASK_LOGS=()
+for rank in "${!MISSING[@]}"; do
+  n_train="${MISSING[rank]}"
+  run_dir="${CONVERGENCE_ROOT}/${X_RESCALE_MODE}/N${n_train}"
+  mkdir -p "${run_dir}/evaluation"
+  task_log="${run_dir}/evaluation/large_${PBS_JOBID:-manual}_N${n_train}.log"
+  TASK_LOGS+=("${task_log}")
+
+  echo "rank=${rank} N=${n_train} log=${task_log}"
+  pbsdsh -n "${rank}" env \
+    PROJECT_ROOT="${PROJECT_ROOT}" \
+    CONVERGENCE_ROOT="${CONVERGENCE_ROOT}" \
+    N_TRAIN="${n_train}" \
+    X_RESCALE_MODE="${X_RESCALE_MODE}" \
+    PBS_NCPUS="${CPUS_PER_TASK}" \
+    OVERWRITE="${OVERWRITE}" \
+    REFRESH_BATTAGLIA="${REFRESH_BATTAGLIA}" \
+    bash "${WORKER}" >"${task_log}" 2>&1 &
+  PIDS+=("$!")
+done
+
+failed=0
+for rank in "${!PIDS[@]}"; do
+  n_train="${MISSING[rank]}"
+  if wait "${PIDS[rank]}"; then
+    echo "Worker exited successfully: N=${n_train}"
+  else
+    status=$?
+    echo "Worker failed: N=${n_train}, exit=${status}, log=${TASK_LOGS[rank]}" >&2
+    failed=1
+  fi
+done
+
+for n_train in "${MISSING[@]}"; do
+  completion="${CONVERGENCE_ROOT}/${X_RESCALE_MODE}/N${n_train}/evaluation/evaluation_complete.json"
+  if [[ ! -f "${completion}" ]]; then
+    echo "Missing completion marker after worker exit: ${completion}" >&2
+    failed=1
+  fi
+done
+
+if (( failed != 0 )); then
+  echo "One or more convergence evaluations did not complete." >&2
+  exit 1
+fi
+
+echo "Finished all launched evaluations: $(date -Is)"
+echo "Run the convergence summary only after all 17 completion markers exist."

@@ -45,6 +45,12 @@ export OUTPUT_BASE="/lustre/work/${CLUSTER_USER}/frb_data/halfdome_lee2022_table
 export RUN_TAG="zsrc1p0_nside4096_nrays120000_allhalos_r200cx3p0_m200c_lee2022_tablea2_noconc_seed42"
 export DM_CACHE="/lustre/work/${CLUSTER_USER}/frb_data/halfdome_frb_inputs/lee2022_tablea2_noconcentration_m200c_dm_cache.jld2"
 export HDF5_USE_FILE_LOCKING=FALSE
+export RUN_PROFILE_2D_CONSISTENCY_CHECK=true
+export PROFILE_CHECK_MASS_MSUN=1.0e14
+export PROFILE_CHECK_REDSHIFT=0.5
+export PROFILE_CHECK_EXTENT_R200C=3.0
+export PROFILE_CHECK_RADIAL_POINTS=400
+export PROFILE_CHECK_GRID_POINTS=500
 
 CACHE_SIGNATURE="${DM_CACHE}.profile_signature.txt"
 if [[ -f "${DM_CACHE}" && -f "${CACHE_SIGNATURE}" ]]; then
@@ -83,6 +89,9 @@ with h5py.File(path, "r") as handle:
         "provenance_halo_mass_definition": "M200c",
         "provenance_halo_radius_definition": "R200c",
         "provenance_halo_reference_density": "critical",
+        "provenance_dm_cache_interpolation_scheme": (
+            "linear B-spline in log(DM); bounded/no cubic overshoot"
+        ),
     }
     for key, expected_value in expected.items():
         actual = text(handle.attrs[key])
@@ -103,6 +112,18 @@ with h5py.File(path, "r") as handle:
 
 print(f"Validated Lee2022 no-concentration M200c/3R200c test: {path}")
 PY
+
+PROFILE_CHECK_DIR="${OUTPUT_BASE}/${RUN_TAG}/profile_consistency"
+for product in \
+  "${PROFILE_CHECK_DIR}/battaglia16_vs_lee2022_projected_electron_density_radial.csv" \
+  "${PROFILE_CHECK_DIR}/battaglia16_vs_lee2022_projected_electron_density_provenance.txt" \
+  "${PROFILE_CHECK_DIR}/battaglia16_vs_lee2022_projected_electron_density_2d.png" \
+  "${PROFILE_CHECK_DIR}/battaglia16_vs_lee2022_projected_electron_density_2d.pdf"; do
+  if [[ ! -s "${product}" ]]; then
+    echo "Missing or empty profile-consistency product: ${product}" >&2
+    exit 3
+  fi
+done
 
 echo "Ready to sync for direct comparison:"
 echo "  ${HISTOGRAM_HDF5}"

@@ -772,17 +772,27 @@ function build_dm_interpolator_compatible(
             "for example --dm-cache=.../public_v04_dm_cache.jld2 --dm-cache-overwrite=true.",
         )
     end
+    generated_signed_cache = false
     if overwrite
         profile = build_interpolator(model; cache_file=cache_file, overwrite=overwrite)
         signature_file = write_cache_signature(cache_file, cache_signature)
-        return (
-            profile=profile,
-            loader="XGPaint.build_interpolator",
-            logtheta_key="generated_overwrite",
-            nonpositive_replaced=0,
-            model_family=generated_model_family,
-            cache_signature_file=signature_file,
-        )
+        # Keep the established XGPaint behavior for unsigned Battaglia caches.
+        # Signed alternative profiles are reloaded below so they can use an
+        # interpolation scheme appropriate for their much steeper/broken slopes.
+        if isempty(cache_signature)
+            return (
+                profile=profile,
+                loader="XGPaint.build_interpolator",
+                logtheta_key="generated_overwrite",
+                nonpositive_replaced=0,
+                model_family=generated_model_family,
+                cache_signature_file=signature_file,
+                interpolation_scheme="XGPaint cubic B-spline in log(DM)",
+                cache_grid_minimum=NaN,
+                cache_grid_maximum=NaN,
+            )
+        end
+        generated_signed_cache = true
     end
 
     signature_file = validate_cache_signature(cache_file, cache_signature)
@@ -812,23 +822,38 @@ function build_dm_interpolator_compatible(
             "--dm-cleanup-nonpositive=false.",
         )
         positive_min = minimum(value for value in prof_y if value > zero(value))
-        floor_value = positive_min * convert(eltype(prof_y), 1e-6)
+        floor_value = max(
+            positive_min * convert(eltype(prof_y), 1e-6),
+            floatmin(eltype(prof_y)),
+        )
         @inbounds for index in eachindex(prof_y)
             prof_y[index] <= zero(eltype(prof_y)) && (prof_y[index] = floor_value)
         end
     end
 
-    interpolation = Interpolations.interpolate(
-        log.(prof_y),
+    # Lee22 has a fitted broken power law in mass and an extremely steep outer
+    # tail. A cubic B-spline in log(DM) is not shape preserving and generated
+    # catastrophic positive ringing (observed DM ~ 1e87). Linear interpolation
+    # in log(DM) is bounded by adjacent positive cache nodes and is therefore the
+    # safe choice for every signed alternative-profile cache. Existing unsigned
+    # Battaglia caches retain the historical cubic interpolation.
+    signed_profile_cache = !isempty(cache_signature)
+    interpolation_kernel = signed_profile_cache ?
+        Interpolations.BSpline(Interpolations.Linear()) :
         Interpolations.BSpline(
             Interpolations.Cubic(Interpolations.Line(Interpolations.OnGrid())),
-        ),
-    )
+        )
+    interpolation_scheme = signed_profile_cache ?
+        "linear B-spline in log(DM); bounded/no cubic overshoot" :
+        "cubic B-spline in log(DM); legacy compatibility"
+    interpolation = Interpolations.interpolate(log.(prof_y), interpolation_kernel)
     scaled = Interpolations.scale(interpolation, native_logthetas, native_redshift, native_logMs)
     profile_type = getfield(XGPaint, :LogInterpolatorProfile)
     return (
         profile=profile_type(model, scaled),
-        loader="generator ASCII/Unicode cache compatibility loader",
+        loader=generated_signed_cache ?
+            "XGPaint grid generation plus generator signed-cache safe loader" :
+            "generator ASCII/Unicode cache compatibility loader",
         logtheta_key=logtheta_key,
         nonpositive_replaced=nonpositive_count,
         model_family=isempty(cache_signature) ?
@@ -837,6 +862,9 @@ function build_dm_interpolator_compatible(
                 "precomputed_dm_cache_model_family_unencoded") :
             generated_model_family,
         cache_signature_file=signature_file,
+        interpolation_scheme=interpolation_scheme,
+        cache_grid_minimum=minimum(prof_y),
+        cache_grid_maximum=maximum(prof_y),
     )
 end
 
@@ -1722,6 +1750,11 @@ function main(options)
         generated_model_family=profile_runtime.generated_model_family,
         cache_signature=profile_runtime.cache_signature,
     )
+    println(
+        "DM cache interpolation: $(interpolator_build.interpolation_scheme); " *
+        "finite node range=[$(interpolator_build.cache_grid_minimum), " *
+        "$(interpolator_build.cache_grid_maximum)] pc cm^-3",
+    )
     dm_model_interp = interpolator_build.profile
     dm_cache_spot = validate_dm_interpolator_spot_value(dm_model_interp)
     theta_min = compute_theta_min_local(dm_model_interp)
@@ -1944,6 +1977,9 @@ function main(options)
         "dm_cache_loader" => interpolator_build.loader,
         "dm_cache_logtheta_key" => interpolator_build.logtheta_key,
         "dm_cache_nonpositive_replaced" => interpolator_build.nonpositive_replaced,
+        "dm_cache_interpolation_scheme" => interpolator_build.interpolation_scheme,
+        "dm_cache_grid_minimum_pc_cm3" => interpolator_build.cache_grid_minimum,
+        "dm_cache_grid_maximum_pc_cm3" => interpolator_build.cache_grid_maximum,
         "dm_model_family" => interpolator_build.model_family,
         "dm_cache_spot_value_pc_cm3" => dm_cache_spot.value,
         "dm_cache_spot_theta_rad" => dm_cache_spot.theta,

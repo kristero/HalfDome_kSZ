@@ -67,9 +67,19 @@ PROVENANCE_TXT="${OUTPUT_DIR}/halfdome_uniform_fixedz_foreground_mass_histograms
 : "${OPENBLAS_NUM_THREADS:=1}"
 : "${MKL_NUM_THREADS:=1}"
 
+# Optional representative-halo consistency image. This does not save a sky map.
+: "${RUN_PROFILE_2D_CONSISTENCY_CHECK:=false}"
+: "${PROFILE_CHECK_MASS_MSUN:=1.0e14}"
+: "${PROFILE_CHECK_REDSHIFT:=0.5}"
+: "${PROFILE_CHECK_EXTENT_R200C:=3.0}"
+: "${PROFILE_CHECK_RADIAL_POINTS:=400}"
+: "${PROFILE_CHECK_GRID_POINTS:=500}"
+
 GENERATOR="${PROJECT_DIR}/frb_map_generation/generate_halfdome_z1_dm_mass_windows.jl"
 PLOTTER="${PROJECT_DIR}/frb_map_generation/plot_halfdome_mass_window_histograms.py"
 : "${JULIA_PROJECT:=}"  # empty reuses the cluster Julia environment
+PROFILE_DATA_GENERATOR="${PROJECT_DIR}/frb_map_generation/generate_battaglia16_lee2022_projected_density_profiles.jl"
+PROFILE_2D_PLOTTER="${PROJECT_DIR}/frb_map_generation/plot_battaglia16_lee2022_2d_density_comparison.py"
 
 mkdir -p "${OUTPUT_DIR}" "${LOG_DIR}"
 JOB_TAG="${PBS_JOBID:-manual}"
@@ -91,6 +101,14 @@ for required_file in "${HALFDOME_PATH}" "${GENERATOR}" "${PLOTTER}"; do
     missing_inputs=1
   fi
 done
+if [[ "${RUN_PROFILE_2D_CONSISTENCY_CHECK}" == "true" ]]; then
+  for required_file in "${PROFILE_DATA_GENERATOR}" "${PROFILE_2D_PLOTTER}"; do
+    if [[ ! -f "${required_file}" ]]; then
+      echo "Required profile-consistency file not found: ${required_file}" >&2
+      missing_inputs=1
+    fi
+  done
+fi
 if [[ "${DM_CACHE_OVERWRITE}" != "true" && ! -f "${DM_CACHE}" ]]; then
   echo "Required existing DM cache not found: ${DM_CACHE}" >&2
   echo "Use a new cache path with DM_CACHE_OVERWRITE=true only when intentionally building a new profile cache." >&2
@@ -153,6 +171,9 @@ if [[ "${DM_PROFILE}" == "lee2022" ]]; then
     'using XGPaint; include(ARGS[1]); run_lee2022_no_concentration_profile_self_test()' \
     "${PROJECT_DIR}/frb_map_generation/lee2022_frb_dm_profile.jl"
 fi
+if [[ "${RUN_PROFILE_2D_CONSISTENCY_CHECK}" == "true" ]]; then
+  run_julia --threads=1 "${PROFILE_DATA_GENERATOR}" --self-test
+fi
 
 run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
   --catalog="${HALFDOME_PATH}" \
@@ -183,6 +204,25 @@ run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
   --overwrite="${OVERWRITE}"
 
 "${PYTHON}" "${PLOTTER}" "${HISTOGRAM_HDF5}" --output-dir "${OUTPUT_DIR}"
+
+if [[ "${RUN_PROFILE_2D_CONSISTENCY_CHECK}" == "true" ]]; then
+  PROFILE_CHECK_DIR="${OUTPUT_DIR}/profile_consistency"
+  PROFILE_RADIAL_CSV="${PROFILE_CHECK_DIR}/battaglia16_vs_lee2022_projected_electron_density_radial.csv"
+  mkdir -p "${PROFILE_CHECK_DIR}"
+  run_julia --threads=1 "${PROFILE_DATA_GENERATOR}" \
+    --output-dir="${PROFILE_CHECK_DIR}" \
+    --mass-msun="${PROFILE_CHECK_MASS_MSUN}" \
+    --redshift="${PROFILE_CHECK_REDSHIFT}" \
+    --minimum-radius-r200c=0.001 \
+    --extent-r200c="${PROFILE_CHECK_EXTENT_R200C}" \
+    --radial-points="${PROFILE_CHECK_RADIAL_POINTS}"
+  "${PYTHON}" "${PROFILE_2D_PLOTTER}" "${PROFILE_RADIAL_CSV}" \
+    --output-dir "${PROFILE_CHECK_DIR}" \
+    --mass-msun "${PROFILE_CHECK_MASS_MSUN}" \
+    --redshift "${PROFILE_CHECK_REDSHIFT}" \
+    --extent-r200c "${PROFILE_CHECK_EXTENT_R200C}" \
+    --grid-points "${PROFILE_CHECK_GRID_POINTS}"
+fi
 
 # Assert that this is genuinely histogram-only and that all curves use the
 # same requested ray count.

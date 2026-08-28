@@ -57,6 +57,11 @@ DEFAULT_SIZES = (
 DEFAULT_CORNER_SIZES = (256, 32768, 523288)
 
 
+def scalar_string(value: Any, default: str = "") -> str:
+    array = np.asarray(value)
+    return str(array.reshape(()).item()) if array.size == 1 else default
+
+
 def parse_ints(value: str) -> list[int]:
     return [
         int(part.replace("_", ""))
@@ -303,11 +308,29 @@ def load_battaglia_samples(
 ) -> list[dict[str, Any]]:
     sample_sets = []
     for n_train in sizes:
-        path = run_root / mode / f"N{n_train}" / "battaglia12_posterior_samples.npy"
+        run_dir = run_root / mode / f"N{n_train}"
+        path = run_dir / "battaglia12_posterior_samples.npy"
+        contract_path = run_dir / "battaglia12_conditioning_contract.npz"
         if not path.is_file():
             raise FileNotFoundError(
                 f"Representative Battaglia12 samples are missing: {path}"
             )
+        if not contract_path.is_file():
+            raise FileNotFoundError(
+                "Battaglia12 samples lack a validated conditioning contract: "
+                f"{contract_path}. Refresh this corner run."
+            )
+        with np.load(contract_path, allow_pickle=True) as contract:
+            source = scalar_string(contract["observation_source"])
+            transformed = np.asarray(
+                contract["transformed_observation"], dtype=np.float32
+            )
+        if not source.startswith("validated_baseline_deproj0:"):
+            raise ValueError(
+                f"Battaglia12 samples have the wrong observation source: {source!r}"
+            )
+        if transformed.ndim != 1 or not np.all(np.isfinite(transformed)):
+            raise ValueError(f"Invalid transformed observation in {contract_path}")
         samples = np.asarray(np.load(path), dtype=np.float64)
         if samples.ndim != 2 or samples.shape[1] != len(PARAMS):
             raise ValueError(f"Invalid Battaglia12 samples: {path}, {samples.shape}")

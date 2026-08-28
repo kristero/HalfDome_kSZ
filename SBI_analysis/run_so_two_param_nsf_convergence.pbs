@@ -16,6 +16,8 @@ cd "${WORK_DIR}"
 : "${PYTHON_ENV_SETUP:=}"
 : "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
 : "${CONVERGENCE_ROOT:=/lustre/work/kristero10/adrian_two_param_nsf_convergence_baseline_deproj0}"
+: "${BATTAGLIA_OBSERVATION:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/battaglia12_baseline_deproj0_observation/prepared/battaglia12_masked_baseline_noise_cross_deproj0_binned_dell.npy}"
+: "${BATTAGLIA_VALIDATION_REPORT:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/battaglia12_baseline_deproj0_observation/prepared/battaglia12_baseline_deproj0_validation.json}"
 : "${N_TRAIN:?N_TRAIN must be supplied by submit_so_two_param_nsf_convergence.sh}"
 : "${X_RESCALE_MODE:=asinh}"
 : "${HOLDOUT_LAST_N:=1000}"
@@ -29,6 +31,7 @@ cd "${WORK_DIR}"
 : "${SBI_SEED:=42}"
 : "${SBI_DEVICE:=cpu}"
 : "${OVERWRITE:=0}"
+: "${REFRESH_BATTAGLIA:=0}"
 
 case "${X_RESCALE_MODE}" in
   asinh) ;;
@@ -41,7 +44,7 @@ EVAL_SCRIPT="${PROJECT_ROOT}/SBI_analysis/evaluate_so_two_param_nsf_convergence_
 RUN_DIR="${CONVERGENCE_ROOT}/${X_RESCALE_MODE}/N${N_TRAIN}"
 EVALUATION_DIR="${RUN_DIR}/evaluation"
 
-for path in "${TRAIN_SCRIPT}" "${EVAL_SCRIPT}" "${PREPARED_DATASET}"; do
+for path in "${TRAIN_SCRIPT}" "${EVAL_SCRIPT}" "${PREPARED_DATASET}" "${BATTAGLIA_OBSERVATION}" "${BATTAGLIA_VALIDATION_REPORT}"; do
   [[ -f "${path}" ]] || { echo "Required input not found: ${path}" >&2; exit 2; }
 done
 mkdir -p /home/kristero10/logs/SBI_runs "${RUN_DIR}" "${EVALUATION_DIR}"
@@ -100,6 +103,8 @@ esac
 set --
 if [[ "${OVERWRITE}" == "1" ]]; then
   set -- --restart
+elif [[ "${REFRESH_BATTAGLIA}" == "1" ]]; then
+  set -- --restart-battaglia
 fi
 
 "${PYTHON}" "${EVAL_SCRIPT}" \
@@ -112,6 +117,8 @@ fi
   --rank-bins 20 \
   --battaglia-samples "${BATTAGLIA_COUNT}" \
   --battaglia-batch-size 2000 \
+  --battaglia-observation "${BATTAGLIA_OBSERVATION}" \
+  --battaglia-validation-report "${BATTAGLIA_VALIDATION_REPORT}" \
   --checkpoint-every 5 \
   --seed "${SBI_SEED}" \
   --device "${SBI_DEVICE}" \

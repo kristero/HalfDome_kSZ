@@ -35,6 +35,16 @@ DEFAULT_DATASET = Path(
     "adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/"
     "so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz"
 )
+DEFAULT_BATTAGLIA_OBSERVATION = Path(
+    "/lustre/work/kristero10/adrian_fisher_baseline_deproj0/"
+    "battaglia12_baseline_deproj0_observation/prepared/"
+    "battaglia12_masked_baseline_noise_cross_deproj0_binned_dell.npy"
+)
+DEFAULT_BATTAGLIA_REPORT = Path(
+    "/lustre/work/kristero10/adrian_fisher_baseline_deproj0/"
+    "battaglia12_baseline_deproj0_observation/prepared/"
+    "battaglia12_baseline_deproj0_validation.json"
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -48,10 +58,25 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--rank-bins", type=int, default=20)
     parser.add_argument("--battaglia-samples", type=int, default=0)
     parser.add_argument("--battaglia-batch-size", type=int, default=2000)
+    parser.add_argument(
+        "--battaglia-observation",
+        type=Path,
+        default=DEFAULT_BATTAGLIA_OBSERVATION,
+    )
+    parser.add_argument(
+        "--battaglia-validation-report",
+        type=Path,
+        default=DEFAULT_BATTAGLIA_REPORT,
+    )
     parser.add_argument("--checkpoint-every", type=int, default=5)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--restart", action="store_true")
+    parser.add_argument(
+        "--restart-battaglia",
+        action="store_true",
+        help="Replace only Battaglia12 samples; reuse held-out profile samples.",
+    )
     parser.add_argument("--validate-only", action="store_true")
     return parser.parse_args()
 
@@ -68,17 +93,92 @@ def atomic_save(path: Path, values: np.ndarray) -> None:
     temporary.replace(path)
 
 
-def load_observation(path: Path, expected_x_dim: int) -> tuple[np.ndarray, str]:
-    with np.load(path, allow_pickle=True) as data:
-        if "obs" not in data.files:
-            raise KeyError(f"Prepared dataset has no baseline-deproj0 obs: {path}")
-        observation = np.asarray(data["obs"], dtype=np.float32).reshape(-1)
-        source = scalar_string(data["obs_source"], "prepared_obs") if "obs_source" in data.files else "prepared_obs"
+def load_observation(
+    prepared_dataset: Path,
+    observation_path: Path,
+    report_path: Path,
+    expected_x_dim: int,
+) -> tuple[np.ndarray, str]:
+    observation_path = observation_path.expanduser().resolve()
+    report_path = report_path.expanduser().resolve()
+    if not observation_path.is_file():
+        raise FileNotFoundError(f"Validated Battaglia12 observation is missing: {observation_path}")
+    if not report_path.is_file():
+        raise FileNotFoundError(f"Battaglia12 validation report is missing: {report_path}")
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    if not report.get("all_checks_passed", False):
+        raise ValueError(f"Battaglia12 validation did not pass: {report_path}")
+    if report.get("required_product") != "masked_baseline_noise_cross_deproj0":
+        raise ValueError(f"Wrong Battaglia12 product in {report_path}")
+    report_dataset = Path(report["prepared_dataset"]).expanduser().resolve()
+    if report_dataset != prepared_dataset.expanduser().resolve():
+        raise ValueError(
+            "Battaglia12 observation was validated against another dataset: "
+            f"{report_dataset} != {prepared_dataset}"
+        )
+    report_observation = Path(
+        report["outputs"]["binned_dell"]
+    ).expanduser().resolve()
+    if report_observation != observation_path:
+        raise ValueError(
+            f"Observation/report mismatch: {observation_path} != {report_observation}"
+        )
+    observation = np.asarray(np.load(observation_path), dtype=np.float32).reshape(-1)
     if observation.size != expected_x_dim:
         raise ValueError(
             f"Battaglia12 observation has {observation.size} features; expected {expected_x_dim}."
         )
-    return observation, source
+    if not np.all(np.isfinite(observation)):
+        raise ValueError(f"Battaglia12 observation contains non-finite values: {observation_path}")
+    return observation, f"validated_baseline_deproj0:{observation_path}"
+
+
+def prepare_battaglia_contract(
+    *,
+    run_dir: Path,
+    observation: np.ndarray,
+    transformed_observation: np.ndarray,
+    observation_source: str,
+    validation_report: Path,
+    restart: bool,
+) -> Path:
+    final_path = run_dir / "battaglia12_posterior_samples.npy"
+    partial_path = run_dir / "evaluation" / "battaglia12_posterior_samples_partial.npy"
+    contract_path = run_dir / "battaglia12_conditioning_contract.npz"
+    if restart:
+        for path in (final_path, partial_path, contract_path):
+            path.unlink(missing_ok=True)
+    existing_samples = final_path.is_file() or partial_path.is_file()
+    if existing_samples:
+        if not contract_path.is_file():
+            raise FileNotFoundError(
+                "Existing Battaglia12 samples have no conditioning contract. "
+                "Rerun with --restart-battaglia."
+            )
+        with np.load(contract_path, allow_pickle=True) as contract:
+            saved_observation = np.asarray(contract["observation"], dtype=np.float32)
+            saved_transformed = np.asarray(
+                contract["transformed_observation"], dtype=np.float32
+            )
+            saved_source = scalar_string(contract["observation_source"])
+        if not np.array_equal(saved_observation, observation):
+            raise ValueError("Existing Battaglia12 samples used a different observation.")
+        if not np.array_equal(saved_transformed, transformed_observation):
+            raise ValueError("Existing Battaglia12 samples used a different transform.")
+        if saved_source != observation_source:
+            raise ValueError("Existing Battaglia12 observation provenance differs.")
+    else:
+        np.savez_compressed(
+            contract_path,
+            observation=np.asarray(observation, dtype=np.float32),
+            transformed_observation=np.asarray(
+                transformed_observation, dtype=np.float32
+            ),
+            observation_source=np.asarray(observation_source),
+            validation_report=np.asarray(str(validation_report.expanduser().resolve())),
+            x_transform=np.asarray(str((run_dir / "x_transform.npz").resolve())),
+        )
+    return contract_path
 
 
 def load_saved_posterior(run_dir: Path) -> Any:
@@ -288,6 +388,7 @@ def main() -> int:
             evaluation_dir / "evaluation_complete.json",
             evaluation_dir / "battaglia12_posterior_samples_partial.npy",
             run_dir / "battaglia12_posterior_samples.npy",
+            run_dir / "battaglia12_conditioning_contract.npz",
         ):
             path.unlink(missing_ok=True)
     data = load_data(dataset_path)
@@ -299,7 +400,12 @@ def main() -> int:
         holdout_last_n=args.holdout_last_n,
         seed=args.seed,
     )
-    observation, observation_source = load_observation(dataset_path, data["x"].shape[1])
+    observation, observation_source = load_observation(
+        dataset_path,
+        args.battaglia_observation,
+        args.battaglia_validation_report,
+        data["x"].shape[1],
+    )
     preflight = {
         "prepared_dataset": dataset_path,
         "run_dir": run_dir,
@@ -353,6 +459,16 @@ def main() -> int:
     transformed_observation = apply_x_transform(
         observation, validation["transform"]
     )
+    battaglia_contract = None
+    if args.battaglia_samples > 0:
+        battaglia_contract = prepare_battaglia_contract(
+            run_dir=run_dir,
+            observation=observation,
+            transformed_observation=transformed_observation,
+            observation_source=observation_source,
+            validation_report=args.battaglia_validation_report,
+            restart=args.restart_battaglia,
+        )
     battaglia = checkpointed_battaglia_samples(
         posterior=posterior,
         transformed_observation=transformed_observation,
@@ -367,6 +483,10 @@ def main() -> int:
         "num_test_profiles": int(len(heldout)),
         "num_posterior_samples_per_test": int(args.num_posterior_samples),
         "battaglia12_samples": 0 if battaglia is None else int(battaglia.shape[0]),
+        "battaglia12_observation_source": observation_source,
+        "battaglia12_conditioning_contract": (
+            "" if battaglia_contract is None else str(battaglia_contract)
+        ),
         "heldout_metrics": str(evaluation_dir / "heldout_metrics.csv"),
         "heldout_summary": str(evaluation_dir / "heldout_summary.csv"),
     }

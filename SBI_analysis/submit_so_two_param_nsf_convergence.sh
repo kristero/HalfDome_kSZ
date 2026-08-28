@@ -8,10 +8,15 @@ DEFAULT_PROJECT_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
 : "${CONVERGENCE_ROOT:=/lustre/work/kristero10/adrian_two_param_nsf_convergence_baseline_deproj0}"
 : "${DATASET_SIZES:=256,512,1024,2048,4096,8192,16384,32768,65536,98304,131072,196608,262144,327680,393216,458752,523288}"
 : "${PBS_QUEUE:=mini}"
+: "${FULL_DATASET_QUEUE:=large}"
 : "${SUMMARY_QUEUE:=mini}"
-: "${PBS_WALLTIME:=24:00:00}"
+: "${PBS_WALLTIME:=23:59:00}"
+: "${PBS_NCPUS:=52}"
+: "${PBS_MEM:=128gb}"
+: "${FULL_DATASET_N:=523288}"
 : "${MAX_CONCURRENT:=5}"
 : "${OVERWRITE:=0}"
+: "${REFRESH_BATTAGLIA:=1}"
 : "${SUBMIT_SUMMARY:=1}"
 
 if (( MAX_CONCURRENT < 1 || MAX_CONCURRENT > 5 )); then
@@ -77,8 +82,14 @@ for n_train in "${SIZES[@]}"; do
 
     lane=$((task_index % MAX_CONCURRENT))
     dependency="${LANE_LAST[lane]}"
+    worker_queue="${PBS_QUEUE}"
+    if (( n_train == FULL_DATASET_N )); then
+      worker_queue="${FULL_DATASET_QUEUE}"
+    fi
+
     QSUB_ARGS=(
-      -q "${PBS_QUEUE}"
+      -q "${worker_queue}"
+      -l "select=1:ncpus=${PBS_NCPUS}:mpiprocs=1:mem=${PBS_MEM}"
       -l "walltime=${PBS_WALLTIME}"
       -N "S2n${mode:0:1}${n_train}"
     )
@@ -86,7 +97,7 @@ for n_train in "${SIZES[@]}"; do
       QSUB_ARGS+=( -W "depend=afterany:${dependency}" )
     fi
     QSUB_ARGS+=(
-      -v "PROJECT_ROOT=${PROJECT_ROOT},PREPARED_DATASET=${PREPARED_DATASET},CONVERGENCE_ROOT=${CONVERGENCE_ROOT},N_TRAIN=${n_train},X_RESCALE_MODE=${mode},OVERWRITE=${OVERWRITE}"
+      -v "PROJECT_ROOT=${PROJECT_ROOT},PREPARED_DATASET=${PREPARED_DATASET},CONVERGENCE_ROOT=${CONVERGENCE_ROOT},N_TRAIN=${n_train},X_RESCALE_MODE=${mode},OVERWRITE=${OVERWRITE},REFRESH_BATTAGLIA=${REFRESH_BATTAGLIA}"
       "${WORKER_PBS}"
     )
 
@@ -99,7 +110,7 @@ for n_train in "${SIZES[@]}"; do
     fi
     LANE_LAST[lane]="${job_id}"
     printf 'worker,%s,%s,%s,%s\n' "${mode}" "${n_train}" "${job_id}" "${dependency}" >> "${LOG}"
-    echo "Submitted lane $((lane + 1))/${MAX_CONCURRENT}: mode=${mode}, N=${n_train}, job=${job_id}, after=${dependency:-none}"
+    echo "Submitted lane $((lane + 1))/${MAX_CONCURRENT}: queue=${worker_queue}, mode=${mode}, N=${n_train}, job=${job_id}, after=${dependency:-none}"
     ((task_index += 1))
     ((submitted += 1))
   done
@@ -133,5 +144,7 @@ fi
 
 echo "Submitted workers: ${submitted}; already complete: ${skipped}"
 echo "At most ${MAX_CONCURRENT} independent worker jobs can run concurrently."
+echo "Queue routing: N=${FULL_DATASET_N} -> ${FULL_DATASET_QUEUE}; all smaller N -> ${PBS_QUEUE}."
+echo "Worker resources: ${PBS_NCPUS} CPUs, ${PBS_MEM}, walltime ${PBS_WALLTIME}."
 echo "Job map: ${LOG}"
 echo "Outputs: ${CONVERGENCE_ROOT}"

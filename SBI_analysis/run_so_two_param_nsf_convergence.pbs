@@ -1,8 +1,8 @@
 #!/bin/bash
 #PBS -N SO2p_NSF
 #PBS -q mini
-#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
-#PBS -l walltime=24:00:00
+#PBS -l select=1:ncpus=52:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
 #PBS -o /home/kristero10/logs/SBI_runs/
 #PBS -e /home/kristero10/logs/SBI_runs/
 #PBS -S /bin/bash
@@ -53,7 +53,7 @@ if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
   eval "${PYTHON_ENV_SETUP}"
 fi
 
-ALLOCATED_CPUS="${PBS_NCPUS:-26}"
+ALLOCATED_CPUS="${PBS_NCPUS:-52}"
 export OMP_NUM_THREADS="${ALLOCATED_CPUS}"
 export OPENBLAS_NUM_THREADS="${ALLOCATED_CPUS}"
 export MKL_NUM_THREADS="${ALLOCATED_CPUS}"

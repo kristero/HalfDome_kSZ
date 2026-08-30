@@ -716,8 +716,15 @@ end
 cache_signature_path(cache_file::AbstractString) = String(cache_file) * ".profile_signature.txt"
 
 function validate_cache_signature(cache_file::AbstractString, expected_signature::AbstractString)
-    isempty(expected_signature) && return ""
     signature_file = cache_signature_path(cache_file)
+    if isempty(expected_signature)
+        isfile(signature_file) && error(
+            "Selected DM profile supplied no cache signature, but the cache is signed: " *
+            "$(signature_file). This usually means a Lee2022 cache was paired with " *
+            "dm_profile=battaglia16. Refusing to load the incompatible cache.",
+        )
+        return ""
+    end
     isfile(signature_file) || error(
         "Profile cache signature is missing: $(signature_file). Refusing to load an " *
         "unidentified cache for the selected DM profile.",
@@ -949,6 +956,7 @@ function add_if_frb_pixel_windows!(
     membership_mask::UInt16,
     nwindow::Int,
     dm_model_interp,
+    contribution_sanity_max::Float64,
 )
     frb_range = searchsorted(sorted_frb_pixels, global_pixel)
     isempty(frb_range) && return 0
@@ -968,6 +976,13 @@ function add_if_frb_pixel_windows!(
         isfinite(contribution) || error(
             "Non-finite XGPaint DM at M200c=$(profile_mass_m200c_msun), " *
             "z=$(redshift), theta=$(theta).",
+        )
+        contribution <= contribution_sanity_max || error(
+            "Individual halo DM=$(contribution) exceeds " *
+            "dm_value_sanity_max=$(contribution_sanity_max) at " *
+            "M200c=$(profile_mass_m200c_msun) Msun, z=$(redshift), " *
+            "theta=$(theta) rad, theta_max=$(theta_max) rad. " *
+            "This is an interpolator/cache value, not an accumulated ray DM.",
         )
         unique_hits += 1
         for iw in 1:nwindow
@@ -999,6 +1014,7 @@ function accumulate_batch_windows!(
     redshifts,
     membership_masks,
     nwindow::Int,
+    contribution_sanity_max::Float64,
 )
     Threads.@threads :static for i in eachindex(masses_m200c)
         tid = Threads.threadid()
@@ -1033,7 +1049,7 @@ function accumulate_batch_windows!(
                     local_dm, local_window_hits, sorted_frb_pixels, sorted_frb_indices,
                     global_pixel, halo_ux, halo_uy, halo_uz,
                     frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200c_msun, redshift,
-                    membership_masks[i], nwindow, dm_model_interp,
+                    membership_masks[i], nwindow, dm_model_interp, contribution_sanity_max,
                 )
             end
         else
@@ -1048,7 +1064,7 @@ function accumulate_batch_windows!(
                         local_dm, local_window_hits, sorted_frb_pixels, sorted_frb_indices,
                         first_pixel + local_pixel_index - 1, halo_ux, halo_uy, halo_uz,
                         frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200c_msun, redshift,
-                        membership_masks[i], nwindow, dm_model_interp,
+                        membership_masks[i], nwindow, dm_model_interp, contribution_sanity_max,
                     )
                 end
             end
@@ -1671,6 +1687,22 @@ function run_self_test()
         @assert overwrite_blocked
         @assert read(sentinel_cache, String) == sentinel_payload
         @assert bytes2hex(sha256(read(sentinel_cache))) == sentinel_sha_before
+        @assert validate_cache_signature(sentinel_cache, "") == ""
+        signed_sidecar = write_cache_signature(sentinel_cache, "lee2022-test-signature")
+        @assert signed_sidecar == cache_signature_path(sentinel_cache)
+        unsigned_profile_blocked = false
+        try
+            validate_cache_signature(sentinel_cache, "")
+        catch exception
+            unsigned_profile_blocked = occursin(
+                "cache is signed", sprint(showerror, exception),
+            )
+        end
+        @assert unsigned_profile_blocked
+        @assert validate_cache_signature(
+            sentinel_cache, "lee2022-test-signature",
+        ) == signed_sidecar
+
         new_public_cache = joinpath(directory, "public_v04_dm_cache.jld2")
         @assert !isfile(new_public_cache)
         @assert isnothing(enforce_generated_cache_target_policy(
@@ -1755,6 +1787,22 @@ function main(options)
         "finite node range=[$(interpolator_build.cache_grid_minimum), " *
         "$(interpolator_build.cache_grid_maximum)] pc cm^-3",
     )
+    if config.dm_profile == "lee2022" &&
+       !startswith(interpolator_build.interpolation_scheme, "linear B-spline")
+        error(
+            "Lee2022 requires the bounded signed-cache interpolation path; got " *
+            "$(repr(interpolator_build.interpolation_scheme)). Check DM_PROFILE, " *
+            "DM_CACHE, and the profile-signature sidecar before processing halos.",
+        )
+    end
+    if config.dm_profile == "lee2022" &&
+       interpolator_build.cache_grid_maximum > config.dm_value_sanity_max
+        error(
+            "Raw Lee2022 cache node maximum=$(interpolator_build.cache_grid_maximum) " *
+            "exceeds dm_value_sanity_max=$(config.dm_value_sanity_max). " *
+            "The cached grid itself is invalid for this run; do not raise the limit.",
+        )
+    end
     dm_model_interp = interpolator_build.profile
     dm_cache_spot = validate_dm_interpolator_spot_value(dm_model_interp)
     theta_min = compute_theta_min_local(dm_model_interp)
@@ -1834,6 +1882,7 @@ function main(options)
                 Float64.(x[selected_indices]), Float64.(y[selected_indices]), Float64.(z[selected_indices]),
                 selected_m200c, redshifts[selected_indices], membership_masks,
                 length(config.windows),
+                config.dm_value_sanity_max,
             )
         end
         if config.progress_every_batches > 0 && batch_number % config.progress_every_batches == 0

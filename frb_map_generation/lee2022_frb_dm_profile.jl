@@ -90,6 +90,42 @@ function lee2022_no_concentration_parameters(
     )
 end
 
+"""Physical projected electron column at `R_perp/R200c`, in pc cm^-3 units."""
+function lee2022_projected_electron_column_pc_cm3(
+    model::Lee2022NoConcentrationDMProfile{T},
+    x_perpendicular::Real,
+    mass_m200c_msun::Real,
+    redshift::Real,
+) where {T}
+    x = T(x_perpendicular)
+    mass = T(mass_m200c_msun)
+    z = T(redshift)
+    x > zero(T) || error("R_perp/R200c must be positive.")
+    mass > zero(T) || error("M200c must be positive.")
+    z >= zero(T) || error("Redshift must be nonnegative.")
+
+    parameters = lee2022_no_concentration_parameters(mass, z, model.cosmo.h)
+    mass_with_units = mass * XGPaint.M_sun
+    r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(
+        model, mass_with_units, z, 200,
+    )
+    beta_standard = parameters.gamma - parameters.alpha * parameters.beta_prime
+    dimensionless_los = XGPaint._nfw_profile_los_quadrature(
+        x,
+        parameters.x_c,
+        parameters.alpha,
+        beta_standard,
+        parameters.gamma,
+    )
+
+    rho_critical = getfield(XGPaint, Symbol(Char(0x03c1), "_crit"))(model, z)
+    n200 = 200 * rho_critical /
+           (model.hydrogen_mass_fraction * XGPaint.constants.ProtonMass) *
+           (model.omega_b / model.omega_m)
+    electron_column = parameters.n0 * dimensionless_los * n200 * r200c
+    return T(ustrip(uconvert(u"pc/cm^3", electron_column)))
+end
+
 """Evaluate observer-frame halo DM in pc cm^-3 at angular radius `theta`."""
 function (model::Lee2022NoConcentrationDMProfile{T})(
     theta_rad,
@@ -103,29 +139,13 @@ function (model::Lee2022NoConcentrationDMProfile{T})(
     mass > zero(T) || error("M200c must be positive.")
     z >= zero(T) || error("Redshift must be nonnegative.")
 
-    parameters = lee2022_no_concentration_parameters(mass, z, model.cosmo.h)
     mass_with_units = mass * XGPaint.M_sun
     r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(model, mass_with_units, z, 200)
     theta200c = XGPaint.angular_size(model, r200c, z)
     x_perpendicular = theta / theta200c
-
-    # XGPaint's standard-GNFW beta satisfies
-    #   (beta_standard - gamma) / alpha = -beta_prime
-    # for the paper's [1 + (x/x_c)^alpha]^(-beta_prime) convention.
-    beta_standard = parameters.gamma - parameters.alpha * parameters.beta_prime
-    dimensionless_los = XGPaint._nfw_profile_los_quadrature(
-        x_perpendicular,
-        parameters.x_c,
-        parameters.alpha,
-        beta_standard,
-        parameters.gamma,
+    emitted_dm = lee2022_projected_electron_column_pc_cm3(
+        model, x_perpendicular, mass, z,
     )
-
-    rho_critical = getfield(XGPaint, Symbol(Char(0x03c1), "_crit"))(model, z)
-    n200 = 200 * rho_critical / (model.hydrogen_mass_fraction * XGPaint.constants.ProtonMass) *
-           (model.omega_b / model.omega_m)
-    electron_column = parameters.n0 * dimensionless_los * n200 * r200c
-    emitted_dm = ustrip(uconvert(u"pc/cm^3", electron_column))
     return T(emitted_dm / (one(T) + z))
 end
 
@@ -173,7 +193,16 @@ function run_lee2022_no_concentration_profile_self_test()
 
     dm = model(1.0e-4, 1.0e14, 0.5)
     @assert isfinite(dm) && dm > 0
-    println("PASS: Lee2022 Appendix-A2 no-concentration parameters, mass-break continuity, and projected DM.")
+    r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(
+        model, 1.0e14 * XGPaint.M_sun, 0.5, 200,
+    )
+    x = 1.0e-4 / XGPaint.angular_size(model, r200c, 0.5)
+    emitted_column = lee2022_projected_electron_column_pc_cm3(model, x, 1.0e14, 0.5)
+    @assert isapprox(emitted_column, dm * 1.5; rtol=2.0e-12)
+    z0_column = lee2022_projected_electron_column_pc_cm3(model, 1.0, 1.0e14, 0.0)
+    @assert isfinite(z0_column) && z0_column > 0
+    println("PASS: Lee2022 parameters, mass-break continuity, angular/physical projection, and z=0 projection.")
     println("  spot DM(theta=1e-4 rad, M200c=1e14 Msun, z=0.5)=$(dm) pc cm^-3")
+    println("  emitted column(x=R200c, M200c=1e14 Msun, z=0)=$(z0_column) pc cm^-3")
     return dm
 end

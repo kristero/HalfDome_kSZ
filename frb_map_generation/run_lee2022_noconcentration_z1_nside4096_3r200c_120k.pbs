@@ -20,10 +20,25 @@ set -euo pipefail
 : "${CLUSTER_USER:=${USER}}"
 : "${PYTHON:=python3}"
 : "${OVERWRITE:=false}"
+: "${DM_VALUE_SANITY_MAX:=1.0e8}"
+: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_lee2022_tablea2_noconcentration_z1_120k_foreground_mass_histograms}"
+: "${RUN_TAG:=zsrc1p0_nside4096_nrays120000_allhalos_r200cx3p0_m200c_lee2022_tablea2_noconc_seed42}"
+: "${DM_CACHE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_frb_inputs/lee2022_tablea2_noconcentration_m200c_dm_cache.jld2}"
+
+export OUTPUT_BASE RUN_TAG DM_CACHE DM_VALUE_SANITY_MAX
+PBS_LOG_DIR="${OUTPUT_BASE}/pbs_logs"
+mkdir -p "${PBS_LOG_DIR}"
+JOB_TAG="${PBS_JOBID:-manual}"
+JOB_TAG="${JOB_TAG//[/_}"
+JOB_TAG="${JOB_TAG//]/_}"
+WRAPPER_LOG="${PBS_LOG_DIR}/lee2022_${JOB_TAG}.log"
+exec > >(tee -a "${WRAPPER_LOG}") 2>&1
+echo "Lee2022 wrapper log: ${WRAPPER_LOG}"
 
 GENERIC_PBS="${PROJECT_DIR}/frb_map_generation/run_halfdome_z1_mass_histograms_120k.pbs"
 PROFILE_FILE="${PROJECT_DIR}/frb_map_generation/lee2022_frb_dm_profile.jl"
-for required_file in "${GENERIC_PBS}" "${PROFILE_FILE}"; do
+GENERATOR="${PROJECT_DIR}/frb_map_generation/generate_halfdome_z1_dm_mass_windows.jl"
+for required_file in "${GENERIC_PBS}" "${PROFILE_FILE}" "${GENERATOR}"; do
   [[ -f "${required_file}" ]] || {
     echo "Required workflow file not found: ${required_file}" >&2
     exit 2
@@ -41,9 +56,6 @@ export XGPAINT_PROFILE_MASS_DEFINITION=m200c
 export DM_PROFILE=lee2022
 export LEE2022_CONCENTRATION_MODE=none
 export MASS_WINDOWS="m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16"
-export OUTPUT_BASE="/lustre/work/${CLUSTER_USER}/frb_data/halfdome_lee2022_tablea2_noconcentration_z1_120k_foreground_mass_histograms"
-export RUN_TAG="zsrc1p0_nside4096_nrays120000_allhalos_r200cx3p0_m200c_lee2022_tablea2_noconc_seed42"
-export DM_CACHE="/lustre/work/${CLUSTER_USER}/frb_data/halfdome_frb_inputs/lee2022_tablea2_noconcentration_m200c_dm_cache.jld2"
 export HDF5_USE_FILE_LOCKING=FALSE
 export RUN_PROFILE_2D_CONSISTENCY_CHECK=true
 export PROFILE_CHECK_MASS_MSUN=1.0e14
@@ -101,6 +113,27 @@ with h5py.File(path, "r") as handle:
     assert int(handle.attrs["provenance_nside"]) == 4096
     assert float(handle.attrs["provenance_source_redshift"]) == 1.0
     assert float(handle.attrs["provenance_halo_extension_r200_multiplier"]) == 3.0
+    assert float(handle.attrs["provenance_dm_value_sanity_max"]) == 1.0e8
+    assert float(handle.attrs["provenance_dm_cache_grid_maximum_pc_cm3"]) <= 1.0e8
+    direct_value = float(handle.attrs["provenance_dm_cache_spot_direct_value_pc_cm3"])
+    cached_value = float(handle.attrs["provenance_dm_cache_spot_value_pc_cm3"])
+    cached_to_direct = float(
+        handle.attrs["provenance_dm_cache_spot_cached_to_direct_ratio"]
+    )
+    assert direct_value > 0.0, direct_value
+    assert cached_value > 0.0, cached_value
+    assert 0.2 <= cached_to_direct <= 5.0, cached_to_direct
+    assert float(
+        handle.attrs["provenance_lee2022_direct_profile_sanity_max_pc_cm3"]
+    ) == 1.0e6
+    implementation_sha = text(
+        handle.attrs["provenance_dm_profile_implementation_sha256"]
+    )
+    assert len(implementation_sha) == 64, implementation_sha
+    assert text(handle.attrs["provenance_dm_cache_profile_signature"]) == (
+        "lee2022_table_a2_no_concentration_v1|M200c|R200c|alpha=1|"
+        "gamma=-0.3|XH=0.76|observer=1/(1+z)"
+    )
     assert int(handle.attrs["provenance_catalog_streamed_halos"]) == int(
         handle.attrs["provenance_catalog_total_halos"]
     )
@@ -111,6 +144,11 @@ with h5py.File(path, "r") as handle:
     assert text(handle.attrs["provenance_lee2022_low_mass_extrapolation"])
 
 print(f"Validated Lee2022 no-concentration M200c/3R200c test: {path}")
+print(
+    "  cache/direct spot check: "
+    f"cached={cached_value:.6g}, direct={direct_value:.6g}, "
+    f"ratio={cached_to_direct:.6g}"
+)
 PY
 
 PROFILE_CHECK_DIR="${OUTPUT_BASE}/${RUN_TAG}/profile_consistency"

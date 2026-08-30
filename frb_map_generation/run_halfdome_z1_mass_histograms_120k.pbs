@@ -62,6 +62,7 @@ PROVENANCE_TXT="${OUTPUT_DIR}/halfdome_uniform_fixedz_foreground_mass_histograms
 : "${PDF_EDGE_COUNT:=300}"
 : "${PDF_DM_MIN:=0.1}"
 : "${PDF_DM_MAX:=30000}"
+: "${DM_VALUE_SANITY_MAX:=1.0e8}"
 : "${OVERWRITE:=false}"
 : "${OMP_NUM_THREADS:=1}"
 : "${OPENBLAS_NUM_THREADS:=1}"
@@ -159,6 +160,7 @@ echo "Foreground halo interval: 0 <= z_halo <= ${ZSOURCE}"
 echo "Maximum catalogue rows: ${MAX_CATALOG_HALOS} (0 means complete catalogue)"
 echo "Mass windows (${MASS_WINDOW_COUNT}): ${MASS_WINDOWS}"
 echo "Histogram: ${PDF_EDGE_COUNT} log edges over [${PDF_DM_MIN}, ${PDF_DM_MAX}] pc cm^-3"
+echo "DM safety abort threshold: ${DM_VALUE_SANITY_MAX} pc cm^-3 (validation only; no clipping)"
 echo "Per-ray DM output: false"
 echo "============================================================"
 
@@ -191,6 +193,7 @@ run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
   --lee2022-concentration-mode="${LEE2022_CONCENTRATION_MODE}" \
   --dm-cache="${DM_CACHE}" \
   --dm-cache-overwrite="${DM_CACHE_OVERWRITE}" \
+  --dm-value-sanity-max="${DM_VALUE_SANITY_MAX}" \
   --xgpaint-profile-mass-definition="${XGPAINT_PROFILE_MASS_DEFINITION}" \
   --halo-extension-r200-multiplier="${HALO_EXTENSION_R200_MULTIPLIER}" \
   --pdf-edge-count="${PDF_EDGE_COUNT}" \

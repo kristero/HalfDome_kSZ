@@ -875,7 +875,12 @@ function build_dm_interpolator_compatible(
     )
 end
 
-function validate_dm_interpolator_spot_value(interpolated_model)
+function validate_dm_interpolator_spot_value(
+    interpolated_model;
+    direct_model=nothing,
+    sanity_max::Real=Inf,
+    maximum_direct_ratio::Real=5.0,
+)
     interpolation = getproperty(interpolated_model, :itp)
     ranges = getproperty(interpolation, :ranges)
     logtheta = clamp(log(1e-4), Float64(first(ranges[1])), Float64(last(ranges[1])))
@@ -888,7 +893,49 @@ function validate_dm_interpolator_spot_value(interpolated_model)
         "DM cache spot check returned $(cached_value) at theta=$(theta), " *
         "M200c=$(mass_msun) Msun, z=$(redshift).",
     )
-    return (value=cached_value, theta=theta, redshift=redshift, mass_m200c_msun=mass_msun)
+    cached_value <= sanity_max || error(
+        "DM cache spot check returned $(cached_value) pc cm^-3, above " *
+        "dm_value_sanity_max=$(sanity_max), at theta=$(theta), " *
+        "M200c=$(mass_msun) Msun, z=$(redshift).",
+    )
+
+    direct_value = NaN
+    cached_to_direct_ratio = NaN
+    policy = "positive finite cached DM below the configured sanity maximum"
+    if direct_model !== nothing
+        direct_value = Float64(direct_model(theta, mass_msun, redshift))
+        isfinite(direct_value) && direct_value > 0.0 || error(
+            "Direct DM profile spot check returned $(direct_value) at " *
+            "theta=$(theta), M200c=$(mass_msun) Msun, z=$(redshift).",
+        )
+        direct_value <= sanity_max || error(
+            "Direct DM profile spot check returned $(direct_value) pc cm^-3, " *
+            "above dm_value_sanity_max=$(sanity_max).",
+        )
+        ratio_limit = Float64(maximum_direct_ratio)
+        isfinite(ratio_limit) && ratio_limit > 1.0 || error(
+            "maximum_direct_ratio must be finite and greater than one.",
+        )
+        cached_to_direct_ratio = cached_value / direct_value
+        inv(ratio_limit) <= cached_to_direct_ratio <= ratio_limit || error(
+            "DM cache/direct-profile mismatch: cached=$(cached_value), " *
+            "direct=$(direct_value), ratio=$(cached_to_direct_ratio), allowed=" *
+            "[$(inv(ratio_limit)), $(ratio_limit)] at theta=$(theta), " *
+            "M200c=$(mass_msun) Msun, z=$(redshift).",
+        )
+        policy =
+            "positive finite cached and direct DM below sanity maximum; " *
+            "cached/direct ratio within factor $(ratio_limit)"
+    end
+    return (
+        value=cached_value,
+        direct_value=direct_value,
+        cached_to_direct_ratio=cached_to_direct_ratio,
+        theta=theta,
+        redshift=redshift,
+        mass_m200c_msun=mass_msun,
+        policy=policy,
+    )
 end
 
 struct ReusableDiscQueryWorkspace{R,I}
@@ -1804,7 +1851,17 @@ function main(options)
         )
     end
     dm_model_interp = interpolator_build.profile
-    dm_cache_spot = validate_dm_interpolator_spot_value(dm_model_interp)
+    dm_cache_spot = validate_dm_interpolator_spot_value(
+        dm_model_interp;
+        direct_model=config.dm_profile == "lee2022" ? dm_model : nothing,
+        sanity_max=config.dm_value_sanity_max,
+    )
+    println(
+        "DM cache spot check: cached=$(dm_cache_spot.value) pc cm^-3" *
+        (isfinite(dm_cache_spot.direct_value) ?
+            ", direct=$(dm_cache_spot.direct_value) pc cm^-3, " *
+            "cached/direct=$(dm_cache_spot.cached_to_direct_ratio)" : ""),
+    )
     theta_min = compute_theta_min_local(dm_model_interp)
     profile_logmass_bounds = interpolator_logmass_bounds(dm_model_interp)
     workspace, sparse_disc_backend = make_sparse_disc_workspace(resolution)
@@ -2023,6 +2080,7 @@ function main(options)
         "dm_cache_sha256" => dm_cache_hash,
         "dm_cache_overwrite" => config.dm_cache_overwrite,
         "dm_cleanup_nonpositive" => config.dm_cleanup_nonpositive,
+        "dm_value_sanity_max" => config.dm_value_sanity_max,
         "dm_cache_loader" => interpolator_build.loader,
         "dm_cache_logtheta_key" => interpolator_build.logtheta_key,
         "dm_cache_nonpositive_replaced" => interpolator_build.nonpositive_replaced,
@@ -2031,10 +2089,13 @@ function main(options)
         "dm_cache_grid_maximum_pc_cm3" => interpolator_build.cache_grid_maximum,
         "dm_model_family" => interpolator_build.model_family,
         "dm_cache_spot_value_pc_cm3" => dm_cache_spot.value,
+        "dm_cache_spot_direct_value_pc_cm3" => dm_cache_spot.direct_value,
+        "dm_cache_spot_cached_to_direct_ratio" =>
+            dm_cache_spot.cached_to_direct_ratio,
         "dm_cache_spot_theta_rad" => dm_cache_spot.theta,
         "dm_cache_spot_redshift" => dm_cache_spot.redshift,
         "dm_cache_spot_m200c_msun" => dm_cache_spot.mass_m200c_msun,
-        "dm_cache_spot_check_policy" => "positive finite cached DM only; no comparison to a differently configured direct profile",
+        "dm_cache_spot_check_policy" => dm_cache_spot.policy,
         "sparse_disc_backend" => sparse_disc_backend,
         "pdf_edge_count" => config.pdf_edge_count,
         "pdf_spacing" => config.pdf_spacing,

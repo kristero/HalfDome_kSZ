@@ -17,6 +17,10 @@ const LEE2022_FIT_MASS_MIN_HINV_MSUN = 1.0e13
 const LEE2022_FIT_MASS_MAX_HINV_MSUN = 10.0^14.8
 const LEE2022_FIT_RADIUS_MIN_R200C = 0.04
 const LEE2022_FIT_RADIUS_MAX_R200C = 1.34
+const LEE2022_DIRECT_PROFILE_SANITY_MAX_PC_CM3 = 1.0e6
+const LEE2022_VALIDATION_LOG10_MASSES_MSUN = (12.5, 13.0, 13.5, 14.0, 14.5, 15.0, 15.5)
+const LEE2022_VALIDATION_REDSHIFTS = (0.0, 1.0, 2.0, 3.0, 4.0)
+const LEE2022_VALIDATION_RADII_R200C = (0.001, 0.04, 1.0, 1.34, 3.0)
 
 """No-concentration electron-density fit in Appendix A, Table A2."""
 struct Lee2022NoConcentrationDMProfile{T,C} <: XGPaint.AbstractGNFW{T}
@@ -176,6 +180,62 @@ function lee2022_no_concentration_provenance(model::Lee2022NoConcentrationDMProf
         "lee2022_beta_prime_alpha_m_below" => 0.70,
         "lee2022_beta_prime_alpha_m_above" => -0.18,
         "lee2022_beta_prime_alpha_z" => -0.31,
+        "lee2022_direct_profile_sanity_max_pc_cm3" =>
+            LEE2022_DIRECT_PROFILE_SANITY_MAX_PC_CM3,
+        "lee2022_direct_validation_log10_masses_msun" =>
+            join(LEE2022_VALIDATION_LOG10_MASSES_MSUN, ","),
+        "lee2022_direct_validation_redshifts" =>
+            join(LEE2022_VALIDATION_REDSHIFTS, ","),
+        "lee2022_direct_validation_radii_r200c" =>
+            join(LEE2022_VALIDATION_RADII_R200C, ","),
+    )
+end
+
+function validate_lee2022_direct_profile_grid(
+    model::Lee2022NoConcentrationDMProfile;
+    sanity_max_pc_cm3::Real=LEE2022_DIRECT_PROFILE_SANITY_MAX_PC_CM3,
+)
+    sanity_max = Float64(sanity_max_pc_cm3)
+    isfinite(sanity_max) && sanity_max > 0 || error(
+        "Lee2022 direct-profile sanity maximum must be finite and positive.",
+    )
+    minimum_value = Inf
+    maximum_value = -Inf
+    point_count = 0
+    for logmass in LEE2022_VALIDATION_LOG10_MASSES_MSUN
+        mass = 10.0^logmass
+        for redshift in LEE2022_VALIDATION_REDSHIFTS
+            previous_value = Inf
+            for radius in LEE2022_VALIDATION_RADII_R200C
+                value = Float64(lee2022_projected_electron_column_pc_cm3(
+                    model, radius, mass, redshift,
+                ))
+                isfinite(value) && value > 0 || error(
+                    "Non-positive/non-finite Lee2022 direct column at " *
+                    "log10(M200c/Msun)=$(logmass), z=$(redshift), " *
+                    "R_perp/R200c=$(radius): $(value) pc cm^-3",
+                )
+                value <= sanity_max || error(
+                    "Unphysical Lee2022 direct column $(value) pc cm^-3 exceeds " *
+                    "$(sanity_max) at log10(M200c/Msun)=$(logmass), " *
+                    "z=$(redshift), R_perp/R200c=$(radius).",
+                )
+                value <= previous_value * (1 + 1.0e-10) || error(
+                    "Lee2022 projected column is not radially non-increasing at " *
+                    "log10(M200c/Msun)=$(logmass), z=$(redshift), " *
+                    "R_perp/R200c=$(radius): $(value) > $(previous_value).",
+                )
+                minimum_value = min(minimum_value, value)
+                maximum_value = max(maximum_value, value)
+                previous_value = value
+                point_count += 1
+            end
+        end
+    end
+    return (
+        minimum_pc_cm3=minimum_value,
+        maximum_pc_cm3=maximum_value,
+        point_count=point_count,
     )
 end
 
@@ -201,8 +261,17 @@ function run_lee2022_no_concentration_profile_self_test()
     @assert isapprox(emitted_column, dm * 1.5; rtol=2.0e-12)
     z0_column = lee2022_projected_electron_column_pc_cm3(model, 1.0, 1.0e14, 0.0)
     @assert isfinite(z0_column) && z0_column > 0
+    validation = validate_lee2022_direct_profile_grid(model)
+    @assert validation.point_count ==
+        length(LEE2022_VALIDATION_LOG10_MASSES_MSUN) *
+        length(LEE2022_VALIDATION_REDSHIFTS) *
+        length(LEE2022_VALIDATION_RADII_R200C)
     println("PASS: Lee2022 parameters, mass-break continuity, angular/physical projection, and z=0 projection.")
     println("  spot DM(theta=1e-4 rad, M200c=1e14 Msun, z=0.5)=$(dm) pc cm^-3")
     println("  emitted column(x=R200c, M200c=1e14 Msun, z=0)=$(z0_column) pc cm^-3")
+    println(
+        "  direct validation grid: $(validation.point_count) points, range=" *
+        "[$(validation.minimum_pc_cm3), $(validation.maximum_pc_cm3)] pc cm^-3",
+    )
     return dm
 end

@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+#PBS -N SO_Nell_Fisher
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mem=32gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+
+set -euo pipefail
+
+PROJECT_DIR="${PROJECT_DIR:-/home/kristero10/HalfDome_kSZ}"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+FISHER_ROOT="${FISHER_ROOT:-/lustre/work/kristero10/adrian_fisher_baseline_deproj0}"
+PREPARED_DATASET="${PREPARED_DATASET:-${PROJECT_DIR}/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+NOISE_DIR="${NOISE_DIR:-/home/kristero10/tSZ_data/SO_noise}"
+BASELINE_NOISE="${BASELINE_NOISE:-${NOISE_DIR}/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt}"
+GOAL_NOISE="${GOAL_NOISE:-${NOISE_DIR}/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt}"
+OUTPUT_DIR="${OUTPUT_DIR:-/lustre/work/kristero10/adrian_fisher_nell_sensitivity_deproj0}"
+NOISE_CASES="${NOISE_CASES:-baseline goal}"
+COVARIANCE_SCOPES="${COVARIANCE_SCOPES:-conditional_noise gaussian_total}"
+DEPROJECTION="${DEPROJECTION:-0}"
+MASK_FSKY_EFFECTIVE="${MASK_FSKY_EFFECTIVE:-0.4}"
+SPLIT_NOISE_FACTOR="${SPLIT_NOISE_FACTOR:-1.0}"
+
+export OMP_NUM_THREADS="${OMP_NUM_THREADS:-26}"
+export MKL_NUM_THREADS="${MKL_NUM_THREADS:-26}"
+export OPENBLAS_NUM_THREADS="${OPENBLAS_NUM_THREADS:-26}"
+export NUMEXPR_NUM_THREADS="${NUMEXPR_NUM_THREADS:-26}"
+export MPLBACKEND=Agg
+
+cd "${PROJECT_DIR}"
+
+read -r -a noise_case_args <<< "${NOISE_CASES}"
+read -r -a covariance_scope_args <<< "${COVARIANCE_SCOPES}"
+
+echo "Starting SO N_ell Fisher sensitivity analysis"
+echo "Host: $(hostname)"
+echo "Prepared dataset: ${PREPARED_DATASET}"
+echo "Fisher root: ${FISHER_ROOT}"
+echo "Noise cases: ${NOISE_CASES}"
+echo "Covariance scopes: ${COVARIANCE_SCOPES}"
+echo "Output: ${OUTPUT_DIR}"
+
+"${PYTHON_BIN}" SBI_analysis/run_so_nell_fisher_sensitivity.py \
+  --prepared-dataset "${PREPARED_DATASET}" \
+  --fisher-root "${FISHER_ROOT}" \
+  --baseline-noise "${BASELINE_NOISE}" \
+  --goal-noise "${GOAL_NOISE}" \
+  --noise-cases "${noise_case_args[@]}" \
+  --covariance-scopes "${covariance_scope_args[@]}" \
+  --deprojection "${DEPROJECTION}" \
+  --mask-fsky-effective "${MASK_FSKY_EFFECTIVE}" \
+  --split-noise-factor "${SPLIT_NOISE_FACTOR}" \
+  --output-dir "${OUTPUT_DIR}"
+
+echo "Finished at $(date -Is)"

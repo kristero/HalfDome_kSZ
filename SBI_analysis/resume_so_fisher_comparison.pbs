@@ -16,12 +16,16 @@ cd "${WORK_DIR}"
 : "${PYTHON:=python3}"
 : "${PYTHON_ENV_SETUP:=}"
 : "${FISHER_ROOT:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0}"
+: "${FISHER_ANALYSIS_DIR:=${FISHER_ROOT}/analysis}"
+: "${OUTPUT_DIR:=${FISHER_ANALYSIS_DIR}/matched_baseline_deproj0_comparison}"
+: "${BATTAGLIA_OBSERVATION:=${FISHER_ROOT}/battaglia12_baseline_deproj0_observation/prepared/battaglia12_masked_baseline_noise_cross_deproj0_binned_dell.npy}"
+: "${OBSERVATION_VALIDATION_REPORT:=${FISHER_ROOT}/battaglia12_baseline_deproj0_observation/prepared/battaglia12_baseline_deproj0_validation.json}"
 : "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
 : "${SBI_RUN_ROOT:=/home/kristero10/HalfDome_kSZ/SBI_analysis/outputs/cluster_outputs/SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_metadata_verified_asinh}"
 : "${SBI_CASE:=masked_baseline_noise_cross_deproj0}"
 : "${NPE_N_TRAIN:=0}"
 : "${SBI_SAMPLES:=10000}"
-: "${SAMPLE_BATCH_SIZE:=${SBI_SAMPLES}}"
+: "${SAMPLE_BATCH_SIZE:=2000}"
 : "${PLOT_SAMPLES:=10000}"
 : "${PLOT_MODE:=all}"
 : "${DEVICE:=cpu}"
@@ -33,16 +37,18 @@ cd "${WORK_DIR}"
 : "${MCMC_NUM_CHAINS:=8}"
 : "${MCMC_NUM_WORKERS:=1}"
 : "${LEAKAGE_DIAGNOSTIC_SAMPLES:=10000}"
+: "${FORCE_RESAMPLE:=0}"
+: "${OVERWRITE_PLOTS:=0}"
 
 SCRIPT="${PROJECT_ROOT}/SBI_analysis/resume_so_fisher_comparison.py"
-OUTPUT_DIR="${FISHER_ROOT}/analysis"
 
 for path in \
   "${SCRIPT}" \
   "${PREPARED_DATASET}" \
-  "${OUTPUT_DIR}/fiducial_battaglia12_dell.npy" \
-  "${OUTPUT_DIR}/fisher_samples_untruncated.npy" \
-  "${OUTPUT_DIR}/fisher_samples_prior_truncated.npy"; do
+  "${BATTAGLIA_OBSERVATION}" \
+  "${OBSERVATION_VALIDATION_REPORT}" \
+  "${FISHER_ANALYSIS_DIR}/fisher_samples_untruncated.npy" \
+  "${FISHER_ANALYSIS_DIR}/fisher_samples_prior_truncated.npy"; do
   if [[ ! -f "${path}" ]]; then
     echo "Required completed output does not exist: ${path}" >&2
     exit 2
@@ -62,16 +68,31 @@ export TORCH_NUM_THREADS="${ALLOCATED_CPUS}"
 export TORCH_NUM_INTEROP_THREADS=1
 
 echo "Started: $(date -Is)"
-echo "Reusing Fisher outputs: ${OUTPUT_DIR}"
+echo "Reusing Fisher outputs: ${FISHER_ANALYSIS_DIR}"
+echo "Validated Battaglia12 observation: ${BATTAGLIA_OBSERVATION}"
+echo "New comparison output: ${OUTPUT_DIR}"
 echo "SBI samples: ${SBI_SAMPLES}, checkpoint batch: ${SAMPLE_BATCH_SIZE}"
 echo "Sampler: ${SAMPLING_METHOD}, MCMC method: ${MCMC_METHOD}"
 echo "MCMC chains: ${MCMC_NUM_CHAINS}, warmup: ${MCMC_WARMUP_STEPS}, thin: ${MCMC_THIN}"
 echo "Plot samples per chain: ${PLOT_SAMPLES}"
+echo "Force resample: ${FORCE_RESAMPLE}; overwrite plots: ${OVERWRITE_PLOTS}"
 "${PYTHON}" --version
+
+set --
+if [[ "${FORCE_RESAMPLE}" == "1" ]]; then
+  set -- "$@" --force-resample
+fi
+if [[ "${OVERWRITE_PLOTS}" == "1" ]]; then
+  set -- "$@" --overwrite-plots
+fi
 
 "${PYTHON}" "${SCRIPT}" \
   --prepared-dataset "${PREPARED_DATASET}" \
   --fisher-root "${FISHER_ROOT}" \
+  --fisher-analysis-dir "${FISHER_ANALYSIS_DIR}" \
+  --output-dir "${OUTPUT_DIR}" \
+  --battaglia-observation "${BATTAGLIA_OBSERVATION}" \
+  --observation-validation-report "${OBSERVATION_VALIDATION_REPORT}" \
   --sbi-run-root "${SBI_RUN_ROOT}" \
   --case "${SBI_CASE}" \
   --npe-n-train "${NPE_N_TRAIN}" \
@@ -87,7 +108,8 @@ echo "Plot samples per chain: ${PLOT_SAMPLES}"
   --mcmc-num-workers "${MCMC_NUM_WORKERS}" \
   --leakage-diagnostic-samples "${LEAKAGE_DIAGNOSTIC_SAMPLES}" \
   --device "${DEVICE}" \
-  --dpi "${DPI}"
+  --dpi "${DPI}" \
+  "$@"
 
 echo "Finished: $(date -Is)"
 echo "Outputs: ${OUTPUT_DIR}"

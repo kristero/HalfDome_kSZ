@@ -328,7 +328,11 @@ def maybe_plot(
     output_path: Path,
     args: argparse.Namespace,
 ) -> None:
-    if output_path.is_file() and not args.overwrite_plots:
+    if (
+        output_path.is_file()
+        and not args.overwrite_plots
+        and not args.force_resample
+    ):
         print(f"Reusing completed plot: {output_path}", flush=True)
         return
     print(f"Generating GetDist plot: {output_path.name}", flush=True)
@@ -478,6 +482,14 @@ def main() -> int:
         f"sbi_samples_N{n_train}_{args.sampling_method}_partial.npy"
     )
     conditioning_contract_path = output_dir / f"npe_conditioning_contract_N{n_train}.npz"
+    if args.force_resample:
+        for stale_path in (final_path, partial_path, conditioning_contract_path):
+            stale_path.unlink(missing_ok=True)
+        print(
+            "Removed the incompatible saved NPE chain and conditioning contract; "
+            "starting a checkpointed replacement.",
+            flush=True,
+        )
     existing_chain = final_path.is_file() or partial_path.is_file()
     if existing_chain and not args.force_resample:
         if not conditioning_contract_path.is_file():

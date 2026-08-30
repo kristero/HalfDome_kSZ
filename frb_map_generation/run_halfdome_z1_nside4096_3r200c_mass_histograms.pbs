@@ -36,8 +36,9 @@ export MAX_CATALOG_HALOS=0
 export HALO_EXTENSION_R200_MULTIPLIER=3.0
 export XGPAINT_PROFILE_MASS_DEFINITION=m200c
 export MASS_WINDOWS="m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16"
-export OUTPUT_BASE="/lustre/work/${CLUSTER_USER}/frb_data/halfdome_m200c_r200c_z1_120k_foreground_mass_histograms"
-export RUN_TAG="zsrc1p0_nside4096_nrays120000_allhalos_r200cx3p0_m200cprofile_seed42"
+: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_m200c_r200c_z1_120k_foreground_mass_histograms}"
+: "${RUN_TAG:=zsrc1p0_nside4096_nrays120000_allhalos_r200cx3p0_m200cprofile_seed42}"
+export OUTPUT_BASE RUN_TAG
 export HDF5_USE_FILE_LOCKING=FALSE
 
 /bin/bash "${GENERIC_PBS}"

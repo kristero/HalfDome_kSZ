@@ -23,7 +23,7 @@ set -euo pipefail
 : "${DM_VALUE_SANITY_MAX:=1.0e8}"
 : "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_lee2022_tablea2_noconcentration_z1_120k_foreground_mass_histograms}"
 : "${RUN_TAG:=zsrc1p0_nside4096_nrays120000_allhalos_r200cx3p0_m200c_lee2022_tablea2_noconc_seed42}"
-: "${DM_CACHE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_frb_inputs/lee2022_tablea2_noconcentration_m200c_dm_cache.jld2}"
+: "${DM_CACHE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_frb_inputs/lee2022_tablea2_noconcentration_m200c_profile_owned_los_v2_dm_cache.jld2}"
 
 export OUTPUT_BASE RUN_TAG DM_CACHE DM_VALUE_SANITY_MAX
 PBS_LOG_DIR="${OUTPUT_BASE}/pbs_logs"
@@ -96,13 +96,18 @@ with h5py.File(path, "r") as handle:
     expected = {
         "provenance_dm_profile": "lee2022",
         "provenance_lee2022_concentration_mode": "none",
-        "provenance_dm_model_family": "lee2022_table_a2_no_concentration_m200c",
+        "provenance_dm_model_family": (
+            "lee2022_table_a2_no_concentration_m200c_profile_owned_los_v2"
+        ),
         "provenance_lee2022_density_table": "Appendix A, Table A2",
         "provenance_halo_mass_definition": "M200c",
         "provenance_halo_radius_definition": "R200c",
         "provenance_halo_reference_density": "critical",
         "provenance_dm_cache_interpolation_scheme": (
             "linear B-spline in log(DM); bounded/no cubic overshoot"
+        ),
+        "provenance_lee2022_los_integrator": (
+            "profile-owned explicit Lee22 GNFW integrand with QuadGK"
         ),
     }
     for key, expected_value in expected.items():
@@ -131,8 +136,11 @@ with h5py.File(path, "r") as handle:
     )
     assert len(implementation_sha) == 64, implementation_sha
     assert text(handle.attrs["provenance_dm_cache_profile_signature"]) == (
-        "lee2022_table_a2_no_concentration_v1|M200c|R200c|alpha=1|"
-        "gamma=-0.3|XH=0.76|observer=1/(1+z)"
+        "lee2022_table_a2_no_concentration_v2|M200c|R200c|alpha=1|"
+        "gamma=-0.3|XH=0.76|profile_owned_los|observer=1/(1+z)"
+    )
+    assert not bool(
+        handle.attrs["provenance_lee2022_xgpaint_private_los_helper_used"]
     )
     assert int(handle.attrs["provenance_catalog_streamed_halos"]) == int(
         handle.attrs["provenance_catalog_total_halos"]

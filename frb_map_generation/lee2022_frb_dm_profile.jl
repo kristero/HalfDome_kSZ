@@ -10,9 +10,10 @@ using UnitfulAstro
 
 const LEE2022_PROFILE_REFERENCE = "Lee et al. 2022, MNRAS 517, 420, Appendix A, Table A2"
 const LEE2022_PROFILE_DOI = "10.1093/mnras/stac2602"
-const LEE2022_NO_CONCENTRATION_MODEL_FAMILY = "lee2022_table_a2_no_concentration_m200c"
+const LEE2022_NO_CONCENTRATION_MODEL_FAMILY =
+    "lee2022_table_a2_no_concentration_m200c_profile_owned_los_v2"
 const LEE2022_NO_CONCENTRATION_CACHE_SIGNATURE =
-    "lee2022_table_a2_no_concentration_v1|M200c|R200c|alpha=1|gamma=-0.3|XH=0.76|observer=1/(1+z)"
+    "lee2022_table_a2_no_concentration_v2|M200c|R200c|alpha=1|gamma=-0.3|XH=0.76|profile_owned_los|observer=1/(1+z)"
 const LEE2022_FIT_MASS_MIN_HINV_MSUN = 1.0e13
 const LEE2022_FIT_MASS_MAX_HINV_MSUN = 10.0^14.8
 const LEE2022_FIT_RADIUS_MIN_R200C = 0.04
@@ -21,6 +22,10 @@ const LEE2022_DIRECT_PROFILE_SANITY_MAX_PC_CM3 = 1.0e6
 const LEE2022_VALIDATION_LOG10_MASSES_MSUN = (12.5, 13.0, 13.5, 14.0, 14.5, 15.0, 15.5)
 const LEE2022_VALIDATION_REDSHIFTS = (0.0, 1.0, 2.0, 3.0, 4.0)
 const LEE2022_VALIDATION_RADII_R200C = (0.001, 0.04, 1.0, 1.34, 3.0)
+const LEE2022_LOS_MAX_R200C = 1.0e5
+const LEE2022_LOS_RELATIVE_TOLERANCE = 1.0e-8
+const LEE2022_REFERENCE_DM_LOGM12P5_Z0_X0P001 = 156.46630756838437
+const LEE2022_PARSEC_IN_CM = Float64(ustrip(uconvert(u"cm", 1.0u"pc")))
 
 """No-concentration electron-density fit in Appendix A, Table A2."""
 struct Lee2022NoConcentrationDMProfile{T,C} <: XGPaint.AbstractGNFW{T}
@@ -94,6 +99,63 @@ function lee2022_no_concentration_parameters(
     )
 end
 
+@inline function lee2022_dimensionless_density(
+    radius_r200c::Real,
+    x_c::Real,
+    alpha::Real,
+    beta_prime::Real,
+    gamma::Real,
+)
+    scaled_radius = Float64(radius_r200c) / Float64(x_c)
+    scaled_radius > 0.0 || error("Lee2022 scaled radius must be positive.")
+    return scaled_radius^Float64(gamma) *
+           (1.0 + scaled_radius^Float64(alpha))^(-Float64(beta_prime))
+end
+
+function lee2022_quadgk_function()
+    if isdefined(XGPaint, :quadgk)
+        return getfield(XGPaint, :quadgk)
+    end
+    if isdefined(XGPaint, :QuadGK)
+        quadgk_module = getfield(XGPaint, :QuadGK)
+        isdefined(quadgk_module, :quadgk) &&
+            return getfield(quadgk_module, :quadgk)
+    end
+    error("The active XGPaint environment does not provide QuadGK.quadgk.")
+end
+
+function lee2022_dimensionless_los(
+    x_perpendicular::Real,
+    x_c::Real,
+    alpha::Real,
+    beta_prime::Real,
+    gamma::Real;
+    los_max_r200c::Real=LEE2022_LOS_MAX_R200C,
+    relative_tolerance::Real=LEE2022_LOS_RELATIVE_TOLERANCE,
+)
+    x = Float64(x_perpendicular)
+    los_max = Float64(los_max_r200c)
+    rtol = Float64(relative_tolerance)
+    x > 0.0 || error("Lee2022 projected radius must be positive.")
+    isfinite(los_max) && los_max > 0.0 ||
+        error("Lee2022 LOS maximum must be finite and positive.")
+    isfinite(rtol) && 0.0 < rtol < 1.0 ||
+        error("Lee2022 LOS relative tolerance must lie in (0, 1).")
+    x_squared = x^2
+    integrand(y) = lee2022_dimensionless_density(
+        sqrt(y^2 + x_squared), x_c, alpha, beta_prime, gamma,
+    )
+    integral, estimated_error = lee2022_quadgk_function()(
+        integrand, 0.0, los_max; rtol=rtol, order=9,
+    )
+    projected = 2.0 * Float64(integral)
+    isfinite(projected) && projected > 0.0 || error(
+        "Lee2022 LOS quadrature returned $(projected); " *
+        "estimated error=$(estimated_error).",
+    )
+    return projected
+end
+
 """Physical projected electron column at `R_perp/R200c`, in pc cm^-3 units."""
 function lee2022_projected_electron_column_pc_cm3(
     model::Lee2022NoConcentrationDMProfile{T},
@@ -113,12 +175,11 @@ function lee2022_projected_electron_column_pc_cm3(
     r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(
         model, mass_with_units, z, 200,
     )
-    beta_standard = parameters.gamma - parameters.alpha * parameters.beta_prime
-    dimensionless_los = XGPaint._nfw_profile_los_quadrature(
+    dimensionless_los = lee2022_dimensionless_los(
         x,
         parameters.x_c,
         parameters.alpha,
-        beta_standard,
+        parameters.beta_prime,
         parameters.gamma,
     )
 
@@ -127,7 +188,8 @@ function lee2022_projected_electron_column_pc_cm3(
            (model.hydrogen_mass_fraction * XGPaint.constants.ProtonMass) *
            (model.omega_b / model.omega_m)
     electron_column = parameters.n0 * dimensionless_los * n200 * r200c
-    return T(ustrip(uconvert(u"pc/cm^3", electron_column)))
+    electron_column_cm2 = Float64(ustrip(uconvert(u"cm^-2", electron_column)))
+    return T(electron_column_cm2 / LEE2022_PARSEC_IN_CM)
 end
 
 """Evaluate observer-frame halo DM in pc cm^-3 at angular radius `theta`."""
@@ -188,6 +250,14 @@ function lee2022_no_concentration_provenance(model::Lee2022NoConcentrationDMProf
             join(LEE2022_VALIDATION_REDSHIFTS, ","),
         "lee2022_direct_validation_radii_r200c" =>
             join(LEE2022_VALIDATION_RADII_R200C, ","),
+        "lee2022_los_integrator" =>
+            "profile-owned explicit Lee22 GNFW integrand with QuadGK",
+        "lee2022_los_max_r200c" => LEE2022_LOS_MAX_R200C,
+        "lee2022_los_relative_tolerance" =>
+            LEE2022_LOS_RELATIVE_TOLERANCE,
+        "lee2022_xgpaint_private_los_helper_used" => false,
+        "lee2022_column_to_dm_conversion" =>
+            "N_e[cm^-2] divided by parsec[cm]",
     )
 end
 
@@ -261,6 +331,12 @@ function run_lee2022_no_concentration_profile_self_test()
     @assert isapprox(emitted_column, dm * 1.5; rtol=2.0e-12)
     z0_column = lee2022_projected_electron_column_pc_cm3(model, 1.0, 1.0e14, 0.0)
     @assert isfinite(z0_column) && z0_column > 0
+    reference_dm = lee2022_projected_electron_column_pc_cm3(
+        model, 0.001, 10.0^12.5, 0.0,
+    )
+    @assert isapprox(
+        reference_dm, LEE2022_REFERENCE_DM_LOGM12P5_Z0_X0P001; rtol=2.0e-8,
+    )
     validation = validate_lee2022_direct_profile_grid(model)
     @assert validation.point_count ==
         length(LEE2022_VALIDATION_LOG10_MASSES_MSUN) *
@@ -269,6 +345,10 @@ function run_lee2022_no_concentration_profile_self_test()
     println("PASS: Lee2022 parameters, mass-break continuity, angular/physical projection, and z=0 projection.")
     println("  spot DM(theta=1e-4 rad, M200c=1e14 Msun, z=0.5)=$(dm) pc cm^-3")
     println("  emitted column(x=R200c, M200c=1e14 Msun, z=0)=$(z0_column) pc cm^-3")
+    println(
+        "  regression DM(x=0.001, log10(M200c/Msun)=12.5, z=0)=" *
+        "$(reference_dm) pc cm^-3",
+    )
     println(
         "  direct validation grid: $(validation.point_count) points, range=" *
         "[$(validation.minimum_pc_cm3), $(validation.maximum_pc_cm3)] pc cm^-3",

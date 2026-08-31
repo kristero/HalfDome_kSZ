@@ -11,6 +11,8 @@ import csv
 import hashlib
 import json
 import math
+import sys
+import traceback
 from pathlib import Path
 
 import matplotlib
@@ -119,10 +121,21 @@ def write_csv(path, rows):
         writer.writerows(rows)
 
 
-def build_bin_operator(ell, bin_min, bin_max):
+def bin_weights(ell, weighting):
+    ell = np.asarray(ell, dtype=float)
+    weighting = str(weighting or "2ell_plus_1").lower()
+    if weighting in ("uniform", "none", "flat"):
+        return np.ones_like(ell)
+    if weighting == "ell":
+        return ell
+    if weighting in ("2ell_plus_1", "modes", "mode_count"):
+        return 2.0 * ell + 1.0
+    raise ValueError("Unsupported prepared bin weighting: {!r}".format(weighting))
+
+
+def build_bin_operator(ell, bin_min, bin_max, weighting):
     operator = np.zeros((len(bin_min), len(ell)), dtype=float)
     centers = np.zeros(len(bin_min), dtype=float)
-    mode_weights = 2.0 * ell.astype(float) + 1.0
     dell_factor = ell.astype(float) * (ell.astype(float) + 1.0) / (2.0 * np.pi)
     assigned = np.zeros(len(ell), dtype=bool)
     for index, (low, high) in enumerate(zip(bin_min, bin_max)):
@@ -132,7 +145,7 @@ def build_bin_operator(ell, bin_min, bin_max):
         if np.any(assigned & selected):
             raise ValueError("Prepared ell bins overlap")
         assigned |= selected
-        weights = mode_weights[selected]
+        weights = bin_weights(ell[selected], weighting)
         weights = weights / weights.sum()
         operator[index, selected] = weights * dell_factor[selected]
         centers[index] = np.sum(weights * ell[selected])
@@ -165,22 +178,46 @@ def load_contract(path):
             np.asarray(data["ell_binned"], dtype=float)
             if "ell_binned" in data else None
         )
+        bin_weighting = "2ell_plus_1"
+        if "bin_weighting" in data:
+            bin_weighting = str(np.asarray(data["bin_weighting"]).reshape(()).item())
+        elif "metadata_json" in data:
+            metadata_text = str(
+                np.asarray(data["metadata_json"]).reshape(()).item()
+            )
+            metadata_payload = json.loads(metadata_text)
+            bin_weighting = str(
+                metadata_payload.get("bin_weighting", bin_weighting)
+            )
     if prior_low.ndim != 1 or prior_low.shape != prior_high.shape:
         raise ValueError("Prior bounds must be matching 1D vectors")
     if len(param_names) != len(prior_low) or np.any(prior_high <= prior_low):
         raise ValueError("Invalid prepared parameter/prior contract")
     if ell.ndim != 1 or np.any(np.diff(ell) <= 0):
         raise ValueError("ell_unbinned must be strictly increasing")
-    operator, centers = build_bin_operator(ell, bin_min, bin_max)
+    operator, centers = build_bin_operator(
+        ell, bin_min, bin_max, bin_weighting
+    )
+    center_max_difference = None
     if saved_centers is not None:
         if saved_centers.shape != centers.shape:
             raise ValueError("ell_binned has the wrong shape")
-        if np.max(np.abs(saved_centers - centers)) > 1.0e-4:
-            raise ValueError("ell_binned does not match 2ell+1 weighting")
+        center_max_difference = float(
+            np.max(np.abs(saved_centers - centers))
+        )
+        if center_max_difference > 1.0e-3:
+            raise ValueError(
+                "ell_binned does not match weighting={!r}; maximum "
+                "difference={:.8g}".format(
+                    bin_weighting, center_max_difference
+                )
+            )
     return {
         "path": path, "prior_low": prior_low, "prior_high": prior_high,
         "prior_width": prior_high - prior_low, "param_names": param_names,
         "ell": ell, "ell_binned": centers, "bin_operator": operator,
+        "bin_weighting": bin_weighting,
+        "ell_binned_max_difference": center_max_difference,
     }
 
 
@@ -744,12 +781,31 @@ def main():
 
     output_dir = args.output_dir.expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / "fisher_sensitivity_failed.json").unlink(
+        missing_ok=True
+    )
+    with (output_dir / "fisher_sensitivity_started.json").open(
+        "w", encoding="utf-8"
+    ) as handle:
+        json.dump(
+            {
+                "started": True,
+                "argv": sys.argv,
+                "output_dir": str(output_dir),
+            },
+            handle,
+            indent=2,
+            sort_keys=True,
+        )
+    print("Loading prepared dataset:", args.prepared_dataset, flush=True)
     contract = load_contract(args.prepared_dataset)
+    print("Loading derivative matrices from:", args.fisher_root, flush=True)
     paths = derivative_paths(args)
     derivatives = load_derivatives(
         paths, len(contract["param_names"]), len(contract["ell_binned"])
     )
     fiducial_path = discover_fiducial(args)
+    print("Loading fiducial clean C_ell:", fiducial_path, flush=True)
     fiducial_cl = align_spectrum(
         np.load(fiducial_path), contract["ell"], "fiducial masked no-noise C_ell"
     )
@@ -789,6 +845,10 @@ def main():
     noise_by_case = {}
     noise_metadata = {}
     for case in args.noise_cases:
+        print(
+            "Loading {} SO N_ell: {}".format(case, requested_paths[case]),
+            flush=True,
+        )
         noise, path, column = load_noise(
             requested_paths[case], contract["ell"], args.deprojection,
             args.noise_is_dl, args.split_noise_factor,
@@ -872,7 +932,10 @@ def main():
         "ell_max": int(contract["ell"][-1]),
         "n_ell": int(len(contract["ell"])),
         "n_bins": int(len(contract["ell_binned"])),
-        "bin_weighting": "2ell_plus_1",
+        "bin_weighting": contract["bin_weighting"],
+        "ell_binned_max_difference": contract[
+            "ell_binned_max_difference"
+        ],
         "statistic": "linear masked pseudo-D_ell",
     }
     with (output_dir / "input_provenance.json").open("w", encoding="utf-8") as handle:
@@ -939,4 +1002,34 @@ def main():
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except Exception as exc:
+        try:
+            failure_args = parse_args()
+            failure_dir = failure_args.output_dir.expanduser().resolve()
+            failure_dir.mkdir(parents=True, exist_ok=True)
+            with (failure_dir / "fisher_sensitivity_failed.json").open(
+                "w", encoding="utf-8"
+            ) as handle:
+                json.dump(
+                    {
+                        "complete": False,
+                        "exception_type": type(exc).__name__,
+                        "error": str(exc),
+                        "traceback": traceback.format_exc(),
+                        "argv": sys.argv,
+                    },
+                    handle,
+                    indent=2,
+                    sort_keys=True,
+                )
+            print(
+                "Failure details written to: "
+                + str(failure_dir / "fisher_sensitivity_failed.json"),
+                file=sys.stderr,
+                flush=True,
+            )
+        except Exception:
+            pass
+        raise

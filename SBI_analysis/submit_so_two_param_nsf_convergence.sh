@@ -11,10 +11,15 @@ DEFAULT_PROJECT_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
 : "${FULL_DATASET_QUEUE:=large}"
 : "${SUMMARY_QUEUE:=mini}"
 : "${PBS_WALLTIME:=23:59:00}"
-: "${PBS_NCPUS:=52}"
-: "${PBS_MEM:=128gb}"
+: "${PBS_NCPUS:=26}"
+: "${PBS_MEM:=64gb}"
 : "${FULL_DATASET_N:=523288}"
 : "${MAX_CONCURRENT:=5}"
+: "${STOP_AFTER_EPOCHS:=20}"
+: "${TRAINING_BATCH_SIZE:=1024}"
+: "${VALIDATION_FRACTION:=0.1}"
+: "${MAX_NUM_EPOCHS:=200}"
+: "${BATTAGLIA_SIZES:=256,32768,523288}"
 : "${OVERWRITE:=0}"
 : "${REFRESH_BATTAGLIA:=1}"
 : "${SUBMIT_SUMMARY:=1}"
@@ -74,10 +79,24 @@ skipped=0
 for n_train in "${SIZES[@]}"; do
   for mode in asinh; do
     completion="${CONVERGENCE_ROOT}/${mode}/N${n_train}/evaluation/evaluation_complete.json"
-    if [[ -f "${completion}" && "${OVERWRITE}" != "1" ]]; then
+    needs_battaglia_refresh=0
+    if [[ "${REFRESH_BATTAGLIA}" == "1" ]]; then
+      case ",${BATTAGLIA_SIZES}," in
+        *",${n_train},"*)
+          run_dir="${CONVERGENCE_ROOT}/${mode}/N${n_train}"
+          if [[ ! -s "${run_dir}/battaglia12_posterior_samples.npy" || ! -s "${run_dir}/battaglia12_conditioning_contract.npz" ]]; then
+            needs_battaglia_refresh=1
+          fi
+          ;;
+      esac
+    fi
+    if [[ -f "${completion}" && "${OVERWRITE}" != "1" && "${needs_battaglia_refresh}" != "1" ]]; then
       echo "Completed, skipping: mode=${mode}, N=${n_train}"
       ((skipped += 1))
       continue
+    fi
+    if [[ "${needs_battaglia_refresh}" == "1" ]]; then
+      echo "Scheduling missing Battaglia12 products: mode=${mode}, N=${n_train}"
     fi
 
     lane=$((task_index % MAX_CONCURRENT))
@@ -97,7 +116,7 @@ for n_train in "${SIZES[@]}"; do
       QSUB_ARGS+=( -W "depend=afterany:${dependency}" )
     fi
     QSUB_ARGS+=(
-      -v "PROJECT_ROOT=${PROJECT_ROOT},PREPARED_DATASET=${PREPARED_DATASET},CONVERGENCE_ROOT=${CONVERGENCE_ROOT},N_TRAIN=${n_train},X_RESCALE_MODE=${mode},OVERWRITE=${OVERWRITE},REFRESH_BATTAGLIA=${REFRESH_BATTAGLIA}"
+      -v "PROJECT_ROOT=${PROJECT_ROOT},PREPARED_DATASET=${PREPARED_DATASET},CONVERGENCE_ROOT=${CONVERGENCE_ROOT},N_TRAIN=${n_train},X_RESCALE_MODE=${mode},OVERWRITE=${OVERWRITE},REFRESH_BATTAGLIA=${REFRESH_BATTAGLIA},BATTAGLIA_SIZES=${BATTAGLIA_SIZES},STOP_AFTER_EPOCHS=${STOP_AFTER_EPOCHS},TRAINING_BATCH_SIZE=${TRAINING_BATCH_SIZE},VALIDATION_FRACTION=${VALIDATION_FRACTION},MAX_NUM_EPOCHS=${MAX_NUM_EPOCHS}"
       "${WORKER_PBS}"
     )
 
@@ -146,5 +165,6 @@ echo "Submitted workers: ${submitted}; already complete: ${skipped}"
 echo "At most ${MAX_CONCURRENT} independent worker jobs can run concurrently."
 echo "Queue routing: N=${FULL_DATASET_N} -> ${FULL_DATASET_QUEUE}; all smaller N -> ${PBS_QUEUE}."
 echo "Worker resources: ${PBS_NCPUS} CPUs, ${PBS_MEM}, walltime ${PBS_WALLTIME}."
+echo "Training controls: batch cap ${TRAINING_BATCH_SIZE}, validation fraction ${VALIDATION_FRACTION}, max epochs ${MAX_NUM_EPOCHS}, patience ${STOP_AFTER_EPOCHS}."
 echo "Job map: ${LOG}"
 echo "Outputs: ${CONVERGENCE_ROOT}"

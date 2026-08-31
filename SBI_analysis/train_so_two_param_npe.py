@@ -99,6 +99,26 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--num-transforms", type=int, default=0)
     parser.add_argument("--num-bins", type=int, default=10)
     parser.add_argument("--stop-after-epochs", type=int, default=60)
+    parser.add_argument(
+        "--training-batch-size",
+        type=int,
+        default=50,
+        help=(
+            "Maximum SBI training batch size. The effective size is reduced "
+            "for small datasets to retain at least about eight batches per epoch."
+        ),
+    )
+    parser.add_argument(
+        "--validation-fraction",
+        type=float,
+        default=0.1,
+    )
+    parser.add_argument(
+        "--max-num-epochs",
+        type=int,
+        default=0,
+        help="Hard training epoch limit; 0 keeps the installed SBI default.",
+    )
     parser.add_argument("--num-battaglia-samples", type=int, default=100_000)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--device", default="cpu")
@@ -259,6 +279,12 @@ def load_inputs(path: Path) -> dict[str, Any]:
 def main() -> int:
     args = parse_args()
     configure_torch_threads()
+    if args.training_batch_size <= 0:
+        raise ValueError("--training-batch-size must be positive")
+    if not 0.0 < args.validation_fraction < 1.0:
+        raise ValueError("--validation-fraction must be in (0, 1)")
+    if args.max_num_epochs < 0:
+        raise ValueError("--max-num-epochs must be non-negative")
     dataset_path = args.prepared_dataset.expanduser().resolve()
     output_dir = args.output_dir.expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -470,15 +496,36 @@ def main() -> int:
         f"x transform: {args.x_rescale_mode}; "
         f"estimator: {args.density_estimator}"
     )
+    estimated_training_rows = max(
+        1,
+        int(np.floor(n_train * (1.0 - args.validation_fraction))),
+    )
+    effective_batch_size = min(
+        int(args.training_batch_size),
+        max(32, estimated_training_rows // 8),
+        estimated_training_rows,
+    )
+    print(
+        f"SBI training batch size: {effective_batch_size} "
+        f"(requested maximum {args.training_batch_size}); "
+        f"validation fraction: {args.validation_fraction}; "
+        f"max epochs: "
+        f"{args.max_num_epochs if args.max_num_epochs > 0 else 'SBI default'}"
+    )
 
     inference = make_configured_npe(prior, args)
+    train_kwargs = {
+        "training_batch_size": int(effective_batch_size),
+        "validation_fraction": float(args.validation_fraction),
+        "stop_after_epochs": int(args.stop_after_epochs),
+        "show_train_summary": True,
+    }
+    if args.max_num_epochs > 0:
+        train_kwargs["max_num_epochs"] = int(args.max_num_epochs)
     captured = ForwardingCapture(stream=os.sys.stdout)
     with contextlib.redirect_stdout(captured):
         density_estimator = (
-            inference.append_simulations(theta_t, x_t).train(
-                stop_after_epochs=int(args.stop_after_epochs),
-                show_train_summary=True,
-            )
+            inference.append_simulations(theta_t, x_t).train(**train_kwargs)
         )
     training_output = captured.getvalue()
     validation_losses = (
@@ -548,6 +595,14 @@ def main() -> int:
         "num_bins": int(args.num_bins),
         "internal_z_score_x": args.internal_z_score_x,
         "stop_after_epochs": int(args.stop_after_epochs),
+        "training_batch_size_requested": int(args.training_batch_size),
+        "training_batch_size_effective": int(effective_batch_size),
+        "validation_fraction": float(args.validation_fraction),
+        "max_num_epochs": (
+            int(args.max_num_epochs)
+            if args.max_num_epochs > 0
+            else None
+        ),
         "num_battaglia_samples": int(
             battaglia_samples.shape[0]
         ),

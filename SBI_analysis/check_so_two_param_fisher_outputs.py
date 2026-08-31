@@ -126,7 +126,18 @@ def check_two_param(root: Path, errors: list[str], warnings: list[str]) -> None:
         completion = load_json(evaluation / "evaluation_complete.json", errors)
         if completion:
             checks = completion.get("validation", {})
-            failed = [name for name, passed in checks.items() if not passed]
+            failed = [
+                name
+                for name, passed in checks.items()
+                if (
+                    name == "overlap_count"
+                    and int(passed) != 0
+                )
+                or (
+                    name != "overlap_count"
+                    and not bool(passed)
+                )
+            ]
             if failed:
                 errors.append(f"N={n_train}: evaluation validation failed: {failed}")
             if int(completion.get("num_test_profiles", -1)) != 1000:

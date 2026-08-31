@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N SO2p_NSF
 #PBS -q mini
-#PBS -l select=1:ncpus=52:mpiprocs=1:mem=128gb
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
 #PBS -l walltime=23:59:00
 #PBS -o /home/kristero10/logs/SBI_runs/
 #PBS -e /home/kristero10/logs/SBI_runs/
@@ -24,7 +24,10 @@ cd "${WORK_DIR}"
 : "${HIDDEN_FEATURES:=64}"
 : "${NUM_TRANSFORMS:=6}"
 : "${NUM_BINS:=10}"
-: "${STOP_AFTER_EPOCHS:=60}"
+: "${STOP_AFTER_EPOCHS:=20}"
+: "${TRAINING_BATCH_SIZE:=1024}"
+: "${VALIDATION_FRACTION:=0.1}"
+: "${MAX_NUM_EPOCHS:=200}"
 : "${NUM_POSTERIOR_SAMPLES:=2000}"
 : "${BATTAGLIA_SIZES:=256,32768,523288}"
 : "${NUM_BATTAGLIA_SAMPLES:=20000}"
@@ -53,7 +56,7 @@ if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
   eval "${PYTHON_ENV_SETUP}"
 fi
 
-ALLOCATED_CPUS="${PBS_NCPUS:-52}"
+ALLOCATED_CPUS="${PBS_NCPUS:-26}"
 export OMP_NUM_THREADS="${ALLOCATED_CPUS}"
 export OPENBLAS_NUM_THREADS="${ALLOCATED_CPUS}"
 export MKL_NUM_THREADS="${ALLOCATED_CPUS}"
@@ -64,6 +67,7 @@ export TORCH_NUM_INTEROP_THREADS=1
 echo "Started: $(date -Is)"
 echo "N_train=${N_TRAIN}, mode=${X_RESCALE_MODE}, estimator=NSF"
 echo "NSF hidden_features=${HIDDEN_FEATURES}, num_transforms=${NUM_TRANSFORMS}, num_bins=${NUM_BINS}"
+echo "Training batch cap=${TRAINING_BATCH_SIZE}, validation_fraction=${VALIDATION_FRACTION}, max_epochs=${MAX_NUM_EPOCHS}, patience=${STOP_AFTER_EPOCHS}"
 echo "The NSF context input is the 40-bin D_ell vector."
 echo "Run directory: ${RUN_DIR}"
 "${PYTHON}" --version
@@ -87,6 +91,9 @@ if [[ "${OVERWRITE}" == "1" || ! -f "${RUN_DIR}/density_estimator.pkl" || ! -f "
     --num-transforms "${NUM_TRANSFORMS}" \
     --num-bins "${NUM_BINS}" \
     --stop-after-epochs "${STOP_AFTER_EPOCHS}" \
+    --training-batch-size "${TRAINING_BATCH_SIZE}" \
+    --validation-fraction "${VALIDATION_FRACTION}" \
+    --max-num-epochs "${MAX_NUM_EPOCHS}" \
     --num-battaglia-samples 0 \
     --seed "${SBI_SEED}" \
     --device "${SBI_DEVICE}" \

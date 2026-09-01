@@ -1,0 +1,34 @@
+#!/bin/bash
+#PBS -N sbi_2vfull_rmse
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+# The Python driver discovers completed N values and ignores unfinished jobs.
+
+PROJECT_ROOT=/home/kristero10/HalfDome_kSZ
+cd $PROJECT_ROOT
+
+: ${PYTHON:=python3}
+: ${PYTHON_ENV_SETUP:=}
+
+if [[ -n $PYTHON_ENV_SETUP ]]; then
+  eval $PYTHON_ENV_SETUP
+fi
+
+ALLOCATED_CPUS=${PBS_NCPUS:-26}
+export OMP_NUM_THREADS=$ALLOCATED_CPUS
+export OPENBLAS_NUM_THREADS=$ALLOCATED_CPUS
+export MKL_NUM_THREADS=$ALLOCATED_CPUS
+export NUMEXPR_NUM_THREADS=$ALLOCATED_CPUS
+export TORCH_NUM_THREADS=$ALLOCATED_CPUS
+export TORCH_NUM_INTEROP_THREADS=1
+export MPLBACKEND=Agg
+export MPLCONFIGDIR=${TMPDIR:-/tmp}/matplotlib-${PBS_JOBID:-manual}
+mkdir -p $MPLCONFIGDIR /home/kristero10/logs/SBI_runs
+
+$PYTHON SBI_analysis/compare_two_vs_full_normalized_rmse.py

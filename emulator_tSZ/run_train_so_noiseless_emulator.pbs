@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+#PBS -N so_emu512
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+umask 027
+
+: "${PROJECT_DIR:=/home/kristero10/HalfDome_kSZ}"
+: "${PYTHON:=python3}"
+: "${PYTHON_ENV_SETUP:=}"
+: "${DATASET:=${PROJECT_DIR}/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_metadata_verified/so_masked_no_noise_ell80_7979_sbi_run.npz}"
+: "${OUTPUT_DIR:=/lustre/work/kristero10/so_noiseless_emulator_512k}"
+: "${EXPECTED_ROWS:=524288}"
+: "${EXPECTED_BINS:=40}"
+: "${TEST_FRACTION:=0.15}"
+: "${SELECTION_VAL_FRACTION:=0.05}"
+: "${SEED:=42}"
+: "${THREADS:=26}"
+: "${BATCH_SIZE:=8192}"
+: "${EVAL_BATCH_SIZE:=16384}"
+: "${HIDDEN_WIDTH:=256}"
+: "${RESIDUAL_BLOCKS:=4}"
+: "${MAX_EPOCHS:=180}"
+: "${PATIENCE:=25}"
+: "${MIN_DELTA:=1e-6}"
+: "${LEARNING_RATE:=1e-3}"
+: "${WEIGHT_DECAY:=1e-6}"
+: "${GATE_MEDIAN_APE_PCT:=1.0}"
+: "${GATE_P95_APE_PCT:=5.0}"
+: "${GATE_MAX_BIN_BIAS_PCT:=1.0}"
+: "${GATE_WORST_BIN_P95_APE_PCT:=7.5}"
+: "${GATE_MIN_BIN_R2:=0.99}"
+: "${GATE_WORST_QUARTILE_P95_APE_PCT:=7.5}"
+: "${FAIL_ON_QUALITY_GATE:=1}"
+: "${REQUIRE_VERIFIED_ORDER:=1}"
+: "${ALLOW_UNVERIFIED_NOISELESS:=0}"
+: "${VALIDATE_ONLY:=0}"
+: "${OVERWRITE:=0}"
+: "${SKIP_DATASET_HASH:=0}"
+: "${NO_PLOTS:=0}"
+: "${NO_SAVE_TEST_PREDICTIONS:=0}"
+: "${MAX_ROWS:=0}"
+
+SCRIPT="${PROJECT_DIR}/emulator_tSZ/train_so_noiseless_emulator.py"
+for required_path in "${SCRIPT}" "${DATASET}"; do
+  if [[ ! -f "${required_path}" ]]; then
+    echo "Required file not found: ${required_path}" >&2
+    exit 2
+  fi
+done
+
+if [[ -n "${PYTHON_ENV_SETUP}" ]]; then
+  eval "${PYTHON_ENV_SETUP}"
+fi
+
+mkdir -p "${OUTPUT_DIR}"
+cd "${PROJECT_DIR}"
+
+export OMP_NUM_THREADS="${THREADS}"
+export MKL_NUM_THREADS="${THREADS}"
+export OPENBLAS_NUM_THREADS="${THREADS}"
+export NUMEXPR_NUM_THREADS="${THREADS}"
+export VECLIB_MAXIMUM_THREADS="${THREADS}"
+export MPLBACKEND=Agg
+
+args=(
+  --dataset "${DATASET}"
+  --output-dir "${OUTPUT_DIR}"
+  --expected-rows "${EXPECTED_ROWS}"
+  --expected-bins "${EXPECTED_BINS}"
+  --test-fraction "${TEST_FRACTION}"
+  --selection-val-fraction "${SELECTION_VAL_FRACTION}"
+  --seed "${SEED}"
+  --device cpu
+  --threads "${THREADS}"
+  --batch-size "${BATCH_SIZE}"
+  --eval-batch-size "${EVAL_BATCH_SIZE}"
+  --hidden-width "${HIDDEN_WIDTH}"
+  --residual-blocks "${RESIDUAL_BLOCKS}"
+  --max-epochs "${MAX_EPOCHS}"
+  --patience "${PATIENCE}"
+  --min-delta "${MIN_DELTA}"
+  --learning-rate "${LEARNING_RATE}"
+  --weight-decay "${WEIGHT_DECAY}"
+  --gate-median-ape-pct "${GATE_MEDIAN_APE_PCT}"
+  --gate-p95-ape-pct "${GATE_P95_APE_PCT}"
+  --gate-max-bin-bias-pct "${GATE_MAX_BIN_BIAS_PCT}"
+  --gate-worst-bin-p95-ape-pct "${GATE_WORST_BIN_P95_APE_PCT}"
+  --gate-min-bin-r2 "${GATE_MIN_BIN_R2}"
+  --gate-worst-quartile-p95-ape-pct "${GATE_WORST_QUARTILE_P95_APE_PCT}"
+  --max-rows "${MAX_ROWS}"
+)
+
+[[ "${FAIL_ON_QUALITY_GATE}" == "1" ]] && args+=(--fail-on-quality-gate)
+[[ "${REQUIRE_VERIFIED_ORDER}" == "1" ]] && args+=(--require-verified-order)
+[[ "${ALLOW_UNVERIFIED_NOISELESS}" == "1" ]] && args+=(--allow-unverified-noiseless)
+[[ "${VALIDATE_ONLY}" == "1" ]] && args+=(--validate-only)
+[[ "${OVERWRITE}" == "1" ]] && args+=(--overwrite)
+[[ "${SKIP_DATASET_HASH}" == "1" ]] && args+=(--skip-dataset-hash)
+[[ "${NO_PLOTS}" == "1" ]] && args+=(--no-plots)
+[[ "${NO_SAVE_TEST_PREDICTIONS}" == "1" ]] && args+=(--no-save-test-predictions)
+
+echo "PBS job: ${PBS_JOBID:-manual}"
+echo "Host: $(hostname)"
+echo "Started: $(date -Is)"
+echo "Dataset: ${DATASET}"
+echo "Output: ${OUTPUT_DIR}"
+echo "Requested outer split: 85% training / 15% testing"
+echo "Threads: ${THREADS}"
+echo "Command: ${PYTHON} ${SCRIPT} ${args[*]}"
+
+"${PYTHON}" "${SCRIPT}" "${args[@]}"
+
+echo "Finished: $(date -Is)"
+if [[ "${VALIDATE_ONLY}" == "1" ]]; then
+  echo "Preflight marker: ${OUTPUT_DIR}/validation_only_complete.json"
+else
+  echo "Artifact: ${OUTPUT_DIR}/so_noiseless_emulator.pt"
+  echo "Metrics: ${OUTPUT_DIR}/test_metrics_overall.json"
+  echo "Quality gate: ${OUTPUT_DIR}/quality_gate.json"
+fi

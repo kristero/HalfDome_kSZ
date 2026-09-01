@@ -38,11 +38,28 @@ fi
 WORKER_PBS="${PROJECT_ROOT}/SBI_analysis/run_so_two_param_maf_convergence.pbs"
 SUMMARY_PBS="${PROJECT_ROOT}/SBI_analysis/run_so_two_param_maf_convergence_summary.pbs"
 RUNTIME_CHECK="${PROJECT_ROOT}/SBI_analysis/check_sbi_cluster_runtime.py"
-for path in "${WORKER_PBS}" "${SUMMARY_PBS}" "${RUNTIME_CHECK}" "${PREPARED_DATASET}"; do
+EVAL_SCRIPT="${PROJECT_ROOT}/SBI_analysis/evaluate_so_two_param_nsf_convergence_run.py"
+SUMMARY_SCRIPT="${PROJECT_ROOT}/SBI_analysis/summarize_so_two_param_nsf_convergence.py"
+for path in \
+  "${WORKER_PBS}" \
+  "${SUMMARY_PBS}" \
+  "${RUNTIME_CHECK}" \
+  "${EVAL_SCRIPT}" \
+  "${SUMMARY_SCRIPT}" \
+  "${PREPARED_DATASET}"
+do
   [[ -e "${path}" ]] || {
     echo "Required input not found: ${path}" >&2
     exit 2
   }
+done
+
+for path in "${EVAL_SCRIPT}" "${SUMMARY_SCRIPT}"; do
+  if ! grep -q -- "--expected-density-estimator" "${path}"; then
+    echo "Incompatible stale script: ${path}" >&2
+    echo "Update the cluster checkout before submitting MAF convergence jobs." >&2
+    exit 2
+  fi
 done
 
 echo "Checking the selected Python before submission: ${PYTHON}"

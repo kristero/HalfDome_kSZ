@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Checkpointed held-out evaluation for one two-parameter NSF run."""
+"""Checkpointed held-out evaluation for one two-parameter NPE run."""
 
 from __future__ import annotations
 
@@ -53,6 +53,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--run-dir", type=Path, required=True)
     parser.add_argument("--mode", choices=("asinh",), required=True)
     parser.add_argument("--n-train", type=int, required=True)
+    parser.add_argument(
+        "--expected-density-estimator",
+        choices=("maf", "nsf"),
+        default="nsf",
+    )
+    parser.add_argument("--expected-hidden-features", type=int, default=64)
+    parser.add_argument("--expected-num-transforms", type=int, default=6)
     parser.add_argument("--holdout-last-n", type=int, default=1000)
     parser.add_argument("--num-posterior-samples", type=int, default=2000)
     parser.add_argument("--rank-bins", type=int, default=20)
@@ -196,6 +203,9 @@ def validate_run(
     n_train: int,
     holdout_last_n: int,
     seed: int,
+    expected_density_estimator: str,
+    expected_hidden_features: int,
+    expected_num_transforms: int,
 ) -> dict[str, Any]:
     metadata_path = run_dir / "run_metadata.json"
     if not metadata_path.is_file():
@@ -223,10 +233,19 @@ def validate_run(
         "posterior": (run_dir / "posterior.pkl").is_file(),
         "n_train": int(metadata.get("n_train", -1)) == int(n_train),
         "mode": metadata.get("x_rescale_mode") == mode,
-        "estimator": str(metadata.get("density_estimator", "")).lower() == "nsf",
+        "estimator": (
+            str(metadata.get("density_estimator", "")).lower()
+            == str(expected_density_estimator).lower()
+        ),
         "internal_z_score_x": metadata.get("internal_z_score_x") == "none",
-        "hidden_features": int(metadata.get("hidden_features", -1)) == 64,
-        "num_transforms": int(metadata.get("num_transforms", -1)) == 6,
+        "hidden_features": (
+            int(metadata.get("hidden_features", -1))
+            == int(expected_hidden_features)
+        ),
+        "num_transforms": (
+            int(metadata.get("num_transforms", -1))
+            == int(expected_num_transforms)
+        ),
         "seed": int(metadata.get("seed", -1)) == int(seed),
         "target_params": metadata.get("target_param_names") == list(PARAMS),
         "target_indices": np.array_equal(target_indices, data["indices"]),
@@ -399,6 +418,9 @@ def main() -> int:
         n_train=args.n_train,
         holdout_last_n=args.holdout_last_n,
         seed=args.seed,
+        expected_density_estimator=args.expected_density_estimator,
+        expected_hidden_features=args.expected_hidden_features,
+        expected_num_transforms=args.expected_num_transforms,
     )
     observation, observation_source = load_observation(
         dataset_path,

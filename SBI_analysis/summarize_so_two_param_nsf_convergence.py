@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Create A&A-style convergence figures for two-parameter SO NSF runs."""
+"""Create A&A-style convergence figures for two-parameter SO NPE runs."""
 
 from __future__ import annotations
 
@@ -84,6 +84,13 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--dpi", type=int, default=300)
     parser.add_argument("--allow-missing", action="store_true")
+    parser.add_argument(
+        "--expected-density-estimator",
+        choices=("maf", "nsf"),
+        default="nsf",
+    )
+    parser.add_argument("--expected-hidden-features", type=int, default=64)
+    parser.add_argument("--expected-num-transforms", type=int, default=6)
     return parser.parse_args()
 
 
@@ -91,6 +98,9 @@ def load_outputs(
     run_root: Path,
     sizes: list[int],
     allow_missing: bool,
+    expected_density_estimator: str,
+    expected_hidden_features: int,
+    expected_num_transforms: int,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, list[dict[str, Any]]]:
     metric_frames: list[pd.DataFrame] = []
     summary_frames: list[pd.DataFrame] = []
@@ -122,6 +132,21 @@ def load_outputs(
             summary_frames.append(summary)
 
             metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            actual_contract = (
+                str(metadata.get("density_estimator", "")).lower(),
+                int(metadata.get("hidden_features", -1)),
+                int(metadata.get("num_transforms", -1)),
+            )
+            expected_contract = (
+                str(expected_density_estimator).lower(),
+                int(expected_hidden_features),
+                int(expected_num_transforms),
+            )
+            if actual_contract != expected_contract:
+                raise ValueError(
+                    f"Estimator contract mismatch in {metadata_path}: "
+                    f"actual={actual_contract}, expected={expected_contract}"
+                )
             validation_rows.append(
                 {
                     "mode": mode,
@@ -442,7 +467,12 @@ def main() -> int:
 
     paper_style()
     metrics, summary, validation, missing = load_outputs(
-        run_root, sizes, args.allow_missing
+        run_root,
+        sizes,
+        args.allow_missing,
+        args.expected_density_estimator,
+        args.expected_hidden_features,
+        args.expected_num_transforms,
     )
     metrics.to_csv(output / "heldout_metrics_all_runs.csv", index=False)
     summary.to_csv(output / "convergence_metrics.csv", index=False)
@@ -511,9 +541,9 @@ def main() -> int:
             "corner_sizes": corner_sizes,
             "modes": MODES,
             "target_parameters": PARAMS,
-            "density_estimator": "nsf",
-            "hidden_features": 64,
-            "num_transforms": 6,
+            "density_estimator": args.expected_density_estimator,
+            "hidden_features": args.expected_hidden_features,
+            "num_transforms": args.expected_num_transforms,
             "internal_z_score_x": "none",
             "heldout_last_n": 1000,
             "missing_runs": missing,
@@ -522,7 +552,11 @@ def main() -> int:
             ),
         },
     )
-    print(f"Completed two-parameter NSF convergence summary: {output}")
+    print(
+        f"Completed two-parameter "
+        f"{args.expected_density_estimator.upper()} convergence summary: "
+        f"{output}"
+    )
     return 0
 
 

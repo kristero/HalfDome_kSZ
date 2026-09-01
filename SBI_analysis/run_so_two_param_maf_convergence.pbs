@@ -1,0 +1,154 @@
+#!/bin/bash
+#PBS -N SO2p_MAF
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+: "${PROJECT_ROOT:=${WORK_DIR}}"
+: "${PYTHON:=python3}"
+: "${CONVERGENCE_CONFIG:=}"
+if [[ -n "${CONVERGENCE_CONFIG}" ]]; then
+  [[ -f "${CONVERGENCE_CONFIG}" ]] || {
+    echo "Convergence config not found: ${CONVERGENCE_CONFIG}" >&2
+    exit 2
+  }
+  source "${CONVERGENCE_CONFIG}"
+fi
+: "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+: "${CONVERGENCE_ROOT:=/lustre/work/kristero10/adrian_two_param_maf_convergence_baseline_deproj0}"
+: "${BATTAGLIA_OBSERVATION:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/battaglia12_baseline_deproj0_observation/prepared/battaglia12_masked_baseline_noise_cross_deproj0_binned_dell.npy}"
+: "${BATTAGLIA_VALIDATION_REPORT:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/battaglia12_baseline_deproj0_observation/prepared/battaglia12_baseline_deproj0_validation.json}"
+: "${N_TRAIN:?N_TRAIN must be supplied by submit_so_two_param_maf_convergence.sh}"
+: "${HOLDOUT_LAST_N:=1000}"
+: "${HIDDEN_FEATURES:=64}"
+: "${NUM_TRANSFORMS:=6}"
+: "${STOP_AFTER_EPOCHS:=20}"
+: "${TRAINING_BATCH_SIZE:=1024}"
+: "${VALIDATION_FRACTION:=0.1}"
+: "${MAX_NUM_EPOCHS:=200}"
+: "${NUM_POSTERIOR_SAMPLES:=2000}"
+: "${BATTAGLIA_SIZES:=256,32768,523288}"
+: "${NUM_BATTAGLIA_SAMPLES:=20000}"
+: "${SBI_SEED:=42}"
+: "${SBI_DEVICE:=cpu}"
+: "${OVERWRITE:=0}"
+: "${REFRESH_BATTAGLIA:=0}"
+
+[[ "${N_TRAIN}" =~ ^[0-9]+$ ]] || {
+  echo "N_TRAIN must be an integer; got ${N_TRAIN}." >&2
+  exit 2
+}
+
+TRAIN_SCRIPT="${PROJECT_ROOT}/SBI_analysis/train_so_two_param_npe.py"
+EVAL_SCRIPT="${PROJECT_ROOT}/SBI_analysis/evaluate_so_two_param_nsf_convergence_run.py"
+RUNTIME_CHECK="${PROJECT_ROOT}/SBI_analysis/check_sbi_cluster_runtime.py"
+RUN_DIR="${CONVERGENCE_ROOT}/asinh/N${N_TRAIN}"
+EVALUATION_DIR="${RUN_DIR}/evaluation"
+
+for path in \
+  "${TRAIN_SCRIPT}" \
+  "${EVAL_SCRIPT}" \
+  "${RUNTIME_CHECK}" \
+  "${PREPARED_DATASET}" \
+  "${BATTAGLIA_OBSERVATION}" \
+  "${BATTAGLIA_VALIDATION_REPORT}"
+do
+  [[ -f "${path}" ]] || {
+    echo "Required input not found: ${path}" >&2
+    exit 2
+  }
+done
+mkdir -p /home/kristero10/logs/SBI_runs "${RUN_DIR}" "${EVALUATION_DIR}"
+
+ALLOCATED_CPUS="${PBS_NCPUS:-26}"
+export OMP_NUM_THREADS="${ALLOCATED_CPUS}"
+export OPENBLAS_NUM_THREADS="${ALLOCATED_CPUS}"
+export MKL_NUM_THREADS="${ALLOCATED_CPUS}"
+export NUMEXPR_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_THREADS="${ALLOCATED_CPUS}"
+export TORCH_NUM_INTEROP_THREADS=1
+export PYTHONUNBUFFERED=1
+
+echo "Started: $(date -Is)"
+echo "Host: $(hostname)"
+echo "N_train=${N_TRAIN}, estimator=MAF, transform=asinh"
+echo "MAF hidden_features=${HIDDEN_FEATURES}, num_transforms=${NUM_TRANSFORMS}"
+echo "Context is the 40-bin transformed D_ell vector."
+echo "Output: ${RUN_DIR}"
+echo "Python: ${PYTHON}"
+"${PYTHON}" "${RUNTIME_CHECK}"
+
+if [[
+  "${OVERWRITE}" == "1" ||
+  ! -f "${RUN_DIR}/density_estimator.pkl" ||
+  ! -f "${RUN_DIR}/run_metadata.json"
+]]; then
+  set --
+  if [[ "${OVERWRITE}" == "1" || -f "${RUN_DIR}/density_estimator.pkl" ]]; then
+    set -- --overwrite
+  fi
+  "${PYTHON}" "${TRAIN_SCRIPT}" \
+    --prepared-dataset "${PREPARED_DATASET}" \
+    --output-dir "${RUN_DIR}" \
+    --target-params P0,beta \
+    --holdout-last-n "${HOLDOUT_LAST_N}" \
+    --n-train "${N_TRAIN}" \
+    --dataset-order shuffle \
+    --x-rescale-mode asinh \
+    --density-estimator maf \
+    --internal-z-score-x none \
+    --hidden-features "${HIDDEN_FEATURES}" \
+    --num-transforms "${NUM_TRANSFORMS}" \
+    --stop-after-epochs "${STOP_AFTER_EPOCHS}" \
+    --training-batch-size "${TRAINING_BATCH_SIZE}" \
+    --validation-fraction "${VALIDATION_FRACTION}" \
+    --max-num-epochs "${MAX_NUM_EPOCHS}" \
+    --num-battaglia-samples 0 \
+    --seed "${SBI_SEED}" \
+    --device "${SBI_DEVICE}" \
+    "$@"
+else
+  echo "Reusing density estimator: ${RUN_DIR}/density_estimator.pkl"
+fi
+
+BATTAGLIA_COUNT=0
+case ",${BATTAGLIA_SIZES}," in
+  *",${N_TRAIN},"*) BATTAGLIA_COUNT="${NUM_BATTAGLIA_SAMPLES}" ;;
+esac
+
+set --
+if [[ "${OVERWRITE}" == "1" ]]; then
+  set -- --restart
+elif [[ "${REFRESH_BATTAGLIA}" == "1" ]]; then
+  set -- --restart-battaglia
+fi
+
+"${PYTHON}" "${EVAL_SCRIPT}" \
+  --prepared-dataset "${PREPARED_DATASET}" \
+  --run-dir "${RUN_DIR}" \
+  --mode asinh \
+  --n-train "${N_TRAIN}" \
+  --expected-density-estimator maf \
+  --expected-hidden-features "${HIDDEN_FEATURES}" \
+  --expected-num-transforms "${NUM_TRANSFORMS}" \
+  --holdout-last-n "${HOLDOUT_LAST_N}" \
+  --num-posterior-samples "${NUM_POSTERIOR_SAMPLES}" \
+  --rank-bins 20 \
+  --battaglia-samples "${BATTAGLIA_COUNT}" \
+  --battaglia-batch-size 2000 \
+  --battaglia-observation "${BATTAGLIA_OBSERVATION}" \
+  --battaglia-validation-report "${BATTAGLIA_VALIDATION_REPORT}" \
+  --checkpoint-every 5 \
+  --seed "${SBI_SEED}" \
+  --device "${SBI_DEVICE}" \
+  "$@"
+
+echo "Finished: $(date -Is)"
+echo "Completion marker: ${EVALUATION_DIR}/evaluation_complete.json"

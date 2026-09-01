@@ -1,0 +1,64 @@
+#!/bin/bash
+#PBS -N SO2p_MAF_sum
+#PBS -q mini
+#PBS -l select=1:ncpus=4:mpiprocs=1:mem=32gb
+#PBS -l walltime=12:00:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+: "${PROJECT_ROOT:=${WORK_DIR}}"
+: "${PYTHON:=python3}"
+: "${CONVERGENCE_CONFIG:=}"
+if [[ -n "${CONVERGENCE_CONFIG}" ]]; then
+  [[ -f "${CONVERGENCE_CONFIG}" ]] || {
+    echo "Convergence config not found: ${CONVERGENCE_CONFIG}" >&2
+    exit 2
+  }
+  source "${CONVERGENCE_CONFIG}"
+fi
+: "${CONVERGENCE_ROOT:=/lustre/work/kristero10/adrian_two_param_maf_convergence_baseline_deproj0}"
+: "${DATASET_SIZES:=256,512,1024,2048,4096,8192,16384,32768,65536,98304,131072,196608,262144,327680,393216,458752,523288}"
+: "${CORNER_SIZES:=256,32768,523288}"
+: "${HIDDEN_FEATURES:=64}"
+: "${NUM_TRANSFORMS:=6}"
+: "${DPI:=300}"
+: "${ALLOW_MISSING:=0}"
+
+SCRIPT="${PROJECT_ROOT}/SBI_analysis/summarize_so_two_param_nsf_convergence.py"
+RUNTIME_CHECK="${PROJECT_ROOT}/SBI_analysis/check_sbi_cluster_runtime.py"
+for path in "${SCRIPT}" "${RUNTIME_CHECK}"; do
+  [[ -f "${path}" ]] || {
+    echo "Required script not found: ${path}" >&2
+    exit 2
+  }
+done
+mkdir -p /home/kristero10/logs/SBI_runs "${CONVERGENCE_ROOT}/summary"
+
+export OMP_NUM_THREADS="${PBS_NCPUS:-4}"
+export OPENBLAS_NUM_THREADS="${PBS_NCPUS:-4}"
+export MKL_NUM_THREADS="${PBS_NCPUS:-4}"
+export PYTHONUNBUFFERED=1
+
+set --
+if [[ "${ALLOW_MISSING}" == "1" ]]; then
+  set -- --allow-missing
+fi
+
+echo "Started MAF summary: $(date -Is)"
+"${PYTHON}" "${RUNTIME_CHECK}"
+"${PYTHON}" "${SCRIPT}" \
+  --run-root "${CONVERGENCE_ROOT}" \
+  --dataset-sizes "${DATASET_SIZES}" \
+  --corner-sizes "${CORNER_SIZES}" \
+  --expected-density-estimator maf \
+  --expected-hidden-features "${HIDDEN_FEATURES}" \
+  --expected-num-transforms "${NUM_TRANSFORMS}" \
+  --dpi "${DPI}" \
+  "$@"
+echo "Finished summary: $(date -Is)"
+echo "Figures: ${CONVERGENCE_ROOT}/summary"

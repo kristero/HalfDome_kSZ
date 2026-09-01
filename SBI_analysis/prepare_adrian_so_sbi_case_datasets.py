@@ -27,6 +27,7 @@ PARAM_NAMES = np.asarray(
 )
 
 SOBOL_PRIOR_BOUNDS = {
+    # Authoritative bounds for the SO Sobol dataset.
     "P0": [1.832524, 34.341221],
     "xc": [0.150011, 0.844503],
     "beta": [3.480627, 5.216611],

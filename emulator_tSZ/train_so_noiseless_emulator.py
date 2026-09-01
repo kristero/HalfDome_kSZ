@@ -22,6 +22,8 @@ from torch import nn
 
 from so_noiseless_emulator import (
     PARAM_NAMES,
+    SO_PARAMETER_PRIOR_HIGH,
+    SO_PARAMETER_PRIOR_LOW,
     SOProfileEmulator,
     load_emulator,
     predict_profiles,
@@ -143,6 +145,88 @@ def sha256_file(path: Path, chunk_bytes: int = 16 * 1024 * 1024) -> str:
     return digest.hexdigest()
 
 
+def resolve_effective_prior_bounds(
+    theta: np.ndarray,
+    saved_low: np.ndarray,
+    saved_high: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, dict[str, Any]]:
+    """Use authoritative inference bounds and audit wider training support."""
+
+    theta = np.asarray(theta, dtype=np.float64)
+    saved_low = np.asarray(saved_low, dtype=np.float64)
+    saved_high = np.asarray(saved_high, dtype=np.float64)
+    sampled_low = np.min(theta, axis=0)
+    sampled_high = np.max(theta, axis=0)
+    authoritative_low = np.asarray(SO_PARAMETER_PRIOR_LOW, dtype=np.float64)
+    authoritative_high = np.asarray(SO_PARAMETER_PRIOR_HIGH, dtype=np.float64)
+    scale = np.maximum(np.abs(authoritative_low), np.abs(authoritative_high))
+    tolerance = np.maximum(
+        5.0e-7,
+        2.0 * np.finfo(np.float32).eps * scale,
+    )
+    outside = (
+        (theta < authoritative_low - tolerance)
+        | (theta > authoritative_high + tolerance)
+    )
+    counts = np.count_nonzero(outside, axis=0)
+    outside_rows = np.any(outside, axis=1)
+    n_outside_rows = int(np.count_nonzero(outside_rows))
+    first_outside: dict[str, Any] | None = None
+    if np.any(outside):
+        row, column = np.argwhere(outside)[0]
+        value = theta[row, column]
+        distance = max(
+            authoritative_low[column] - value,
+            value - authoritative_high[column],
+        )
+        first_outside = {
+            "row": int(row),
+            "parameter": PARAM_NAMES[column],
+            "value": float(value),
+            "prior_low": float(authoritative_low[column]),
+            "prior_high": float(authoritative_high[column]),
+            "distance_outside": float(distance),
+        }
+
+    saved_matches = np.array_equal(
+        saved_low.astype(np.float32), SO_PARAMETER_PRIOR_LOW
+    ) and np.array_equal(saved_high.astype(np.float32), SO_PARAMETER_PRIOR_HIGH)
+    resolution: dict[str, Any] = {
+        "applied": not saved_matches,
+        "policy": "authoritative_inference_bounds_retain_wider_training_support",
+        "reason": (
+            "saved bounds match the authoritative bounds"
+            if saved_matches
+            else "saved bounds replaced by the authoritative user-supplied bounds"
+        ),
+        "saved_prior_low": saved_low,
+        "saved_prior_high": saved_high,
+        "effective_prior_low": authoritative_low,
+        "effective_prior_high": authoritative_high,
+        "numerical_tolerance": tolerance,
+        "sampled_theta_min": sampled_low,
+        "sampled_theta_max": sampled_high,
+        "authoritative_bound_violation_counts": {
+            name: int(counts[index])
+            for index, name in enumerate(PARAM_NAMES)
+        },
+        "training_rows_outside_authoritative_prior": n_outside_rows,
+        "training_fraction_outside_authoritative_prior": float(
+            n_outside_rows / theta.shape[0]
+        ),
+        "first_training_support_violation": first_outside,
+        "training_support_action": (
+            "retained without clipping; authoritative bounds remain the "
+            "default inference domain"
+        ),
+    }
+    return (
+        np.ascontiguousarray(authoritative_low, dtype=np.float32),
+        np.ascontiguousarray(authoritative_high, dtype=np.float32),
+        resolution,
+    )
+
+
 def load_dataset(path: Path, args: argparse.Namespace) -> dict[str, Any]:
     path = path.expanduser().resolve()
     if not path.is_file():
@@ -242,6 +326,13 @@ def load_dataset(path: Path, args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError("Prior bounds contain non-finite values")
     if np.any(prior_high <= prior_low):
         raise ValueError("Every prior_high value must exceed prior_low")
+    saved_prior_low = np.ascontiguousarray(prior_low, dtype=np.float32)
+    saved_prior_high = np.ascontiguousarray(prior_high, dtype=np.float32)
+    prior_low, prior_high, prior_bounds_resolution = resolve_effective_prior_bounds(
+        theta,
+        saved_prior_low,
+        saved_prior_high,
+    )
 
     label_values = [str(path.name), source_cl_path, *labels.values()]
     verified_noiseless = any(
@@ -266,14 +357,6 @@ def load_dataset(path: Path, args: argparse.Namespace) -> dict[str, Any]:
         if np.unique(sobol_global_row).size != full_rows:
             raise ValueError("sobol_global_row contains duplicate mappings")
 
-    tolerance = 1.0e-5 * np.maximum(1.0, np.abs(prior_high - prior_low))
-    outside = (theta < prior_low - tolerance) | (theta > prior_high + tolerance)
-    if np.any(outside):
-        row, column = np.argwhere(outside)[0]
-        raise ValueError(
-            f"theta row {row} is outside the saved prior for {PARAM_NAMES[column]}"
-        )
-
     used_rows = full_rows
     if args.max_rows > 0:
         if args.max_rows < 100:
@@ -297,8 +380,11 @@ def load_dataset(path: Path, args: argparse.Namespace) -> dict[str, Any]:
         "ell": ell,
         "bin_ell_min": bin_ell_min,
         "bin_ell_max": bin_ell_max,
-        "prior_low": prior_low,
-        "prior_high": prior_high,
+        "saved_prior_low": saved_prior_low,
+        "saved_prior_high": saved_prior_high,
+        "effective_prior_low": prior_low,
+        "effective_prior_high": prior_high,
+        "prior_bounds_resolution": prior_bounds_resolution,
         "labels": labels,
         "source_cl_path": source_cl_path,
         "theta_source": theta_source,
@@ -1088,6 +1174,26 @@ def main() -> int:
     print(f"Torch threads: {torch.get_num_threads()}")
     dataset = load_dataset(dataset_path, args)
     contract = dict(dataset["contract"])
+    prior_resolution = contract["prior_bounds_resolution"]
+    if prior_resolution["applied"]:
+        print(
+            "Replaced dataset prior metadata with the authoritative SO Sobol "
+            "inference bounds.",
+            flush=True,
+        )
+    n_support_outside = int(
+        prior_resolution["training_rows_outside_authoritative_prior"]
+    )
+    if n_support_outside:
+        first = prior_resolution["first_training_support_violation"]
+        print(
+            f"Training-support notice: retained {n_support_outside:,} theta rows "
+            "outside the authoritative inference prior as a boundary buffer "
+            f"(first: row={first['row']}, parameter={first['parameter']}, "
+            f"value={first['value']:.9g}). No theta values were clipped and "
+            "the artifact prediction bounds were not widened.",
+            flush=True,
+        )
     if not args.skip_dataset_hash:
         print("Computing dataset SHA256...", flush=True)
         contract["dataset_sha256"] = sha256_file(dataset_path)
@@ -1219,7 +1325,13 @@ def main() -> int:
     )
     truth = np.ascontiguousarray(target[test_idx], dtype=np.float32)
     theta_test = np.ascontiguousarray(theta[test_idx], dtype=np.float32)
-    overall, per_bin, profile_metrics, absolute_percentage, signed_percentage = (
+    (
+        support_overall,
+        support_per_bin,
+        support_profile_metrics,
+        support_absolute_percentage,
+        support_signed_percentage,
+    ) = (
         compute_test_metrics(
             truth,
             prediction,
@@ -1228,13 +1340,52 @@ def main() -> int:
             dataset["bin_ell_max"],
         )
     )
-    quartile_rows = parameter_quartile_metrics(
-        theta_test,
+
+    prior_low = dataset["prior_low"].astype(np.float64)
+    prior_high = dataset["prior_high"].astype(np.float64)
+    prior_scale = np.maximum(np.abs(prior_low), np.abs(prior_high))
+    prior_tolerance = np.maximum(
+        5.0e-7,
+        2.0 * np.finfo(np.float32).eps * prior_scale,
+    )
+    test_in_prior = np.all(
+        (theta_test >= prior_low - prior_tolerance)
+        & (theta_test <= prior_high + prior_tolerance),
+        axis=1,
+    )
+    if not np.any(test_in_prior):
+        raise RuntimeError("The test partition contains no rows inside the authoritative prior")
+    test_outside_prior = ~test_in_prior
+    (
+        overall,
+        per_bin,
+        profile_metrics,
         absolute_percentage,
-        np.log10(truth.astype(np.float64)),
-        prediction_log10.astype(np.float64),
-        dataset["prior_low"].astype(np.float64),
-        dataset["prior_high"].astype(np.float64),
+        signed_percentage,
+    ) = compute_test_metrics(
+        truth[test_in_prior],
+        prediction[test_in_prior],
+        dataset["ell"],
+        dataset["bin_ell_min"],
+        dataset["bin_ell_max"],
+    )
+    buffer_overall: dict[str, Any] | None = None
+    buffer_per_bin: list[dict[str, Any]] | None = None
+    if np.any(test_outside_prior):
+        buffer_overall, buffer_per_bin, _, _, _ = compute_test_metrics(
+            truth[test_outside_prior],
+            prediction[test_outside_prior],
+            dataset["ell"],
+            dataset["bin_ell_min"],
+            dataset["bin_ell_max"],
+        )
+    quartile_rows = parameter_quartile_metrics(
+        theta_test[test_in_prior],
+        absolute_percentage,
+        np.log10(truth[test_in_prior].astype(np.float64)),
+        prediction_log10[test_in_prior].astype(np.float64),
+        prior_low,
+        prior_high,
     )
     quality_gate = evaluate_quality_gate(overall, quartile_rows, args)
 
@@ -1247,6 +1398,10 @@ def main() -> int:
         "final_refit_epochs": len(final_history),
         "outer_train_rows": int(train_idx.size),
         "test_rows": int(test_idx.size),
+        "test_rows_inside_authoritative_prior": int(np.count_nonzero(test_in_prior)),
+        "test_rows_outside_authoritative_prior": int(
+            np.count_nonzero(test_outside_prior)
+        ),
         "selection_fit_rows": int(selection_fit_idx.size),
         "selection_validation_rows": int(selection_val_idx.size),
     }
@@ -1277,6 +1432,9 @@ def main() -> int:
         "split_summary": split_summary,
         "training_summary": training_summary,
         "test_metrics": overall,
+        "test_metrics_domain": "inside_authoritative_prior",
+        "test_metrics_all_training_support": support_overall,
+        "test_metrics_outside_prior_buffer": buffer_overall,
         "quality_gate": quality_gate,
         "noise_contract": (
             "The emulator predicts the saved no-noise SO D_ell target only. "
@@ -1287,9 +1445,11 @@ def main() -> int:
 
     print("Reloading the saved artifact for an inference round-trip check...", flush=True)
     reloaded_model, reloaded_artifact = load_emulator(artifact_path, device="cpu")
-    roundtrip_count = min(16, theta_test.shape[0])
+    theta_roundtrip = theta_test[test_in_prior]
+    prediction_roundtrip_reference = prediction[test_in_prior]
+    roundtrip_count = min(16, theta_roundtrip.shape[0])
     roundtrip_prediction = predict_profiles(
-        theta_test[:roundtrip_count],
+        theta_roundtrip[:roundtrip_count],
         reloaded_model,
         reloaded_artifact,
         device="cpu",
@@ -1297,19 +1457,42 @@ def main() -> int:
     )
     np.testing.assert_allclose(
         roundtrip_prediction,
-        prediction[:roundtrip_count],
+        prediction_roundtrip_reference[:roundtrip_count],
         rtol=2.0e-5,
         atol=0.0,
     )
 
     write_json(output_dir / "test_metrics_overall.json", overall)
     write_csv_rows(output_dir / "test_metrics_by_bin.csv", per_bin)
+    write_json(
+        output_dir / "test_metrics_all_training_support.json", support_overall
+    )
+    write_csv_rows(
+        output_dir / "test_metrics_by_bin_all_training_support.csv",
+        support_per_bin,
+    )
+    if buffer_overall is not None and buffer_per_bin is not None:
+        write_json(
+            output_dir / "test_metrics_outside_prior_buffer.json", buffer_overall
+        )
+        write_csv_rows(
+            output_dir / "test_metrics_by_bin_outside_prior_buffer.csv",
+            buffer_per_bin,
+        )
     write_csv_rows(
         output_dir / "test_metrics_by_parameter_quartile.csv", quartile_rows
     )
     write_csv_rows(
         output_dir / "test_profile_metrics.csv",
-        profile_metric_rows(test_idx, profile_metrics, dataset["sobol_global_row"]),
+        profile_metric_rows(
+            test_idx[test_in_prior], profile_metrics, dataset["sobol_global_row"]
+        ),
+    )
+    write_csv_rows(
+        output_dir / "test_profile_metrics_all_training_support.csv",
+        profile_metric_rows(
+            test_idx, support_profile_metrics, dataset["sobol_global_row"]
+        ),
     )
     write_csv_rows(
         output_dir / "training_history.csv",
@@ -1334,8 +1517,9 @@ def main() -> int:
             theta=theta_test,
             truth_dl=truth,
             predicted_dl=prediction,
-            signed_percentage_difference=signed_percentage.astype(np.float32),
-            absolute_percentage_difference=absolute_percentage.astype(np.float32),
+            in_authoritative_prior=test_in_prior,
+            signed_percentage_difference=support_signed_percentage.astype(np.float32),
+            absolute_percentage_difference=support_absolute_percentage.astype(np.float32),
             ell=dataset["ell"],
             bin_ell_min=dataset["bin_ell_min"],
             bin_ell_max=dataset["bin_ell_max"],
@@ -1346,8 +1530,8 @@ def main() -> int:
         save_diagnostic_plots(
             output_dir,
             dataset["ell"],
-            truth,
-            prediction,
+            truth[test_in_prior],
+            prediction[test_in_prior],
             absolute_percentage,
             signed_percentage,
             per_bin,
@@ -1363,6 +1547,9 @@ def main() -> int:
         "split": split_summary,
         "training": training_summary,
         "test_metrics": overall,
+        "test_metrics_domain": "inside_authoritative_prior",
+        "test_metrics_all_training_support": support_overall,
+        "test_metrics_outside_prior_buffer": buffer_overall,
         "quality_gate": quality_gate,
         "inference_roundtrip_passed": True,
     }

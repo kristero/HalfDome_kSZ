@@ -25,6 +25,16 @@ PARAM_NAMES = (
     "alpha_z_beta",
 )
 
+# Authoritative bounds for the SO Sobol dataset.
+SO_PARAMETER_PRIOR_LOW = np.asarray(
+    [1.832524, 0.150011, 3.480627, 0.000312, -0.099718, -0.019935, -1.363457, 0.147393, 0.083808],
+    dtype=np.float32,
+)
+SO_PARAMETER_PRIOR_HIGH = np.asarray(
+    [34.341221, 0.844503, 5.216611, 0.292251, 0.099795, 0.099767, -0.228839, 1.314474, 0.745884],
+    dtype=np.float32,
+)
+
 
 class ResidualBlock(nn.Module):
     """A small fully connected residual block for smooth profile emulation."""

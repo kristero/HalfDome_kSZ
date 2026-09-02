@@ -1,0 +1,66 @@
+#!/bin/bash
+#PBS -N SO_B12_chunk
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+: "${PROJECT_ROOT:=${PBS_O_WORKDIR:-$PWD}}"
+: "${SINGLE_PROFILE_PBS:=${PROJECT_ROOT}/SBI_analysis/run_battaglia12_baseline_deproj0_observation.pbs}"
+: "${OUTPUT_BASE:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/battaglia12_baseline_deproj0_ensemble}"
+: "${MASK_SEED:=12345}"
+: "${NOISE_SEED_START:=20001}"
+: "${PROFILE_START:?PROFILE_START must be supplied by the ensemble launcher}"
+: "${PROFILE_COUNT:?PROFILE_COUNT must be supplied by the ensemble launcher}"
+: "${CHUNK_INDEX:?CHUNK_INDEX must be supplied by the ensemble launcher}"
+
+if (( PROFILE_START < 0 || PROFILE_COUNT < 1 || CHUNK_INDEX < 0 )); then
+  echo "Invalid chunk values: start=${PROFILE_START}, count=${PROFILE_COUNT}, index=${CHUNK_INDEX}" >&2
+  exit 2
+fi
+if [[ ! -f "${SINGLE_PROFILE_PBS}" ]]; then
+  echo "Single-profile worker does not exist: ${SINGLE_PROFILE_PBS}" >&2
+  exit 2
+fi
+
+cd "${PROJECT_ROOT}"
+mkdir -p "${OUTPUT_BASE}/chunk_records"
+record_file="${OUTPUT_BASE}/chunk_records/chunk$(printf '%02d' "$((CHUNK_INDEX + 1))")_${PBS_JOBID:-local}.tsv"
+printf "profile_offset\tnoise_seed\tstatus\toutput_root\n" > "${record_file}"
+
+echo "Started chunk $((CHUNK_INDEX + 1)) at $(date -Is)"
+echo "Profile offsets: ${PROFILE_START} through $((PROFILE_START + PROFILE_COUNT - 1))"
+echo "Fixed mask seed: ${MASK_SEED}"
+
+failures=0
+for ((local_index=0; local_index<PROFILE_COUNT; local_index++)); do
+  profile_offset=$((PROFILE_START + local_index))
+  noise_seed=$((NOISE_SEED_START + profile_offset))
+  output_root="${OUTPUT_BASE}/noise_seed${noise_seed}"
+
+  echo "[$((local_index + 1))/${PROFILE_COUNT}] noise seed ${noise_seed}"
+  if env \
+      PROJECT_ROOT="${PROJECT_ROOT}" \
+      MASK_SEED="${MASK_SEED}" \
+      NOISE_SEED="${noise_seed}" \
+      OUTPUT_ROOT="${output_root}" \
+      bash "${SINGLE_PROFILE_PBS}"; then
+    status="complete"
+  else
+    status="failed"
+    failures=$((failures + 1))
+  fi
+  printf "%s\t%s\t%s\t%s\n" \
+    "${profile_offset}" "${noise_seed}" "${status}" "${output_root}" \
+    >> "${record_file}"
+done
+
+echo "Finished chunk $((CHUNK_INDEX + 1)) at $(date -Is); failures=${failures}"
+echo "Chunk record: ${record_file}"
+if (( failures > 0 )); then
+  exit 1
+fi

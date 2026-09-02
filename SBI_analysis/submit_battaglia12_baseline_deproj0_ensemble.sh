@@ -2,67 +2,65 @@
 set -euo pipefail
 
 : "${PROJECT_ROOT:=${PWD}}"
-: "${PBS_SCRIPT:=${PROJECT_ROOT}/SBI_analysis/run_battaglia12_baseline_deproj0_observation.pbs}"
+: "${SINGLE_PROFILE_PBS:=${PROJECT_ROOT}/SBI_analysis/run_battaglia12_baseline_deproj0_observation.pbs}"
+: "${CHUNK_PBS_SCRIPT:=${PROJECT_ROOT}/SBI_analysis/run_battaglia12_baseline_deproj0_ensemble_chunk.pbs}"
 : "${OUTPUT_BASE:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/battaglia12_baseline_deproj0_ensemble}"
 : "${N_PROFILES:=64}"
+: "${N_JOBS:=6}"
 : "${MASK_SEED:=12345}"
 : "${NOISE_SEED_START:=20001}"
-: "${MAX_ACTIVE_JOBS:=5}"
-: "${POLL_SECONDS:=60}"
 
-if [[ ! -f "${PBS_SCRIPT}" ]]; then
-  echo "PBS script does not exist: ${PBS_SCRIPT}" >&2
+if [[ ! -f "${SINGLE_PROFILE_PBS}" || ! -f "${CHUNK_PBS_SCRIPT}" ]]; then
+  echo "Required PBS script is missing." >&2
+  echo "Single-profile worker: ${SINGLE_PROFILE_PBS}" >&2
+  echo "Chunk worker: ${CHUNK_PBS_SCRIPT}" >&2
   exit 2
 fi
-if (( N_PROFILES < 1 || MAX_ACTIVE_JOBS < 1 )); then
-  echo "N_PROFILES and MAX_ACTIVE_JOBS must be positive." >&2
+if (( N_PROFILES < 1 || N_JOBS < 1 || N_JOBS > N_PROFILES )); then
+  echo "Require N_PROFILES >= N_JOBS >= 1." >&2
   exit 2
 fi
 
 mkdir -p "${OUTPUT_BASE}"
 run_id="$(date +%Y%m%dT%H%M%S)"
-active_file="${OUTPUT_BASE}/active_jobs_${run_id}.txt"
-record_file="${OUTPUT_BASE}/submitted_jobs_${run_id}.tsv"
-: > "${active_file}"
-printf "noise_seed\tjob_id\toutput_root\n" > "${record_file}"
+record_file="${OUTPUT_BASE}/submitted_chunks_${run_id}.tsv"
+printf "chunk_index\tprofile_start\tprofile_count\tfirst_noise_seed\tlast_noise_seed\tjob_id\n" > "${record_file}"
 
-refresh_active_jobs() {
-  local refreshed="${active_file}.new"
-  : > "${refreshed}"
-  while IFS= read -r job_id; do
-    [[ -n "${job_id}" ]] || continue
-    if qstat "${job_id}" >/dev/null 2>&1; then
-      printf "%s\n" "${job_id}" >> "${refreshed}"
-    fi
-  done < "${active_file}"
-  mv "${refreshed}" "${active_file}"
-}
-
-active_count() {
-  refresh_active_jobs
-  wc -l < "${active_file}"
-}
-
-echo "Submitting ${N_PROFILES} separate Battaglia12 jobs."
+echo "Submitting ${N_JOBS} Battaglia12 ensemble jobs for ${N_PROFILES} profiles."
 echo "Mask seed remains fixed at ${MASK_SEED}; only the noise seed changes."
-echo "At most ${MAX_ACTIVE_JOBS} submitted jobs are kept active at once."
+echo "Each job processes its assigned profiles sequentially."
 echo "Submission record: ${record_file}"
 
-for ((offset=0; offset<N_PROFILES; offset++)); do
-  noise_seed=$((NOISE_SEED_START + offset))
-  while (( $(active_count) >= MAX_ACTIVE_JOBS )); do
-    echo "Five-job limit reached; checking again in ${POLL_SECONDS} s."
-    sleep "${POLL_SECONDS}"
-  done
+base_count=$((N_PROFILES / N_JOBS))
+remainder=$((N_PROFILES % N_JOBS))
+profile_start=0
 
-  output_root="${OUTPUT_BASE}/noise_seed${noise_seed}"
+for ((chunk_index=0; chunk_index<N_JOBS; chunk_index++)); do
+  profile_count=${base_count}
+  if (( chunk_index < remainder )); then
+    profile_count=$((profile_count + 1))
+  fi
+  first_noise_seed=$((NOISE_SEED_START + profile_start))
+  last_noise_seed=$((first_noise_seed + profile_count - 1))
+
   job_id="$(
-    qsub       -N "B12n${noise_seed}"       -v "PROJECT_ROOT=${PROJECT_ROOT},MASK_SEED=${MASK_SEED},NOISE_SEED=${noise_seed},OUTPUT_ROOT=${output_root}"       "${PBS_SCRIPT}"
+    qsub \
+      -N "B12ens$((chunk_index + 1))" \
+      -v "PROJECT_ROOT=${PROJECT_ROOT},SINGLE_PROFILE_PBS=${SINGLE_PROFILE_PBS},OUTPUT_BASE=${OUTPUT_BASE},MASK_SEED=${MASK_SEED},NOISE_SEED_START=${NOISE_SEED_START},PROFILE_START=${profile_start},PROFILE_COUNT=${profile_count},CHUNK_INDEX=${chunk_index}" \
+      "${CHUNK_PBS_SCRIPT}"
   )"
-  printf "%s\n" "${job_id}" >> "${active_file}"
-  printf "%s\t%s\t%s\n" "${noise_seed}" "${job_id}" "${output_root}" >> "${record_file}"
-  echo "Submitted noise seed ${noise_seed}: ${job_id}"
+  printf "%s\t%s\t%s\t%s\t%s\t%s\n" \
+    "${chunk_index}" "${profile_start}" "${profile_count}" \
+    "${first_noise_seed}" "${last_noise_seed}" "${job_id}" \
+    >> "${record_file}"
+  echo "Submitted chunk $((chunk_index + 1))/${N_JOBS}: ${profile_count} profiles, seeds ${first_noise_seed}-${last_noise_seed}, job ${job_id}"
+  profile_start=$((profile_start + profile_count))
 done
 
-echo "All ${N_PROFILES} jobs have been submitted as separate PBS jobs."
-echo "The last jobs may still be queued or running; inspect IDs in ${record_file}."
+if (( profile_start != N_PROFILES )); then
+  echo "Internal error: assigned ${profile_start}/${N_PROFILES} profiles." >&2
+  exit 3
+fi
+
+echo "Submitted exactly ${N_JOBS} PBS jobs covering all ${N_PROFILES} profiles."
+echo "Inspect job IDs and seed ranges in ${record_file}."

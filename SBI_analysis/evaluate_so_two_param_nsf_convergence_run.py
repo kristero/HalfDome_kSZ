@@ -100,6 +100,15 @@ def atomic_save(path: Path, values: np.ndarray) -> None:
     temporary.replace(path)
 
 
+def paths_refer_to_same_file(left: Path, right: Path) -> bool:
+    left = left.expanduser()
+    right = right.expanduser()
+    try:
+        return left.samefile(right)
+    except (FileNotFoundError, OSError):
+        return left.resolve() == right.resolve()
+
+
 def load_observation(
     prepared_dataset: Path,
     observation_path: Path,
@@ -117,18 +126,19 @@ def load_observation(
         raise ValueError(f"Battaglia12 validation did not pass: {report_path}")
     if report.get("required_product") != "masked_baseline_noise_cross_deproj0":
         raise ValueError(f"Wrong Battaglia12 product in {report_path}")
-    report_dataset = Path(report["prepared_dataset"]).expanduser().resolve()
-    if report_dataset != prepared_dataset.expanduser().resolve():
+    report_dataset = Path(report["prepared_dataset"]).expanduser()
+    if not paths_refer_to_same_file(report_dataset, prepared_dataset):
         raise ValueError(
             "Battaglia12 observation was validated against another dataset: "
-            f"{report_dataset} != {prepared_dataset}"
+            f"{report_dataset.resolve()} != {prepared_dataset.expanduser().resolve()}"
         )
     report_observation = Path(
         report["outputs"]["binned_dell"]
-    ).expanduser().resolve()
-    if report_observation != observation_path:
+    ).expanduser()
+    if not paths_refer_to_same_file(report_observation, observation_path):
         raise ValueError(
-            f"Observation/report mismatch: {observation_path} != {report_observation}"
+            "Observation/report mismatch: "
+            f"{observation_path} != {report_observation.resolve()}"
         )
     observation = np.asarray(np.load(observation_path), dtype=np.float32).reshape(-1)
     if observation.size != expected_x_dim:
@@ -422,12 +432,15 @@ def main() -> int:
         expected_hidden_features=args.expected_hidden_features,
         expected_num_transforms=args.expected_num_transforms,
     )
-    observation, observation_source = load_observation(
-        dataset_path,
-        args.battaglia_observation,
-        args.battaglia_validation_report,
-        data["x"].shape[1],
-    )
+    observation = None
+    observation_source = ""
+    if args.battaglia_samples > 0:
+        observation, observation_source = load_observation(
+            dataset_path,
+            args.battaglia_observation,
+            args.battaglia_validation_report,
+            data["x"].shape[1],
+        )
     preflight = {
         "prepared_dataset": dataset_path,
         "run_dir": run_dir,
@@ -478,11 +491,14 @@ def main() -> int:
     write_csv(evaluation_dir / "heldout_summary.csv", summary_rows)
     write_json(evaluation_dir / "heldout_summary.json", summary_rows)
 
-    transformed_observation = apply_x_transform(
-        observation, validation["transform"]
-    )
     battaglia_contract = None
+    battaglia = None
     if args.battaglia_samples > 0:
+        if observation is None:
+            raise RuntimeError("Battaglia12 observation was not loaded.")
+        transformed_observation = apply_x_transform(
+            observation, validation["transform"]
+        )
         battaglia_contract = prepare_battaglia_contract(
             run_dir=run_dir,
             observation=observation,
@@ -491,15 +507,15 @@ def main() -> int:
             validation_report=args.battaglia_validation_report,
             restart=args.restart_battaglia,
         )
-    battaglia = checkpointed_battaglia_samples(
-        posterior=posterior,
-        transformed_observation=transformed_observation,
-        run_dir=run_dir,
-        count=args.battaglia_samples,
-        batch_size=args.battaglia_batch_size,
-        seed=args.seed,
-        device=args.device,
-    )
+        battaglia = checkpointed_battaglia_samples(
+            posterior=posterior,
+            transformed_observation=transformed_observation,
+            run_dir=run_dir,
+            count=args.battaglia_samples,
+            batch_size=args.battaglia_batch_size,
+            seed=args.seed,
+            device=args.device,
+        )
     completion = {
         **preflight,
         "num_test_profiles": int(len(heldout)),

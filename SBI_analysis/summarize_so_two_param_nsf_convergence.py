@@ -507,6 +507,7 @@ def main() -> int:
         validation, output / "validation_performance_vs_dataset_size.jpg", args.dpi
     )
 
+    skipped_optional_outputs = []
     for mode in MODES:
         selected_true_mean_plot(
             metrics,
@@ -515,14 +516,25 @@ def main() -> int:
             output / f"true_vs_mean_min_mid_max_{mode}.jpg",
             args.dpi,
         )
-        plot_getdist(
-            load_battaglia_samples(run_root, mode, corner_sizes),
-            list(PARAMS),
-            BATTAGLIA12,
-            output / f"battaglia12_P0_beta_corner_min_mid_max_{mode}.jpg",
-            filled_last_only=True,
-            dpi=args.dpi,
-        )
+        try:
+            battaglia_sample_sets = load_battaglia_samples(
+                run_root, mode, corner_sizes
+            )
+        except (FileNotFoundError, ValueError) as exc:
+            if not args.allow_missing:
+                raise
+            message = f"Skipped optional Battaglia12 corner for {mode}: {exc}"
+            skipped_optional_outputs.append(message)
+            print(f"WARNING: {message}")
+        else:
+            plot_getdist(
+                battaglia_sample_sets,
+                list(PARAMS),
+                BATTAGLIA12,
+                output / f"battaglia12_P0_beta_corner_min_mid_max_{mode}.jpg",
+                filled_last_only=True,
+                dpi=args.dpi,
+            )
 
     plot_sbc_cdf(
         metrics,
@@ -531,8 +543,16 @@ def main() -> int:
         args.dpi,
     )
 
-    constraints = constraint_rows(run_root, corner_sizes)
-    write_csv(output / "battaglia12_constraints_min_mid_max.csv", constraints)
+    try:
+        constraints = constraint_rows(run_root, corner_sizes)
+    except (FileNotFoundError, ValueError) as exc:
+        if not args.allow_missing:
+            raise
+        message = f"Skipped optional Battaglia12 constraint table: {exc}"
+        skipped_optional_outputs.append(message)
+        print(f"WARNING: {message}")
+    else:
+        write_csv(output / "battaglia12_constraints_min_mid_max.csv", constraints)
     write_json(
         output / "convergence_summary.json",
         {
@@ -547,6 +567,7 @@ def main() -> int:
             "internal_z_score_x": "none",
             "heldout_last_n": 1000,
             "missing_runs": missing,
+            "skipped_optional_outputs": skipped_optional_outputs,
             "primary_rmse_definition": (
                 "sqrt(mean(((posterior_mean - theta_true) / prior_width)^2))"
             ),

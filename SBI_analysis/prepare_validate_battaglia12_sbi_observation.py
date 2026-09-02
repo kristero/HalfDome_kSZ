@@ -16,7 +16,8 @@ EXPECTED_PRODUCT = "masked_baseline_noise_cross_deproj0"
 EXPECTED_FILENAME_PATTERNS = (
     r"masked_baseline_noise_cross_cl",
     r"gaussbeam_2(?:p0+)?arcmin",
-    r"so_fsky0p4(?:0*)?_apo60(?:p0+)?arcmin_seed12345_deproj0",
+    r"so_fsky0p4(?:0*)?_apo60(?:p0+)?arcmin",
+    r"deproj0",
     r"lmax7979",
 )
 BATTAGLIA12 = {
@@ -118,7 +119,13 @@ def align_to_ell(values: np.ndarray, ell: np.ndarray) -> np.ndarray:
     )
 
 
-def discover_profile(path: Path) -> Path:
+def expected_seed_pattern(mask_seed: int, noise_seed: int) -> str:
+    if mask_seed == noise_seed:
+        return rf"(?:seed{mask_seed}|maskseed{mask_seed}_noiseseed{noise_seed})"
+    return rf"maskseed{mask_seed}_noiseseed{noise_seed}"
+
+
+def discover_profile(path: Path, mask_seed: int, noise_seed: int) -> Path:
     path = path.expanduser().resolve()
     if path.is_file():
         candidates = [path]
@@ -134,9 +141,13 @@ def discover_profile(path: Path) -> Path:
         )
     result = candidates[0].resolve()
     filename = result.name.lower()
+    required_patterns = (
+        *EXPECTED_FILENAME_PATTERNS,
+        expected_seed_pattern(mask_seed, noise_seed),
+    )
     missing = [
         pattern
-        for pattern in EXPECTED_FILENAME_PATTERNS
+        for pattern in required_patterns
         if re.search(pattern, filename) is None
     ]
     if missing:
@@ -224,15 +235,37 @@ def self_test() -> int:
         rtol=2e-7,
         atol=0.0,
     )
-    julia_filename = (
-        "halfdome_fullsky_masked_baseline_noise_cross_cl_m200c_nside4096_"
-        "base_planck18_gaussbeam_2p0arcmin_"
-        "so_fsky0p4_apo60p0arcmin_seed12345_deproj0_lmax7979.npy"
+    julia_filenames = (
+        (
+            "halfdome_fullsky_masked_baseline_noise_cross_cl_m200c_nside4096_"
+            "base_planck18_gaussbeam_2p0arcmin_"
+            "so_fsky0p4_apo60p0arcmin_seed12345_deproj0_lmax7979.npy",
+            12345,
+            12345,
+        ),
+        (
+            "halfdome_fullsky_masked_baseline_noise_cross_cl_m200c_nside4096_"
+            "base_planck18_gaussbeam_2p0arcmin_"
+            "so_fsky0p4_apo60p0arcmin_maskseed12345_noiseseed20001_"
+            "deproj0_lmax7979.npy",
+            12345,
+            20001,
+        ),
     )
-    for pattern in EXPECTED_FILENAME_PATTERNS:
-        if re.search(pattern, julia_filename) is None:
-            raise AssertionError(f"Filename pattern does not match Julia formatting: {pattern}")
-    print("Self-test passed: ell alignment, C_ell -> D_ell binning, and asinh.")
+    for julia_filename, mask_seed, noise_seed in julia_filenames:
+        required_patterns = (
+            *EXPECTED_FILENAME_PATTERNS,
+            expected_seed_pattern(mask_seed, noise_seed),
+        )
+        for pattern in required_patterns:
+            if re.search(pattern, julia_filename) is None:
+                raise AssertionError(
+                    f"Filename pattern does not match Julia formatting: {pattern}"
+                )
+    print(
+        "Self-test passed: ell alignment, C_ell -> D_ell binning, "
+        "asinh, and independent mask/noise seed tags."
+    )
     return 0
 
 
@@ -248,6 +281,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path)
     parser.add_argument("--roundtrip-rows", type=int, default=5)
     parser.add_argument("--expected-transform", default="asinh")
+    parser.add_argument("--expected-mask-seed", type=int, default=12345)
+    parser.add_argument("--expected-noise-seed", type=int, default=12345)
     parser.add_argument("--self-test", action="store_true")
     return parser.parse_args()
 
@@ -270,7 +305,11 @@ def main() -> int:
     training_raw_path = args.training_raw_cl.expanduser().resolve()
     output_dir = args.output_dir.expanduser().resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
-    raw_profile_path = discover_profile(args.raw_profile)
+    raw_profile_path = discover_profile(
+        args.raw_profile,
+        args.expected_mask_seed,
+        args.expected_noise_seed,
+    )
     if args.npe_run_dir:
         run_dir = args.npe_run_dir.expanduser().resolve()
     elif args.sbi_run_root:
@@ -437,7 +476,10 @@ def main() -> int:
             "gaussian_beam_fwhm_arcmin": 2.0,
             "mask_fsky": 0.4,
             "mask_apodization_arcmin": 60.0,
-            "seed": 12345,
+            "legacy_seed": args.expected_mask_seed,
+            "mask_seed": args.expected_mask_seed,
+            "noise_seed": args.expected_noise_seed,
+            "same_mask_across_noise_realizations": True,
             "ell_min": int(round(float(ell_unbinned.min()))),
             "ell_max": int(round(float(ell_unbinned.max()))),
         },

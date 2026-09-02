@@ -24,6 +24,8 @@ set -euo pipefail
 : "${SBI_CASE:=masked_baseline_noise_cross_deproj0}"
 : "${NPE_N_TRAIN:=0}"
 : "${THREADS_PER_TASK:=26}"
+: "${MASK_SEED:=12345}"
+: "${NOISE_SEED:=${MASK_SEED}}"
 
 cd "${PROJECT_ROOT}"
 SIMULATOR="${PROJECT_ROOT}/tSZ_visuals/run_halfdome_fullsky_so_noise.jl"
@@ -63,6 +65,8 @@ echo "Training product: ${SBI_CASE}"
 echo "Prepared training dataset: ${PREPARED_DATASET}"
 echo "Consolidated training C_ell: ${TRAINING_RAW_CL}"
 echo "Output root: ${OUTPUT_ROOT}"
+echo "Fixed mask seed: ${MASK_SEED}"
+echo "Independent noise seed: ${NOISE_SEED}"
 
 if [[ -z "${existing_profile}" ]]; then
   echo "Generating matched Battaglia12 baseline-deproj0 split-noise cross C_ell."
@@ -85,7 +89,9 @@ if [[ -z "${existing_profile}" ]]; then
     gaussian_beam_fwhm_arcmin=2.0
     mask_fsky=0.4
     mask_apodization_arcmin=60.0
-    seed=12345
+    seed="${MASK_SEED}"
+    mask_seed="${MASK_SEED}"
+    noise_seed="${NOISE_SEED}"
     model_exists=false
     reuse_existing_cache=true
     cache_wait_seconds=0
@@ -131,6 +137,8 @@ validator_args=(
   --case "${SBI_CASE}"
   --n-train "${NPE_N_TRAIN}"
   --expected-transform asinh
+  --expected-mask-seed "${MASK_SEED}"
+  --expected-noise-seed "${NOISE_SEED}"
   --output-dir "${PREPARED_DIR}"
 )
 "${PYTHON}" "${VALIDATOR}" "${validator_args[@]}"

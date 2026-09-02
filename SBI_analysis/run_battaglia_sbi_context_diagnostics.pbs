@@ -1,0 +1,26 @@
+#!/bin/bash
+#PBS -N B12_context
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+: "${PROJECT_ROOT:=${PBS_O_WORKDIR:-$PWD}}"
+: "${PYTHON:=python3}"
+: "${PREPARED_DATASET:=/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+: "${BATTAGLIA_OBSERVATION:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/battaglia12_baseline_deproj0_observation/prepared/battaglia12_masked_baseline_noise_cross_deproj0_binned_dell.npy}"
+: "${NPE_RUN_DIR:=/home/kristero10/HalfDome_kSZ/SBI_analysis/outputs/cluster_outputs/SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_metadata_verified_asinh/masked_baseline_noise_cross_deproj0/job_N523788/N523788}"
+: "${OUTPUT_DIR:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0/battaglia12_context_diagnostics}"
+: "${THREADS_PER_TASK:=26}"
+
+cd "${PROJECT_ROOT}"
+export OMP_NUM_THREADS="${THREADS_PER_TASK}"
+export MKL_NUM_THREADS="${THREADS_PER_TASK}"
+export OPENBLAS_NUM_THREADS="${THREADS_PER_TASK}"
+export NUMEXPR_NUM_THREADS="${THREADS_PER_TASK}"
+
+"${PYTHON}" SBI_analysis/diagnose_battaglia_sbi_context.py   --prepared-dataset "${PREPARED_DATASET}"   --observation "${BATTAGLIA_OBSERVATION}"   --run-dir "${NPE_RUN_DIR}"   --output-dir "${OUTPUT_DIR}"   --context-sample-size 100000   --flow-samples 10000   --profile-lines 8   --pca-components 20

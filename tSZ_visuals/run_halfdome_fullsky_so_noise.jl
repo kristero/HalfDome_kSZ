@@ -81,6 +81,8 @@ Base.@kwdef struct HalfDomeFullSkySONoiseConfig
     fsky::Float64
     mask_apodization_arcmin::Float64
     seed::Int
+    mask_seed::Int
+    noise_seed::Int
     save_unmasked_no_noise_cl::Bool
     save_no_noise_cl::Bool
     save_baseline_noise_cross_cl::Bool
@@ -176,6 +178,8 @@ function load_halfdome_fullsky_so_noise_config()
         env="TSZ_MASK_APODIZATION_ARCMIN"
     )
     seed = get_int_arg("seed", 12345; env="TSZ_FULLSKY_NOISE_SEED")
+    mask_seed = get_int_arg("mask_seed", seed; env="TSZ_MASK_SEED")
+    noise_seed = get_int_arg("noise_seed", seed; env="TSZ_NOISE_SEED")
     save_unmasked_no_noise_cl = get_bool_arg(
         "save_unmasked_no_noise_cl",
         false;
@@ -224,6 +228,8 @@ function load_halfdome_fullsky_so_noise_config()
         fsky=fsky,
         mask_apodization_arcmin=mask_apodization_arcmin,
         seed=seed,
+        mask_seed=mask_seed,
+        noise_seed=noise_seed,
         save_unmasked_no_noise_cl=save_unmasked_no_noise_cl,
         save_no_noise_cl=save_no_noise_cl,
         save_baseline_noise_cross_cl=save_baseline_noise_cross_cl,
@@ -237,12 +243,17 @@ function load_halfdome_fullsky_so_noise_config()
 end
 
 function so_noise_tag(cfg::HalfDomeFullSkySONoiseConfig)
+    seed_tags = if cfg.mask_seed == cfg.noise_seed
+        ("seed$(cfg.mask_seed)",)
+    else
+        ("maskseed$(cfg.mask_seed)", "noiseseed$(cfg.noise_seed)")
+    end
     return join(
         (
             "so",
             "fsky$(fmt_param_value(cfg.fsky))",
             "apo$(fmt_param_value(cfg.mask_apodization_arcmin))arcmin",
-            "seed$(cfg.seed)",
+            seed_tags...,
             "deproj$(cfg.noise_deprojection)"
         ),
         "_"
@@ -282,6 +293,8 @@ function with_noise_deprojection(cfg::HalfDomeFullSkySONoiseConfig, deprojection
         fsky=cfg.fsky,
         mask_apodization_arcmin=cfg.mask_apodization_arcmin,
         seed=cfg.seed,
+        mask_seed=cfg.mask_seed,
+        noise_seed=cfg.noise_seed,
         save_unmasked_no_noise_cl=cfg.save_unmasked_no_noise_cl,
         save_no_noise_cl=cfg.save_no_noise_cl,
         save_baseline_noise_cross_cl=cfg.save_baseline_noise_cross_cl,
@@ -318,7 +331,9 @@ function print_halfdome_fullsky_so_noise_config(cfg::HalfDomeFullSkySONoiseConfi
     println("SO noise input treated as D_l: $(cfg.noise_is_dl)")
     println("Mask support fsky: $(cfg.fsky)")
     println("Mask apodization: $(cfg.mask_apodization_arcmin) arcmin")
-    println("Random seed: $(cfg.seed)")
+    println("Legacy/default random seed: $(cfg.seed)")
+    println("Mask seed: $(cfg.mask_seed)")
+    println("Noise seed: $(cfg.noise_seed)")
     println("Save unmasked no-noise C_l: $(cfg.save_unmasked_no_noise_cl)")
     println("Save masked no-noise C_l: $(cfg.save_no_noise_cl)")
     println("Save baseline split-noise cross C_l: $(cfg.save_baseline_noise_cross_cl)")
@@ -572,7 +587,7 @@ end
 
 function noise_split_seed(cfg::HalfDomeFullSkySONoiseConfig, case_label::AbstractString, split_index::Integer)
     case_offset = case_label == "baseline" ? 100 : case_label == "goal" ? 200 : 300
-    return cfg.seed + 10_000 * (cfg.noise_deprojection + 1) + case_offset + Int(split_index)
+    return cfg.noise_seed + 10_000 * (cfg.noise_deprojection + 1) + case_offset + Int(split_index)
 end
 
 function process_noise_case_cross!(
@@ -675,7 +690,7 @@ function run_halfdome_fullsky_so_noise()
         cfg.base_cfg.nside,
         cfg.fsky,
         cfg.mask_apodization_arcmin,
-        MersenneTwister(cfg.seed)
+        MersenneTwister(cfg.mask_seed)
     )
     mask_map = mask_info.mask
     println("Mask support fsky after pixelization: $(mask_info.support_fsky)")

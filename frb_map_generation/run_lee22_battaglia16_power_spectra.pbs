@@ -1,0 +1,161 @@
+#!/bin/bash
+#PBS -N frb_dm_cls_profiles
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+set -euo pipefail
+
+# Matched full-sky HalfDome halo-DM power-spectrum comparison:
+# Lee22 Appendix-A2 no-concentration versus Battaglia16 electron density.
+# Both maps use the same complete lightcone, physical M200c profile masses,
+# 0 < z_halo <= 1, NSIDE=4096, and an externally enforced 3R200c aperture.
+
+: "${PROJECT_DIR:=/home/${USER}/HalfDome_kSZ}"
+: "${CLUSTER_USER:=${USER}}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${JULIA_PROJECT:=}"
+: "${ENV_SETUP:=}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5}"
+: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/lee22_vs_battaglia16_m200c_3r200c_z1_power_spectra}"
+: "${BATTAGLIA16_CACHE:=${PROJECT_DIR}/frb_map_generation/outputs/shared_xgpaint_dm_cache.jld2}"
+: "${LEE22_CACHE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_frb_inputs/lee2022_tablea2_noconcentration_m200c_profile_owned_los_v2_dm_cache.jld2}"
+
+: "${NSIDE:=4096}"
+: "${SOURCE_REDSHIFT:=1.0}"
+: "${APERTURE_R200C:=3.0}"
+: "${LMAX:=8192}"
+: "${NITER:=0}"
+: "${CHUNK_SIZE:=100000}"
+: "${PROGRESS_EVERY:=5}"
+: "${DM_VALUE_SANITY_MAX:=1.0e8}"
+: "${MAX_CATALOG_HALOS:=0}"
+: "${OVERWRITE_MAPS:=false}"
+: "${OVERWRITE_SPECTRA:=false}"
+: "${DECONVOLVE_PIXEL_WINDOW:=false}"
+
+MAP_DIR="${OUTPUT_BASE}/maps"
+RESULT_DIR="${OUTPUT_BASE}/results"
+LOG_DIR="${OUTPUT_BASE}/pbs_logs"
+mkdir -p "${MAP_DIR}" "${RESULT_DIR}" "${LOG_DIR}"
+
+JOB_TAG="${PBS_JOBID:-manual}"
+JOB_TAG="${JOB_TAG//[/_}"
+JOB_TAG="${JOB_TAG//]/_}"
+LOG_FILE="${LOG_DIR}/lee22_vs_battaglia16_power_${JOB_TAG}.log"
+exec > >(tee -a "${LOG_FILE}") 2>&1
+
+PAINTER="${PROJECT_DIR}/frb_map_generation/paint_halfdome_matched_profile_dm_map.jl"
+COMPARISON="${PROJECT_DIR}/frb_map_generation/compare_lee22_battaglia16_power_spectra.jl"
+SOURCE_REDSHIFT_TAG="${SOURCE_REDSHIFT//./p}"
+APERTURE_TAG="${APERTURE_R200C//./p}"
+BATTAGLIA16_MAP="${MAP_DIR}/battaglia16_halfdome_full_halo_dm_zsrc${SOURCE_REDSHIFT_TAG}_nside${NSIDE}_m200c_r200cx${APERTURE_TAG}.fits"
+LEE22_MAP="${MAP_DIR}/lee22_noconcentration_halfdome_full_halo_dm_zsrc${SOURCE_REDSHIFT_TAG}_nside${NSIDE}_m200c_r200cx${APERTURE_TAG}.fits"
+
+cd "${PROJECT_DIR}"
+if [[ -n "${ENV_SETUP}" ]]; then
+  echo "Running environment setup: ${ENV_SETUP}"
+  eval "${ENV_SETUP}"
+fi
+
+missing=0
+for required in \
+  "${HALFDOME_PATH}" \
+  "${BATTAGLIA16_CACHE}" \
+  "${LEE22_CACHE}" \
+  "${LEE22_CACHE}.profile_signature.txt" \
+  "${PAINTER}" \
+  "${COMPARISON}"; do
+  if [[ ! -f "${required}" ]]; then
+    echo "Required file not found: ${required}" >&2
+    missing=1
+  fi
+done
+if [[ -n "${JULIA_PROJECT}" && ! -f "${JULIA_PROJECT}/Project.toml" ]]; then
+  echo "Julia project not found: ${JULIA_PROJECT}/Project.toml" >&2
+  missing=1
+fi
+(( missing == 0 )) || exit 2
+
+export JULIA_NUM_THREADS="${PBS_NCPUS:-26}"
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE
+
+run_julia() {
+  if [[ -n "${JULIA_PROJECT}" ]]; then
+    "${JULIA}" --project="${JULIA_PROJECT}" "$@"
+  else
+    "${JULIA}" "$@"
+  fi
+}
+
+echo "============================================================"
+echo "Lee22 versus Battaglia16 full halo-DM power spectra"
+echo "Date: $(date -Is)"
+echo "Host: $(hostname)"
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Queue contract: mini, 26 CPUs, 23:59:00"
+echo "HalfDome catalogue: ${HALFDOME_PATH}"
+echo "Foreground: complete resolved halo mass range, 0 < z <= ${SOURCE_REDSHIFT}"
+echo "Matched geometry: M200c, ${APERTURE_R200C}R200c, NSIDE=${NSIDE}"
+echo "Spectrum: full-sky monopole-subtracted DM, lmax=${LMAX}, niter=${NITER}"
+echo "Pixel-window deconvolution: ${DECONVOLVE_PIXEL_WINDOW}"
+echo "Output: ${OUTPUT_BASE}"
+echo "Log: ${LOG_FILE}"
+echo "============================================================"
+"${JULIA}" --version
+
+paint_map_if_needed() {
+  local profile="$1"
+  local cache="$2"
+  local output_map="$3"
+
+  if [[ -f "${output_map}" && "${OVERWRITE_MAPS}" != "true" ]]; then
+    echo "Reusing completed ${profile} map: ${output_map}"
+    return
+  fi
+
+  run_julia --threads="${JULIA_NUM_THREADS}" "${PAINTER}" \
+    --dm-profile="${profile}" \
+    --lee2022-concentration-mode=none \
+    --halfdome-path="${HALFDOME_PATH}" \
+    --dm-cache="${cache}" \
+    --dm-cache-overwrite=false \
+    --output-map="${output_map}" \
+    --nside="${NSIDE}" \
+    --source-redshift="${SOURCE_REDSHIFT}" \
+    --halo-extension-r200-multiplier="${APERTURE_R200C}" \
+    --chunk-size="${CHUNK_SIZE}" \
+    --max-catalog-halos="${MAX_CATALOG_HALOS}" \
+    --progress-every="${PROGRESS_EVERY}" \
+    --dm-value-sanity-max="${DM_VALUE_SANITY_MAX}" \
+    --overwrite="${OVERWRITE_MAPS}"
+}
+
+paint_map_if_needed battaglia16 "${BATTAGLIA16_CACHE}" "${BATTAGLIA16_MAP}"
+paint_map_if_needed lee2022 "${LEE22_CACHE}" "${LEE22_MAP}"
+
+run_julia --threads="${JULIA_NUM_THREADS}" "${COMPARISON}" \
+  --lee22-map="${LEE22_MAP}" \
+  --battaglia16-map="${BATTAGLIA16_MAP}" \
+  --output-dir="${RESULT_DIR}" \
+  --source-redshift="${SOURCE_REDSHIFT}" \
+  --aperture-r200c="${APERTURE_R200C}" \
+  --lmax="${LMAX}" \
+  --niter="${NITER}" \
+  --plot-lmin=2 \
+  --plot-bins=55 \
+  --deconvolve-pixel-window="${DECONVOLVE_PIXEL_WINDOW}" \
+  --overwrite="${OVERWRITE_SPECTRA}"
+
+echo "Completed: $(date -Is)"
+echo "Comparison PDF:"
+echo "  ${RESULT_DIR}/lee22_vs_battaglia16_full_halo_dm_power_spectra.pdf"
+echo "Full C_ell table:"
+echo "  ${RESULT_DIR}/lee22_vs_battaglia16_full_halo_dm_power_spectra.csv"
+echo "Bandpowers:"
+echo "  ${RESULT_DIR}/lee22_vs_battaglia16_full_halo_dm_power_spectra_bandpowers.csv"

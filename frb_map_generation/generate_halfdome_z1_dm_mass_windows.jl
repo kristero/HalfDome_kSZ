@@ -2133,14 +2133,24 @@ function main(options)
     println("Saved provenance: $(config.provenance)")
 end
 
-if HELP_MODE
-    show_help()
-elseif SELF_TEST_MODE
-    run_self_test()
-elseif DRY_RUN_MODE
-    config = configuration(CLI_OPTIONS; require_catalog=false)
-    print_configuration(config)
-    println("Dry run only: no catalog was opened and no output was written.")
-else
-    main(CLI_OPTIONS)
+"""Run the command-line entry point when this file is executed directly."""
+function command_line_main()
+    if HELP_MODE
+        show_help()
+    elseif SELF_TEST_MODE
+        run_self_test()
+    elseif DRY_RUN_MODE
+        config = configuration(CLI_OPTIONS; require_catalog=false)
+        print_configuration(config)
+        println("Dry run only: no catalog was opened and no output was written.")
+    else
+        main(CLI_OPTIONS)
+    end
+    return nothing
+end
+
+# Other workflows may include this file in a private module to reuse the
+# validated profile/cache and M200c/R200c helpers. Direct CLI behavior is unchanged.
+if abspath(PROGRAM_FILE) == abspath(@__FILE__)
+    command_line_main()
 end

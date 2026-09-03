@@ -116,6 +116,8 @@ function paint_batch_external_r200c!(
     redshifts,
     positions;
     contribution_sanity_max::Float64,
+    quantity_label::AbstractString="single-halo DM",
+    quantity_units::AbstractString="pc cm^-3",
 )
     update_counts = zeros(Int64, thread_capacity())
     halo_hit_counts = zeros(Int64, thread_capacity())
@@ -164,13 +166,14 @@ function paint_batch_external_r200c!(
                     contribution = Float64(interpolated_profile(
                         max(theta, theta_min), mass, redshift,
                     ))
+                    units_suffix = isempty(quantity_units) ? "" : " $(quantity_units)"
                     isfinite(contribution) && contribution >= 0.0 || error(
-                        "Invalid halo DM=$(contribution) pc cm^-3 at " *
+                        "Invalid $(quantity_label)=$(contribution)$(units_suffix) at " *
                         "M200c=$(mass), z=$(redshift), theta=$(theta).",
                     )
                     contribution <= contribution_sanity_max || error(
-                        "Single-halo DM=$(contribution) pc cm^-3 exceeds " *
-                        "dm_value_sanity_max=$(contribution_sanity_max). " *
+                        "$(quantity_label)=$(contribution)$(units_suffix) exceeds " *
+                        "sanity maximum=$(contribution_sanity_max)$(units_suffix). " *
                         "The value is not clipped.",
                     )
                     dm_map.pixels[global_pixel] += contribution

@@ -1,0 +1,156 @@
+#!/bin/bash
+#PBS -N tsz_frb_xdm
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+set -euo pipefail
+
+# One matched Battaglia12 Compton-y map is crossed with both completed halo-DM
+# maps. All fields use lightcone_100, physical M200c, all resolved halos in
+# 0 < z <= 1, NSIDE=4096, no beam, full sky, and external 3R200c support.
+
+: "${PROJECT_DIR:=/home/${USER}/HalfDome_kSZ}"
+: "${CLUSTER_USER:=${USER}}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${JULIA_PROJECT:=}"
+: "${ENV_SETUP:=}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5}"
+: "${DM_OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/lee22_vs_battaglia16_m200c_3r200c_z1_power_spectra}"
+: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/battaglia12_tsz_x_lee22_battaglia16_dm_m200c_3r200c_z1}"
+: "${TSZ_CACHE:=/lustre/work/${CLUSTER_USER}/tSZ_data/cache/battaglia12_fiducial_m200c_logm15p7_tsz_interpolator.jld2}"
+
+: "${NSIDE:=4096}"
+: "${SOURCE_REDSHIFT:=1.0}"
+: "${APERTURE_R200C:=3.0}"
+: "${LMAX:=8192}"
+: "${NITER:=0}"
+: "${CHUNK_SIZE:=100000}"
+: "${PROGRESS_EVERY:=5}"
+: "${MAX_CATALOG_HALOS:=0}"
+: "${TSZ_VALUE_SANITY_MAX:=1.0}"
+: "${INTERPOLATOR_PAD:=256}"
+: "${INTERPOLATOR_LOGM_MAX:=15.7}"
+: "${OVERWRITE_TSZ_CACHE:=false}"
+: "${OVERWRITE_TSZ_MAP:=false}"
+: "${OVERWRITE_SPECTRA:=false}"
+: "${DECONVOLVE_PIXEL_WINDOW:=false}"
+: "${PERCENT_DENOMINATOR_FLOOR_FRACTION:=1.0e-6}"
+
+MAP_DIR="${OUTPUT_BASE}/maps"
+RESULT_DIR="${OUTPUT_BASE}/results"
+LOG_DIR="${OUTPUT_BASE}/pbs_logs"
+mkdir -p "${MAP_DIR}" "${RESULT_DIR}" "${LOG_DIR}" "$(dirname "${TSZ_CACHE}")"
+
+JOB_TAG="${PBS_JOBID:-manual}"
+JOB_TAG="${JOB_TAG//[/_}"
+JOB_TAG="${JOB_TAG//]/_}"
+LOG_FILE="${LOG_DIR}/battaglia12_tsz_frb_cross_${JOB_TAG}.log"
+exec > >(tee -a "${LOG_FILE}") 2>&1
+
+TSZ_PAINTER="${PROJECT_DIR}/frb_map_generation/paint_halfdome_battaglia12_tsz_map.jl"
+CROSS_SCRIPT="${PROJECT_DIR}/frb_map_generation/compare_battaglia12_tsz_frb_dm_cross_spectra.jl"
+SOURCE_REDSHIFT_TAG="${SOURCE_REDSHIFT//./p}"
+APERTURE_TAG="${APERTURE_R200C//./p}"
+TSZ_MAP="${MAP_DIR}/battaglia12_fiducial_halfdome_compton_y_zmax${SOURCE_REDSHIFT_TAG}_nside${NSIDE}_m200c_r200cx${APERTURE_TAG}.fits"
+BATTAGLIA16_DM_MAP="${DM_OUTPUT_BASE}/maps/battaglia16_halfdome_full_halo_dm_zsrc${SOURCE_REDSHIFT_TAG}_nside${NSIDE}_m200c_r200cx${APERTURE_TAG}.fits"
+LEE22_DM_MAP="${DM_OUTPUT_BASE}/maps/lee22_noconcentration_halfdome_full_halo_dm_zsrc${SOURCE_REDSHIFT_TAG}_nside${NSIDE}_m200c_r200cx${APERTURE_TAG}.fits"
+
+cd "${PROJECT_DIR}"
+if [[ -n "${ENV_SETUP}" ]]; then
+  echo "Running environment setup: ${ENV_SETUP}"
+  eval "${ENV_SETUP}"
+fi
+
+missing=0
+for required in \
+  "${HALFDOME_PATH}" \
+  "${BATTAGLIA16_DM_MAP}" \
+  "${LEE22_DM_MAP}" \
+  "${TSZ_PAINTER}" \
+  "${CROSS_SCRIPT}"; do
+  if [[ ! -f "${required}" ]]; then
+    echo "Required file not found: ${required}" >&2
+    missing=1
+  fi
+done
+if [[ -n "${JULIA_PROJECT}" && ! -f "${JULIA_PROJECT}/Project.toml" ]]; then
+  echo "Julia project not found: ${JULIA_PROJECT}/Project.toml" >&2
+  missing=1
+fi
+(( missing == 0 )) || exit 2
+
+export JULIA_NUM_THREADS="${PBS_NCPUS:-26}"
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE
+export GKSwstype=100
+
+run_julia() {
+  if [[ -n "${JULIA_PROJECT}" ]]; then
+    "${JULIA}" --project="${JULIA_PROJECT}" "$@"
+  else
+    "${JULIA}" "$@"
+  fi
+}
+
+echo "============================================================"
+echo "Battaglia12 tSZ x Lee22/Battaglia16 halo-DM cross-spectra"
+echo "Date: $(date -Is)"
+echo "Host: $(hostname)"
+echo "PBS job id: ${PBS_JOBID:-NA}"
+echo "Queue contract: mini, 26 CPUs, 23:59:00"
+echo "HalfDome catalogue: ${HALFDOME_PATH}"
+echo "Halo selection: all resolved halos, 0 < z <= ${SOURCE_REDSHIFT}"
+echo "Geometry: physical M200c, ${APERTURE_R200C}R200c, NSIDE=${NSIDE}"
+echo "tSZ: fiducial Battaglia12 pressure, dimensionless Compton-y, no beam"
+echo "DM maps: ${DM_OUTPUT_BASE}/maps"
+echo "Spectrum: full sky, monopoles removed, lmax=${LMAX}, niter=${NITER}"
+echo "Output: ${OUTPUT_BASE}"
+echo "Log: ${LOG_FILE}"
+echo "============================================================"
+"${JULIA}" --version
+
+if [[ -f "${TSZ_MAP}" && "${OVERWRITE_TSZ_MAP}" != "true" ]]; then
+  echo "Reusing completed matched tSZ map: ${TSZ_MAP}"
+else
+  run_julia --threads="${JULIA_NUM_THREADS}" "${TSZ_PAINTER}" \
+    --halfdome-path="${HALFDOME_PATH}" \
+    --tsz-cache="${TSZ_CACHE}" \
+    --tsz-cache-overwrite="${OVERWRITE_TSZ_CACHE}" \
+    --output-map="${TSZ_MAP}" \
+    --nside="${NSIDE}" \
+    --source-redshift="${SOURCE_REDSHIFT}" \
+    --halo-extension-r200-multiplier="${APERTURE_R200C}" \
+    --chunk-size="${CHUNK_SIZE}" \
+    --max-catalog-halos="${MAX_CATALOG_HALOS}" \
+    --progress-every="${PROGRESS_EVERY}" \
+    --tsz-value-sanity-max="${TSZ_VALUE_SANITY_MAX}" \
+    --interpolator-pad="${INTERPOLATOR_PAD}" \
+    --interpolator-logmass-max="${INTERPOLATOR_LOGM_MAX}" \
+    --overwrite="${OVERWRITE_TSZ_MAP}"
+fi
+
+run_julia --threads="${JULIA_NUM_THREADS}" "${CROSS_SCRIPT}" \
+  --tsz-map="${TSZ_MAP}" \
+  --lee22-dm-map="${LEE22_DM_MAP}" \
+  --battaglia16-dm-map="${BATTAGLIA16_DM_MAP}" \
+  --output-dir="${RESULT_DIR}" \
+  --source-redshift="${SOURCE_REDSHIFT}" \
+  --aperture-r200c="${APERTURE_R200C}" \
+  --lmax="${LMAX}" \
+  --niter="${NITER}" \
+  --plot-lmin=2 \
+  --plot-bins=55 \
+  --deconvolve-pixel-window="${DECONVOLVE_PIXEL_WINDOW}" \
+  --percent-denominator-floor-fraction="${PERCENT_DENOMINATOR_FLOOR_FRACTION}" \
+  --overwrite="${OVERWRITE_SPECTRA}"
+
+echo "Completed: $(date -Is)"
+echo "Matched tSZ map: ${TSZ_MAP}"
+echo "Cross-spectrum HDF5: ${RESULT_DIR}/battaglia12_tsz_x_lee22_battaglia16_dm_cross_spectra.h5"
+echo "Cross-spectrum PDF: ${RESULT_DIR}/battaglia12_tsz_x_lee22_battaglia16_dm_cross_spectra.pdf"
+echo "Bandpowers: ${RESULT_DIR}/battaglia12_tsz_x_lee22_battaglia16_dm_cross_spectra_bandpowers.csv"

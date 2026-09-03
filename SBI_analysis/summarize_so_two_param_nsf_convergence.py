@@ -196,8 +196,8 @@ def plot_correlation(summary: pd.DataFrame, output: Path, dpi: int) -> None:
         for param in PARAMS:
             sub = summary[(summary["mode"] == mode) & (summary["param"] == param)].sort_values("n_train")
             ax.plot(
-                sub["n_train"],
-                sub["pearson_r"],
+                sub["n_train"].to_numpy(dtype=float),
+                sub["pearson_r"].to_numpy(dtype=float),
                 color=COLORS[mode],
                 ls=line_styles[param],
                 marker=markers[param],
@@ -230,8 +230,8 @@ def plot_metric_panels(
             if sub.empty or column not in sub:
                 continue
             axis.plot(
-                sub["n_train"],
-                sub[column],
+                sub["n_train"].to_numpy(dtype=float),
+                pd.to_numeric(sub[column], errors="coerce").to_numpy(dtype=float),
                 marker="o",
                 ms=3.0,
                 lw=0.9,
@@ -254,8 +254,10 @@ def plot_validation(validation: pd.DataFrame, output: Path, dpi: int) -> None:
     for mode in MODES:
         sub = validation[validation["mode"] == mode].sort_values("n_train")
         ax.plot(
-            sub["n_train"],
-            pd.to_numeric(sub["best_validation_performance"], errors="coerce"),
+            sub["n_train"].to_numpy(dtype=float),
+            pd.to_numeric(
+                sub["best_validation_performance"], errors="coerce"
+            ).to_numpy(dtype=float),
             marker="o",
             ms=3.0,
             lw=0.9,

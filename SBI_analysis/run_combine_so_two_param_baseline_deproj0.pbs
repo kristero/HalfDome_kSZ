@@ -1,0 +1,53 @@
+#!/bin/bash
+#PBS -N SO2p_combine
+#PBS -q mini
+#PBS -l select=1:ncpus=4:mpiprocs=1:mem=32gb
+#PBS -l walltime=04:00:00
+#PBS -o /home/kristero10/logs/tSZ_two_param/
+#PBS -e /home/kristero10/logs/tSZ_two_param/
+#PBS -j oe
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+: "${PROJECT_DIR:=${WORK_DIR}}"
+: "${PYTHON:=python3}"
+: "${RUN_ROOT:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0}"
+: "${SOBOL_CSV:=${RUN_ROOT}/design/battaglia_sobol_P0_beta_32768.csv}"
+: "${MANIFEST_DIR:=${RUN_ROOT}/run_manifests}"
+: "${OUTPUT_DIR:=${RUN_ROOT}/prepared}"
+: "${MASK_SEED:=12345}"
+: "${NOISE_SEED_BASE:=1000000}"
+: "${TEST_LAST_N:=1000}"
+: "${FORCE_COMBINE:=0}"
+
+mkdir -p "${OUTPUT_DIR}" /home/kristero10/logs/tSZ_two_param
+export OMP_NUM_THREADS="${PBS_NCPUS:-4}"
+export OPENBLAS_NUM_THREADS="${PBS_NCPUS:-4}"
+export MKL_NUM_THREADS="${PBS_NCPUS:-4}"
+export NUMEXPR_NUM_THREADS="${PBS_NCPUS:-4}"
+export PYTHONUNBUFFERED=1
+
+set --
+if [[ "${FORCE_COMBINE}" == "1" ]]; then
+  set -- --force
+fi
+
+echo "Started: $(date -Is)"
+echo "Combining baseline deproj0 two-parameter products"
+echo "Sobol CSV: ${SOBOL_CSV}"
+echo "Manifests: ${MANIFEST_DIR}"
+echo "Output: ${OUTPUT_DIR}"
+
+"${PYTHON}" "${PROJECT_DIR}/SBI_analysis/combine_so_two_param_baseline_deproj0.py" \
+  --sobol-csv "${SOBOL_CSV}" \
+  --manifest-dir "${MANIFEST_DIR}" \
+  --output-dir "${OUTPUT_DIR}" \
+  --mask-seed "${MASK_SEED}" \
+  --noise-seed-base "${NOISE_SEED_BASE}" \
+  --test-last-n "${TEST_LAST_N}" \
+  "$@"
+
+echo "Finished: $(date -Is)"

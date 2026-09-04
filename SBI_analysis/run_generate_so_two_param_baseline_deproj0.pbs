@@ -1,0 +1,191 @@
+#!/bin/bash
+#PBS -N SO2p_gen
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/tSZ_two_param/
+#PBS -e /home/kristero10/logs/tSZ_two_param/
+#PBS -j oe
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
+cd "${WORK_DIR}"
+
+: "${PROJECT_DIR:=${WORK_DIR}}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${LIGHTCONE_ID:=100}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
+: "${SOBOL_CSV:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/design/battaglia_sobol_P0_beta_32768.csv}"
+: "${BASELINE_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt}"
+: "${GOAL_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt}"
+: "${RAW_OUTPUT_DIR:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/raw}"
+: "${RUN_META_DIR:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/run_manifests}"
+: "${CACHE_DIR:=/lustre/work/kristero10/tSZ_data/cache}"
+: "${ROW_LOG_DIR:=/home/kristero10/logs/tSZ_two_param/rows}"
+
+: "${ROW_START:?ROW_START must be supplied by the submitter}"
+: "${ROW_STOP:?ROW_STOP must be supplied by the submitter}"
+: "${MASK_SEED:=12345}"
+: "${NOISE_SEED_BASE:=1000000}"
+
+: "${NSIDE:=4096}"
+: "${ELL_MIN:=80}"
+: "${ELL_MAX:=7979}"
+: "${MASK_FSKY:=0.4}"
+: "${MASK_APODIZATION_ARCMIN:=60.0}"
+: "${APPLY_GAUSSIAN_BEAM:=true}"
+: "${GAUSSIAN_BEAM_FWHM_ARCMIN:=2.0}"
+: "${CL_NITER:=0}"
+: "${MODEL_EXISTS:=false}"
+: "${REUSE_EXISTING_CACHE:=true}"
+: "${INTERPOLATOR_PAD:=256}"
+: "${INTERPOLATOR_LOGM_MAX:=15.7}"
+: "${THREADS_PER_TASK:=${PBS_NCPUS:-26}}"
+
+: "${OMP_NUM_THREADS:=1}"
+: "${OPENBLAS_NUM_THREADS:=1}"
+: "${MKL_NUM_THREADS:=1}"
+export OMP_NUM_THREADS OPENBLAS_NUM_THREADS MKL_NUM_THREADS
+export HDF5_USE_FILE_LOCKING=FALSE
+
+is_uint() {
+  [[ "${1:-}" =~ ^[0-9]+$ ]]
+}
+
+for value in "${ROW_START}" "${ROW_STOP}" "${MASK_SEED}" "${NOISE_SEED_BASE}"; do
+  is_uint "${value}" || {
+    echo "Expected a non-negative integer, got: ${value}" >&2
+    exit 2
+  }
+done
+
+SIMULATOR="${PROJECT_DIR}/tSZ_visuals/run_halfdome_fullsky_so_noise.jl"
+for path in \
+  "${SIMULATOR}" \
+  "${HALFDOME_PATH}" \
+  "${SOBOL_CSV}" \
+  "${BASELINE_NOISE_PATH}" \
+  "${GOAL_NOISE_PATH}"
+do
+  [[ -e "${path}" ]] || {
+    echo "Required input does not exist: ${path}" >&2
+    exit 2
+  }
+done
+
+N_ROWS=$(( $(wc -l < "${SOBOL_CSV}") - 1 ))
+if (( ROW_START < 1 || ROW_STOP < ROW_START || ROW_STOP > N_ROWS )); then
+  echo "Invalid row range ${ROW_START}:${ROW_STOP}; CSV contains ${N_ROWS} rows." >&2
+  exit 2
+fi
+
+mkdir -p "${RAW_OUTPUT_DIR}" "${RUN_META_DIR}" "${CACHE_DIR}" "${ROW_LOG_DIR}"
+JOB_ID="${PBS_JOBID:-manual}"
+SAFE_JOB_ID="${JOB_ID//[^A-Za-z0-9_.-]/_}"
+MANIFEST="${RUN_META_DIR}/chunk_${ROW_START}_${ROW_STOP}_${SAFE_JOB_ID}.csv"
+printf '%s\n' \
+  'sobol_row,mask_seed,noise_seed,status,output_path,row_log' \
+  > "${MANIFEST}"
+
+echo "Started: $(date -Is)"
+echo "Host: $(hostname)"
+echo "Rows: ${ROW_START}:${ROW_STOP} / ${N_ROWS}"
+echo "Sobol CSV: ${SOBOL_CSV}"
+echo "Raw output: ${RAW_OUTPUT_DIR}"
+echo "Manifest: ${MANIFEST}"
+echo "Product: masked_baseline_noise_cross_deproj0 only"
+echo "Mask seed: ${MASK_SEED} (fixed for every row)"
+echo "Noise policy: noise_seed=${NOISE_SEED_BASE}+sobol_row"
+echo "Beam: apply=${APPLY_GAUSSIAN_BEAM}, FWHM=${GAUSSIAN_BEAM_FWHM_ARCMIN} arcmin"
+echo "No FITS/debug maps will be written."
+
+failed=0
+completed=0
+for (( sobol_row=ROW_START; sobol_row<=ROW_STOP; sobol_row++ )); do
+  noise_seed=$(( NOISE_SEED_BASE + sobol_row ))
+  row_log="${ROW_LOG_DIR}/row_$(printf '%05d' "${sobol_row}")_${SAFE_JOB_ID}.log"
+  row_start_time=$(date +%s)
+
+  echo "[$(date -Is)] row ${sobol_row}/${N_ROWS}, noise_seed=${noise_seed}"
+  set +e
+  JULIA_NUM_THREADS="${THREADS_PER_TASK}" \
+  "${JULIA}" --threads="${THREADS_PER_TASK}" "${SIMULATOR}" \
+    catalog_source=halfdome \
+    simulation_name="halfdome_lightcone_${LIGHTCONE_ID}" \
+    batching_mode=full \
+    halfdome_path="${HALFDOME_PATH}" \
+    output_dir="${RAW_OUTPUT_DIR}" \
+    cache_dir="${CACHE_DIR}" \
+    sobol_csv_path="${SOBOL_CSV}" \
+    sobol_row="${sobol_row}" \
+    baseline_noise_path="${BASELINE_NOISE_PATH}" \
+    goal_noise_path="${GOAL_NOISE_PATH}" \
+    nside="${NSIDE}" \
+    cl_lmax="${ELL_MAX}" \
+    so_noise_lmax="${ELL_MAX}" \
+    cl_niter="${CL_NITER}" \
+    so_noise_deprojections=0 \
+    so_noise_is_dl=false \
+    apply_gaussian_beam="${APPLY_GAUSSIAN_BEAM}" \
+    gaussian_beam_fwhm_arcmin="${GAUSSIAN_BEAM_FWHM_ARCMIN}" \
+    mask_fsky="${MASK_FSKY}" \
+    mask_apodization_arcmin="${MASK_APODIZATION_ARCMIN}" \
+    seed="${MASK_SEED}" \
+    mask_seed="${MASK_SEED}" \
+    noise_seed="${noise_seed}" \
+    model_exists="${MODEL_EXISTS}" \
+    reuse_existing_cache="${REUSE_EXISTING_CACHE}" \
+    cache_wait_seconds=0 \
+    cache_poll_seconds=30 \
+    interpolator_pad="${INTERPOLATOR_PAD}" \
+    interpolator_logM_max="${INTERPOLATOR_LOGM_MAX}" \
+    save_healpix_map=false \
+    save_bin_maps=false \
+    save_mass_map=false \
+    save_cl=true \
+    save_no_noise_cl=false \
+    save_baseline_noise_cross_cl=true \
+    save_goal_noise_cross_cl=false \
+    save_unmasked_no_noise_cl=false \
+    save_noise_maps=false \
+    save_noisy_maps=false \
+    save_mask_map=false \
+    save_signal_map=false \
+    save_masked_signal_map=false \
+    skip_existing_outputs=false \
+    skip_existing_any_run_instance=false \
+    enforce_battaglia_guardrails=true \
+    skip_invalid_battaglia_rows=false \
+    run_instance_tag= \
+    print_runtime_environment=false \
+    > "${row_log}" 2>&1
+  status=$?
+  set -e
+
+  output_path="$(
+    sed -n 's/^Saved masked_baseline_noise_cross C_l NumPy array to //p' \
+      "${row_log}" | tail -n 1
+  )"
+  if [[ "${status}" -eq 0 && -n "${output_path}" && -s "${output_path}" ]]; then
+    printf '%s,%s,%s,success,%s,%s\n' \
+      "${sobol_row}" "${MASK_SEED}" "${noise_seed}" \
+      "${output_path}" "${row_log}" >> "${MANIFEST}"
+    completed=$(( completed + 1 ))
+    elapsed=$(( $(date +%s) - row_start_time ))
+    echo "Completed row ${sobol_row} in ${elapsed}s: ${output_path}"
+  else
+    printf '%s,%s,%s,failed,%s,%s\n' \
+      "${sobol_row}" "${MASK_SEED}" "${noise_seed}" \
+      "${output_path}" "${row_log}" >> "${MANIFEST}"
+    echo "FAILED row ${sobol_row}; exit=${status}; log=${row_log}" >&2
+    failed=$(( failed + 1 ))
+  fi
+done
+
+echo "Chunk complete: successful=${completed}, failed=${failed}"
+echo "Finished: $(date -Is)"
+if (( failed > 0 )); then
+  exit 1
+fi

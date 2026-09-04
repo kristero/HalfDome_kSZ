@@ -17,11 +17,12 @@ cd "${WORK_DIR}"
 : "${JULIA:=/usr/local/bin/julia}"
 : "${LIGHTCONE_ID:=100}"
 : "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_${LIGHTCONE_ID}.hdf5}"
-: "${SOBOL_CSV:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/design/battaglia_sobol_P0_beta_32768.csv}"
+: "${RUN_ROOT:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/block_offset0_n16384}"
+: "${SOBOL_CSV:=${RUN_ROOT}/design/battaglia_sobol_P0_beta_16384.csv}"
 : "${BASELINE_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt}"
 : "${GOAL_NOISE_PATH:=/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt}"
-: "${RAW_OUTPUT_DIR:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/raw}"
-: "${RUN_META_DIR:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/run_manifests}"
+: "${RAW_OUTPUT_DIR:=${RUN_ROOT}/raw}"
+: "${RUN_META_DIR:=${RUN_ROOT}/run_manifests}"
 : "${CACHE_DIR:=/lustre/work/kristero10/tSZ_data/cache}"
 : "${ROW_LOG_DIR:=/home/kristero10/logs/tSZ_two_param/rows}"
 
@@ -29,6 +30,7 @@ cd "${WORK_DIR}"
 : "${ROW_STOP:?ROW_STOP must be supplied by the submitter}"
 : "${MASK_SEED:=12345}"
 : "${NOISE_SEED_BASE:=1000000}"
+: "${SEQUENCE_OFFSET:=0}"
 
 : "${NSIDE:=4096}"
 : "${ELL_MIN:=80}"
@@ -60,6 +62,10 @@ for value in "${ROW_START}" "${ROW_STOP}" "${MASK_SEED}" "${NOISE_SEED_BASE}"; d
     exit 2
   }
 done
+is_uint "${SEQUENCE_OFFSET}" || {
+  echo "Expected a non-negative sequence offset, got: ${SEQUENCE_OFFSET}" >&2
+  exit 2
+}
 
 SIMULATOR="${PROJECT_DIR}/tSZ_visuals/run_halfdome_fullsky_so_noise.jl"
 for path in \
@@ -86,7 +92,7 @@ JOB_ID="${PBS_JOBID:-manual}"
 SAFE_JOB_ID="${JOB_ID//[^A-Za-z0-9_.-]/_}"
 MANIFEST="${RUN_META_DIR}/chunk_${ROW_START}_${ROW_STOP}_${SAFE_JOB_ID}.csv"
 printf '%s\n' \
-  'sobol_row,mask_seed,noise_seed,status,output_path,row_log' \
+  'sobol_row,sobol_sequence_index,mask_seed,noise_seed,status,no_noise_output_path,output_path,row_log' \
   > "${MANIFEST}"
 
 echo "Started: $(date -Is)"
@@ -97,14 +103,16 @@ echo "Raw output: ${RAW_OUTPUT_DIR}"
 echo "Manifest: ${MANIFEST}"
 echo "Product: masked_baseline_noise_cross_deproj0 only"
 echo "Mask seed: ${MASK_SEED} (fixed for every row)"
-echo "Noise policy: noise_seed=${NOISE_SEED_BASE}+sobol_row"
+echo "Sobol sequence offset: ${SEQUENCE_OFFSET}"
+echo "Noise policy: noise_seed=${NOISE_SEED_BASE}+sequence_offset+sobol_row"
 echo "Beam: apply=${APPLY_GAUSSIAN_BEAM}, FWHM=${GAUSSIAN_BEAM_FWHM_ARCMIN} arcmin"
 echo "No FITS/debug maps will be written."
 
 failed=0
 completed=0
 for (( sobol_row=ROW_START; sobol_row<=ROW_STOP; sobol_row++ )); do
-  noise_seed=$(( NOISE_SEED_BASE + sobol_row ))
+  sobol_sequence_index=$(( SEQUENCE_OFFSET + sobol_row ))
+  noise_seed=$(( NOISE_SEED_BASE + sobol_sequence_index ))
   row_log="${ROW_LOG_DIR}/row_$(printf '%05d' "${sobol_row}")_${SAFE_JOB_ID}.log"
   row_start_time=$(date +%s)
 
@@ -145,7 +153,7 @@ for (( sobol_row=ROW_START; sobol_row<=ROW_STOP; sobol_row++ )); do
     save_bin_maps=false \
     save_mass_map=false \
     save_cl=true \
-    save_no_noise_cl=false \
+    save_no_noise_cl=true \
     save_baseline_noise_cross_cl=true \
     save_goal_noise_cross_cl=false \
     save_unmasked_no_noise_cl=false \
@@ -164,21 +172,27 @@ for (( sobol_row=ROW_START; sobol_row<=ROW_STOP; sobol_row++ )); do
   status=$?
   set -e
 
+  no_noise_output_path="$(
+    sed -n 's/^Saved masked_no_noise C_l NumPy array to //p' \
+      "${row_log}" | tail -n 1
+  )"
   output_path="$(
     sed -n 's/^Saved masked_baseline_noise_cross C_l NumPy array to //p' \
       "${row_log}" | tail -n 1
   )"
-  if [[ "${status}" -eq 0 && -n "${output_path}" && -s "${output_path}" ]]; then
-    printf '%s,%s,%s,success,%s,%s\n' \
-      "${sobol_row}" "${MASK_SEED}" "${noise_seed}" \
-      "${output_path}" "${row_log}" >> "${MANIFEST}"
+  if [[ "${status}" -eq 0 \
+        && -n "${no_noise_output_path}" && -s "${no_noise_output_path}" \
+        && -n "${output_path}" && -s "${output_path}" ]]; then
+    printf '%s,%s,%s,%s,success,%s,%s,%s\n' \
+      "${sobol_row}" "${sobol_sequence_index}" "${MASK_SEED}" "${noise_seed}" \
+      "${no_noise_output_path}" "${output_path}" "${row_log}" >> "${MANIFEST}"
     completed=$(( completed + 1 ))
     elapsed=$(( $(date +%s) - row_start_time ))
     echo "Completed row ${sobol_row} in ${elapsed}s: ${output_path}"
   else
-    printf '%s,%s,%s,failed,%s,%s\n' \
-      "${sobol_row}" "${MASK_SEED}" "${noise_seed}" \
-      "${output_path}" "${row_log}" >> "${MANIFEST}"
+    printf '%s,%s,%s,%s,failed,%s,%s,%s\n' \
+      "${sobol_row}" "${sobol_sequence_index}" "${MASK_SEED}" "${noise_seed}" \
+      "${no_noise_output_path}" "${output_path}" "${row_log}" >> "${MANIFEST}"
     echo "FAILED row ${sobol_row}; exit=${status}; log=${row_log}" >&2
     failed=$(( failed + 1 ))
   fi

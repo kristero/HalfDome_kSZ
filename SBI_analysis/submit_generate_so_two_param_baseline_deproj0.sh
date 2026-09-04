@@ -8,8 +8,8 @@ DEFAULT_PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 : "${PROJECT_DIR:=${DEFAULT_PROJECT_DIR}}"
 : "${PYTHON:=python3}"
 : "${QSUB:=qsub}"
-: "${RUN_ROOT:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0}"
-: "${N_SAMPLES:=32768}"
+: "${RUN_ROOT:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/block_offset0_n16384}"
+: "${N_SAMPLES:=16384}"
 : "${P0_LOW:=1.832524}"
 : "${P0_HIGH:=34.341221}"
 : "${BETA_LOW:=3.480627}"
@@ -21,9 +21,10 @@ DEFAULT_PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 : "${MASK_SEED:=12345}"
 : "${NOISE_SEED_BASE:=1000000}"
-: "${CHUNK_ROWS:=256}"
+: "${CHUNK_ROWS:=320}"
 : "${MAX_ACTIVE_JOBS:=5}"
 : "${TEST_LAST_N:=1000}"
+: "${MOPED_LOCAL_N:=2048}"
 : "${DRY_RUN:=0}"
 
 : "${LIGHTCONE_ID:=100}"
@@ -111,6 +112,7 @@ echo "Submitting ${chunk_count} separate generation jobs in ${MAX_ACTIVE_JOBS} d
 echo "At most ${MAX_ACTIVE_JOBS} generation jobs can be runnable simultaneously."
 echo "Rows per job: ${CHUNK_ROWS}"
 echo "Run root: ${RUN_ROOT}"
+echo "Sobol sequence indices: $((SOBOL_SEQUENCE_OFFSET + 1))-$((SOBOL_SEQUENCE_OFFSET + N_SAMPLES))"
 
 declare -a lane_last
 for (( lane=0; lane<MAX_ACTIVE_JOBS; lane++ )); do
@@ -130,7 +132,7 @@ for (( chunk=0; chunk<chunk_count; chunk++ )); do
   lane=$(( chunk % MAX_ACTIVE_JOBS ))
   job_name="$(printf 'S2p%03d' "${chunk}")"
 
-  variables="PROJECT_DIR=${PROJECT_DIR},LIGHTCONE_ID=${LIGHTCONE_ID},HALFDOME_PATH=${HALFDOME_PATH},SOBOL_CSV=${SOBOL_CSV},BASELINE_NOISE_PATH=${BASELINE_NOISE_PATH},GOAL_NOISE_PATH=${GOAL_NOISE_PATH},RAW_OUTPUT_DIR=${RAW_OUTPUT_DIR},RUN_META_DIR=${RUN_META_DIR},CACHE_DIR=${CACHE_DIR},ROW_START=${row_start},ROW_STOP=${row_stop},MASK_SEED=${MASK_SEED},NOISE_SEED_BASE=${NOISE_SEED_BASE}"
+  variables="PROJECT_DIR=${PROJECT_DIR},LIGHTCONE_ID=${LIGHTCONE_ID},HALFDOME_PATH=${HALFDOME_PATH},SOBOL_CSV=${SOBOL_CSV},BASELINE_NOISE_PATH=${BASELINE_NOISE_PATH},GOAL_NOISE_PATH=${GOAL_NOISE_PATH},RAW_OUTPUT_DIR=${RAW_OUTPUT_DIR},RUN_META_DIR=${RUN_META_DIR},CACHE_DIR=${CACHE_DIR},ROW_START=${row_start},ROW_STOP=${row_stop},MASK_SEED=${MASK_SEED},NOISE_SEED_BASE=${NOISE_SEED_BASE},SEQUENCE_OFFSET=${SOBOL_SEQUENCE_OFFSET}"
 
   qsub_args=(-N "${job_name}" -v "${variables}")
   if [[ -n "${lane_last[lane]}" ]]; then
@@ -155,7 +157,7 @@ for (( lane=0; lane<MAX_ACTIVE_JOBS; lane++ )); do
   fi
 done
 dependency="$(IFS=:; echo "${dependency_ids[*]}")"
-combine_vars="PROJECT_DIR=${PROJECT_DIR},PYTHON=${PYTHON},RUN_ROOT=${RUN_ROOT},SOBOL_CSV=${SOBOL_CSV},MANIFEST_DIR=${RUN_META_DIR},OUTPUT_DIR=${RUN_ROOT}/prepared,MASK_SEED=${MASK_SEED},NOISE_SEED_BASE=${NOISE_SEED_BASE},TEST_LAST_N=${TEST_LAST_N}"
+combine_vars="PROJECT_DIR=${PROJECT_DIR},PYTHON=${PYTHON},RUN_ROOT=${RUN_ROOT},SOBOL_CSV=${SOBOL_CSV},MANIFEST_DIR=${RUN_META_DIR},OUTPUT_DIR=${RUN_ROOT}/prepared,MASK_SEED=${MASK_SEED},NOISE_SEED_BASE=${NOISE_SEED_BASE},SEQUENCE_OFFSET=${SOBOL_SEQUENCE_OFFSET},TEST_LAST_N=${TEST_LAST_N},MOPED_LOCAL_N=${MOPED_LOCAL_N}"
 combine_args=(-N S2pCombine -W "depend=afterok:${dependency}" -v "${combine_vars}")
 
 if [[ "${DRY_RUN}" == "1" ]]; then

@@ -56,16 +56,19 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=Path(
             "/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/"
-            "design/battaglia_sobol_P0_beta_32768.csv"
+            "block_offset0_n16384/design/battaglia_sobol_P0_beta_16384.csv"
         ),
     )
-    parser.add_argument("--n-samples", type=int, default=32768)
+    parser.add_argument("--n-samples", type=int, default=16384)
     parser.add_argument("--sobol-seed", type=int, default=12345)
     parser.add_argument(
         "--sequence-offset",
         type=int,
         default=0,
-        help="Skip this many Sobol points before drawing. Zero preserves balance.",
+        help=(
+            "Skip this many points in the same Sobol sequence. Use 16384 for "
+            "the second non-overlapping 16k block."
+        ),
     )
     scramble = parser.add_mutually_exclusive_group()
     scramble.add_argument("--scramble", dest="scramble", action="store_true")
@@ -91,7 +94,10 @@ def parse_args() -> argparse.Namespace:
         "--noise-seed-base",
         type=int,
         default=1_000_000,
-        help="Worker uses noise_seed = noise_seed_base + one-based Sobol row.",
+        help=(
+            "Worker uses noise_seed = noise_seed_base + sequence_offset "
+            "+ one-based local Sobol row."
+        ),
     )
     parser.add_argument(
         "--validate-existing",
@@ -144,10 +150,14 @@ def validate_args(args: argparse.Namespace) -> None:
             "WARNING: n_samples is not a power of two; the Sobol design loses "
             "its strongest balance property."
         )
-    if args.sequence_offset:
+    balanced_continuation = (
+        is_power_of_two(args.n_samples)
+        and is_power_of_two(args.sequence_offset + args.n_samples)
+    )
+    if args.sequence_offset and not balanced_continuation:
         print(
-            "WARNING: a nonzero sequence offset can weaken balance unless the "
-            "skip and requested sample count are chosen as a compatible Sobol block."
+            "WARNING: this nonzero sequence offset is not a compatible "
+            "base-2 continuation, so the requested block can have weaker balance."
         )
 
 
@@ -161,17 +171,23 @@ def draw_unit_sobol(args: argparse.Namespace) -> tuple[np.ndarray, str]:
         ) from exc
 
     engine = qmc.Sobol(d=2, scramble=args.scramble, seed=args.sobol_seed)
-    if args.sequence_offset:
-        engine.fast_forward(args.sequence_offset)
-        unit = engine.random(args.n_samples)
-        method = "fast_forward_then_random"
-    elif is_power_of_two(args.n_samples):
+    balanced_block = (
+        is_power_of_two(args.n_samples)
+        and is_power_of_two(args.sequence_offset + args.n_samples)
+    )
+    if balanced_block:
+        if args.sequence_offset:
+            engine.fast_forward(args.sequence_offset)
         exponent = int(round(math.log2(args.n_samples)))
         unit = engine.random_base2(exponent)
-        method = f"random_base2({exponent})"
+        method = (
+            f"fast_forward({args.sequence_offset})_then_random_base2({exponent})"
+        )
     else:
+        if args.sequence_offset:
+            engine.fast_forward(args.sequence_offset)
         unit = engine.random(args.n_samples)
-        method = "random"
+        method = f"fast_forward({args.sequence_offset})_then_random"
 
     unit = np.asarray(unit, dtype=np.float64)
     if unit.shape != (args.n_samples, 2):
@@ -262,6 +278,7 @@ def validate_existing_design(
     expected_prior_low = np.asarray([args.p0_low, args.beta_low], dtype=np.float64)
     expected_prior_high = np.asarray([args.p0_high, args.beta_high], dtype=np.float64)
     expected_rows = np.arange(1, args.n_samples + 1, dtype=np.int64)
+    expected_sequence_indices = args.sequence_offset + expected_rows
     fixed_names = [name for name in PARAMETER_NAMES if name not in TARGET_PARAMETERS]
     expected_fixed = np.asarray(
         [getattr(args, f"fixed_{name}") for name in fixed_names], dtype=np.float64
@@ -292,6 +309,9 @@ def validate_existing_design(
                 saved["fixed_param_values"], expected_fixed
             ),
             "Sobol rows": np.array_equal(saved["sobol_row"], expected_rows),
+            "Sobol sequence indices": np.array_equal(
+                saved["sobol_sequence_index"], expected_sequence_indices
+            ),
             "Sobol seed": int(np.asarray(saved["sobol_seed"]).item())
             == args.sobol_seed,
             "Sobol sequence offset": int(np.asarray(saved["sequence_offset"]).item())
@@ -301,7 +321,7 @@ def validate_existing_design(
             "noise seed base": int(np.asarray(saved["noise_seed_base"]).item())
             == args.noise_seed_base,
             "noise seeds": np.array_equal(
-                saved["noise_seed"], args.noise_seed_base + expected_rows
+                saved["noise_seed"], args.noise_seed_base + expected_sequence_indices
             ),
         }
 
@@ -367,7 +387,8 @@ def main() -> int:
         dtype=np.float64,
     )
     sobol_rows = np.arange(1, args.n_samples + 1, dtype=np.int64)
-    noise_seeds = args.noise_seed_base + sobol_rows
+    sobol_sequence_indices = args.sequence_offset + sobol_rows
+    noise_seeds = args.noise_seed_base + sobol_sequence_indices
 
     np.savez_compressed(
         metadata_npz,
@@ -382,6 +403,7 @@ def main() -> int:
         prior_high=prior_high,
         sobol_unit=unit,
         sobol_row=sobol_rows,
+        sobol_sequence_index=sobol_sequence_indices,
         noise_seed=noise_seeds,
         noise_seed_base=np.asarray(args.noise_seed_base, dtype=np.int64),
         sobol_seed=np.asarray(args.sobol_seed, dtype=np.int64),
@@ -406,7 +428,9 @@ def main() -> int:
         "sobol_scramble": args.scramble,
         "sequence_offset": args.sequence_offset,
         "generator": generator,
-        "noise_seed_policy": "noise_seed_base + one_based_sobol_row",
+        "noise_seed_policy": (
+            "noise_seed_base + sequence_offset + one_based_local_sobol_row"
+        ),
         "noise_seed_base": args.noise_seed_base,
         "same_mask_policy": "one fixed mask_seed supplied by the PBS worker",
         "validation": validation,

@@ -14,13 +14,15 @@ WORK_DIR="${PBS_O_WORKDIR:-$PWD}"
 cd "${WORK_DIR}"
 : "${PROJECT_DIR:=${WORK_DIR}}"
 : "${PYTHON:=python3}"
-: "${RUN_ROOT:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0}"
-: "${SOBOL_CSV:=${RUN_ROOT}/design/battaglia_sobol_P0_beta_32768.csv}"
+: "${RUN_ROOT:=/lustre/work/kristero10/adrian_two_param_so_baseline_deproj0/block_offset0_n16384}"
+: "${SOBOL_CSV:=${RUN_ROOT}/design/battaglia_sobol_P0_beta_16384.csv}"
 : "${MANIFEST_DIR:=${RUN_ROOT}/run_manifests}"
 : "${OUTPUT_DIR:=${RUN_ROOT}/prepared}"
 : "${MASK_SEED:=12345}"
 : "${NOISE_SEED_BASE:=1000000}"
+: "${SEQUENCE_OFFSET:=0}"
 : "${TEST_LAST_N:=1000}"
+: "${MOPED_LOCAL_N:=2048}"
 : "${FORCE_COMBINE:=0}"
 
 mkdir -p "${OUTPUT_DIR}" /home/kristero10/logs/tSZ_two_param
@@ -47,7 +49,9 @@ echo "Output: ${OUTPUT_DIR}"
   --output-dir "${OUTPUT_DIR}" \
   --mask-seed "${MASK_SEED}" \
   --noise-seed-base "${NOISE_SEED_BASE}" \
+  --sequence-offset "${SEQUENCE_OFFSET}" \
   --test-last-n "${TEST_LAST_N}" \
+  --moped-local-n "${MOPED_LOCAL_N}" \
   "$@"
 
 echo "Finished: $(date -Is)"

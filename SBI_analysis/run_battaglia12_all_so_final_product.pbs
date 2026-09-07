@@ -124,17 +124,19 @@ JULIA_NUM_THREADS="${THREADS_PER_TASK}" \
   save_masked_signal_map=false \
   save_noisy_maps=false
 
-package_args=()
+# Keep the array nonempty: older Bash treats empty arrays as unset under set -u.
+package_args=(
+  "${PACKAGER}"
+  --deproj0-dir "${DEPROJ0_DIR}"
+  --deproj2-dir "${DEPROJ2_DIR}"
+  --output-dir "${PREPARED_DIR}"
+  --mask-seed "${MASK_SEED}"
+  --noise-seed "${NOISE_SEED}"
+)
 if [[ "${FORCE_PACKAGE}" == "1" ]]; then
   package_args+=(--force)
 fi
-"${PYTHON}" "${PACKAGER}" \
-  --deproj0-dir "${DEPROJ0_DIR}" \
-  --deproj2-dir "${DEPROJ2_DIR}" \
-  --output-dir "${PREPARED_DIR}" \
-  --mask-seed "${MASK_SEED}" \
-  --noise-seed "${NOISE_SEED}" \
-  "${package_args[@]}"
+"${PYTHON}" "${package_args[@]}"
 
 echo "Finished: $(date -Is)"
 echo "Reusable product: ${PREPARED_DIR}/battaglia12_masked_so_all_noise_ell80_7979.npz"

@@ -1,0 +1,64 @@
+#!/bin/bash
+#PBS -N SO_compression
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+
+if [[ -n "${COMPRESSION_CONFIG:-}" ]]; then
+  source "${COMPRESSION_CONFIG}"
+fi
+: "${PROJECT_ROOT:=/home/kristero10/HalfDome_kSZ}"
+: "${PYTHON:=python3}"
+: "${COMPRESSION_STAGE:=run}"
+: "${COMPRESSION_METHOD:=bins40}"
+: "${COMPRESSION_ROOT:=/lustre/work/kristero10/adrian_9param_compression_baseline_deproj0}"
+DATA_DIR="${PROJECT_ROOT}/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow"
+: "${PREPARED_DATASET:=${DATA_DIR}/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz}"
+: "${CLEAN_DATASET:=${DATA_DIR}/so_masked_no_noise_ell80_7979_sbi_run.npz}"
+
+cd "${PROJECT_ROOT}"
+mkdir -p "${COMPRESSION_ROOT}/logs"
+exec > >(tee -a "${COMPRESSION_ROOT}/logs/${COMPRESSION_STAGE}_${COMPRESSION_METHOD}_${PBS_JOBID:-manual}.log") 2>&1
+export OMP_NUM_THREADS="${PBS_NCPUS:-26}"
+export OPENBLAS_NUM_THREADS="${OMP_NUM_THREADS}"
+export MKL_NUM_THREADS="${OMP_NUM_THREADS}"
+export NUMEXPR_NUM_THREADS="${OMP_NUM_THREADS}"
+export TORCH_NUM_THREADS="${OMP_NUM_THREADS}"
+export TORCH_NUM_INTEROP_THREADS=1
+export PYTHONUNBUFFERED=1
+export MPLBACKEND=Agg
+
+echo "SO compression stage=${COMPRESSION_STAGE}, method=${COMPRESSION_METHOD}"
+echo "Started $(date -Is) on $(hostname); output=${COMPRESSION_ROOT}"
+SCRIPT="${PROJECT_ROOT}/SBI_analysis/run_so_sbi_compression_comparison.py"
+# Positional arguments remain safe even with old Bash and set -u.
+set -- "${COMPRESSION_STAGE}" --output-root "${COMPRESSION_ROOT}"
+case "${COMPRESSION_STAGE}" in
+  prepare)
+    set -- "$@" --dataset "${PREPARED_DATASET}" --clean-dataset "${CLEAN_DATASET}" \
+      --holdout-last-n "${HOLDOUT_LAST_N:-500}" --pca-components "${PCA_COMPONENTS:-9}" \
+      --moped-local-n "${MOPED_LOCAL_N:-20000}" \
+      --covariance-shrinkage "${COVARIANCE_SHRINKAGE:-0.05}" \
+      --moped-rcond "${MOPED_RCOND:-1e-6}" \
+      --hidden-features "${HIDDEN_FEATURES:-64}" --num-transforms "${NUM_TRANSFORMS:-6}" \
+      --training-batch-size "${TRAINING_BATCH_SIZE:-1024}" \
+      --stop-after-epochs "${STOP_AFTER_EPOCHS:-20}" --max-num-epochs "${MAX_NUM_EPOCHS:-200}" \
+      --validation-fraction "${VALIDATION_FRACTION:-0.1}" \
+      --posterior-samples "${POSTERIOR_SAMPLES:-2000}" \
+      --max-proposals "${MAX_PROPOSALS:-200000}" --sampling-seconds "${SAMPLING_SECONDS:-120}" \
+      --seed "${SBI_SEED:-42}"
+    ;;
+  run)
+    "${PYTHON}" SBI_analysis/check_sbi_cluster_runtime.py
+    set -- "$@" --method "${COMPRESSION_METHOD}"
+    ;;
+  summarize) ;;
+  *) echo "Invalid COMPRESSION_STAGE: ${COMPRESSION_STAGE}" >&2; exit 2 ;;
+esac
+"${PYTHON}" "${SCRIPT}" "$@"
+echo "Finished $(date -Is)"

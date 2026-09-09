@@ -1,0 +1,27 @@
+#!/bin/bash
+#PBS -N SOcmp_audit
+#PBS -q mini
+#PBS -l select=1:ncpus=2:mpiprocs=1:mem=8gb
+#PBS -l walltime=00:15:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+
+set -euo pipefail
+: "${PROJECT_ROOT:=/home/kristero10/HalfDome_kSZ}"
+: "${COMPRESSION_ROOT:=/lustre/work/kristero10/adrian_9param_compression_baseline_deproj0}"
+: "${PYTHON:=python3}"
+: "${RAW_SAMPLES:=20000}"
+: "${AUDIT_OUTPUT:=${COMPRESSION_ROOT}/diagnostics/acceptance_audit}"
+cd "${PROJECT_ROOT}"
+mkdir -p "${AUDIT_OUTPUT}"
+exec > >(tee -a "${AUDIT_OUTPUT}/audit_${PBS_JOBID:-manual}.log") 2>&1
+export OMP_NUM_THREADS="${PBS_NCPUS:-2}"
+export OPENBLAS_NUM_THREADS="${OMP_NUM_THREADS}"
+export MKL_NUM_THREADS="${OMP_NUM_THREADS}"
+export NUMEXPR_NUM_THREADS="${OMP_NUM_THREADS}"
+export PYTHONUNBUFFERED=1
+echo "Diagnostics only: no training, no evaluation retries, no posterior replacement."
+"${PYTHON}" SBI_analysis/diagnose_so_compression_acceptance.py \
+  --run-root "${COMPRESSION_ROOT}" --output-dir "${AUDIT_OUTPUT}" \
+  --raw-samples "${RAW_SAMPLES}" --threads "${OMP_NUM_THREADS}"

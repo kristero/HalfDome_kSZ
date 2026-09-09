@@ -3,6 +3,7 @@
 import json
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 
 import numpy as np
@@ -33,6 +34,43 @@ def synthetic_data(n=1200):
 
 
 class CompressionTests(unittest.TestCase):
+    def test_best_validation_weights_restored_at_epoch_cap(self):
+        try:
+            import torch
+        except ImportError:
+            self.skipTest("Checkpoint restoration check requires Torch, but not SBI")
+        estimator = torch.nn.Linear(2, 1)
+        best = {key: value.detach().clone() for key, value in estimator.state_dict().items()}
+        inference = SimpleNamespace(_best_model_state_dict=best)
+        with torch.no_grad():
+            estimator.weight.add_(10)
+        result = runner.restore_best_validation_weights(estimator, inference)
+        self.assertTrue(result["returned_weights_differed_from_best"])
+        for key, value in estimator.state_dict().items():
+            self.assertTrue(torch.equal(value, best[key]))
+        result = runner.restore_best_validation_weights(estimator, inference)
+        self.assertFalse(result["returned_weights_differed_from_best"])
+        with self.assertRaisesRegex(RuntimeError, "best-validation state"):
+            runner.restore_best_validation_weights(estimator, SimpleNamespace())
+        with self.assertRaises(RuntimeError):
+            runner.restore_best_validation_weights(estimator, SimpleNamespace(
+                _best_model_state_dict={"wrong_layer": torch.ones(1)}))
+
+    def test_raw_acceptance_requires_all_parameters_inside(self):
+        from diagnose_so_compression_acceptance import summarize_raw
+        raw = np.full((4, 9), .5)
+        raw[1, 0] = -.1
+        raw[2, 1] = 1.1
+        raw[3, [0, 1]] = [-.1, 1.1]
+        result = summarize_raw(raw, np.zeros(9), np.ones(9))
+        self.assertEqual(result["accepted_count"], 1)
+        self.assertEqual(result["acceptance"], .25)
+        self.assertEqual(result["per_parameter"][0]["below"], .5)
+        self.assertEqual(result["per_parameter"][1]["above"], .5)
+        raw[0, 0] = np.nan
+        with self.assertRaises(ValueError):
+            summarize_raw(raw, np.zeros(9), np.ones(9))
+
     def test_split_preserves_prior_and_original_holdout(self):
         noisy, _ = synthetic_data()
         noisy["theta"][[2, 1199], 0] = noisy["prior_high"][0] + 1
@@ -100,6 +138,34 @@ class CompressionTests(unittest.TestCase):
         np.testing.assert_allclose(metric["pull"], [1., 1.])
         self.assertAlmostEqual(np.sqrt(np.mean(metric["normalized_error_prior"]**2)), np.sqrt(.1))
         np.testing.assert_allclose(pearson_columns(samples, samples), [1, 1])
+
+    def test_bounded_sampling_old_and_new_interfaces(self):
+        try:
+            import torch
+        except ImportError:
+            self.skipTest("Sampling adapter check requires Torch, but not SBI")
+
+        class OldFlow:
+            def sample(self, num_samples, context):
+                return torch.ones((1, num_samples, 3))
+
+        class NewFlow:
+            def sample(self, sample_shape, condition):
+                return torch.ones((*sample_shape, 1, 3))
+
+        class OutsideFlow:
+            def sample(self, num_samples, context):
+                return torch.full((1, num_samples, 3), 100.)
+
+        config = dict(posterior_samples=10, max_proposals=23, sampling_seconds=30)
+        for model in (OldFlow(), NewFlow()):
+            samples, proposals, acceptance = runner.bounded_samples(
+                model, np.zeros(40), np.zeros(3), np.full(3, 2), config)
+            self.assertEqual(samples.shape, (10, 3))
+            self.assertEqual(proposals, 23)
+            self.assertEqual(acceptance, 1)
+        with self.assertRaisesRegex(RuntimeError, "accepted=0, proposals=23"):
+            runner.bounded_samples(OutsideFlow(), np.zeros(40), np.zeros(3), np.full(3, 2), config)
 
     def test_prepare_and_plot_without_sbi(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -9,7 +9,6 @@ import csv
 from functools import lru_cache
 import inspect
 import json
-import os
 import pickle
 import re
 import sys
@@ -36,7 +35,7 @@ LABELS = (r"P_0", r"x_{\rm c}", r"\beta", r"\alpha_{m,P_0}",
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("prepare", "run", "summarize"))
+    parser.add_argument("stage", choices=("prepare", "run", "summarize", "check-runtime"))
     parser.add_argument("--output-root", type=Path, default=DEFAULT_ROOT)
     parser.add_argument("--method", choices=METHODS)
     parser.add_argument("--dataset", type=Path,
@@ -172,6 +171,27 @@ def prepare(args):
     print("Prepared experiment:", root)
 
 
+def restore_best_validation_weights(estimator, inference):
+    """Select SBI's best recorded snapshot even when training hits its epoch cap.
+
+    SBI 0.22 returns the final network at the cap; its normal early-stopping
+    path alone restores the best weights. Keep this version-specific access
+    isolated and fail clearly if a future SBI version changes the contract.
+    """
+    import torch
+    best = getattr(inference, "_best_model_state_dict", None)
+    if not best:
+        raise RuntimeError("SBI did not expose a best-validation state dictionary; "
+                           "refusing to label final-epoch weights as the best model")
+    current = estimator.state_dict()
+    differs = set(current) != set(best) or any(
+        not torch.equal(current[key], best[key]) for key in current
+    )
+    estimator.load_state_dict(best, strict=True)
+    return dict(weights_selection="best_validation_snapshot",
+                returned_weights_differed_from_best=differs)
+
+
 def train(root, method, config, shared):
     import torch
     from sbi_for_cluster import (
@@ -192,6 +212,11 @@ def train(root, method, config, shared):
             raise ValueError("Training belongs to another experiment")
         if not (run / "density_estimator.pkl").is_file():
             raise FileNotFoundError(run / "density_estimator.pkl")
+        if (not status.get("converged_by_early_stopping", False)
+                and status.get("weights_selection") != "best_validation_snapshot"):
+            print("WARNING: this legacy capped run may contain final-epoch weights, "
+                  "not its reported best-validation weights. Reuse leaves it unchanged; "
+                  "a corrected training comparison needs a new output root.", flush=True)
         print("Reusing trained density estimator:", run, flush=True)
         return
     configure_runtime_threads()
@@ -235,6 +260,8 @@ def train(root, method, config, shared):
     output = capture.getvalue()
     validation = parse_validation_losses_from_training_output(output)
     save_training_output_and_validation_losses(run, output, validation)
+    selection = restore_best_validation_weights(estimator, inference)
+    print("Saved-weight selection:", selection, flush=True)
     # Save the learned estimator before any potentially slow posterior evaluation.
     estimator.eval()
     for name, value in (("density_estimator.pkl", estimator), ("prior.pkl", prior)):
@@ -251,7 +278,8 @@ def train(root, method, config, shared):
                            x_dim=x.shape[1], best_validation_performance=validation,
                            epochs_trained=int(epochs[-1]) if epochs else None,
                            converged_by_early_stopping="successfully converged" in output.lower(),
-                           python=sys.version, sbi=str(sbi.__version__), torch=str(torch.__version__)))
+                           python=sys.version, sbi=str(sbi.__version__), torch=str(torch.__version__),
+                           **selection))
 
 
 def bounded_samples(estimator, context, low, high, config):
@@ -355,7 +383,7 @@ def summarize(args, config, shared):
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    root, width = args.output_root, shared["high"] - shared["low"]
+    root = args.output_root
     out = root / "summary"
     out.mkdir(exist_ok=True)
     # Validate every expected row first. Never compare different successful subsets.
@@ -537,6 +565,15 @@ def summarize(args, config, shared):
 
 def main():
     args = parse_args()
+    if args.stage == "check-runtime":
+        # Test the actual imports used here. Newer sbi does not need ArviZ/Numba.
+        import torch
+        import sbi
+        from sbi_for_cluster import SBI_NPE
+        print(json.dumps(dict(python=sys.executable, numpy=np.__version__,
+                              torch=str(torch.__version__), sbi=str(sbi.__version__),
+                              inference_class=SBI_NPE.__name__), indent=2))
+        return 0
     if args.stage == "prepare":
         prepare(args)
         return 0
@@ -548,7 +585,15 @@ def main():
         train(args.output_root, args.method, config, shared)
         evaluate(args.output_root, args.method, config, shared)
     else:
-        summarize(args, config, shared)
+        failure = args.output_root / "summary/summary_failure.json"
+        try:
+            summarize(args, config, shared)
+        except Exception as error:
+            write_json(failure, dict(experiment_id=config["experiment_id"],
+                                    error_type=type(error).__name__, error=str(error)))
+            raise
+        else:
+            failure.unlink(missing_ok=True)
     return 0
 
 

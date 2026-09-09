@@ -158,6 +158,99 @@ this first comparison does not establish statistically significant gains.
 
 ## Resume or plot locally
 
+### Best-validation weights and acceptance audit
+
+Training now explicitly restores SBI's best recorded validation snapshot
+before saving either density-estimator file. In cluster SBI 0.22, reaching
+the epoch cap returned final weights even though the printed summary
+reported the best validation score. The original PCA and MOPED runs reached
+that cap. Their old models/results are NOT repaired by this source change,
+and resuming evaluation does not retrain or overwrite them. Corrected training
+must use a new output root to avoid mixing posterior checkpoints from different
+networks. The new training marker records `weights_selection` and whether the
+returned network differed from the best snapshot. The printed validation
+summary is still retained verbatim; no TensorBoard loss-tag plot is required.
+
+For diagnostics only, without restarting training or completing failed rows:
+
+```bash
+qsub SBI_analysis/run_so_compression_acceptance_diagnostics.pbs
+```
+
+This is one 2-CPU, 8-GB, 15-minute mini job. It checks row identity, parameter
+order, saved priors, disjoint splits, cached training/test transforms and
+posterior contexts. It samples a bounded number of raw draws at failed rows
+and two controls, reporting the mass outside each parameter's bounds.
+`diagnostics/acceptance_audit/acceptance_diagnostics.json` records the results;
+the saved raw sample heads are diagnostic arrays, not posterior samples.
+Nearest-neighbor distance percentiles use 50000 optimization rows as a
+reference and the held-out set as the percentile population. They are a
+coverage heuristic, not proof of an out-of-distribution observation.
+
+An unconstrained MAF can assign mass outside a finite BoxUniform prior.
+Accepting a draw requires all nine coordinates to lie inside simultaneously.
+Low acceptance is therefore not fixed by widening the prior or clipping
+draws; either changes the inference. More proposals only sample the same
+restricted learned density more accurately, not a better-trained density.
+
+### Local execution
+
+To rerun only the capped PCA/MOPED training with corrected weight selection:
+
+```bash
+COMPRESSION_ROOT=/lustre/work/kristero10/adrian_9param_compression_baseline_deproj0_bestval \
+bash SBI_analysis/submit_so_compression_bestval_rerun.sh
+```
+
+The target must not exist. The launcher copies prepared inputs unchanged and
+the completed bins40 baseline, then submits exactly three ordinary jobs:
+PCA, MOPED, and summary. It does not copy the old PCA/MOPED models or samples.
+The summary uses `afterany` to report missing evaluations visibly; strict
+same-profile comparison checks still prohibit a selective-subset summary.
+
+On the local machine (keep it awake and connected):
+
+```bash
+python SBI_analysis/download_so_compression_summary.py \
+  --remote-root /lustre/work/kristero10/adrian_9param_compression_baseline_deproj0_bestval \
+  --local-root SBI_analysis/outputs/compression_bestval
+```
+
+The downloader waits for a completion/failure marker and transfers plots,
+CSV tables, logs and provenance using `ssh idark`. It does not download the
+large training arrays. A failed summary is labelled failed, not complete.
+
+The entire workflow can run locally in WSL, not only the summary. On your
+machine, use the HalfDome Python environment:
+
+```bash
+cd /home/cbllover/HalfDome
+export PYTHON=/home/cbllover/miniconda3/envs/halfdome/bin/python
+
+# Only needed if this environment lacks GetDist; no dependency upgrades:
+"$PYTHON" -m pip install --no-deps getdist==1.7.7
+
+# Preparation + sequential training/evaluation of all three methods + plots:
+LOCAL_THREADS=4 bash SBI_analysis/run_so_sbi_compression_local.sh all
+```
+
+The launcher supplies local input paths, uses the selected Python environment's
+C++ runtime (needed for the local SciPy installation), and runs only one
+model at a time. It does not install or alter your scientific environment.
+Local default output is:
+
+```
+/home/cbllover/HalfDome/SBI_analysis/outputs/local_so_9param_compression/
+```
+
+Use `prepare` instead of `all` for the fast compression-only stage;
+`run pca` to train/evaluate one method; or `summarize` to replot. The same
+configuration environment variables work locally and on PBS. Do not run
+two processes against the same method/output directory simultaneously.
+CPU training at this data size can be lengthy; suspend/sleep interrupts useful
+progress. A preparation or synthetic training smoke test does not establish
+full-dataset training runtime or scientific performance.
+
 Sampling is checkpointed per profile and limited to 200000 proposals or
 120 seconds (checked between network calls). Failed rows are reported and
 prevent a selective-subset comparison. Resubmission reuses completed models

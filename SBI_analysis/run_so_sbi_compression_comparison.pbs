@@ -54,7 +54,7 @@ case "${COMPRESSION_STAGE}" in
       --seed "${SBI_SEED:-42}"
     ;;
   run)
-    "${PYTHON}" SBI_analysis/check_sbi_cluster_runtime.py
+    "${PYTHON}" "${SCRIPT}" check-runtime
     set -- "$@" --method "${COMPRESSION_METHOD}"
     ;;
   summarize) ;;

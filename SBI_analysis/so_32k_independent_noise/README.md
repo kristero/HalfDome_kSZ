@@ -1,5 +1,9 @@
 # Independent-noise SO mocks: two-parameter and nine-parameter datasets
 
+**For Adrian's cluster agent:** start with [AGENTS.md](AGENTS.md). It limits the
+current task to both 32768-row designs with baseline deproj0 only, and gives the
+ordered preflight, smoke, submission, resume and final-verification procedure.
+
 The default remains 32768 rows per dataset, baseline deproj0 only. See
 `VALIDATION.md` and `validation_plots/` for the noise and painter audit.
 `MOCK_AUDIT_EXPLAINED.md` explains the threaded-painter/beam fixes, every check,

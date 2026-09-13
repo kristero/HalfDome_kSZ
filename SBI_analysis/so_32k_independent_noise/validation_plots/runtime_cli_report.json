@@ -1,0 +1,46 @@
+[
+  {
+    "checked": {
+      "Validated beam": 2.0,
+      "Validated deprojections": "0",
+      "Validated mask seed": 12345,
+      "Validated noise seed": 1000000
+    },
+    "mode": "two_param",
+    "passed": true,
+    "row": 1
+  },
+  {
+    "checked": {
+      "Validated beam": 3.0,
+      "Validated deprojections": "2,0",
+      "Validated mask seed": 12345,
+      "Validated noise seed": 2148418112
+    },
+    "mode": "two_param",
+    "passed": true,
+    "row": 32768
+  },
+  {
+    "checked": {
+      "Validated beam": 2.0,
+      "Validated deprojections": "0",
+      "Validated mask seed": 12345,
+      "Validated noise seed": 281474977710656
+    },
+    "mode": "nine_param",
+    "passed": true,
+    "row": 1
+  },
+  {
+    "checked": {
+      "Validated beam": 3.0,
+      "Validated deprojections": "2,0",
+      "Validated mask seed": 12345,
+      "Validated noise seed": 281477125128768
+    },
+    "mode": "nine_param",
+    "passed": true,
+    "row": 32768
+  }
+]

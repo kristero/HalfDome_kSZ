@@ -1,0 +1,82 @@
+{
+  "config": {
+    "beam_fwhm_arcmin": 2.0,
+    "cosmo_h": 0.68,
+    "cosmo_omegab": 0.049,
+    "cosmo_omegac": 0.261,
+    "default_product": "baseline_deproj0",
+    "delta_ell": 200,
+    "deprojections": [
+      0,
+      2
+    ],
+    "design_dir": "designs",
+    "ell_max": 7979,
+    "ell_min": 80,
+    "fiducial": [
+      18.1,
+      0.497,
+      4.35,
+      0.154,
+      -0.00865,
+      0.0393,
+      -0.758,
+      0.731,
+      0.415
+    ],
+    "interpolator_logM_max": 15.7,
+    "interpolator_pad": 256,
+    "mask_apodization_arcmin": 60.0,
+    "mask_fsky": 0.4,
+    "mask_seed": 12345,
+    "mass_min": 1000000000000.0,
+    "n_rows": 32768,
+    "noise_cases": [
+      "baseline",
+      "goal"
+    ],
+    "noise_seed_bases": {
+      "nine_param": 281474977710656,
+      "two_param": 1000000
+    },
+    "noise_seed_stride": 65536,
+    "nside": 4096,
+    "prior_high": [
+      34.39,
+      0.8449,
+      5.22,
+      0.2926,
+      0.1,
+      0.1,
+      -0.2274,
+      1.3158,
+      0.747
+    ],
+    "prior_low": [
+      1.81,
+      0.1491,
+      3.48,
+      0.0,
+      -0.1,
+      -0.02,
+      -1.3644,
+      0.1462,
+      0.083
+    ],
+    "sequence_offset": 0
+  },
+  "lmax": 255,
+  "noise_sha256": {
+    "SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+    "SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt": "5564becc9520374159655f46f26a8b19c025195ebc7ec4791f93300ec2522681"
+  },
+  "nside": 128,
+  "source_sha256": {
+    "diagnose_noise.jl": "6f3f605b44a13cfc3abf7a954b6d2c203bd72b1ab7db975a54fbe3707c61dd89",
+    "diagnose_noise.py": "1101583f0031746081825d1bbb681c33d0e753e55f2744e47d77bc900700116d",
+    "generate.py": "db2a04d59552ac00e3a790684091716d6ad64689a68042d8d4860c81bf2c76eb",
+    "safe_paint.jl": "d72803e43d58863be3bc2d4f154b7f6047b1370cdbae47964f7785eb4fa06967",
+    "simulator/tSZ_visuals/run_halfdome_fullsky_so_noise.jl": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+    "test_paint.jl": "379eb5ac892ec06416bed1655ed481d6ff56cce168adff2c8c19b8dfa956287b"
+  }
+}

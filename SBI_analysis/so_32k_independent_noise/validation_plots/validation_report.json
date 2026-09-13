@@ -1,0 +1,41 @@
+{
+  "actual_noise_maps": 72,
+  "checks": {
+    "baseline_deproj0_power_within_5sigma": true,
+    "baseline_deproj2_power_within_5sigma": true,
+    "goal_deproj0_power_within_5sigma": true,
+    "goal_deproj2_power_within_5sigma": true,
+    "new_streams_have_no_duplicate_maps": true,
+    "repeated_row_maps_identical": true,
+    "ring_locked_painter_matches_serial": true,
+    "stride1_reuses_previous_split2": true
+  },
+  "configured_rows_per_mode": 32768,
+  "diagnostic_lmax": 255,
+  "diagnostic_nside": 128,
+  "harmonic_power": {
+    "baseline_deproj0": {
+      "expected_sigma": 0.0016787978417195423,
+      "mean_power_ratio": 1.0025281553827259
+    },
+    "baseline_deproj2": {
+      "expected_sigma": 0.0016787978417195423,
+      "mean_power_ratio": 0.9994089998840279
+    },
+    "goal_deproj0": {
+      "expected_sigma": 0.0016787978417195423,
+      "mean_power_ratio": 0.9991771847180623
+    },
+    "goal_deproj2": {
+      "expected_sigma": 0.0016787978417195423,
+      "mean_power_ratio": 1.0015477157083759
+    }
+  },
+  "limitations": "Noise-only reduced-resolution checks; not full-resolution halo generation or a survey covariance validation.",
+  "max_absolute_independent_map_correlation": 0.03868055598156443,
+  "painter_stress_max_fixed_relative_error": 0.0,
+  "painter_stress_max_legacy_relative_error": 0.005287266813519194,
+  "passed": true,
+  "unique_seeds_all_products_524288": 8388608,
+  "unique_seeds_all_products_configured_n": 524288
+}

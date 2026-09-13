@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -N SO_indnoise
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${BUNDLE:?Submit using submit.sh from the extracted handoff folder}"
+source "${BUNDLE}/cluster.env"
+mkdir -p "${OUTPUT_ROOT}/logs"
+exec > >(tee -a "${OUTPUT_ROOT}/logs/worker_${WORKER:-0}_${PBS_JOBID:-manual}.log") 2>&1
+export PYTHONUNBUFFERED=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+cd "${BUNDLE}"
+echo "$(date -Is) host=$(hostname), worker=${WORKER:-0}, nworkers=${WORKERS:-20}"
+"${PYTHON}" generate.py work --worker "${WORKER:-0}" --workers "${WORKERS:-20}" \
+  --max-rows "${MAX_ROWS:-0}"

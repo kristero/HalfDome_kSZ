@@ -1,0 +1,18 @@
+{
+  "two_param": {
+    "original_file": "battaglia_sobol_P0_beta_524288.csv",
+    "source_sha256": "3c165370d22e136d0cb42c649a566aeb01403d818be89e1bd3f8a4dad47d285e",
+    "n_rows": 32768,
+    "sequence_offset": 0,
+    "selection": "first 32768 data rows, in original CSV order",
+    "csv_sha256": "a21196715b1862646ce2bd5b2a43dcff44991c523f8d578cc477fabfa54d59f4"
+  },
+  "nine_param": {
+    "original_file": "battaglia_sobol_1048576.csv",
+    "source_sha256": "715601d91110293abe1d84c67530248ec707b36f5e8f5b0d1a9ee6609f734cb8",
+    "n_rows": 32768,
+    "sequence_offset": 0,
+    "selection": "first 32768 data rows, in original CSV order",
+    "csv_sha256": "f98f0fc1e7143c733245fc53c19a21560b1a841a8bd293bad22ccc58201123ea"
+  }
+}

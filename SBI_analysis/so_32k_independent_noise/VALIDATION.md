@@ -92,3 +92,23 @@ catalogue output check. No claim is made that these checks prove all mocks corre
 
 The immutable source/data inventory is in SHA256SUMS. Verify it before editing
 cluster.env/config.json. Dependencies and the catalogue are external to the archive.
+
+## Sobol extension checks, 2026-09-13
+
+The actual original CSVs were checked at N=32768 and N=524288 for both designs.
+The larger tables exactly extend the shipped 32k prefixes, with no duplicate
+parameter rows or values outside the configured priors. The two-parameter design
+keeps the other seven columns fixed to Battaglia12. Each varied parameter has
+exactly 1024 and 16384 rows per bin, respectively, in 32 equal-width prior bins.
+
+Plots, source hashes, numerical summaries and prefix-check results are in
+`sobol_plots/`. The corner scatter panels show the first 1024 points for legibility;
+their diagonal histograms use all rows. These are input-design checks, not
+posterior constraints or evidence of SBI convergence. No iid uniformity p-values
+are assigned to a deterministic or scrambled low-discrepancy sequence.
+
+All 16 Python tests passed (`test_generation.py` and `test_sobol_plots.py`).
+The additional tests cover plotting inputs and the 524288-row, four-noise-product
+preset, including its 8,388,608 disjoint split seeds across both designs. This
+update did not rerun Julia sky simulations or submit cluster jobs; the earlier
+small-map validation and the need for a full-resolution smoke test still apply.

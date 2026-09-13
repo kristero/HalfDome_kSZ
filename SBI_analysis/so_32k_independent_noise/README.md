@@ -2,6 +2,8 @@
 
 The default remains 32768 rows per dataset, baseline deproj0 only. See
 `VALIDATION.md` and `validation_plots/` for the noise and painter audit.
+`MOCK_AUDIT_EXPLAINED.md` explains the threaded-painter/beam fixes, every check,
+the larger-run setup, and the new `sobol_plots/` distributions in detail.
 
 ## What to generate
 
@@ -66,6 +68,10 @@ Physical positivity and line-of-sight convergence checks remain enabled. The
 old hard-coded Julia prior does not override the bounds in `config.json`.
 
 ### Larger datasets with the original Sobol sequence
+
+`config_524288_all_noise.example.json` is a complete ready-to-select configuration
+for 524288 rows per design with baseline/goal and deproj0/2. Activate it only in
+a separate run folder and use a new output root; `config.json` is unchanged by default.
 
 Set `n_rows` to 524288 and `sequence_offset` to 0. To retain the EXACT prefix
 of the shipped designs, obtain both original full CSVs and run:
@@ -307,3 +313,15 @@ observation. Those are separate later steps. Keep the seed metadata and fit
 the training/observation preprocessing consistently in the analysis pipeline.
 An estimator trained on the earlier fixed-noise data must not be reused as an
 independent-noise estimator; train new NPE models on these newly generated pairs.
+
+## Sobol parameter distributions
+
+`python3 plot_sobol_designs.py` plots the configured tables. For the shipped 32k
+and exact 524288-row extensions together, pass `--sizes 32768 524288` plus
+`--two-param-csv` and `--nine-param-csv` with the original full source CSVs.
+The saved `sobol_plots/` include all nine marginal panels, nine-parameter joint
+coverage, P0-beta prefix coverage, and numerical diagnostics. All histogram
+counts use real CSV rows; joint scatter panels are explicitly limited to the
+first 1024 points. These are prior/design plots, not SBI constraints.
+The seven fixed parameters of the two-parameter design are drawn as vertical lines.
+Run `python3 -m unittest -v test_sobol_plots.py` for the plotting-data and preset tests.

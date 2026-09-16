@@ -556,6 +556,189 @@ function validate_lee2022_direct_profile_grid(
     )
 end
 
+# ---------------------------------------------------------------------------
+# Profile-owned Battaglia16 density and the spherical (chord-limited) boundary
+# ---------------------------------------------------------------------------
+
+"""Battaglia16 gas density evaluated from XGPaint's own parameters and normalization
+(rho_gas = P0 gNFW f_b rho_crit; n_e via XGPaint's ne2d composition), but with the
+line-of-sight integral owned by this file so it can be truncated at a sphere."""
+struct Battaglia16DensityDMProfile{T,C,P} <: XGPaint.AbstractGNFW{T}
+    cosmo::C
+    inner::P
+end
+
+function Battaglia16DensityDMProfile(inner::XGPaint.HaloDMProfile{T,C}) where {T,C}
+    return Battaglia16DensityDMProfile{T,C,typeof(inner)}(inner.cosmo, inner)
+end
+
+const B16_DENSITY_CACHE_SIGNATURE =
+    "battaglia16_xgpaint_params|rho_gas=P0*gnfw*f_b*rho_crit|ne2d_composition|M200c|R200c|profile_owned_los|observer=1/(1+z)"
+const B16_DENSITY_MODEL_FAMILY = "battaglia16_profile_owned_los_v1"
+
+"""Physical 3-D electron density [m^-3] at x = r/R200c for either density family."""
+function halo_electron_density_m3(model::Battaglia16DensityDMProfile, x::Real, mass_msun::Real, z::Real)
+    inner = model.inner
+    par = XGPaint.get_params(inner, mass_msun * XGPaint.M_sun, z)
+    rho_crit = getfield(XGPaint, Symbol(Char(0x03c1), "_crit"))(inner, z)
+    rho_gas = par.P₀ * XGPaint.generalized_nfw(x, par.xc, par.α, par.β, par.γ) * inner.f_b * rho_crit
+    me = XGPaint.constants.ElectronMass
+    mH = XGPaint.constants.ProtonMass
+    xH = 0.76
+    factor = me + (2xH / (xH + 1)) * mH + ((1 - xH) / (2(1 + xH))) * 4mH
+    return Float64(ustrip(uconvert(u"m^-3", 0.9 * rho_gas / factor)))
+end
+
+function halo_electron_density_m3(model::AbstractLee2022DMProfile, x::Real, mass_msun::Real, z::Real)
+    parameters = lee2022_parameters(model, mass_msun, z)
+    rho_critical = getfield(XGPaint, Symbol(Char(0x03c1), "_crit"))(model, z)
+    n200 = 200 * rho_critical / (model.hydrogen_mass_fraction * XGPaint.constants.ProtonMass) *
+           (model.omega_b / model.omega_m)
+    n200_m3 = Float64(ustrip(uconvert(u"m^-3", n200)))
+    return lee2022_normalization_factor(model) * lee2022_redshift_scaling_factor(model, z) *
+           parameters.n0 * n200_m3 *
+           lee2022_dimensionless_density(x, parameters.x_c, parameters.alpha, parameters.beta_prime, parameters.gamma)
+end
+
+const M2_TO_PC_CM3_LOCAL = Float64(ustrip(uconvert(u"pc*cm^-3", 1.0u"m^-2")))
+
+"""Observer-frame DM [pc cm^-3] through a chord of half-length `lmax` (in R200c units) at
+projected radius `x` (R200c units), integrating the profile-owned 3-D density."""
+function chord_dm_pc_cm3(model, x::Real, lmax::Real, mass_msun::Real, z::Real; rtol=1.0e-8)
+    lmax > 0 || return 0.0
+    r200c_m = Float64(ustrip(uconvert(u"m",
+        getfield(XGPaint, Symbol("R_", Char(0x0394)))(model, mass_msun * XGPaint.M_sun, z, 200))))
+    integral, _ = lee2022_quadgk_function()(
+        l -> halo_electron_density_m3(model, sqrt(x^2 + l^2), mass_msun, z), 0.0, Float64(lmax);
+        rtol=rtol, order=9,
+    )
+    return 2 * integral * r200c_m * M2_TO_PC_CM3_LOCAL / (1 + z)
+end
+
+"""Projected (long LOS) evaluation, same convention as XGPaint's HaloDMProfile."""
+function (model::Battaglia16DensityDMProfile{T})(theta_rad, mass_msun, redshift) where {T}
+    theta = Float64(theta_rad); mass = Float64(mass_msun); z = Float64(redshift)
+    theta > 0 || error("Angular radius must be positive.")
+    r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(model, mass * XGPaint.M_sun, z, 200)
+    x = theta / XGPaint.angular_size(model, r200c, z)
+    return T(chord_dm_pc_cm3(model, x, LEE2022_LOS_MAX_R200C, mass, z))
+end
+
+"""Chord-mean wrapper for a spherical boundary of radius `sphere_r200c` R200c.
+
+The callable returns g(theta, M, z) = DM_sphere / (2 L_max), the mean electron
+column per unit chord half-length, which is smooth and positive everywhere (it tends
+to the edge density inside R200c/(1+z) units and stays there outside the sphere), so it
+can be cached and log-interpolated safely. The generator multiplies the interpolated
+g by the exact chord factor 2 L_max = 2 X sqrt(1 - (theta/theta_max)^2) per ray, which
+gives DM -> 0 continuously at the boundary instead of the projected hard floor.
+"""
+struct SphericalChordDMProfile{T,C,P} <: XGPaint.AbstractGNFW{T}
+    cosmo::C
+    inner::P
+    sphere_r200c::Float64
+end
+
+function SphericalChordDMProfile(inner::XGPaint.AbstractGNFW{T}, sphere_r200c::Real) where {T}
+    isfinite(sphere_r200c) && sphere_r200c > 0 || error("Sphere radius must be positive")
+    return SphericalChordDMProfile{T,typeof(inner.cosmo),typeof(inner)}(inner.cosmo, inner, Float64(sphere_r200c))
+end
+
+spherical_chord_half_length(x::Real, sphere::Real) = x < sphere ? sqrt(sphere^2 - x^2) : 0.0
+
+"""Exact chord factor used by the generator: 2 L_max at angular radius theta, given the
+aperture edge theta_max = angular_size(X R200c)."""
+@inline function spherical_chord_factor(theta::Real, theta_max::Real, sphere::Real)
+    ratio = Float64(theta) / Float64(theta_max)
+    ratio >= 1 && return 0.0
+    return 2 * Float64(sphere) * sqrt(1 - ratio^2)
+end
+
+function (model::SphericalChordDMProfile{T})(theta_rad, mass_msun, redshift) where {T}
+    theta = Float64(theta_rad); mass = Float64(mass_msun); z = Float64(redshift)
+    theta > 0 || error("Angular radius must be positive.")
+    r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(model, mass * XGPaint.M_sun, z, 200)
+    x = theta / XGPaint.angular_size(model, r200c, z)
+    sphere = model.sphere_r200c
+    lmax = spherical_chord_half_length(x, sphere)
+    if lmax < 1.0e-6
+        # At or beyond the edge: the chord-mean tends to the edge density; keep the
+        # cached function continuous and positive (the generator never uses g there).
+        r200c_m = Float64(ustrip(uconvert(u"m", r200c)))
+        return T(halo_electron_density_m3(model.inner, sphere, mass, z) * r200c_m * M2_TO_PC_CM3_LOCAL / (1 + z))
+    end
+    return T(chord_dm_pc_cm3(model.inner, x, lmax, mass, z) / (2 * lmax))
+end
+
+"""Direct spherical DM (no cache) for validation."""
+function spherical_dm_pc_cm3(model::SphericalChordDMProfile, theta_rad, mass_msun, redshift)
+    r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(model, Float64(mass_msun) * XGPaint.M_sun, Float64(redshift), 200)
+    x = Float64(theta_rad) / XGPaint.angular_size(model, r200c, Float64(redshift))
+    return chord_dm_pc_cm3(model.inner, x, spherical_chord_half_length(x, model.sphere_r200c), Float64(mass_msun), Float64(redshift))
+end
+
+profile_cache_signature(model::AbstractLee2022DMProfile) = lee2022_cache_signature(model)
+profile_cache_signature(::Battaglia16DensityDMProfile) = B16_DENSITY_CACHE_SIGNATURE
+profile_cache_signature(model::SphericalChordDMProfile) =
+    profile_cache_signature(model.inner) * "|boundary=sphere$(model.sphere_r200c)R200c|cache=chord_mean"
+profile_model_family(model::AbstractLee2022DMProfile) = lee2022_model_family(model)
+profile_model_family(::Battaglia16DensityDMProfile) = B16_DENSITY_MODEL_FAMILY
+profile_model_family(model::SphericalChordDMProfile) =
+    profile_model_family(model.inner) * "_sphere" * replace(string(model.sphere_r200c), "." => "p") * "r200c_chordmean"
+
+profile_provenance(model::Lee2022NoConcentrationDMProfile) = lee2022_no_concentration_provenance(model)
+profile_provenance(model::Lee2022ConcentrationDMProfile) = lee2022_concentration_provenance(model)
+profile_provenance(::Battaglia16DensityDMProfile) = Dict{String,Any}(
+    "battaglia16_density_source" => "XGPaint BattagliaTauProfile parameters; rho_gas = P0 gNFW f_b rho_crit(z); ne2d composition",
+    "battaglia16_los_max_r200c" => LEE2022_LOS_MAX_R200C,
+)
+function profile_provenance(model::SphericalChordDMProfile)
+    return merge(profile_provenance(model.inner), Dict{String,Any}(
+        "halo_boundary" => "spherical",
+        "halo_boundary_sphere_r200c" => model.sphere_r200c,
+        "halo_boundary_cache_quantity" => "chord-mean electron column g = DM_sphere/(2 L_max); exact chord factor applied per ray",
+        "halo_boundary_impact_parameter" => "b/R200c = theta/theta200c with theta200c = atan(R200c/D_A)",
+    ))
+end
+
+function run_spherical_boundary_self_test()
+    b16_inner = XGPaint.HaloDMProfile(XGPaint.BattagliaTauProfile(Omega_c=0.261, Omega_b=0.049, h=0.68))
+    b16 = Battaglia16DensityDMProfile(b16_inner)
+    # 1. Profile-owned projected B16 reproduces XGPaint's HaloDMProfile.
+    for (mass, z, xb) in ((1.0e14, 0.5, 0.01), (1.0e14, 0.5, 1.0), (7.327e12, 0.2, 0.5), (1.0e15, 1.0, 2.0))
+        r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(b16, mass * XGPaint.M_sun, z, 200)
+        theta = xb * XGPaint.angular_size(b16, r200c, z)
+        ours = b16(theta, mass, z); ref = b16_inner(theta, mass, z)
+        isapprox(ours, ref; rtol=1.0e-5) || error("B16 density LOS mismatch: $(ours) vs XGPaint $(ref) at M=$(mass) z=$(z) x=$(xb)")
+    end
+    # 2. Spherical chord: DM_sphere <= DM_projected, continuous to zero at the edge, and the
+    #    chord-mean times the exact chord factor reproduces the direct spherical quadrature.
+    sph = SphericalChordDMProfile(b16, 1.0)
+    for (mass, z) in ((7.327e12, 0.5), (1.0e14, 0.5), (1.0e15, 0.2))
+        r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(b16, mass * XGPaint.M_sun, z, 200)
+        theta200c = XGPaint.angular_size(b16, r200c, z)
+        previous = Inf
+        for xb in (0.01, 0.5, 0.9, 0.99, 0.999)
+            theta = xb * theta200c
+            direct = spherical_dm_pc_cm3(sph, theta, mass, z)
+            rebuilt = sph(theta, mass, z) * spherical_chord_factor(theta, theta200c, 1.0)
+            isapprox(direct, rebuilt; rtol=1.0e-9) || error("chord-mean reconstruction mismatch $(direct) vs $(rebuilt)")
+            direct <= b16(theta, mass, z) * (1 + 1.0e-9) || error("spherical DM exceeds projected DM")
+            direct < previous || error("spherical DM not decreasing outward")
+            previous = direct
+        end
+        edge_g = sph(theta200c * (1 + 1.0e-9), mass, z)
+        near_g = sph(theta200c * 0.9995, mass, z)
+        isapprox(edge_g, near_g; rtol=5.0e-2) || error("chord-mean not continuous at the edge: $(near_g) vs $(edge_g)")
+        spherical_chord_factor(theta200c * 1.0001, theta200c, 1.0) == 0.0 || error("chord factor must vanish outside")
+    end
+    lee = SphericalChordDMProfile(Lee2022NoConcentrationDMProfile(normalization=:baryon_fraction, n0_pivot=:mcut), 1.0)
+    v = spherical_dm_pc_cm3(lee, 1.0e-4, 1.0e14, 0.5)
+    isfinite(v) && v > 0 || error("Lee22 spherical DM invalid")
+    println("PASS: profile-owned Battaglia16 LOS matches XGPaint; spherical chord-mean cache reconstruction, monotonicity and edge continuity.")
+    return nothing
+end
+
 function run_lee2022_no_concentration_profile_self_test()
     model = Lee2022NoConcentrationDMProfile()
     mass_cut = 10.0^13.61 / model.cosmo.h

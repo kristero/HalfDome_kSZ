@@ -159,6 +159,13 @@ function normalize_lee2022_concentration_source(value::AbstractString)
     error("lee2022_concentration_source must be duffy2008 or tng_mean; got $(repr(value)).")
 end
 
+function normalize_halo_boundary(value::AbstractString)
+    normalized = lowercase(strip(value))
+    normalized in ("projected", "aperture", "") && return "projected"
+    normalized in ("spherical", "sphere", "chord") && return "spherical"
+    error("halo_boundary must be projected or spherical; got $(repr(value)).")
+end
+
 function normalize_lee2022_redshift_scaling(value::AbstractString)
     normalized = lowercase(strip(value))
     normalized in ("physical", "") && return "physical"
@@ -179,6 +186,24 @@ end
 
 if !EARLY_MODE
     function dm_profile_runtime_configuration(config)
+        runtime = dm_profile_projected_runtime_configuration(config)
+        config.halo_boundary == "spherical" || return runtime
+        # Spherical boundary: profile-owned density inside the X R200c sphere. The cache
+        # stores the chord-mean column; the generator applies the exact chord factor per ray.
+        inner = runtime.model isa HaloDMProfile ? Battaglia16DensityDMProfile(runtime.model) : runtime.model
+        model = SphericalChordDMProfile(inner, config.dm_aperture_r200_multiplier)
+        return (
+            model=model,
+            source=runtime.source * "; spherical $(config.dm_aperture_r200_multiplier) R200c boundary (profile-owned chord LOS)",
+            generated_model_family=profile_model_family(model),
+            cache_signature=profile_cache_signature(model),
+            description=runtime.description * "; boundary=sphere $(config.dm_aperture_r200_multiplier) R200c, chord-mean cache",
+            implementation_path=joinpath(@__DIR__, "lee2022_frb_dm_profile.jl"),
+            provenance=profile_provenance(model),
+        )
+    end
+
+    function dm_profile_projected_runtime_configuration(config)
         if config.dm_profile == "battaglia16"
             model = HaloDMProfile(BattagliaTauProfile(
                 Omega_c=OMEGAC, Omega_b=OMEGAB, h=H_VALUE,
@@ -352,7 +377,7 @@ function validate_known_options(options)
         "apply_catalog_mass_floor", "catalog_masses_are_msun_h", "dm_cache", "dm_cache_file",
         "xgpaint_profile_mass_definition",
         "dm_profile", "lee2022_concentration_mode", "lee2022_normalization", "lee2022_n0_pivot",
-        "lee2022_concentration_source", "lee2022_shape_mass_clip", "lee2022_redshift_scaling",
+        "lee2022_concentration_source", "lee2022_shape_mass_clip", "lee2022_redshift_scaling", "halo_boundary",
         "dm_cache_overwrite", "dm_cleanup_nonpositive", "dm_value_sanity_max",
         "halo_extension_r200_multiplier", "halo_extension_r200",
         "dm_aperture_r200_multiplier", "pdf_bins",
@@ -416,6 +441,8 @@ Core options (both --key=value and key=value are accepted):
   --lee2022-n0-pivot=legacy_1e14     no-concentration n0 pivot: legacy 1e14 Msun or mcut (eq. 12)
   --lee2022-concentration-source=duffy2008  duffy2008 or tng_mean (Lee22 sec. 2.3 quoted means)
   --lee2022-shape-mass-clip=none     none, fit (freeze x_c/beta' above 10^14.8 h^-1 Msun), or Msun
+  --halo-boundary=projected          projected: profile's long LOS, rays selected inside the aperture (default)
+                                      spherical: only gas inside the X R200c sphere (chord LOS -> DM=0 at the edge)
   --lee2022-redshift-scaling=physical  physical (eq. 9 with rho_crit(z)) or comoving_hypothesis
                                       (extra (1+z)^3/E^2(z); bookkeeping hypothesis, see docs)
   --lee2022-concentration-mode=none  Preserved no-concentration baseline
@@ -1076,6 +1103,7 @@ function add_if_frb_pixel_windows!(
     nwindow::Int,
     dm_model_interp,
     contribution_sanity_max::Float64,
+    chord_sphere_r200c::Float64,
 )
     frb_range = searchsorted(sorted_frb_pixels, global_pixel)
     isempty(frb_range) && return 0
@@ -1092,6 +1120,10 @@ function add_if_frb_pixel_windows!(
         contribution = Float64(dm_model_interp(
             max(theta, theta_min), profile_mass_m200c_msun, redshift,
         ))
+        if chord_sphere_r200c > 0.0
+            # Spherical boundary: cached chord-mean column times the exact chord length.
+            contribution *= spherical_chord_factor(theta, theta_max, chord_sphere_r200c)
+        end
         isfinite(contribution) || error(
             "Non-finite XGPaint DM at M200c=$(profile_mass_m200c_msun), " *
             "z=$(redshift), theta=$(theta).",
@@ -1134,6 +1166,7 @@ function accumulate_batch_windows!(
     membership_masks,
     nwindow::Int,
     contribution_sanity_max::Float64,
+    chord_sphere_r200c::Float64=0.0,
 )
     Threads.@threads :static for i in eachindex(masses_m200c)
         tid = Threads.threadid()
@@ -1169,6 +1202,7 @@ function accumulate_batch_windows!(
                     global_pixel, halo_ux, halo_uy, halo_uz,
                     frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200c_msun, redshift,
                     membership_masks[i], nwindow, dm_model_interp, contribution_sanity_max,
+                chord_sphere_r200c,
                 )
             end
         else
@@ -1184,6 +1218,7 @@ function accumulate_batch_windows!(
                         first_pixel + local_pixel_index - 1, halo_ux, halo_uy, halo_uz,
                         frb_ux, frb_uy, frb_uz, theta_min, theta_max, profile_mass_m200c_msun, redshift,
                         membership_masks[i], nwindow, dm_model_interp, contribution_sanity_max,
+                    chord_sphere_r200c,
                     )
                 end
             end
@@ -1559,6 +1594,7 @@ function configuration(options; require_catalog=true)
     lee2022_redshift_scaling = normalize_lee2022_redshift_scaling(get_string_option(
         options, ("lee2022_redshift_scaling",), "physical",
     ))
+    halo_boundary = normalize_halo_boundary(get_string_option(options, ("halo_boundary",), "projected"))
     profile_mass_option_raw = String(strip(get_string_option(
         options, ("xgpaint_profile_mass_definition",), "m200c",
     )))
@@ -1648,7 +1684,7 @@ function configuration(options; require_catalog=true)
         catalog_mass_floor, apply_catalog_mass_floor, catalog_masses_are_msun_h,
         dm_profile, lee2022_concentration_mode, lee2022_normalization, lee2022_n0_pivot,
         lee2022_concentration_source, lee2022_shape_mass_clip_msun, lee2022_redshift_scaling,
-        xgpaint_profile_mass_definition, catalog,
+        halo_boundary, xgpaint_profile_mass_definition, catalog,
         output, summary, provenance, dm_cache, dm_cache_overwrite, dm_cleanup_nonpositive,
         dm_value_sanity_max, dm_aperture_r200_multiplier, pdf_edge_count, pdf_spacing,
         pdf_dm_min, pdf_dm_max, progress_every_batches,
@@ -1679,6 +1715,7 @@ function print_configuration(config)
     println("  mass-window selection=$(HALO_MASS_DEFINITION) from $(CATALOG_M200C_DATASET)")
     println("  dm_profile=$(config.dm_profile)")
     println("  lee2022_concentration_mode=$(config.lee2022_concentration_mode)")
+    println("  halo_boundary=$(config.halo_boundary)")
     if config.dm_profile == "lee2022"
         println("  lee2022_normalization=$(config.lee2022_normalization), n0_pivot=$(config.lee2022_n0_pivot), " *
                 "concentration_source=$(config.lee2022_concentration_source), " *
@@ -2031,6 +2068,7 @@ function main(options)
                 selected_m200c, redshifts[selected_indices], membership_masks,
                 length(config.windows),
                 config.dm_value_sanity_max,
+                config.halo_boundary == "spherical" ? config.dm_aperture_r200_multiplier : 0.0,
             )
         end
         if config.progress_every_batches > 0 && batch_number % config.progress_every_batches == 0
@@ -2154,6 +2192,7 @@ function main(options)
         "lee2022_concentration_source_option" => config.lee2022_concentration_source,
         "lee2022_shape_mass_clip_option_msun" => config.lee2022_shape_mass_clip_msun,
         "lee2022_redshift_scaling_option" => config.lee2022_redshift_scaling,
+        "halo_boundary" => config.halo_boundary,
         "profile" => profile_runtime.description,
         "halo_dm_profile_source" => profile_runtime.source,
         "dm_profile_implementation_path" => profile_runtime.implementation_path,
@@ -2165,7 +2204,9 @@ function main(options)
         "dm_observer_frame_redshift_dilution" => "1/(1+z_halo)",
         "halo_extension_r200_multiplier" => config.dm_aperture_r200_multiplier,
         "dm_aperture_r200_multiplier" => config.dm_aperture_r200_multiplier,
-        "profile_angular_support" => "generator exact angular filter at angular_size($(config.dm_aperture_r200_multiplier)*R200c); XGPaint compute_theta_max and paint! bypassed",
+        "profile_angular_support" => config.halo_boundary == "spherical" ?
+            "generator exact angular filter at angular_size($(config.dm_aperture_r200_multiplier)*R200c); LOS limited to the chord inside that sphere (DM->0 at the edge); XGPaint compute_theta_max and paint! bypassed" :
+            "generator exact angular filter at angular_size($(config.dm_aperture_r200_multiplier)*R200c); XGPaint compute_theta_max and paint! bypassed",
         "dm_cache_profile_log10_m200c_min" => profile_logmass_bounds[1],
         "dm_cache_profile_log10_m200c_max" => profile_logmass_bounds[2],
         "xgpaint_version" => xgpaint_version,

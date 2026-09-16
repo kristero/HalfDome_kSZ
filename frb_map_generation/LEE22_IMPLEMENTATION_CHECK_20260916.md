@@ -103,3 +103,7 @@ Reading of the figures:
 - `run_halfdome_z1_mass_histograms_120k.pbs`: environment pass-through for the five options (defaults unchanged).
 - `make_publication_comparisons.py`: `halo_pdf_lee22_figures` and `--lee22-1r200c-only`.
 - The historical 3R200c Lee22 products and the earlier cross-correlation results were not touched; they used the literal conventions.
+
+## Addendum (2026-09-16, after the like-for-like spherical comparison)
+
+`LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md` compares the same fits with gas counted only inside the R200c sphere, which is what TNG's within-R200 catalogue does. In the 1e13-1e14 Msun window, where both catalogues contain the same halos (hit fractions 52.6% TNG versus 53.7% HalfDome), the mean DM of hit rays is 138.6 pc cm^-3 in TNG, 36-37 for the Lee22 fits with the Omega_b/Omega_m factor of item 2 (a factor 3.8 too low) and 230-234 without it (a factor 1.66 too high); Battaglia16 inside the sphere gives 92.9. Item 2 therefore over-corrects: the f_b reading cannot be right as implemented, but neither is the literal one. The recommendation stands that the normalization (definition of n200, and whether the fitted profiles are means or medians over halos) be confirmed with the authors before Lee22 is used for absolute predictions; until then the two readings bracket the answer and both are available as options (`--lee2022-normalization=literal|baryon_fraction`).

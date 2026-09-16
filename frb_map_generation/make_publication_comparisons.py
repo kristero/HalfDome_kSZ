@@ -564,6 +564,164 @@ def halo_pdf_lee22_figures(root, project, book, manifest):
     (root/"analysis/lee22_1r200c_products.json").write_text(json.dumps(summary, indent=2))
 
 
+SPHERICAL_1R200C_VARIANTS = {
+    "b16": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_b16_seed42",
+                expect=dict(provenance_dm_profile="battaglia16", provenance_halo_boundary="spherical"),
+                label=r"HalfDome: Battaglia16, gas inside $R_{200c}$ sphere", color="#0072B2", ls="-", lw=2.6),
+    "lee22_noconc": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_noconc_seed42",
+                expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="none", provenance_lee2022_normalization="baryon_fraction"),
+                label=r"HalfDome: Lee22 no-c (corrected), inside $R_{200c}$ sphere", color="#D55E00", ls="-", lw=2.4),
+    "lee22_pref": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_pref_seed42",
+                expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="baryon_fraction",
+                            provenance_lee2022_concentration_source="tng_mean"),
+                label=r"HalfDome: Lee22 best fit (corrected), inside $R_{200c}$ sphere", color="#009E73", ls="-", lw=2.4),
+    # sensitivity: identical conventions and geometry, but the literal eq. 9 normalization (no Omega_b/Omega_m factor)
+    "lee22_noconc_literalnorm": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_noconc_literalnorm_seed42",
+                expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="none", provenance_lee2022_normalization="literal",
+                            provenance_lee2022_n0_pivot="mcut"),
+                label=r"HalfDome: Lee22 no-c, literal eq. 9 norm. (no $\Omega_b/\Omega_m$), sphere", color="#D55E00", ls=":", lw=2.0),
+    "lee22_pref_literalnorm": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_pref_literalnorm_seed42",
+                expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="literal",
+                            provenance_lee2022_concentration_source="tng_mean"),
+                label=r"HalfDome: Lee22 best fit, literal eq. 9 norm. (no $\Omega_b/\Omega_m$), sphere", color="#009E73", ls=":", lw=2.0),
+}
+SPHERICAL_CORE_KEYS = ("b16", "lee22_noconc", "lee22_pref")
+SPHERICAL_FIGURE_SETS = {
+    "": SPHERICAL_CORE_KEYS,
+    "sensitivity_": SPHERICAL_CORE_KEYS + ("lee22_noconc_literalnorm", "lee22_pref_literalnorm"),
+}
+
+
+def load_spherical_1r200c(project, key):
+    spec = SPHERICAL_1R200C_VARIANTS[key]
+    path = Path(project)/"frb_map_generation/outputs"/spec["run"]/"halfdome_uniform_fixedz_foreground_mass_histograms.h5"
+    if not path.exists():
+        raise FileNotFoundError(path)
+    text = lambda v: v.decode() if isinstance(v, bytes) else str(v)
+    with h5py.File(path, "r") as h:
+        attrs = dict(h.attrs.items())
+        labels = [text(v) for v in h["window_label"][:]]
+        edges = np.asarray(h["pdf_bin_edges_pc_cm3"][:], float)
+        centers = np.asarray(h["pdf_bin_centers_pc_cm3"][:], float)
+        density = np.asarray(h["pdf_density_per_pc_cm3"][:], float)
+        counts = np.asarray(h["pdf_count"][:], np.int64)
+    if density.shape[0] != len(labels):
+        density, counts = density.T, counts.T
+    contract = dict(provenance_halo_mass_definition="M200c", provenance_halo_radius_definition="R200c",
+                    provenance_aperture_geometry_owner="generator", **spec["expect"])
+    for k, v in contract.items():
+        actual = text(attrs.get(k, ""))
+        if actual != v:
+            raise ValueError("spherical provenance mismatch {}: {!r} != {!r} in {}".format(k, actual, v, path))
+    numeric = dict(provenance_source_redshift=1.0, provenance_nside=4096, n_rays=120000,
+                   provenance_halo_extension_r200_multiplier=1.0, provenance_frb_seed=42, provenance_halo_boundary_sphere_r200c=1.0)
+    for k, v in numeric.items():
+        if not np.isclose(float(attrs[k]), v):
+            raise ValueError("spherical numeric provenance mismatch {}: {} != {} in {}".format(k, attrs[k], v, path))
+    if int(attrs["provenance_catalog_streamed_halos"]) != int(attrs["provenance_catalog_total_halos"]):
+        raise ValueError("spherical product did not stream the complete catalogue: {}".format(path))
+    return {label: dict(edges=edges, centers=centers, pdf=density[i], counts=counts[i],
+                        zero_fraction=1.-counts[i].sum()/120000., attrs=attrs, path=path)
+            for i, label in enumerate(labels)}
+
+
+def halo_pdf_spherical_figures(root, project, book, manifest):
+    """Like-for-like: TNG within R200 versus HalfDome models with gas counted only inside the R200c sphere."""
+    direct = Lee22TngBattagliaComparison(project).direct
+    direct.validate_fixed_200c_input()
+    windows = tuple(dict.fromkeys(e[2] for e in UPPER_ENTRIES + TO_1E14_ENTRIES))
+    b16_proj = {w: direct.load_halfdome(1., 4096, 1.0, w, validated_200c=True) for w in windows}
+    sph = {}
+    for k in SPHERICAL_1R200C_VARIANTS:
+        try:
+            sph[k] = load_spherical_1r200c(project, k)
+        except FileNotFoundError as missing:
+            print("skipping spherical variant {} (missing product: {})".format(k, missing))
+    for k in sph:
+        for w in windows:
+            np.testing.assert_allclose(sph[k][w]["edges"], b16_proj[w]["edges"], rtol=1e-12, atol=0)
+    audit, hits, seen = [], [], set()
+    for prefix, keys in SPHERICAL_FIGURE_SETS.items():
+        if any(k not in sph for k in keys):
+            print("skipping spherical figure set {!r}: missing {}".format(prefix, [k for k in keys if k not in sph]))
+            continue
+        for group_name, entries, xmax in (("upper_mass_limits", UPPER_ENTRIES, 5000.), ("to_1e14", TO_1E14_ENTRIES, 10000.)):
+            fig = plt.figure(figsize=(17.5, 12.5))
+            outer = fig.add_gridspec(2, 3, hspace=.38, wspace=.32, left=.075, right=.985, bottom=.065, top=.89)
+            for j, (label, tng_label, hd_label) in enumerate(entries):
+                inner = outer[j//3, j%3].subgridspec(2, 1, height_ratios=(2.7, 1.25), hspace=.06)
+                top = fig.add_subplot(inner[0]); bottom = fig.add_subplot(inner[1], sharex=top)
+                edges = b16_proj[hd_label]["edges"]
+                tng_pdf, tng_count, tng_zero = direct.histogram_from_values(direct.tng_values(tng_label, 1.), edges)
+                direct.draw_pdf(top, b16_proj[hd_label]["centers"], tng_pdf, color=".15", lw=2.7)
+                drawn = [("b16_projected", b16_proj[hd_label], "#0072B2", ":", 1.6)]
+                drawn += [(k, sph[k][hd_label], SPHERICAL_1R200C_VARIANTS[k]["color"], SPHERICAL_1R200C_VARIANTS[k]["ls"],
+                           SPHERICAL_1R200C_VARIANTS[k]["lw"]) for k in keys]
+                any_counts = False
+                for name, product, color, line, lw in drawn:
+                    any_counts |= bool(np.any(product["counts"]))
+                    direct.draw_pdf(top, product["centers"], product["pdf"], color=color, ls=line, lw=lw)
+                    delta = direct.percent_difference(product["pdf"], tng_pdf, product["counts"], tng_count)
+                    bottom.plot(product["centers"], delta, color=color, ls=line, lw=lw)
+                    if (hd_label, name) not in seen:
+                        seen.add((hd_label, name))
+                        for b in range(len(tng_pdf)):
+                            audit.append(dict(window=hd_label, model=name, dm_low=edges[b], dm_high=edges[b+1], tng_pdf=tng_pdf[b],
+                                halfdome_pdf=product["pdf"][b], tng_count=int(tng_count[b]), halfdome_count=int(product["counts"][b]),
+                                percent_difference=delta[b], halfdome_zero_fraction=product["zero_fraction"]))
+                        hits.append(dict(window=hd_label, model=name, hit_percent=100.*(1.-product["zero_fraction"]),
+                                         tng_hit_percent=100.*(1.-tng_zero)))
+                lines = [("TNG", ".15", 100.*(1.-tng_zero))] + [({"b16": "B16 sphere", "lee22_noconc": "Lee22 no-c sphere",
+                          "lee22_pref": "Lee22 best sphere"}[k], SPHERICAL_1R200C_VARIANTS[k]["color"], 100.*(1.-sph[k][hd_label]["zero_fraction"]))
+                         for k in SPHERICAL_CORE_KEYS]
+                for k2, (nm, color, hit) in enumerate(lines):
+                    top.text(.03, .05+.068*(len(lines)-1-k2), "{}: {:.1f}%".format(nm, hit), transform=top.transAxes,
+                             ha="left", va="bottom", fontsize=11.5, color=color, fontweight="bold")
+                title = "Total" if j == 0 else label.replace(r"\,M_\odot", "")
+                top.set_title(title, pad=10); top.set_yscale("log")
+                common_axis(top, (.1, xmax)); common_axis(bottom, (.1, xmax), percent=True)
+                bottom.set_yscale("symlog", linthresh=100., linscale=1.2)
+                bottom.set_yticks([-100, 0, 100, 1000]); bottom.set_yticklabels(["-100", "0", "100", "1000"])
+                top.yaxis.set_major_locator(LogLocator(base=10, numticks=4)); top.tick_params(labelbottom=False)
+                bottom.set_xlabel(r"DM [pc cm$^{-3}$]")
+                if j % 3 == 0:
+                    top.set_ylabel(r"$p(\mathrm{DM})$"); bottom.set_ylabel(r"$\Delta p/p_{\rm TNG}$ [%]", fontsize=18)
+                if not any_counts:
+                    top.text(.58, .3, "HD: no resolved halos", transform=top.transAxes, ha="center", fontsize=16, color=".35")
+                    bottom.set_yticks([]); bottom.text(.5, .6, "Undefined", transform=bottom.transAxes, ha="center", fontsize=16, color=".4")
+            legend_ax = fig.add_subplot(outer[1, 2]); legend_ax.axis("off")
+            handles = [Line2D([], [], color=".15", label="IllustrisTNG (within $R_{200}$)"),
+                       Line2D([], [], color="#0072B2", ls=":", lw=1.6, label=r"HalfDome: Battaglia16, projected $1\,R_{200c}$ (previous)")]
+            handles += [Line2D([], [], color=v["color"], ls=v["ls"], lw=v["lw"], label=v["label"])
+                        for v in (SPHERICAL_1R200C_VARIANTS[k] for k in keys)]
+            legend_ax.legend(handles=handles, loc="upper center", frameon=False, fontsize=14.5 if not prefix else 12.5,
+                             labelspacing=.9 if not prefix else .6, handlelength=2.8, bbox_to_anchor=(.5, 1.02))
+            legend_ax.text(.5, .02, "Solid HalfDome curves: line of sight limited to the chord inside the\n$R_{200c}$ sphere, so DM $\\to$ 0 for grazing rays. Panel %: rays with DM > 0",
+                           transform=legend_ax.transAxes, ha="center", va="bottom", fontsize=13.5, color=".3")
+            fig.suptitle(r"Halo DM PDFs  |  $z_s=1$  |  $M_{200c}/M_\odot$  |  gas inside $R_{200c}$", y=.985)
+            stem = "halo_pdf_sphere_1r200c_b16_lee22_tng_" + prefix + group_name
+            caption = ("Like-for-like halo-only positive-DM PDFs at z=1, NSIDE=4096, 120k uniform rays. Solid HalfDome curves count only the gas "
+                "inside the R200c sphere of each halo: the cached quantity is the chord-mean electron column and the exact chord length "
+                "2 sqrt(R200c^2 - b^2) is applied per ray, so the DM of a grazing ray goes to zero continuously, as for a simulation "
+                "catalogue that assigns gas cells to halos inside R200. Battaglia16 uses XGPaint's parameters and f_b rho_crit normalization "
+                "with a profile-owned LOS (verified against XGPaint's projected DM to 1e-5); Lee22 fits use the corrected conventions "
+                "(Omega_b/Omega_m factor, common M_cut pivot, TNG-mean concentration, shape clip above 10^14.8 h^-1 Msun). The dotted "
+                "curve is the previous projected-aperture Battaglia16 product with the profile's long LOS. TNG is Ralf Konietzka's "
+                "catalogue; its exact within-r200 recipe is not documented here. PDFs normalized over in-range rays; percentages 100*(HD-TNG)/TNG "
+                "only where both counts >= 10, on a symmetric-log axis linear within +-100%.")
+            if prefix:
+                caption += (" Dotted orange/green curves: the same Lee22 fits with the literal eq. 9 normalization (no Omega_b/Omega_m "
+                            "factor), otherwise identical conventions and geometry; together with the solid curves they bracket the "
+                            "normalization question discussed in LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md.")
+            finish(fig, stem, root, book, manifest, caption)
+    write_rows(root/"analysis/halo_pdf_sphere_1r200c_bins.csv", audit)
+    write_rows(root/"analysis/halo_hit_percentages_sphere_1r200c.csv", hits)
+
+
 def select_cross(rows, survey, model, n, unbeamed=False):
     return sorted([r for r in rows if r["survey"] == survey and r["model"] == model
                    and int(r["nrays"]) == n and r["filter"] == ("unbeamed" if unbeamed else survey)],
@@ -743,14 +901,17 @@ def main():
                         help="Only export the Battaglia16 1-5 R200c (plus 3R200c repeat) versus TNG halo-PDF figures")
     parser.add_argument("--lee22-1r200c-only", action="store_true",
                         help="Only export the TNG versus Battaglia16 versus Lee22 (two fits) 1R200c halo-PDF figures")
+    parser.add_argument("--sphere-1r200c-only", action="store_true",
+                        help="Only export the like-for-like (gas inside the R200c sphere) TNG versus Battaglia16 versus Lee22 figures")
     args = parser.parse_args()
     root, parent, pdf = Path(args.output), Path(args.parent), Path(args.pdf)
     (root/"plots").mkdir(parents=True, exist_ok=True)
     (root/"analysis").mkdir(parents=True, exist_ok=True)
     pdf.parent.mkdir(parents=True, exist_ok=True)
     manifest = []
-    if args.aperture_only or args.aperture_series_only or args.lee22_1r200c_only:
-        maker = (halo_pdf_lee22_figures if args.lee22_1r200c_only else
+    if args.aperture_only or args.aperture_series_only or args.lee22_1r200c_only or args.sphere_1r200c_only:
+        maker = (halo_pdf_spherical_figures if args.sphere_1r200c_only else
+                 halo_pdf_lee22_figures if args.lee22_1r200c_only else
                  halo_pdf_aperture_series_figures if args.aperture_series_only else halo_pdf_aperture_figures)
         with plt.rc_context(STYLE), PdfPages(pdf) as book:
             maker(root, Path(args.project), book, manifest)

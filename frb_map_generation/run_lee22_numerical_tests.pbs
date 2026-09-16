@@ -1,0 +1,77 @@
+#!/bin/bash
+#PBS -N frb_lee22_tests
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=32gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+set -euo pipefail
+
+# Run from an immutable source snapshot supplied at submission. Existing maps
+# and caches are read-only inputs. Neither XGPaint nor production outputs change.
+: "${TEST_CODE_DIR:?Set TEST_CODE_DIR to the uploaded source snapshot}"
+: "${TEST_OUTPUT:?Set TEST_OUTPUT to a new isolated output directory}"
+: "${CLUSTER_USER:=kristero10}"
+: "${PROJECT_DIR:=/home/${CLUSTER_USER}/HalfDome_kSZ}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${JULIA_PROJECT:=}"
+: "${PYTHON:=/home/${CLUSTER_USER}/.conda/envs/SZ/bin/python}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5}"
+: "${BATTAGLIA16_CACHE:=${PROJECT_DIR}/frb_map_generation/outputs/shared_xgpaint_dm_cache.jld2}"
+: "${LEE22_CACHE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_frb_inputs/lee2022_tablea2_noconcentration_m200c_profile_owned_los_v2_dm_cache.jld2}"
+: "${BASE_MAP_DIR:=/lustre/work/${CLUSTER_USER}/frb_data/lee22_vs_battaglia16_m200c_3r200c_z1_power_spectra/maps}"
+: "${MC_SEEDS:=16}"
+
+mkdir -p "${TEST_OUTPUT}/logs"
+JOB_TAG="${PBS_JOBID:-manual}"
+exec > >(tee -a "${TEST_OUTPUT}/logs/job_${JOB_TAG}.log") 2>&1
+finish() {
+  result=$?
+  printf '%s\n' "${result}" > "${TEST_OUTPUT}/exit_status.txt"
+  printf 'Finished %s; exit=%s\n' "$(date -Is)" "${result}"
+}
+trap finish EXIT
+cd "${TEST_CODE_DIR}"
+export JULIA_NUM_THREADS=26
+export OMP_NUM_THREADS=26
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export MPLBACKEND=Agg
+export PYTHONNOUSERSITE=1
+
+run_julia() {
+  if [[ -n "${JULIA_PROJECT}" ]]; then
+    "${JULIA}" --project="${JULIA_PROJECT}" --threads=26 "$@"
+  else
+    "${JULIA}" --threads=26 "$@"
+  fi
+}
+
+printf 'Started %s on %s, job=%s\n' "$(date -Is)" "$(hostname)" "${JOB_TAG}"
+printf 'Numerical tests only; queue=%s, CPUs=26, walltime=23:59:00\n' "${PBS_QUEUE:-mini}"
+printf 'Sources: %s\nResults: %s\n' "${TEST_CODE_DIR}" "${TEST_OUTPUT}"
+for input in "${HALFDOME_PATH}" "${BATTAGLIA16_CACHE}" "${LEE22_CACHE}" "${LEE22_CACHE}.profile_signature.txt"; do
+  [[ -r "${input}" ]] || { echo "Missing readable input: ${input}"; exit 2; }
+done
+"${PYTHON}" -c 'import sys,numpy,scipy,h5py,healpy,matplotlib; print(sys.version); print(numpy.__version__,scipy.__version__,healpy.__version__,matplotlib.__version__)'
+"${JULIA}" --version
+sha256sum ./*.py ./*.jl ./*.pbs > "${TEST_OUTPUT}/source_sha256.txt"
+
+printf 'select_nearby\n' > "${TEST_OUTPUT}/stage.txt"
+"${PYTHON}" summarize_lee22_profile_audit.py --output-dir="${TEST_OUTPUT}" --catalogue="${HALFDOME_PATH}" --select-only
+printf 'direct_profile_audit\n' > "${TEST_OUTPUT}/stage.txt"
+run_julia audit_lee22_profile_cache.jl --output-dir="${TEST_OUTPUT}" --battaglia16-cache="${BATTAGLIA16_CACHE}" --lee22-cache="${LEE22_CACHE}"
+"${PYTHON}" summarize_lee22_profile_audit.py --output-dir="${TEST_OUTPUT}"
+for refinement in 1 2; do
+  printf 'radius_table_refinement_%s\n' "${refinement}" > "${TEST_OUTPUT}/stage.txt"
+  run_julia test_radius_scaled_dm_cache.jl --output-dir="${TEST_OUTPUT}" --refinement="${refinement}" --battaglia16-cache="${BATTAGLIA16_CACHE}" --lee22-cache="${LEE22_CACHE}"
+done
+"${PYTHON}" summarize_cluster_dm_tests.py --output-dir="${TEST_OUTPUT}"
+printf 'million_ray_sampling\n' > "${TEST_OUTPUT}/stage.txt"
+"${PYTHON}" test_cluster_dm_sampling.py \
+  --battaglia16-map="${BASE_MAP_DIR}/battaglia16_halfdome_full_halo_dm_zsrc1p0_nside4096_m200c_r200cx3p0.fits" \
+  --lee22-map="${BASE_MAP_DIR}/lee22_noconcentration_halfdome_full_halo_dm_zsrc1p0_nside4096_m200c_r200cx3p0.fits" \
+  --output-dir="${TEST_OUTPUT}" --mc-seeds="${MC_SEEDS}" --n-rays=1000000 --lmax=8192
+printf 'complete\n' > "${TEST_OUTPUT}/stage.txt"
+echo "Completed numerical tests. Original maps/caches and density normalization unchanged."

@@ -138,6 +138,45 @@ function normalize_lee2022_concentration_mode(value::AbstractString)
     error("lee2022_concentration_mode must be none or duffy2008; got $(repr(value)).")
 end
 
+function normalize_lee2022_normalization(value::AbstractString)
+    normalized = lowercase(strip(value))
+    normalized in ("literal", "eq9", "") && return "literal"
+    normalized in ("baryon_fraction", "fb", "f_b") && return "baryon_fraction"
+    error("lee2022_normalization must be literal or baryon_fraction; got $(repr(value)).")
+end
+
+function normalize_lee2022_n0_pivot(value::AbstractString)
+    normalized = lowercase(strip(value))
+    normalized in ("legacy", "legacy_1e14", "1e14", "") && return "legacy_1e14"
+    normalized in ("mcut", "m_cut", "eq12") && return "mcut"
+    error("lee2022_n0_pivot must be legacy_1e14 or mcut; got $(repr(value)).")
+end
+
+function normalize_lee2022_concentration_source(value::AbstractString)
+    normalized = lowercase(strip(value))
+    normalized in ("duffy", "duffy2008", "") && return "duffy2008"
+    normalized in ("tng_mean", "tngmean", "tng") && return "tng_mean"
+    error("lee2022_concentration_source must be duffy2008 or tng_mean; got $(repr(value)).")
+end
+
+function normalize_lee2022_redshift_scaling(value::AbstractString)
+    normalized = lowercase(strip(value))
+    normalized in ("physical", "") && return "physical"
+    normalized in ("comoving_hypothesis", "comoving", "comoving_hyp") && return "comoving_hypothesis"
+    error("lee2022_redshift_scaling must be physical or comoving_hypothesis; got $(repr(value)).")
+end
+
+"""Return Inf (no clipping), the fit-range upper mass, or an explicit physical mass in Msun."""
+function normalize_lee2022_shape_mass_clip(value::AbstractString)
+    normalized = lowercase(strip(value))
+    normalized in ("none", "inf", "") && return Inf
+    normalized in ("fit", "fit_range", "fitrange") && return 10.0^14.8 / H_VALUE
+    parsed = tryparse(Float64, normalized)
+    (parsed !== nothing && isfinite(parsed) && parsed > 0) ||
+        error("lee2022_shape_mass_clip must be none, fit, or a positive mass in Msun; got $(repr(value)).")
+    return parsed
+end
+
 if !EARLY_MODE
     function dm_profile_runtime_configuration(config)
         if config.dm_profile == "battaglia16"
@@ -154,21 +193,46 @@ if !EARLY_MODE
                 provenance=Dict{String,Any}(),
             )
         elseif config.dm_profile == "lee2022"
-            config.lee2022_concentration_mode == "none" || error(
-                "lee2022_concentration_mode=duffy2008 is reserved for the future " *
-                "concentration-dependent Table-4 implementation. This run implements only " *
-                "the requested Appendix-A2 no-concentration profile.",
-            )
+            normalization = Symbol(config.lee2022_normalization)
+            clip = config.lee2022_shape_mass_clip_msun
+            zscaling = Symbol(config.lee2022_redshift_scaling)
+            if config.lee2022_concentration_mode == "duffy2008"
+                model = Lee2022ConcentrationDMProfile(
+                    Omega_c=OMEGAC, Omega_b=OMEGAB, h=H_VALUE,
+                    normalization=normalization,
+                    concentration_source=Symbol(config.lee2022_concentration_source),
+                    shape_clip_mass_msun=clip,
+                    redshift_scaling=zscaling,
+                )
+                tokens = lee2022_variant_tokens(model)
+                return (
+                    model=model,
+                    source="local Lee22 preferred concentration-dependent density fit",
+                    generated_model_family=lee2022_model_family(model),
+                    cache_signature=lee2022_cache_signature(model),
+                    description="Lee22 preferred density fit (Table 3) + $(config.lee2022_concentration_source) concentration; Eq12 common mass pivot" *
+                        (isempty(tokens) ? "" : "; options: " * join(tokens, ", ")),
+                    implementation_path=joinpath(@__DIR__, "lee2022_frb_dm_profile.jl"),
+                    provenance=lee2022_concentration_provenance(model),
+                )
+            end
+            config.lee2022_concentration_mode == "none" || error("Unknown Lee22 concentration mode")
             model = Lee2022NoConcentrationDMProfile(
                 Omega_c=OMEGAC, Omega_b=OMEGAB, h=H_VALUE,
+                normalization=normalization,
+                n0_pivot=Symbol(config.lee2022_n0_pivot),
+                shape_clip_mass_msun=clip,
+                redshift_scaling=zscaling,
             )
+            tokens = lee2022_variant_tokens(model)
             implementation_path = joinpath(@__DIR__, "lee2022_frb_dm_profile.jl")
             return (
                 model=model,
                 source="local Lee2022 Appendix-A2 no-concentration electron-density profile",
-                generated_model_family=LEE2022_NO_CONCENTRATION_MODEL_FAMILY,
-                cache_signature=LEE2022_NO_CONCENTRATION_CACHE_SIGNATURE,
-                description="Lee2022NoConcentrationDMProfile(Appendix A Table A2; M200c/R200c)",
+                generated_model_family=lee2022_model_family(model),
+                cache_signature=lee2022_cache_signature(model),
+                description="Lee2022NoConcentrationDMProfile(Appendix A Table A2; M200c/R200c)" *
+                    (isempty(tokens) ? "" : "; options: " * join(tokens, ", ")),
                 implementation_path=implementation_path,
                 provenance=lee2022_no_concentration_provenance(model),
             )
@@ -287,7 +351,8 @@ function validate_known_options(options)
         "sightline_progress_every_rows",
         "apply_catalog_mass_floor", "catalog_masses_are_msun_h", "dm_cache", "dm_cache_file",
         "xgpaint_profile_mass_definition",
-        "dm_profile", "lee2022_concentration_mode",
+        "dm_profile", "lee2022_concentration_mode", "lee2022_normalization", "lee2022_n0_pivot",
+        "lee2022_concentration_source", "lee2022_shape_mass_clip", "lee2022_redshift_scaling",
         "dm_cache_overwrite", "dm_cleanup_nonpositive", "dm_value_sanity_max",
         "halo_extension_r200_multiplier", "halo_extension_r200",
         "dm_aperture_r200_multiplier", "pdf_bins",
@@ -346,9 +411,16 @@ Core options (both --key=value and key=value are accepted):
   --chunk-size=1000000               Catalog rows per HDF5 read
   --dm-profile=battaglia16           Existing production profile (default)
   --dm-profile=lee2022               Lee et al. 2022 Appendix-A2 electron-density fit
-  --lee2022-concentration-mode=none  Current implemented Lee2022 mode
-                                      duffy2008 is a reserved future Table-4 branch and fails
-                                      explicitly rather than silently substituting concentration
+  --lee2022-normalization=literal    literal eq. (9) n200 (legacy) or baryon_fraction,
+                                      which multiplies the Lee22 electron density by Omega_b/Omega_m
+  --lee2022-n0-pivot=legacy_1e14     no-concentration n0 pivot: legacy 1e14 Msun or mcut (eq. 12)
+  --lee2022-concentration-source=duffy2008  duffy2008 or tng_mean (Lee22 sec. 2.3 quoted means)
+  --lee2022-shape-mass-clip=none     none, fit (freeze x_c/beta' above 10^14.8 h^-1 Msun), or Msun
+  --lee2022-redshift-scaling=physical  physical (eq. 9 with rho_crit(z)) or comoving_hypothesis
+                                      (extra (1+z)^3/E^2(z); bookkeeping hypothesis, see docs)
+  --lee2022-concentration-mode=none  Preserved no-concentration baseline
+                                      duffy2008 selects the preferred density fit (arXiv Table 3)
+                                      with a median c200c proxy; divergent outer tails are rejected
                                       The Lee2022 fit covers 0.04-1.34R200c and
                                       1e13-1e14.8 h^-1 Msun; the requested 3R200c/full-window
                                       test is recorded as radial and low-mass extrapolation
@@ -1472,10 +1544,21 @@ function configuration(options; require_catalog=true)
     lee2022_concentration_mode = normalize_lee2022_concentration_mode(get_string_option(
         options, ("lee2022_concentration_mode",), "none",
     ))
-    dm_profile == "lee2022" && lee2022_concentration_mode == "duffy2008" && error(
-        "lee2022_concentration_mode=duffy2008 is reserved for a future Table-4 " *
-        "implementation; use none for the current Appendix-A2 test.",
-    )
+    lee2022_normalization = normalize_lee2022_normalization(get_string_option(
+        options, ("lee2022_normalization",), "literal",
+    ))
+    lee2022_n0_pivot = normalize_lee2022_n0_pivot(get_string_option(
+        options, ("lee2022_n0_pivot",), "legacy_1e14",
+    ))
+    lee2022_concentration_source = normalize_lee2022_concentration_source(get_string_option(
+        options, ("lee2022_concentration_source",), "duffy2008",
+    ))
+    lee2022_shape_mass_clip_msun = normalize_lee2022_shape_mass_clip(get_string_option(
+        options, ("lee2022_shape_mass_clip",), "none",
+    ))
+    lee2022_redshift_scaling = normalize_lee2022_redshift_scaling(get_string_option(
+        options, ("lee2022_redshift_scaling",), "physical",
+    ))
     profile_mass_option_raw = String(strip(get_string_option(
         options, ("xgpaint_profile_mass_definition",), "m200c",
     )))
@@ -1563,7 +1646,9 @@ function configuration(options; require_catalog=true)
         sightline_redshift_width, sightline_max_rows, sightline_progress_every_rows,
         chunk_size, max_catalog_halos,
         catalog_mass_floor, apply_catalog_mass_floor, catalog_masses_are_msun_h,
-        dm_profile, lee2022_concentration_mode, xgpaint_profile_mass_definition, catalog,
+        dm_profile, lee2022_concentration_mode, lee2022_normalization, lee2022_n0_pivot,
+        lee2022_concentration_source, lee2022_shape_mass_clip_msun, lee2022_redshift_scaling,
+        xgpaint_profile_mass_definition, catalog,
         output, summary, provenance, dm_cache, dm_cache_overwrite, dm_cleanup_nonpositive,
         dm_value_sanity_max, dm_aperture_r200_multiplier, pdf_edge_count, pdf_spacing,
         pdf_dm_min, pdf_dm_max, progress_every_batches,
@@ -1594,6 +1679,12 @@ function print_configuration(config)
     println("  mass-window selection=$(HALO_MASS_DEFINITION) from $(CATALOG_M200C_DATASET)")
     println("  dm_profile=$(config.dm_profile)")
     println("  lee2022_concentration_mode=$(config.lee2022_concentration_mode)")
+    if config.dm_profile == "lee2022"
+        println("  lee2022_normalization=$(config.lee2022_normalization), n0_pivot=$(config.lee2022_n0_pivot), " *
+                "concentration_source=$(config.lee2022_concentration_source), " *
+                "shape_mass_clip_msun=$(config.lee2022_shape_mass_clip_msun), " *
+                "redshift_scaling=$(config.lee2022_redshift_scaling)")
+    end
     println("  XGPaint profile input=$(config.xgpaint_profile_mass_definition) from $(CATALOG_M200C_DATASET)")
     println(
         "  aperture=$(config.dm_aperture_r200_multiplier) $(HALO_RADIUS_DEFINITION), " *
@@ -2058,6 +2149,11 @@ function main(options)
         "mass_windows_specification" => isempty(config.mass_windows_specification) ? "legacy defaults" : config.mass_windows_specification,
         "dm_profile" => config.dm_profile,
         "lee2022_concentration_mode" => config.lee2022_concentration_mode,
+        "lee2022_normalization_option" => config.lee2022_normalization,
+        "lee2022_n0_pivot_option" => config.lee2022_n0_pivot,
+        "lee2022_concentration_source_option" => config.lee2022_concentration_source,
+        "lee2022_shape_mass_clip_option_msun" => config.lee2022_shape_mass_clip_msun,
+        "lee2022_redshift_scaling_option" => config.lee2022_redshift_scaling,
         "profile" => profile_runtime.description,
         "halo_dm_profile_source" => profile_runtime.source,
         "dm_profile_implementation_path" => profile_runtime.implementation_path,

@@ -37,6 +37,12 @@ set -euo pipefail
 : "${XGPAINT_PROFILE_MASS_DEFINITION:=m200c}"
 : "${DM_PROFILE:=battaglia16}"
 : "${LEE2022_CONCENTRATION_MODE:=none}"
+# Lee22 convention options; defaults reproduce the historical products exactly.
+: "${LEE2022_NORMALIZATION:=literal}"
+: "${LEE2022_N0_PIVOT:=legacy_1e14}"
+: "${LEE2022_CONCENTRATION_SOURCE:=duffy2008}"
+: "${LEE2022_SHAPE_MASS_CLIP:=none}"
+: "${LEE2022_REDSHIFT_SCALING:=physical}"
 : "${MASS_WINDOWS:=m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16}"
 
 # Each parameter combination receives an isolated directory automatically.
@@ -149,6 +155,7 @@ echo "Python: ${PYTHON}"
 echo "HalfDome catalog: ${HALFDOME_PATH}"
 echo "DM profile: ${DM_PROFILE}"
 echo "Lee2022 concentration mode: ${LEE2022_CONCENTRATION_MODE}"
+echo "Lee2022 options: normalization=${LEE2022_NORMALIZATION} n0_pivot=${LEE2022_N0_PIVOT} concentration_source=${LEE2022_CONCENTRATION_SOURCE} shape_mass_clip=${LEE2022_SHAPE_MASS_CLIP} redshift_scaling=${LEE2022_REDSHIFT_SCALING}"
 echo "DM cache: ${DM_CACHE}"
 echo "DM cache overwrite/build: ${DM_CACHE_OVERWRITE}"
 echo "Output directory: ${OUTPUT_DIR}"
@@ -191,6 +198,11 @@ run_julia --threads="${THREADS_PER_TASK}" "${GENERATOR}" \
   --mass-windows="${MASS_WINDOWS}" \
   --dm-profile="${DM_PROFILE}" \
   --lee2022-concentration-mode="${LEE2022_CONCENTRATION_MODE}" \
+  --lee2022-normalization="${LEE2022_NORMALIZATION}" \
+  --lee2022-n0-pivot="${LEE2022_N0_PIVOT}" \
+  --lee2022-concentration-source="${LEE2022_CONCENTRATION_SOURCE}" \
+  --lee2022-shape-mass-clip="${LEE2022_SHAPE_MASS_CLIP}" \
+  --lee2022-redshift-scaling="${LEE2022_REDSHIFT_SCALING}" \
   --dm-cache="${DM_CACHE}" \
   --dm-cache-overwrite="${DM_CACHE_OVERWRITE}" \
   --dm-value-sanity-max="${DM_VALUE_SANITY_MAX}" \

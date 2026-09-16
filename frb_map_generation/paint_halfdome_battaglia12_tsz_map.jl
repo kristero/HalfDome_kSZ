@@ -1,8 +1,9 @@
 #!/usr/bin/env julia
 
 # Paint a full-sky HalfDome Compton-y map for the fiducial Battaglia thermal
-# pressure profile.  The halo selection and external R200c aperture deliberately
-# match the full-halo FRB-DM maps used by the Lee22/Battaglia16 comparison.
+# pressure profile. The map can use the complete lightcone (the default) or an
+# explicitly truncated maximum halo redshift. The external R200c aperture is
+# independent of the redshift selection and is recorded in the provenance.
 
 using Dates
 using HDF5
@@ -26,19 +27,23 @@ function cluster_username()
     return get(ENV, "CLUSTER_USER", get(ENV, "USER", "kristero10"))
 end
 
-function default_output_map(nside, source_redshift, aperture)
+function redshift_tag(maximum_halo_redshift)
+    return isinf(maximum_halo_redshift) ?
+        "allz" : "zmax" * replace(string(maximum_halo_redshift), "." => "p")
+end
+
+function default_output_map(nside, maximum_halo_redshift, aperture)
     root = joinpath(
         "/lustre/work",
         cluster_username(),
         "frb_data",
-        "battaglia12_tsz_x_lee22_battaglia16_dm_m200c_3r200c_z1",
+        "battaglia12_tsz_full_lightcone_m200c",
         "maps",
     )
-    redshift_tag = replace(string(source_redshift), "." => "p")
     aperture_tag = replace(string(aperture), "." => "p")
     return joinpath(
         root,
-        "battaglia12_fiducial_halfdome_compton_y_zmax$(redshift_tag)_" *
+        "battaglia12_fiducial_halfdome_compton_y_$(redshift_tag(maximum_halo_redshift))_" *
         "nside$(nside)_m200c_r200cx$(aperture_tag).fits",
     )
 end
@@ -109,11 +114,48 @@ function build_or_load_interpolator(
     return interpolated, "built"
 end
 
+function interpolator_redshift_bounds(interpolated_profile)
+    hasproperty(interpolated_profile, :itp) ||
+        error("tSZ interpolator has no interpolation grid.")
+    interpolation = getproperty(interpolated_profile, :itp)
+    hasproperty(interpolation, :ranges) ||
+        error("tSZ interpolator exposes no coordinate ranges.")
+    ranges = getproperty(interpolation, :ranges)
+    length(ranges) >= 2 ||
+        error("tSZ interpolator has fewer than two coordinate axes.")
+    lower = Float64(first(ranges[2]))
+    upper = Float64(last(ranges[2]))
+    isfinite(lower) && isfinite(upper) && lower < upper ||
+        error("tSZ interpolator has invalid redshift bounds $(lower), $(upper).")
+    return (lower, upper)
+end
+
+function validate_profile_redshifts_in_cache(redshifts, bounds)
+    isempty(redshifts) && return nothing
+    lower, upper = bounds
+    selected_min, selected_max = extrema(redshifts)
+    tolerance = 32eps(Float64) * max(1.0, abs(lower), abs(upper))
+    lower - tolerance <= selected_min && selected_max <= upper + tolerance || error(
+        "Selected halo-redshift interval [$(selected_min), $(selected_max)] is " *
+        "outside the tSZ cache axis [$(lower), $(upper)].",
+    )
+    return nothing
+end
+
 function main()
     options = Support.parse_options(ARGS)
     catalog = abspath(Support.option(options, "halfdome_path", DEFAULT_CATALOG))
     nside = Support.int_option(options, "nside", 4096)
-    source_redshift = Support.float_option(options, "source_redshift", 1.0)
+    # --source-redshift is retained only as a compatibility alias for the
+    # earlier matched-z PBS workflow. New calls should use
+    # --maximum-halo-redshift; Inf means the complete catalogue lightcone.
+    maximum_halo_redshift = if haskey(options, "maximum_halo_redshift")
+        Support.float_option(options, "maximum_halo_redshift", Inf)
+    elseif haskey(options, "source_redshift")
+        Support.float_option(options, "source_redshift", Inf)
+    else
+        Inf
+    end
     aperture_r200c =
         Support.float_option(options, "halo_extension_r200_multiplier", 3.0)
     chunk_size = Support.int_option(options, "chunk_size", 100_000)
@@ -130,7 +172,7 @@ function main()
     output_map = abspath(Support.option(
         options,
         "output_map",
-        default_output_map(nside, source_redshift, aperture_r200c),
+        default_output_map(nside, maximum_halo_redshift, aperture_r200c),
     ))
     provenance_path = abspath(Support.option(
         options,
@@ -140,7 +182,8 @@ function main()
 
     isfile(catalog) || error("HalfDome catalogue not found: $(catalog)")
     nside > 0 || error("nside must be positive.")
-    source_redshift > 0.0 || error("source_redshift must be positive.")
+    maximum_halo_redshift > 0.0 ||
+        error("maximum_halo_redshift must be positive or Inf.")
     aperture_r200c > 0.0 ||
         error("halo_extension_r200_multiplier must be positive.")
     chunk_size > 0 || error("chunk_size must be positive.")
@@ -167,6 +210,7 @@ function main()
     )
     theta_min = ProfileSupport.compute_theta_min_local(interpolated_profile)
     logmass_bounds = ProfileSupport.interpolator_logmass_bounds(interpolated_profile)
+    redshift_bounds = interpolator_redshift_bounds(interpolated_profile)
     spot_theta = max(theta_min, 1.0e-5)
     spot_value = Float64(interpolated_profile(spot_theta, 1.0e14, 0.5))
     isfinite(spot_value) && 0.0 <= spot_value <= sanity_max || error(
@@ -174,16 +218,19 @@ function main()
         "theta=$(spot_theta), M200c=1e14 Msun, z=0.5.",
     )
 
-    println("Matched HalfDome Battaglia12 Compton-y map")
+    println("HalfDome Battaglia12 Compton-y map")
     println("  catalogue=$(catalog)")
     println("  output_map=$(output_map)")
-    println("  foreground interval: 0 < z_halo <= $(source_redshift)")
+    redshift_description = isinf(maximum_halo_redshift) ?
+        "complete catalogue lightcone" : "0 < z_halo <= $(maximum_halo_redshift)"
+    println("  halo redshift selection: $(redshift_description)")
     println("  mass selection: complete resolved catalogue range")
     println("  profile mass: physical M200c (catalogue halo_mass_m200c / h)")
     println("  aperture=$(aperture_r200c) R200c, externally enforced")
     println("  NSIDE=$(nside), threads=$(Threads.nthreads())")
     println("  cache=$(cache_path) ($(cache_action))")
     println("  cache log10(M200c/Msun) bounds=$(logmass_bounds)")
+    println("  cache redshift bounds=$(redshift_bounds)")
     println("  cache spot Compton-y=$(spot_value)")
 
     resolution = Healpix.Resolution(nside)
@@ -229,7 +276,9 @@ function main()
             keep = isfinite.(masses) .& isfinite.(redshifts)
             keep .&= masses .> 0.0
             keep .&= redshifts .> 0.0
-            keep .&= redshifts .<= source_redshift
+            if isfinite(maximum_halo_redshift)
+                keep .&= redshifts .<= maximum_halo_redshift
+            end
             selected_count = count(keep)
             selected_count == 0 && continue
 
@@ -240,6 +289,7 @@ function main()
                 selected_masses,
                 logmass_bounds,
             )
+            validate_profile_redshifts_in_cache(selected_redshifts, redshift_bounds)
 
             updates, hit_halos = Support.paint_batch_external_r200c!(
                 y_map,
@@ -288,6 +338,7 @@ function main()
         "profile_label" => "Battaglia12 fiducial thermal pressure",
         "xgpaint_profile_type" => "Battaglia16ThermalSZProfile",
         "catalogue" => catalog,
+        "output_map" => output_map,
         "catalog_mass_dataset" => "halo_mass_m200c",
         "catalog_mass_native_units" => "Msun/h",
         "profile_mass_definition" => "M200c",
@@ -299,17 +350,22 @@ function main()
         "aperture_radius_definition" => "R200c",
         "aperture_r200c_multiplier" => aperture_r200c,
         "aperture_owner" => "this generator; XGPaint default 4R200 bypassed",
-        "foreground_redshift_interval" => "(0, source_redshift]",
-        "source_redshift" => source_redshift,
+        "halo_redshift_selection" => redshift_description,
+        "maximum_halo_redshift_requested" => maximum_halo_redshift,
+        "catalog_truncated" => maximum_catalog_rows != 0,
         "mass_selection" => "complete resolved catalogue range; no science mass cut",
         "nside" => nside,
         "ordering" => "RING",
         "map_units" => "dimensionless Compton-y",
         "beam" => "none",
+        "instrumental_noise" => "none",
+        "mask" => "none",
         "interpolator_cache" => cache_path,
         "interpolator_cache_action" => cache_action,
         "profile_logmass_cache_min" => logmass_bounds[1],
         "profile_logmass_cache_max" => logmass_bounds[2],
+        "profile_redshift_cache_min" => redshift_bounds[1],
+        "profile_redshift_cache_max" => redshift_bounds[2],
         "interpolator_spot_theta_rad" => spot_theta,
         "interpolator_spot_y" => spot_value,
         "thread_safety" => "one lock per HEALPix ring for overlapping halo writes",

@@ -18,6 +18,14 @@ module ValidatedDMProfileSupport
 include(joinpath(@__DIR__, "generate_halfdome_z1_dm_mass_windows.jl"))
 end
 const ProfileSupport = ValidatedDMProfileSupport
+include(joinpath(@__DIR__, "radius_scaled_dm_cache.jl"))
+
+# Generic path also serves the existing tSZ painter; radius caches specialize
+# this hook to move unit conversions and profile normalization out of pixels.
+prepare_painted_halo(profile, mass, z, aperture) = (
+    theta_max=ProfileSupport.compute_theta_max_r200c_external(profile, mass, z, aperture),
+    value=theta -> profile(theta, mass, z),
+)
 
 const H_VALUE = 0.68
 const DEFAULT_CATALOG =
@@ -102,7 +110,7 @@ Paint a batch using an externally supplied R200c aperture.
 
 XGPaint's interpolation supplies DM(theta, M200c, z), but its internal
 compute_theta_max/paint! route is intentionally bypassed. Ring locks make
-overlapping halo writes deterministic and race-free while retaining halo-level
+overlapping halo writes race-free while retaining halo-level
 threading.
 """
 function paint_batch_external_r200c!(
@@ -137,9 +145,8 @@ function paint_batch_external_r200c!(
         center_phi = mod(Float64(center_phi), 2pi)
         mass = Float64(masses_m200c[halo_index])
         redshift = Float64(redshifts[halo_index])
-        theta_max = ProfileSupport.compute_theta_max_r200c_external(
-            interpolated_profile, mass, redshift, aperture_r200c,
-        )
+        prepared = prepare_painted_halo(interpolated_profile, mass, redshift, aperture_r200c)
+        theta_max = prepared.theta_max
         isfinite(theta_max) && theta_max > 0.0 ||
             error("Invalid 3R200c angular radius for M200c=$(mass), z=$(redshift).")
         theta_max = min(theta_max, pi)
@@ -163,9 +170,7 @@ function paint_batch_external_r200c!(
                     cosine = clamp(ux * px + uy * py + uz * pz, -1.0, 1.0)
                     theta = acos(cosine)
                     theta < theta_max || continue
-                    contribution = Float64(interpolated_profile(
-                        max(theta, theta_min), mass, redshift,
-                    ))
+                    contribution = Float64(prepared.value(max(theta, theta_min)))
                     units_suffix = isempty(quantity_units) ? "" : " $(quantity_units)"
                     isfinite(contribution) && contribution >= 0.0 || error(
                         "Invalid $(quantity_label)=$(contribution)$(units_suffix) at " *
@@ -204,9 +209,15 @@ function main()
     concentration_mode = ProfileSupport.normalize_lee2022_concentration_mode(
         option(options, "lee2022_concentration_mode", "none"),
     )
-    profile == "lee2022" && concentration_mode != "none" && error(
-        "Only Lee22 no-concentration is implemented; duffy2008 remains a future option.",
-    )
+    cache_coordinate = option(options, "dm_cache_coordinate", "angular")
+    cache_coordinate in ("angular", "radius") || error("dm-cache-coordinate must be angular or radius")
+    spherical_cut = float_option(options, "spherical_cut_r200c", 0.0)
+    spherical_cut >= 0 && isfinite(spherical_cut) || error("Invalid spherical cutoff")
+    spherical_cut > 0 && cache_coordinate != "radius" && error("Spherical cutoff requires the external radius cache")
+    if profile == "lee2022" && concentration_mode == "duffy2008"
+        haskey(options, "dm_cache") && haskey(options, "output_map") || error(
+            "The preferred Lee22 model requires explicit --dm-cache and --output-map to protect old results.")
+    end
 
     catalog = abspath(option(options, "halfdome_path", DEFAULT_CATALOG))
     nside = int_option(options, "nside", 4096)
@@ -250,22 +261,38 @@ function main()
         lee2022_concentration_mode=concentration_mode,
     ))
     ENV["XGPAINT_CLEANUP_NONPOSITIVE"] = cleanup_nonpositive ? "true" : "false"
-    cache_build = ProfileSupport.build_dm_interpolator_compatible(
-        runtime.model;
-        cache_file=dm_cache,
-        overwrite=cache_overwrite,
-        cleanup_nonpositive=cleanup_nonpositive,
-        generated_model_family=runtime.generated_model_family,
-        cache_signature=runtime.cache_signature,
-    )
-    interpolated_profile = cache_build.profile
-    spot_check = ProfileSupport.validate_dm_interpolator_spot_value(
-        interpolated_profile;
-        direct_model=profile == "lee2022" ? runtime.model : nothing,
-        sanity_max=sanity_max,
-    )
-    theta_min = ProfileSupport.compute_theta_min_local(interpolated_profile)
-    logmass_bounds = ProfileSupport.interpolator_logmass_bounds(interpolated_profile)
+    if cache_coordinate == "radius"
+        haskey(options, "dm_cache") && haskey(options, "output_map") || error(
+            "Radius-coordinate tests require explicit --dm-cache and --output-map.")
+        interpolated_profile = build_radius_scaled_cache(runtime, dm_cache;
+            refinement=int_option(options, "radius_refinement", 2), zmax=source_redshift,
+            spherical_cut=spherical_cut)
+        validation_path = splitext(output_map)[1] * "_radius_validation.csv"
+        validate_radius_cache(interpolated_profile; output_path=validation_path)
+        prepared = prepare_painted_halo(interpolated_profile, 1e14, 0.5, aperture_r200c)
+        spot_check = (value=prepared.value(1e-4),)
+        theta_min = 0.0
+        logmass_bounds = (first(interpolated_profile.logmasses), last(interpolated_profile.logmasses))
+        cache_build = (model_family=runtime.generated_model_family,
+                       interpolation_scheme="linear log dimensionless shape in log(R/R200c), z, logM; exact amplitude")
+    else
+        cache_build = ProfileSupport.build_dm_interpolator_compatible(
+            runtime.model;
+            cache_file=dm_cache,
+            overwrite=cache_overwrite,
+            cleanup_nonpositive=cleanup_nonpositive,
+            generated_model_family=runtime.generated_model_family,
+            cache_signature=runtime.cache_signature,
+        )
+        interpolated_profile = cache_build.profile
+        spot_check = ProfileSupport.validate_dm_interpolator_spot_value(
+            interpolated_profile;
+            direct_model=profile == "lee2022" ? runtime.model : nothing,
+            sanity_max=sanity_max,
+        )
+        theta_min = ProfileSupport.compute_theta_min_local(interpolated_profile)
+        logmass_bounds = ProfileSupport.interpolator_logmass_bounds(interpolated_profile)
+    end
 
     println("Matched HalfDome halo-DM full-map configuration")
     println("  profile=$(profile): $(runtime.description)")
@@ -409,6 +436,9 @@ function main()
         "profile_logmass_cache_min" => logmass_bounds[1],
         "profile_logmass_cache_max" => logmass_bounds[2],
         "dm_cache" => dm_cache,
+        "dm_cache_coordinate" => cache_coordinate,
+        "spherical_cut_r200c" => spherical_cut,
+        "projection_geometry" => spherical_cut > 0 ? "R_perp/R200c=tan(theta)/tan(theta200c)" : "unchanged angular-profile theta/theta200c",
         "dm_cache_interpolation" => cache_build.interpolation_scheme,
         "dm_cache_spot_value_pc_cm3" => spot_check.value,
         "dm_value_sanity_max_pc_cm3" => sanity_max,

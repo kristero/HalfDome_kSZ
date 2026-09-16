@@ -1,0 +1,44 @@
+#!/bin/bash
+#PBS -N frb_100k_rays
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=48gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+set -euo pipefail
+: "${COMPARISON_CODE:?Supply an uploaded source snapshot}"
+: "${COMPARISON_OUT:?Supply a fresh 100k output directory}"
+: "${PREVIOUS_OUT:?Supply the completed full-map comparison directory}"
+: "${STAGE:=dm}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${PYTHON:=/home/kristero10/.conda/envs/SZ/bin/python}"
+mkdir -p "$COMPARISON_OUT/logs" "$COMPARISON_OUT/analysis"
+exec > >(tee -a "$COMPARISON_OUT/logs/${STAGE}_${PBS_JOBID:-manual}.log") 2>&1
+finish() {
+    status=$?
+    printf '%s\n' "$status" > "$COMPARISON_OUT/${STAGE}_exit_status.txt"
+    printf 'Finished %s exit=%s\n' "$(date -Is)" "$status"
+}
+trap finish EXIT
+export JULIA_NUM_THREADS=26 OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE MPLBACKEND=Agg PYTHONNOUSERSITE=1
+cd "$COMPARISON_CODE"
+printf 'Started %s host=%s job=%s stage=%s\n' "$(date -Is)" "$(hostname)" "${PBS_JOBID:-manual}" "$STAGE"
+sha256sum ./*.jl ./*.py ./*.pbs > "$COMPARISON_OUT/${STAGE}_source_sha256.txt"
+"$PYTHON" compare_takahashi_sightlines.py self-test
+case "$STAGE" in
+    dm)
+        "$JULIA" --threads=26 sample_halfdome_observed_sightlines.jl \
+            --output-dir="$COMPARISON_OUT" --previous-dir="$PREVIOUS_OUT"
+        ;;
+    y)
+        "$PYTHON" compare_takahashi_sightlines.py sample-y \
+            --output "$COMPARISON_OUT" --previous "$PREVIOUS_OUT"
+        ;;
+    analyze)
+        "$PYTHON" compare_takahashi_sightlines.py analyze \
+            --output "$COMPARISON_OUT" --previous "$PREVIOUS_OUT"
+        ;;
+    *) printf 'Unknown STAGE=%s\n' "$STAGE"; exit 2 ;;
+esac

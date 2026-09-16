@@ -1,0 +1,106 @@
+#!/bin/bash
+#PBS -N frb_z1_n4096_r200c_apertures
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+set -euo pipefail
+
+# Aperture series for the fixed IllustrisTNG comparison. Each entry repeats the
+# 3R200c/1R200c product exactly (same 120k rays, complete lightcone, shared
+# Battaglia16 M200c DM cache, M200c windows, 300 log bins) and changes only the
+# generator-owned external projected aperture, N*R200c.
+#
+# APERTURE_MULTIPLIERS entries are "mult" or "mult:run_tag_suffix"; a suffix is
+# needed when the plain run tag already exists (e.g. the 3R200c repeat).
+
+: "${PROJECT_DIR:=/home/${USER}/HalfDome_kSZ}"
+: "${CLUSTER_USER:=${USER}}"
+: "${PYTHON:=python3}"
+: "${OVERWRITE:=false}"
+: "${APERTURE_MULTIPLIERS:=2.0 3.0:_repeat20260916 4.0 5.0}"
+: "${OUTPUT_BASE:=/lustre/work/${CLUSTER_USER}/frb_data/halfdome_m200c_r200c_z1_120k_foreground_mass_histograms}"
+
+GENERIC_PBS="${PROJECT_DIR}/frb_map_generation/run_halfdome_z1_mass_histograms_120k.pbs"
+[[ -f "${GENERIC_PBS}" ]] || {
+  echo "Required workflow not found: ${GENERIC_PBS}" >&2
+  exit 2
+}
+
+export PROJECT_DIR CLUSTER_USER PYTHON OVERWRITE OUTPUT_BASE
+export NFRB=120000
+export ZSOURCE=1.0
+export SEED=42
+export NSIDE=4096
+export MAX_CATALOG_HALOS=0
+export XGPAINT_PROFILE_MASS_DEFINITION=m200c
+export MASS_WINDOWS="m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16"
+export HDF5_USE_FILE_LOCKING=FALSE
+
+check_product() {
+  local hdf5="$1" multiplier="$2"
+  "${PYTHON}" - "${hdf5}" "${multiplier}" <<'PY'
+import sys
+import h5py
+
+path, multiplier = sys.argv[1], float(sys.argv[2])
+
+
+def text(value):
+    return value.decode() if isinstance(value, bytes) else str(value)
+
+
+with h5py.File(path, "r") as handle:
+    expected = {
+        "halo_mass_definition": "M200c",
+        "halo_radius_definition": "R200c",
+        "halo_reference_density": "critical",
+        "provenance_halo_mass_definition": "M200c",
+        "provenance_halo_radius_definition": "R200c",
+        "provenance_halo_reference_density": "critical",
+        "provenance_mass_window_selection_definition": "M200c",
+        "provenance_xgpaint_input_mass_definition": "M200c",
+        "provenance_xgpaint_profile_input_mass_definition": "M200c",
+        "provenance_xgpaint_profile_input_mass_dataset": "halo_mass_m200c",
+        "provenance_xgpaint_aperture_radius_definition": "R200c",
+        "provenance_aperture_mass_definition": "M200c",
+        "provenance_aperture_mass_dataset": "halo_mass_m200c",
+        "provenance_aperture_radius_definition": "R200c",
+        "provenance_aperture_geometry_owner": "generator",
+        "provenance_xgpaint_profile_internal_radius_definition": "R200c",
+    }
+    for key, value in expected.items():
+        actual = text(handle.attrs[key])
+        assert actual == value, (key, actual, value)
+    assert int(handle.attrs["halo_overdensity"]) == 200
+    assert int(handle.attrs["provenance_halo_overdensity"]) == 200
+    assert int(handle.attrs["provenance_nside"]) == 4096
+    assert float(handle.attrs["provenance_source_redshift"]) == 1.0
+    assert abs(float(handle.attrs["provenance_halo_extension_r200_multiplier"]) - multiplier) < 1e-12
+    assert not bool(handle.attrs["provenance_xgpaint_default_theta_max_used"])
+    assert not bool(handle.attrs["provenance_xgpaint_paint_function_used"])
+    assert int(handle.attrs["provenance_catalog_streamed_halos"]) == int(
+        handle.attrs["provenance_catalog_total_halos"]
+    )
+    assert int(handle.attrs["provenance_catalog_m200c_validation_sample_count"]) > 0
+
+print(f"Validated fixed M200c/{multiplier:g}R200c comparison product: {path}")
+PY
+}
+
+for entry in ${APERTURE_MULTIPLIERS}; do
+  multiplier="${entry%%:*}"
+  suffix=""
+  [[ "${entry}" == *:* ]] && suffix="${entry#*:}"
+  tag="$(printf '%.1f' "${multiplier}")"
+  tag="${tag//./p}"
+  run_tag="zsrc1p0_nside4096_nrays120000_allhalos_r200cx${tag}_m200cprofile_seed42${suffix}"
+  echo "############ aperture ${multiplier} R200c -> ${OUTPUT_BASE}/${run_tag} ############"
+  HALO_EXTENSION_R200_MULTIPLIER="${multiplier}" RUN_TAG="${run_tag}" \
+    /bin/bash "${GENERIC_PBS}"
+  check_product "${OUTPUT_BASE}/${run_tag}/halfdome_uniform_fixedz_foreground_mass_histograms.h5" "${multiplier}"
+done
+
+echo "Aperture series complete: ${APERTURE_MULTIPLIERS}"

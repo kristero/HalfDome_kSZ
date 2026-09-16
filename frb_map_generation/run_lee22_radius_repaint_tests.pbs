@@ -1,0 +1,63 @@
+#!/bin/bash
+#PBS -N frb_radius_tests
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=48gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+set -euo pipefail
+: "${TEST_CODE_DIR:?Supply an uploaded source snapshot}"
+: "${TEST_OUTPUT:?Supply a new output root}"
+: "${TEST_KIND:=spherical3}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${PYTHON:=/home/kristero10/.conda/envs/SZ/bin/python}"
+: "${MC_SEEDS:=16}"
+[[ "$TEST_KIND" == spherical3 || "$TEST_KIND" == projected3 ]] || exit 2
+mkdir -p "$TEST_OUTPUT/logs" "$TEST_OUTPUT/maps" "$TEST_OUTPUT/cache" "$TEST_OUTPUT/analysis"
+JOB_TAG="${PBS_JOBID:-manual}"
+exec > >(tee -a "$TEST_OUTPUT/logs/${TEST_KIND}_${JOB_TAG}.log") 2>&1
+finish() {
+    result=$?
+    printf '%s\n' "$result" > "$TEST_OUTPUT/${TEST_KIND}_exit_status.txt"
+    printf 'Finished %s: exit=%s\n' "$(date -Is)" "$result"
+}
+trap finish EXIT
+export JULIA_NUM_THREADS=26 OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export PYTHONNOUSERSITE=1 MPLBACKEND=Agg HDF5_USE_FILE_LOCKING=FALSE
+cd "$TEST_CODE_DIR"
+printf 'Started %s host=%s job=%s kind=%s\n' "$(date -Is)" "$(hostname)" "$JOB_TAG" "$TEST_KIND"
+sha256sum ./*.jl ./*.py ./*.pbs > "$TEST_OUTPUT/${TEST_KIND}_source_sha256.txt"
+"$JULIA" --version
+"$PYTHON" -c 'import healpy,numpy,h5py; print(healpy.__version__,numpy.__version__)'
+if [[ "$TEST_KIND" == spherical3 ]]; then
+    "$JULIA" --threads=26 test_lee22_preferred_profile.jl --output-dir="$TEST_OUTPUT/analysis"
+    "$PYTHON" analyze_radius_dm_tests.py --output-dir="$TEST_OUTPUT/analysis" --profiles-only
+    profiles=(battaglia16 lee22_legacy lee22_preferred)
+    spherical_cut=3
+else
+    profiles=(battaglia16 lee22_legacy)
+    spherical_cut=0
+fi
+for label in "${profiles[@]}"; do
+    profile=lee2022
+    mode=none
+    [[ "$label" == battaglia16 ]] && profile=battaglia16
+    [[ "$label" == lee22_preferred ]] && mode=duffy2008
+    tag="${label}_${TEST_KIND}"
+    printf 'painting_%s\n' "$tag" > "$TEST_OUTPUT/${TEST_KIND}_stage.txt"
+    "$JULIA" --threads=26 paint_halfdome_matched_profile_dm_map.jl \
+        --halfdome-path="$HALFDOME_PATH" --dm-profile="$profile" \
+        --lee2022-concentration-mode="$mode" --dm-cache-coordinate=radius \
+        --dm-cache="$TEST_OUTPUT/cache/${tag}_r2.h5" --radius-refinement=2 \
+        --output-map="$TEST_OUTPUT/maps/${tag}.fits" --spherical-cut-r200c="$spherical_cut" \
+        --nside=4096 --source-redshift=1 --halo-extension-r200-multiplier=3 \
+        --max-catalog-halos=0 --chunk-size=100000 --overwrite=false
+    printf 'sampling_%s\n' "$tag" > "$TEST_OUTPUT/${TEST_KIND}_stage.txt"
+    "$PYTHON" analyze_radius_dm_tests.py --map="$TEST_OUTPUT/maps/${tag}.fits" \
+        --label="$tag" --output-dir="$TEST_OUTPUT/analysis" --samples="$MC_SEEDS"
+done
+# The combined comparison is rendered after both jobs finish, to avoid two
+# jobs concurrently writing the same PNG. Each individual plot is unique.
+printf 'complete\n' > "$TEST_OUTPUT/${TEST_KIND}_stage.txt"

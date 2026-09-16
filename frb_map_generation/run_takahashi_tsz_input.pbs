@@ -1,0 +1,26 @@
+#!/bin/bash
+#PBS -N takahashi_tsz
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=48gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+set -euo pipefail
+: "${COMPARISON_CODE:?Supply the source snapshot}"
+: "${COMPARISON_OUT:?Supply the separate comparison output root}"
+: "${TSZ_CACHE:=/lustre/work/kristero10/tSZ_data/cache/battaglia12_fiducial_m200c_logm15p7_tsz_interpolator.jld2}"
+mkdir -p "$COMPARISON_OUT/logs" "$COMPARISON_OUT/inputs"
+exec > >(tee -a "$COMPARISON_OUT/logs/tsz_repaint_${PBS_JOBID:-manual}.log") 2>&1
+finish() { status=$?; printf '%s\n' "$status" > "$COMPARISON_OUT/tsz_repaint_exit_status.txt"; }
+trap finish EXIT
+export JULIA_NUM_THREADS=26 OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE
+cd "$COMPARISON_CODE"
+MAP="$COMPARISON_OUT/inputs/battaglia12_full_lightcone_repaint.fits"
+/usr/local/bin/julia --threads=26 paint_halfdome_battaglia12_tsz_map.jl \
+    --halfdome-path=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5 \
+    --tsz-cache="$TSZ_CACHE" --output-map="$MAP" --nside=4096 \
+    --maximum-halo-redshift=Inf --halo-extension-r200-multiplier=4 \
+    --max-catalog-halos=0 --overwrite=false
+sha256sum "$MAP" > "${MAP%.fits}.sha256"
+printf 'Completed full-lightcone B12 tSZ: %s\n' "$(date -Is)"

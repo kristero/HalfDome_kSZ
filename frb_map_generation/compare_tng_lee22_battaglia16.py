@@ -34,6 +34,8 @@ PREVIOUS_BATTAGLIA_RUN_NAME = (
     "zsrc1p0_nside4096_nrays120000_allhalos_"
     "r200cx3p0_m200cprofile_seed42"
 )
+RALF_TNG_LABEL = "IllustrisTNG (Ralf Konietzka)"
+BIN_EDGE_RELATIVE_TOLERANCE = 1.0e-12
 
 UPPER_ENTRIES = (
     ("Total: TNG all / HD all resolved", "all", "m1e10_to_1e16"),
@@ -260,7 +262,7 @@ class Lee22TngBattagliaComparison:
             self.project_root
             / "tng_halfdome_direct_comparison"
             / "cluster_HalfDome_pdfs"
-            / "lee22_vs_tng_vs_battaglia16_best"
+            / "lee22_vs_ralf_tng_vs_battaglia16_best"
         )
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.previous_battaglia_h5 = (
@@ -298,9 +300,15 @@ class Lee22TngBattagliaComparison:
                 label,
                 validated_200c=True,
             )
-            if not np.array_equal(lee["edges"], battaglia["edges"]):
+            if not np.allclose(
+                lee["edges"],
+                battaglia["edges"],
+                rtol=BIN_EDGE_RELATIVE_TOLERANCE,
+                atol=0.0,
+            ):
                 raise ValueError(
-                    f"Lee22 and Battaglia16 use different PDF bin edges for {label}"
+                    f"Lee22 and Battaglia16 use materially different PDF bin edges "
+                    f"for {label}"
                 )
 
     def audit_rows(self) -> list[dict[str, Any]]:
@@ -319,6 +327,12 @@ class Lee22TngBattagliaComparison:
                     "lee22_effective_max_msun": lee["effective_max_msun"],
                     "lee22_zero_fraction": lee["zero_fraction"],
                     "battaglia16_zero_fraction": battaglia["zero_fraction"],
+                    "max_relative_bin_edge_difference": float(
+                        np.max(
+                            np.abs(lee["edges"] - battaglia["edges"])
+                            / np.maximum(np.abs(lee["edges"]), np.finfo(float).tiny)
+                        )
+                    ),
                     "max_abs_lee22_minus_battaglia16_pdf": float(
                         np.max(np.abs(lee["pdf"] - battaglia["pdf"]))
                     ),
@@ -328,7 +342,7 @@ class Lee22TngBattagliaComparison:
 
     def save_audit_csv(self) -> Path:
         rows = self.audit_rows()
-        path = self.output_dir / "lee22_vs_battaglia16_mass_window_audit.csv"
+        path = self.output_dir / "lee22_vs_ralf_tng_vs_battaglia16_mass_window_audit.csv"
         with path.open("w", newline="") as handle:
             writer = csv.DictWriter(handle, fieldnames=tuple(rows[0]))
             writer.writeheader()
@@ -396,7 +410,7 @@ class Lee22TngBattagliaComparison:
         legend_ax.axis("off")
         legend_ax.legend(
             handles=(
-                Line2D([0], [0], color="#264653", linewidth=2.8, label="IllustrisTNG"),
+                Line2D([0], [0], color="#264653", linewidth=2.8, label=RALF_TNG_LABEL),
                 Line2D(
                     [0], [0], color="#d1495b", linewidth=1.8, marker="o",
                     markersize=4, label="HalfDome Lee22 Table A2, no concentration",
@@ -412,7 +426,7 @@ class Lee22TngBattagliaComparison:
             0.5, 0.02,
             "Both HalfDome models: M200c bins and masses, external 3R200c, "
             "z_source=1, NSIDE=4096, 120,000 uniform rays. "
-            "Percentage axes are linear and use TNG as the denominator.",
+            "Percentage axes are linear and use Ralf Konietzka\'s TNG arrays as the denominator.",
             ha="center", va="bottom", fontsize=9.2,
         )
         fig.suptitle(title, fontsize=17)
@@ -428,14 +442,14 @@ class Lee22TngBattagliaComparison:
         self.validate_inputs()
         upper_png, upper_pdf = self._plot(
             UPPER_ENTRIES,
-            "tng_vs_lee22_vs_battaglia16_upper_m200c_windows",
-            r"IllustrisTNG versus Lee22 and Battaglia16: upper $M_{200c}$ limits",
+            "ralf_tng_vs_lee22_vs_battaglia16_upper_m200c_windows",
+            r"Ralf IllustrisTNG versus Lee22 and Battaglia16: upper $M_{200c}$ limits",
             5_000.0,
         )
         to14_png, to14_pdf = self._plot(
             TO_1E14_ENTRIES,
-            "tng_vs_lee22_vs_battaglia16_to_1e14_m200c_windows",
-            r"IllustrisTNG versus Lee22 and Battaglia16: windows ending at $10^{14}M_\odot$",
+            "ralf_tng_vs_lee22_vs_battaglia16_to_1e14_m200c_windows",
+            r"Ralf IllustrisTNG versus Lee22 and Battaglia16: windows ending at $10^{14}M_\odot$",
             10_000.0,
         )
         return {

@@ -360,6 +360,7 @@ function paint_full_foreground_map!(
                 selected_redshifts[perm],
                 ras[perm],
                 decs[perm],
+                zerobeforepainting=false,
             )
 
             halos_painted += selected_count

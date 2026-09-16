@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -N frb_takahashi
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=48gb
+#PBS -l walltime=23:59:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+set -euo pipefail
+: "${COMPARISON_CODE:?Supply an uploaded source snapshot}"
+: "${COMPARISON_OUT:?Supply a fresh output root with kernels/}"
+: "${TSZ_MAP:?Supply the verified full-lightcone Battaglia12 map}"
+: "${PROFILE_LABEL:=battaglia16}"
+: "${SPECTRA_ONLY:=false}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${PYTHON:=/home/kristero10/.conda/envs/SZ/bin/python}"
+mkdir -p "$COMPARISON_OUT/logs"
+exec > >(tee -a "$COMPARISON_OUT/logs/${PROFILE_LABEL}_${PBS_JOBID:-manual}.log") 2>&1
+finish() {
+    status=$?
+    printf '%s\n' "$status" > "$COMPARISON_OUT/${PROFILE_LABEL}_exit_status.txt"
+    printf 'Finished %s exit=%s\n' "$(date -Is)" "$status"
+}
+trap finish EXIT
+export JULIA_NUM_THREADS=26 OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE MPLBACKEND=Agg PYTHONNOUSERSITE=1
+cd "$COMPARISON_CODE"
+printf 'Started %s host=%s job=%s model=%s\n' "$(date -Is)" "$(hostname)" "${PBS_JOBID:-manual}" "$PROFILE_LABEL"
+sha256sum ./*.jl ./*.py ./*.pbs > "$COMPARISON_OUT/${PROFILE_LABEL}_source_sha256.txt"
+"$PYTHON" compare_halfdome_takahashi.py self-test
+if [[ "$SPECTRA_ONLY" != true ]]; then
+    "$JULIA" --threads=26 paint_halfdome_observed_source_dm_maps.jl \
+        --label="$PROFILE_LABEL" --halfdome-path="$HALFDOME_PATH" \
+        --output-dir="$COMPARISON_OUT" --kernel-dir="$COMPARISON_OUT/kernels" --nside=4096
+fi
+"$PYTHON" compare_halfdome_takahashi.py spectra --output "$COMPARISON_OUT" \
+    --label "$PROFILE_LABEL" --tsz-map "$TSZ_MAP" --lmax 8192

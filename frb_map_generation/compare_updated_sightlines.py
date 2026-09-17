@@ -39,6 +39,8 @@ STYLE = {
     "lee22_noconc_sphere1": ("Lee22 no-c, gas inside $R_{200c}$ (sphere)", ORANGE, "-", 3.0, "s", True),
     "lee22_noconc_sphere3": ("Lee22 no-c, gas inside $3R_{200c}$ (sphere)", ORANGE, (0, (1.2, 1.6)), 2.0, None, True),
     "lee22_noconc_projected1": ("Lee22 no-c, old truncation ($R_{200c}$ cylinder)", ORANGE, (0, (5, 2, 1.2, 2)), 2.0, None, True),
+    "b16_sphere1_calib": ("Battaglia16, only halos in the Lee22 calibrated ranges", BLUE, "--", 2.2, "o", False),
+    "lee22_noconc_sphere1_calib": ("Lee22 no-c, only halos in its calibrated ranges", ORANGE, "--", 3.0, "s", False),
     "lee22_legacy_sphere3": ("Lee22 previous reading, $3R_{200c}$", GREY, (0, (3, 2)), 1.6, None, False),
     "lee22_pref_sphere1": ("Lee22 + c (diagnostic), inside $R_{200c}$", "#7B3294", (0, (4, 2)), 1.6, None, False),
 }
@@ -200,6 +202,46 @@ def plot_takahashi(out, select, reference="geometry"):
     plt.close(fig)
 
 
+def plot_calibrated(out, select):
+    """Lee22 with all resolved halos versus only the halos inside its calibration ranges
+    (1e13-10^14.8 h^-1 Msun, z <= 2; the R200c sphere keeps radii inside 0.04-1.34 R200c),
+    with Battaglia16 under the same two selections as reference."""
+    observations = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
+    plt.rcParams.update(RC)
+    fig, axes = plt.subplots(1, 2, figsize=(15.5, 7.0))
+    labels_all = {"lee22_noconc_sphere1": "Lee22 no-c, all resolved halos ($M \\geq 6.8\\times10^{12}\\,M_\\odot$, $z \\leq z_{\\rm FRB}$)",
+                  "b16_sphere1": "Battaglia16, all resolved halos"}
+    labels_cal = {"lee22_noconc_sphere1_calib": "Lee22 no-c, only calibrated halos ($1.5\\times10^{13}$-$9.3\\times10^{14}\\,M_\\odot$, $z \\leq 2$)",
+                  "b16_sphere1_calib": "Battaglia16, same calibrated-range halos"}
+    for ax, plane in zip(axes, ("planck", "act")):
+        name, beam, count = PLANES[plane]
+        obs = [r for r in observations if ("ACT" in r["series"]) == (plane == "act")]
+        ax.errorbar(column(obs, "theta_plotted_arcmin"), column(obs, "w_yDM_pc_cm3") / 1e-5,
+                    yerr=np.vstack([column(obs, "error_lower_pc_cm3"), column(obs, "error_upper_pc_cm3")]) / 1e-5,
+                    fmt="o", color="black", ms=6, capsize=2.5, lw=1.3, label="Takahashi+25 (digitized)", zorder=6)
+        for label, legend in list(labels_all.items()) + list(labels_cal.items()):
+            x, value, error = select(plane, plane, label)
+            _, color, ls, lw, marker, _ = STYLE[label]
+            calibrated = label.endswith("_calib")
+            ax.errorbar(x, value / 1e-5, yerr=error / 1e-5, color=color, ls="--" if calibrated else "-",
+                        lw=3.0 if "lee22" in label else 2.0, marker=marker, ms=6.5 if "lee22" in label else 5,
+                        mfc="white" if calibrated else color, capsize=2.5, elinewidth=1.2, label=legend, zorder=4)
+        ax.axvspan(1, PAPER_CUT[plane], color=".5", alpha=.12, zorder=0)
+        style_axis(ax, 1)
+        ax.set_title("{}: {}, {} FRB redshifts".format(name, beam, count), pad=10)
+    axes[0].set_ylabel(r"$w_{y\,\mathrm{DM}}(\theta)\ \ [10^{-5}\ \mathrm{pc\,cm^{-3}}]$")
+    handles, labels = axes[0].get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    wanted = [labels_all["lee22_noconc_sphere1"], labels_cal["lee22_noconc_sphere1_calib"],
+              labels_all["b16_sphere1"], labels_cal["b16_sphere1_calib"], "Takahashi+25 (digitized)"]
+    fig.legend([by_label[w] for w in wanted], wanted, loc="upper center", ncol=2, frameon=False,
+               bbox_to_anchor=(0.5, 1.0), columnspacing=1.4, handlelength=2.8)
+    fig.subplots_adjust(left=.07, right=.985, top=.76, bottom=.125, wspace=.2)
+    for ext in ("png", "pdf", "svg"):
+        fig.savefig(str(out / "plots" / ("takahashi_fig13_lee22_calibrated_range." + ext)), dpi=200 if ext == "png" else None)
+    plt.close(fig)
+
+
 def plot_medlock(out, select, plane):
     fits = read_rows(PREVIOUS / "references/medlock_fig5_best_fit_digitized.csv")
     points = read_rows(INPUTS / "digitized/medlock_nagai_fig5_approximate.csv")
@@ -346,6 +388,7 @@ def plot(args):
     plane_z2 = [p for p in planes if p not in PLANES][0]
     plot_takahashi(out, select, reference="geometry")
     plot_takahashi(out, select, reference="previous")
+    plot_calibrated(out, select)
     plot_medlock(out, select, plane_z2)
     plot_diagnostic(out, select)
     write_tables(out, rows, select, plane_z2)

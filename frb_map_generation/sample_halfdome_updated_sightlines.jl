@@ -23,7 +23,15 @@ struct UpdatedModelSpec
     cut::Float64        # spherical boundary radius in R200c; 0 = no sphere (XGPaint projected convention)
     aperture::Float64   # angular aperture in R200c inside which a ray receives this model's column
     note::String
+    cache_label::String # models that differ only by a halo selection share one cache
+    mass_min::Float64   # halo selection (physical M200c, Msun): mass_min <= M < mass_max
+    mass_max::Float64
+    z_max::Float64      # halo selection: z_halo <= z_max
 end
+
+spec(label, config, cut, aperture, note; cache_label=label, mass_min=0.0, mass_max=Inf, z_max=Inf) =
+    UpdatedModelSpec(label, config, cut, aperture, note, cache_label, mass_min, mass_max, z_max)
+in_selection(s::UpdatedModelSpec, mass, z) = s.mass_min <= mass < s.mass_max && z <= s.z_max
 
 # halo_boundary="projected" here only means "hand the plain density model to the radius cache";
 # the spherical chord integration is done by build_radius_scaled_cache(spherical_cut=...).
@@ -37,22 +45,31 @@ function updated_model_specs()
                            lee2022_n0_pivot="mcut", lee2022_shape_mass_clip_msun=clip_fit))
     lee_pref = merge(lee_new, (lee2022_concentration_mode="duffy2008", lee2022_concentration_source="tng_mean"))
     lee_legacy = merge(base, (dm_profile="lee2022",))
+    # Lee22 calibration: masses 1e13-10^14.8 h^-1 Msun (Lee et al. 2022, fit range), 20 TNG300 snapshots to z = 2
+    calib_mass = (1.0e13 / H_VALUE, 10.0^14.8 / H_VALUE)
+    calib_zmax = 2.0
     return UpdatedModelSpec[
-        UpdatedModelSpec("b16_sphere1", base, 1.0, 1.0,
+        spec("b16_sphere1", base, 1.0, 1.0,
             "Battaglia16; gas inside the R200c sphere (TNG like-for-like implementation)"),
-        UpdatedModelSpec("b16_sphere3", base, 3.0, 3.0,
+        spec("b16_sphere3", base, 3.0, 3.0,
             "Battaglia16; gas inside 3 R200c (previous cross-correlation convention)"),
-        UpdatedModelSpec("b16_projected1", base, 0.0, 1.0,
+        spec("b16_projected1", base, 0.0, 1.0,
             "Battaglia16; old truncation: full-LOS column (XGPaint, 1e5 R200c) inside an angular aperture of 1 R200c (cylinder)"),
-        UpdatedModelSpec("lee22_noconc_sphere1", lee_new, 1.0, 1.0,
+        spec("b16_sphere1_calib", base, 1.0, 1.0,
+            "Battaglia16, R200c sphere, only halos inside the Lee22 calibration ranges (reference)";
+            cache_label="b16_sphere1", mass_min=calib_mass[1], mass_max=calib_mass[2], z_max=calib_zmax),
+        spec("lee22_noconc_sphere1", lee_new, 1.0, 1.0,
             "Lee22 no-c fit; XGPaint-native normalization, M_cut pivot, fit-range shape clip; R200c sphere"),
-        UpdatedModelSpec("lee22_noconc_sphere3", lee_new, 3.0, 3.0,
+        spec("lee22_noconc_sphere3", lee_new, 3.0, 3.0,
             "same Lee22 no-c fit extrapolated to 3 R200c (outside the 0.04-1.34 R200c fit range)"),
-        UpdatedModelSpec("lee22_noconc_projected1", lee_new, 0.0, 1.0,
+        spec("lee22_noconc_projected1", lee_new, 0.0, 1.0,
             "same Lee22 no-c fit; old truncation: full-LOS column inside an angular aperture of 1 R200c (cylinder)"),
-        UpdatedModelSpec("lee22_pref_sphere1", lee_pref, 1.0, 1.0,
+        spec("lee22_noconc_sphere1_calib", lee_new, 1.0, 1.0,
+            "Lee22 no-c, R200c sphere, only halos inside the calibration ranges: 1e13-10^14.8 h^-1 Msun, z <= 2";
+            cache_label="lee22_noconc_sphere1", mass_min=calib_mass[1], mass_max=calib_mass[2], z_max=calib_zmax),
+        spec("lee22_pref_sphere1", lee_pref, 1.0, 1.0,
             "Lee22 Table-3 fit + TNG-mean concentration, same reading; R200c sphere (diagnostic)"),
-        UpdatedModelSpec("lee22_legacy_sphere3", lee_legacy, 3.0, 3.0,
+        spec("lee22_legacy_sphere3", lee_legacy, 3.0, 3.0,
             "previous Lee22 reading (literal eq. 9, 1e14 pivot, no clip); 3 R200c regression"),
     ]
 end
@@ -154,7 +171,7 @@ function updated_sightline_main()
     provenance = Dict{String,Any}()
     for spec in specs
         runtime = ProfileSupport.dm_profile_runtime_configuration(spec.config)
-        path = joinpath(cache_dir, spec.label * "_radius_cache.h5")
+        path = joinpath(cache_dir, spec.cache_label * "_radius_cache.h5")
         println("== $(spec.label): $(runtime.description); sphere=$(spec.cut) R200c")
         flush(stdout)
         t0 = time()
@@ -172,6 +189,8 @@ function updated_sightline_main()
         provenance[spec.label * ".cache_signature"] = runtime.cache_signature
         provenance[spec.label * ".sphere_r200c"] = spec.cut
         provenance[spec.label * ".aperture_r200c"] = spec.aperture
+        provenance[spec.label * ".halo_selection"] = isfinite(spec.mass_max) || isfinite(spec.z_max) ?
+            "$(spec.mass_min) <= M200c/Msun < $(spec.mass_max), z <= $(spec.z_max)" : "all resolved halos"
         provenance[spec.label * ".geometry"] = spec.cut > 0 ? "sphere; chord-limited LOS; DM -> 0 at the edge" :
             "cylinder; full LOS to 1e5 R200c; angular aperture cut (XGPaint convention)"
         provenance[spec.label * ".note"] = spec.note
@@ -236,7 +255,8 @@ function updated_sightline_main()
                         theta_aperture = [apertures[p] == 1.0 ? theta_r200c :
                             ProfileSupport.compute_theta_max_r200c_external(model0, m[h], z[h], apertures[p]) for p in 1:nmodel]
                     end
-                    values = [theta < theta_aperture[p] ? Float64(prepared[p].value(theta)) : 0.0 for p in 1:nmodel]
+                    values = [theta < theta_aperture[p] && in_selection(specs[p], m[h], z[h]) ?
+                              Float64(prepared[p].value(theta)) : 0.0 for p in 1:nmodel]
                     all(v -> isfinite(v) && 0 <= v <= 1.0e8, values) ||
                         error("Invalid single-halo DM; values are never clipped")
                     inside = theta < theta_r200c

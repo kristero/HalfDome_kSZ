@@ -18,6 +18,8 @@ Figures (PNG/PDF/SVG) under `outputs/tsz_dm_cross_updated_20260917/plots/`:
   aperture of R200c, a cylinder (dash-dotted).
 - `takahashi_fig13_updated_models_vs_previous` - the inside-R200c curves with the 2026-09-14 products
   (3R200c sphere; legacy Lee22 reading) as the previous implementation.
+- `takahashi_fig13_lee22_calibrated_range` - Lee22 (R200c sphere) with all resolved halos versus only the
+  halos inside its calibration ranges, Battaglia16 under both selections as reference.
 - `medlock_fig5_updated_models` - ACT, Planck MILCA, Planck NILC panels, all sources at z = 2, no beam.
 - `updated_vs_previous_diagnostic` - the new products against the 2026-09-14 sightline products.
 
@@ -37,7 +39,7 @@ Reused unchanged from the 2026-09-14 test (`TAKAHASHI_100K_SIGHTLINES.md`):
   halo-only DM and the annular y, averaged over strata with equal weight; delete-one-source
   jackknife errors. These errors measure finite-source sampling on one simulated sky only.
 
-New: the per-source halo DM for eight models (`sample_halfdome_updated_sightlines.jl`), plus a third
+New: the per-source halo DM for ten models (`sample_halfdome_updated_sightlines.jl`), plus a third
 source plane with every source at z = 2 for the Medlock & Nagai kernel. One pass over the
 85,224,251 catalogue rows (74,907,259 halos with 0 < z <= 2.148) took about 60 s on 20 local threads.
 
@@ -49,6 +51,8 @@ source plane with every source at z = 2 for the Medlock & Nagai kernel. One pass
 | `lee22_noconc_sphere1` | Lee22 Table A2, no concentration | XGPaint-native (P0 = 200 n0, `ne2d`), M_cut pivot, fit-range shape clip | inside R200c | the Lee22 implementation that matches TNG |
 | `lee22_noconc_sphere3` | same | same | inside 3 R200c | extrapolation beyond the 0.04-1.34 R200c fit range |
 | `lee22_noconc_projected1` | same | same | full LOS inside an angular aperture of R200c (cylinder) | the old truncation, same fit and reading |
+| `lee22_noconc_sphere1_calib` | same | same | inside R200c; only halos with 1.5e13 <= M200c < 9.3e14 Msun and z <= 2 | the fit used only where it was calibrated |
+| `b16_sphere1_calib` | Battaglia16 | XGPaint `ne2d` | inside R200c; same halo selection | reference for the selection itself |
 | `lee22_pref_sphere1` | Lee22 Table 3 + TNG-mean concentration | same reading | inside R200c | diagnostic only (not plotted in the main figures) |
 | `lee22_legacy_sphere3` | Lee22 Table A2 | previous reading: literal eq. 9, 1e14 pivot, no clip | inside 3 R200c | regression against the 2026-09-14 product |
 
@@ -203,6 +207,37 @@ The cylinder adds 35 % to the mean halo DM per ray for both models (Battaglia16 
 59.1 -> 80.6 pc cm^-3) and 10-35 % to the cross-correlation, more at large angles where the outer gas
 matters. It sits between the two spheres everywhere: it contains the gas beyond R200c along the ray but
 not the gas at b > R200c that the 3R200c sphere adds. The ACT plane gives the same ratios within 0.02.
+
+## 5b2. Lee22 used only where it was calibrated
+
+`lee22_noconc_sphere1_calib` keeps the R200c sphere (radii inside the 0.04-1.34 R200c fit range) and
+counts only halos with 1e13 <= M200c h/Msun < 10^14.8 (1.47e13-9.28e14 Msun) and z <= 2, the mass and
+redshift ranges of the Lee22 fit. `b16_sphere1_calib` applies the same selection to Battaglia16. The
+removed halos are the resolved halos below 1.47e13 Msun (the bulk of the catalogue by number), the 868
+foreground halos above 9.28e14 Msun, and the few above z = 2. Values in 1e-5 pc cm^-3:
+
+| annulus ['] | observed Planck | Lee22 all halos | Lee22 calibrated | ratio | B16 all halos | B16 calibrated | ratio |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 10-17.8 | 4.28 +- 1.61 | 5.62 | 3.19 +- 0.26 | 0.57 | 1.28 | 0.83 | 0.65 |
+| 17.8-31.6 | 2.48 +- 1.30 | 2.93 | 1.66 +- 0.14 | 0.57 | 0.66 | 0.42 | 0.64 |
+| 31.6-56.2 | 1.08 +- 0.87 | 1.27 | 0.79 +- 0.06 | 0.62 | 0.29 | 0.20 | 0.69 |
+| 56.2-100 | 1.21 +- 0.36 | 0.44 | 0.33 +- 0.02 | 0.75 | 0.11 | 0.09 | 0.79 |
+| 100-178 | 0.67 +- 0.35 | 0.16 | 0.13 +- 0.02 | 0.83 | 0.04 | 0.03 | 0.83 |
+
+The selection removes 13 % of the mean halo DM per ray (Planck plane: 59.1 -> 51.6 pc cm^-3 for Lee22,
+24.5 -> 20.0 for Battaglia16) but 40 % of the cross-correlation at theta <= 56' and 10-25 % beyond
+100', for both models alike (ratios 0.57-0.63 versus 0.64-0.72 at small angles). The small-angle loss is
+therefore not a property of the Lee22 fit but of the selection: the excluded halos above 9.28e14 Msun
+carry the largest Compton-y and dominate the one-halo part of the signal, while the many excluded
+low-mass halos carry little y. Lee22 loses slightly more than Battaglia16 because its DM per halo rises
+faster with mass (n0 ~ M^0.68 against P0 ~ M^0.29).
+
+Against the Planck points the calibrated Lee22 curve is within 0.7 sigma at 10-56' and 2.4 sigma low at
+56-100'; against ACT it is 1.2-2.9 sigma high at 1.8-10' and within 0.8 sigma at 10-56'. Indicative
+amplitudes (observed = A x model, diagonal digitized errors): Planck A = 1.80 +- 0.37 (all halos:
+1.00 +- 0.22), ACT A = 0.43 +- 0.19 (all halos: 0.28 +- 0.12). The redshift caveat of Section 5 is
+unchanged by this selection: z <= 2 is the fitted range, but the fit's low-redshift normalization exceeds
+the cosmic baryon budget inside R200c, and the Takahashi halos are at z < 0.3.
 
 ## 5c. Why Battaglia16 is nearly self-similar and Lee22 is not
 

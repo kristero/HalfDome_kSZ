@@ -33,7 +33,12 @@ abstract type AbstractLee2022DMProfile{T} <: XGPaint.AbstractGNFW{T} end
 #   normalization      :literal          n_e = n0 f(x) n200 with n200 from eq. (9) as printed
 #                      :baryon_fraction  n_e = (Omega_b/Omega_m) n0 f(x) n200; makes the fits
 #                                        physically consistent with XGPaint's Battaglia16 (which
-#                                        carries the same f_b factor) and with TNG gas fractions
+#                                        carries the same f_b factor) and with TNG gas fractions;
+#                                        the like-for-like spherical test (2026-09-16) shows this
+#                                        over-corrects by a factor 3.8 against TNG within R200
+#                      :electron_count   replaces the 1/(X_H m_p) of eq. (9) by the free electrons
+#                                        per unit mass of ionized H+He, (1+X_H)/(2 m_p): factor
+#                                        X_H(1+X_H)/2 = 0.669 on the literal reading
 #   n0_pivot           :legacy_1e14      no-concentration n0 uses the eq. (11) 1e14 Msun pivot
 #                      :mcut             all parameters share M_cut, the literal eq. (12) form
 #   concentration_source :duffy2008      Duffy08 median NFW c200c
@@ -46,7 +51,7 @@ abstract type AbstractLee2022DMProfile{T} <: XGPaint.AbstractGNFW{T} end
 #                                        the fitted n_e were comoving densities normalized by the z=0
 #                                        critical density; this reproduces the fitted alpha_z of n0 and
 #                                        is a hypothesis about the paper's bookkeeping, not a documented fact
-const LEE2022_NORMALIZATIONS = (:literal, :baryon_fraction)
+const LEE2022_NORMALIZATIONS = (:literal, :baryon_fraction, :electron_count)
 const LEE2022_REDSHIFT_SCALINGS = (:physical, :comoving_hypothesis)
 const LEE2022_N0_PIVOTS = (:legacy_1e14, :mcut)
 const LEE2022_CONCENTRATION_SOURCES = (:duffy2008, :tng_mean)
@@ -174,8 +179,16 @@ lee2022_parameters(model::Lee2022ConcentrationDMProfile, mass, z) =
         shape_clip_mass_msun=model.shape_clip_mass_msun)
 
 """Overall factor multiplying the literal eq. (9) normalization."""
-lee2022_normalization_factor(model::AbstractLee2022DMProfile) =
-    model.normalization == :baryon_fraction ? model.omega_b / model.omega_m : one(model.omega_b)
+function lee2022_normalization_factor(model::AbstractLee2022DMProfile)
+    model.normalization == :baryon_fraction && return model.omega_b / model.omega_m
+    if model.normalization == :electron_count
+        # eq. (9) divides the gas mass by X_H m_p; the free electrons per unit mass of fully
+        # ionized H+He are (1+X_H)/(2 m_p), so replace 1/(X_H m_p) by (1+X_H)/(2 m_p):
+        xh = model.hydrogen_mass_fraction
+        return xh * (1 + xh) / 2
+    end
+    return one(model.omega_b)
+end
 
 """Redshift-dependent factor: 1 for the literal physical reading, (1+z)^3/E^2(z) for the
 comoving-bookkeeping hypothesis (E^2 = rho_crit(z)/rho_crit(0))."""
@@ -189,6 +202,7 @@ end
 function lee2022_variant_tokens(model::AbstractLee2022DMProfile)
     tokens = String[]
     model.normalization == :baryon_fraction && push!(tokens, "norm=fb")
+    model.normalization == :electron_count && push!(tokens, "norm=necount")
     if model isa Lee2022NoConcentrationDMProfile && model.n0_pivot == :mcut
         push!(tokens, "n0pivot=mcut")
     end

@@ -70,6 +70,8 @@ Mean DM of hit rays, 1e13-1e14 window: TNG 138.6; Battaglia16 sphere 92.9 (0.67 
 
 An approximate translation into enclosed gas: the implementation check gives Battaglia16 0.57-0.63 f_b of the baryons inside R200c at 3e13-1e14 Msun. Scaling by the DM ratios, TNG's within-R200 sum corresponds to roughly 0.85-0.95 f_b of free electrons inside R200c for these halos, the corrected Lee22 fits to about 0.2 f_b and the literal fits to about 1.4 f_b (the literal fits' enclosed fraction falls steeply with redshift, from 2-5 f_b at z = 0 to 0.5-0.7 f_b at z = 1, and rays to z_s = 1 mostly sample halos at z = 0.3-0.8). These are order-of-magnitude figures that ignore the mass and redshift weighting of the rays.
 
+**Electron-count reading of eq. 9 (added 2026-09-17).** Eq. 9 converts the reference gas density to a number density with 1/(X_H m_p). The free electrons per unit mass of fully ionized H+He are (1+X_H)/(2 m_p) = 0.88/m_p (TNG's own electron abundance for ionized primordial gas gives the same 0.88), while 1/(X_H m_p) = 1.32/m_p. Replacing one by the other multiplies the literal reading by X_H(1+X_H)/2 = 0.669 (option `--lee2022-normalization=electron_count`, no Omega_b/Omega_m factor, otherwise the corrected conventions). Inside the sphere, in the 1e13-1e14 window, this gives a mean DM per hit ray of 154-157 pc cm^-3 against TNG's 138.6 (1.11-1.13), a median of 95 against 81, and tail fractions 0.33 / 3.3 / 17 % below 3 / 10 / 30 pc cm^-3 against TNG's 0.57 / 4.5 / 20 %. That is closer to TNG than the literal reading (1.66), the f_b-corrected reading (0.27) and Battaglia16 (0.67). Whether the fit's n200 was really the electron count or the printed 1/(X_H m_p) is a question about the paper's bookkeeping (n0 is defined relative to whatever n200 they used), so this reading is the recommended default only until that is confirmed.
+
 - Battaglia16 inside R200c has the right tail shape but about 30% less electron column per hit than TNG's within-R200 gas. Both are physically normalized with f_b rho_crit; the difference is the gas fraction and profile shape of the underlying simulations (Battaglia's AGN-feedback runs versus TNG300), plus everything TNG's cell sum contains that a smooth profile does not (satellites, clumps, gas of neighbouring halos inside the sphere).
 - The corrected Lee22 fits fall a factor 3.7 below TNG in the very mass range they were fitted to (1e13-10^14.8 h^-1 Msun). Geometry can no longer explain this. The sensitivity runs with the literal eq. 9 normalization (no extra Omega_b/Omega_m factor; everything else, including the sphere, the M_cut pivot, the TNG-mean concentration and the shape clip, identical) give 230-234 in the same window, a factor 1.66 *above* TNG, and their low-tail fractions (0.02 / 0.14 / 1.6 / 10 % below 1 / 3 / 10 / 30 pc cm^-3) are closer to TNG's than the corrected fits' (0.64 / 4.9 / 26 / 61 %), though not as close as Battaglia16's. Neither reading of the normalization reproduces TNG: the truth lies between them, at about 0.6 of the literal or 3.8 times the f_b-corrected value. The (1+z)^3/E^2 redshift-scaling hypothesis of the implementation check (factor 1.9 at z = 0.5) would close about half of the gap on top of the corrected reading. The Omega_b/Omega_m factor of the implementation check was inferred from the paper's Figure 5; the like-for-like numbers say that inference over-corrects, so the factor must be settled from the paper's definition of n200 and of the fitted quantity rather than from the figure. The rest most plausibly comes from what was fitted: if the paper's radial profiles are medians over halos (or otherwise clump-suppressed), they underpredict the *mean* electron column that DM measures, especially near R200c where satellites dominate the mean density. This, the exact definition of n200 in eq. 9 and the gas cells included in Konietzka's within-R200 sum are the three things to confirm with the authors before using Lee22 for absolute predictions.
 
@@ -88,6 +90,8 @@ An approximate translation into enclosed gas: the implementation check gives Bat
 | Lee22 best corrected, inside sphere | 64.9 | 35.0 | 54.0 | 26.7 | 0.104 | 0.66 | 4.62 | 22.70 | 53.49 |
 | Lee22 no-c, literal norm., inside sphere (sensitivity) | 64.9 | 208.2 | 321.0 | 164.0 | 0.42 | 0.01 | 0.13 | 1.63 | 9.43 |
 | Lee22 best, literal norm., inside sphere (sensitivity) | 64.9 | 221.7 | 341.8 | 171.1 | 0.42 | 0.01 | 0.13 | 1.62 | 9.26 |
+| Lee22 no-c, eq. 9 with (1+X_H)/2m_p electrons, inside sphere | 64.9 | 139.3 | 214.7 | 107.6 | 0.287 | 0.03 | 0.33 | 3.29 | 15.80 |
+| Lee22 best, eq. 9 with (1+X_H)/2m_p electrons, inside sphere | 64.9 | 148.3 | 228.6 | 112.2 | 0.287 | 0.03 | 0.34 | 3.25 | 15.47 |
 
 **1e13-1e14 Msun (fit range, same halos in both)**
 
@@ -102,6 +106,8 @@ An approximate translation into enclosed gas: the implementation check gives Bat
 | Lee22 best corrected, inside sphere | 53.7 | 19.9 | 37.0 | 22.6 | 0.1 | 0.63 | 4.74 | 25.11 | 60.04 |
 | Lee22 no-c, literal norm., inside sphere (sensitivity) | 53.7 | 123.8 | 230.4 | 138.5 | 0.42 | 0.02 | 0.14 | 1.60 | 10.15 |
 | Lee22 best, literal norm., inside sphere (sensitivity) | 53.7 | 125.8 | 234.0 | 138.5 | 0.42 | 0.02 | 0.13 | 1.57 | 9.94 |
+| Lee22 no-c, eq. 9 with (1+X_H)/2m_p electrons, inside sphere | 53.7 | 82.8 | 154.1 | 94.8 | 0.287 | 0.04 | 0.33 | 3.33 | 17.25 |
+| Lee22 best, eq. 9 with (1+X_H)/2m_p electrons, inside sphere | 53.7 | 84.1 | 156.5 | 94.8 | 0.287 | 0.04 | 0.32 | 3.27 | 16.89 |
 
 **1e10-1e14 Msun**
 
@@ -116,6 +122,8 @@ An approximate translation into enclosed gas: the implementation check gives Bat
 | Lee22 best corrected, inside sphere | 60.2 | 21.3 | 35.4 | 20.8 | 0.1 | 0.79 | 5.53 | 27.07 | 61.87 |
 | Lee22 no-c, literal norm., inside sphere (sensitivity) | 60.2 | 132.6 | 220.3 | 132.8 | 0.42 | 0.02 | 0.17 | 1.94 | 11.29 |
 | Lee22 best, literal norm., inside sphere (sensitivity) | 60.2 | 134.6 | 223.7 | 132.8 | 0.42 | 0.02 | 0.16 | 1.93 | 11.15 |
+| Lee22 no-c, eq. 9 with (1+X_H)/2m_p electrons, inside sphere | 60.2 | 88.7 | 147.4 | 87.1 | 0.287 | 0.04 | 0.40 | 3.90 | 18.83 |
+| Lee22 best, eq. 9 with (1+X_H)/2m_p electrons, inside sphere | 60.2 | 90.0 | 149.6 | 87.1 | 0.287 | 0.04 | 0.41 | 3.88 | 18.56 |
 
 Notes. "Lowest DM seen" is the raw minimum for TNG and the lower edge of the first populated histogram bin for HalfDome (the histogram starts at 0.1 pc cm^-3). A hit ray crosses on average 1.4 halos in the 1e13-1e14 window (hit fraction 52.6% corresponds to a Poisson mean of 0.75 crossings per ray), identically for TNG and HalfDome, so ratios between rows are unaffected by multiple crossings. The literal/corrected ratio is exactly 1/f_b = 6.33 for both Lee22 fits, as it must be. Sensitivity figures: `..._sensitivity_{upper_mass_limits,to_1e14}` add the two literal-normalization rows to the core figure.
 
@@ -124,3 +132,4 @@ Notes. "Lowest DM seen" is the raw minimum for TNG and the lower edge of the fir
 - Code: `lee2022_frb_dm_profile.jl` (density models, chord wrapper, self-test), `generate_halfdome_z1_dm_mass_windows.jl` (`--halo-boundary`), `run_halfdome_z1_mass_histograms_120k.pbs` (`HALO_BOUNDARY`), `run_spherical_z1_nside4096_1r200c_variants_local.sh`, `make_publication_comparisons.py` (`--sphere-1r200c-only`).
 - Figures: `frb_map_generation/outputs/publication_comparison_20260916_sphere_1r200c/plots/halo_pdf_sphere_1r200c_b16_lee22_tng_{upper_mass_limits,to_1e14}.{png,svg}` (core: TNG, projected Battaglia16, and the three spherical products) and `..._sensitivity_{upper_mass_limits,to_1e14}` (adds the literal-normalization Lee22 fits inside the sphere); PDF `output/pdf/halfdome_sphere_1r200c_b16_lee22_vs_tng_20260916.pdf`; tables under `analysis/`.
 - Sensitivity products: `..._sphere1p0_m200c_lee22_{noconc,pref}_literalnorm_seed42/` (runner variants `lee22_noconc_literalnorm`, `lee22_pref_literalnorm`).
+- Electron-count products: `..._sphere1p0_m200c_lee22_{noconc,pref}_efix_seed42/` (runner variants `lee22_noconc_efix`, `lee22_pref_efix`); figures `..._efix_{upper_mass_limits,to_1e14}`.

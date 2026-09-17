@@ -588,11 +588,23 @@ SPHERICAL_1R200C_VARIANTS = {
                             provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="literal",
                             provenance_lee2022_concentration_source="tng_mean"),
                 label=r"HalfDome: Lee22 best fit, literal eq. 9 norm. (no $\Omega_b/\Omega_m$), sphere", color="#009E73", ls=":", lw=2.0),
+    # electron-count fix: eq. 9 with the free electrons per unit mass of ionized H+He, (1+X_H)/(2 m_p), instead of 1/(X_H m_p)
+    "lee22_noconc_efix": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_noconc_efix_seed42",
+                expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="none", provenance_lee2022_normalization="electron_count",
+                            provenance_lee2022_n0_pivot="mcut"),
+                label=r"HalfDome: Lee22 no-c, eq. 9 with $(1+X_H)/2m_p$ electrons, inside $R_{200c}$ sphere", color="#D55E00", ls="-", lw=2.4),
+    "lee22_pref_efix": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_pref_efix_seed42",
+                expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="electron_count",
+                            provenance_lee2022_concentration_source="tng_mean"),
+                label=r"HalfDome: Lee22 best fit, eq. 9 with $(1+X_H)/2m_p$ electrons, inside $R_{200c}$ sphere", color="#009E73", ls="-", lw=2.4),
 }
 SPHERICAL_CORE_KEYS = ("b16", "lee22_noconc", "lee22_pref")
 SPHERICAL_FIGURE_SETS = {
     "": SPHERICAL_CORE_KEYS,
     "sensitivity_": SPHERICAL_CORE_KEYS + ("lee22_noconc_literalnorm", "lee22_pref_literalnorm"),
+    "efix_": ("b16", "lee22_noconc_efix", "lee22_pref_efix"),
 }
 
 
@@ -675,9 +687,10 @@ def halo_pdf_spherical_figures(root, project, book, manifest):
                                 percent_difference=delta[b], halfdome_zero_fraction=product["zero_fraction"]))
                         hits.append(dict(window=hd_label, model=name, hit_percent=100.*(1.-product["zero_fraction"]),
                                          tng_hit_percent=100.*(1.-tng_zero)))
-                lines = [("TNG", ".15", 100.*(1.-tng_zero))] + [({"b16": "B16 sphere", "lee22_noconc": "Lee22 no-c sphere",
-                          "lee22_pref": "Lee22 best sphere"}[k], SPHERICAL_1R200C_VARIANTS[k]["color"], 100.*(1.-sph[k][hd_label]["zero_fraction"]))
-                         for k in SPHERICAL_CORE_KEYS]
+                short = {"b16": "B16 sphere", "lee22_noconc": "Lee22 no-c sphere", "lee22_pref": "Lee22 best sphere",
+                         "lee22_noconc_efix": "Lee22 no-c (e-count) sphere", "lee22_pref_efix": "Lee22 best (e-count) sphere"}
+                lines = [("TNG", ".15", 100.*(1.-tng_zero))] + [(short[k], SPHERICAL_1R200C_VARIANTS[k]["color"],
+                          100.*(1.-sph[k][hd_label]["zero_fraction"])) for k in (keys if prefix == "efix_" else SPHERICAL_CORE_KEYS)]
                 for k2, (nm, color, hit) in enumerate(lines):
                     top.text(.03, .05+.068*(len(lines)-1-k2), "{}: {:.1f}%".format(nm, hit), transform=top.transAxes,
                              ha="left", va="bottom", fontsize=11.5, color=color, fontweight="bold")
@@ -713,7 +726,11 @@ def halo_pdf_spherical_figures(root, project, book, manifest):
                 "curve is the previous projected-aperture Battaglia16 product with the profile's long LOS. TNG is Ralf Konietzka's "
                 "catalogue; its exact within-r200 recipe is not documented here. PDFs normalized over in-range rays; percentages 100*(HD-TNG)/TNG "
                 "only where both counts >= 10, on a symmetric-log axis linear within +-100%.")
-            if prefix:
+            if prefix == "efix_":
+                caption += (" Lee22 curves here use eq. 9 with the free electrons per unit mass of ionized H+He, (1+X_H)/(2 m_p), in "
+                            "place of 1/(X_H m_p): a factor X_H(1+X_H)/2 = 0.669 on the literal reading and no Omega_b/Omega_m factor; "
+                            "otherwise the corrected conventions (M_cut pivot, TNG-mean concentration, shape clip above 10^14.8 h^-1 Msun).")
+            elif prefix:
                 caption += (" Dotted orange/green curves: the same Lee22 fits with the literal eq. 9 normalization (no Omega_b/Omega_m "
                             "factor), otherwise identical conventions and geometry; together with the solid curves they bracket the "
                             "normalization question discussed in LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md.")

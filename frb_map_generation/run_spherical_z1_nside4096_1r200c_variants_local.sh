@@ -4,6 +4,7 @@
 # the projected 1R200c products. Variants: b16, lee22_noconc, lee22_pref (corrected conventions);
 # sensitivity: lee22_noconc_literalnorm, lee22_pref_literalnorm (same conventions, but the literal eq. 9
 # normalization without the Omega_b/Omega_m factor, to isolate that factor in the spherical geometry).
+# electron-count fix: lee22_noconc_efix, lee22_pref_efix (eq. 9 with (1+X_H)/(2 m_p) instead of 1/(X_H m_p)).
 set -euo pipefail
 export PROJECT_DIR=/home/cbllover/HalfDome
 export JULIA=/home/kn18001/.juliaup/bin/julia
@@ -39,6 +40,12 @@ for variant in "${variants[@]}"; do
     lee22_pref_literalnorm) export DM_PROFILE=lee2022 LEE2022_CONCENTRATION_MODE=duffy2008 LEE2022_NORMALIZATION=literal \
                          LEE2022_N0_PIVOT=mcut LEE2022_CONCENTRATION_SOURCE=tng_mean LEE2022_SHAPE_MASS_CLIP=fit
                   cache=lee2022_pref_tngc_literalnorm_shapeclip_sphere${tag}_chordmean_dm_cache.jld2 ;;
+    lee22_noconc_efix) export DM_PROFILE=lee2022 LEE2022_CONCENTRATION_MODE=none LEE2022_NORMALIZATION=electron_count \
+                         LEE2022_N0_PIVOT=mcut LEE2022_CONCENTRATION_SOURCE=duffy2008 LEE2022_SHAPE_MASS_CLIP=fit
+                  cache=lee2022_noconc_necount_mcutpivot_shapeclip_sphere${tag}_chordmean_dm_cache.jld2 ;;
+    lee22_pref_efix) export DM_PROFILE=lee2022 LEE2022_CONCENTRATION_MODE=duffy2008 LEE2022_NORMALIZATION=electron_count \
+                         LEE2022_N0_PIVOT=mcut LEE2022_CONCENTRATION_SOURCE=tng_mean LEE2022_SHAPE_MASS_CLIP=fit
+                  cache=lee2022_pref_tngc_necount_shapeclip_sphere${tag}_chordmean_dm_cache.jld2 ;;
     *) echo "Unknown variant ${variant}" >&2; exit 2 ;;
   esac
   export RUN_TAG="zsrc1p0_nside4096_nrays120000_allhalos_sphere${tag}_m200c_${variant}_seed42"

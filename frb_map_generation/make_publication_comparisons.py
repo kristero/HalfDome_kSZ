@@ -919,6 +919,93 @@ def halo_pdf_spherical_b16_figures(root, project, book, manifest):
     write_rows(root/"analysis/halo_hit_percentages_sphere_b16.csv", hits)
 
 
+# Publication figure: TNG within R200 versus Battaglia16 (previous projected and inside the sphere) and Lee22 no-c
+# (XGPaint-native reading, through XGPaint's pipeline). Panels are included only when both catalogues hold the window.
+PUBLICATION_PANELS = (
+    ("All halos", "all", "m1e10_to_1e16"),
+    (r"$10^{13}$ – $10^{14}\,M_\odot$", "m1e13_to_1e14", "m1e13_to_1e14"),
+    (r"$10^{14}$ – $10^{15}\,M_\odot$", "m1e14_to_1e15", "m1e14_to_1e15"),
+)
+PUBLICATION_LEE22_KEY = "lee22_noconc_xgpnative"
+
+
+def halo_pdf_publication_panels(root, project, book, manifest):
+    direct = Lee22TngBattagliaComparison(project).direct
+    direct.validate_fixed_200c_input()
+    b16_sph = load_spherical_1r200c(project, "b16")
+    lee = load_spherical_1r200c(project, PUBLICATION_LEE22_KEY)
+    panels = [(t, tl, hl) for t, tl, hl in PUBLICATION_PANELS if tl in direct.tng_arrays and hl in b16_sph and hl in lee]
+    skipped = [t for t, tl, hl in PUBLICATION_PANELS if (t, tl, hl) not in panels]
+    if skipped:
+        print("publication panels skipped (window missing in TNG or HalfDome):", skipped)
+    n = len(panels)
+    rc = {"font.size": 17, "axes.labelsize": 20, "axes.titlesize": 21, "xtick.labelsize": 16, "ytick.labelsize": 16,
+          "legend.fontsize": 18, "axes.linewidth": 1.1}
+    models = (("b16_projected", "#0072B2", (0, (1.4, 1.6)), 2.4, "Battaglia16, previous"),
+              ("b16_sphere", "#0072B2", "-", 3.0, "Battaglia16"),
+              ("lee22_noconc", "#D55E00", "--", 3.0, "Lee22 no-c"))
+    audit, hits = [], []
+    with plt.rc_context(rc):
+        fig = plt.figure(figsize=(7.4 * n + 0.8, 8.6))
+        outer = fig.add_gridspec(1, n, wspace=.22, left=.075 if n > 1 else .13, right=.985, bottom=.095, top=.86)
+        for j, (title, tng_label, hd_label) in enumerate(panels):
+            inner = outer[0, j].subgridspec(2, 1, height_ratios=(2.6, 1.4), hspace=.06)
+            top = fig.add_subplot(inner[0]); bottom = fig.add_subplot(inner[1], sharex=top)
+            proj = direct.load_halfdome(1., 4096, 1.0, hd_label, validated_200c=True)
+            edges = proj["edges"]
+            np.testing.assert_allclose(b16_sph[hd_label]["edges"], edges, rtol=1e-12, atol=0)
+            np.testing.assert_allclose(lee[hd_label]["edges"], edges, rtol=1e-12, atol=0)
+            tng_pdf, tng_count, tng_zero = direct.histogram_from_values(direct.tng_values(tng_label, 1.), edges)
+            direct.draw_pdf(top, proj["centers"], tng_pdf, color=".12", lw=3.2)
+            products = {"b16_projected": proj, "b16_sphere": b16_sph[hd_label], "lee22_noconc": lee[hd_label]}
+            for name, color, line, lw, label in models:
+                product = products[name]
+                direct.draw_pdf(top, product["centers"], product["pdf"], color=color, ls=line, lw=lw)
+                delta = percent_difference_extended(product["pdf"], tng_pdf, product["counts"], tng_count, 1)
+                robust = (product["counts"] >= ROBUST_BIN_COUNT) & (tng_count >= ROBUST_BIN_COUNT)
+                medges, mvals = merged_percent_difference(product["counts"], tng_count, edges)
+                step_ls = line if line in ("-", "--") else (0, (1.4, 1.6))
+                for k in range(len(mvals)):
+                    if np.isfinite(mvals[k]):
+                        bottom.hlines(min(mvals[k], 100.), medges[k], medges[k + 1], color=color, lw=1.1, alpha=.75, ls=step_ls)
+                        if k + 1 < len(mvals) and np.isfinite(mvals[k + 1]):
+                            bottom.vlines(medges[k + 1], min(mvals[k], 100.), min(mvals[k + 1], 100.), color=color, lw=.8, alpha=.6)
+                bottom.plot(product["centers"], np.where(robust, delta, np.nan), color=color, ls=line, lw=lw)
+                for b in range(len(tng_pdf)):
+                    audit.append(dict(window=hd_label, model=name, dm_low=edges[b], dm_high=edges[b+1], tng_pdf=tng_pdf[b],
+                        halfdome_pdf=product["pdf"][b], tng_count=int(tng_count[b]), halfdome_count=int(product["counts"][b]),
+                        percent_difference=delta[b], robust=bool(robust[b])))
+                hits.append(dict(window=hd_label, model=name, hit_percent=100.*(1.-product["zero_fraction"]), tng_hit_percent=100.*(1.-tng_zero)))
+            top.set_title(title, pad=12)
+            top.set_yscale("log")
+            common_axis(top, (.1, 5000.)); common_axis(bottom, (.1, 5000.), percent=True)
+            bottom.set_ylim(-100., 100.); bottom.set_yticks([-100, -50, 0, 50, 100])
+            top.yaxis.set_major_locator(LogLocator(base=10, numticks=5)); top.tick_params(labelbottom=False)
+            top.set_ylim(top.get_ylim()[0], 3e-2)
+            bottom.set_xlabel(r"DM [pc cm$^{-3}$]")
+            if j == 0:
+                top.set_ylabel(r"$p(\mathrm{DM})$"); bottom.set_ylabel(r"$\Delta p / p_{\rm TNG}$ [%]")
+            else:
+                top.tick_params(labelleft=False); bottom.tick_params(labelleft=False)
+        handles = [Line2D([], [], color=".12", lw=3.2, label="IllustrisTNG")]
+        handles += [Line2D([], [], color=c, ls=l, lw=w, label=lab) for _, c, l, w, lab in models]
+        fig.legend(handles=handles, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(.5, .985), handlelength=3.2, columnspacing=2.2)
+        stem = "halo_pdf_publication_b16_lee22_tng"
+        (root / "plots").mkdir(parents=True, exist_ok=True)
+        fig.savefig(root / "plots" / (stem + ".pdf"), bbox_inches="tight", pad_inches=.15)
+        caption = ("Halo-only DM PDFs of rays to z_s = 1 (120k uniform rays, NSIDE 4096). IllustrisTNG: Ralf Konietzka's within-R200 "
+            "catalogue. HalfDome curves: gas of each M200c halo counted inside its R200c sphere (chord-limited line of sight, DM->0 for "
+            "grazing rays), except 'Battaglia16, previous' = projected 1 R200c aperture with the profile line of sight to 1e5 R200c. "
+            "Battaglia16: XGPaint parameters and normalization. Lee22 no-c: Table A2 fit with the M_cut pivot, through XGPaint's "
+            "pipeline (get_params: beta = alpha beta' - gamma, P0 = 200 n0) with XGPaint's own electron conversion. PDFs normalized "
+            "over rays with DM > 0; TNG resolves halos to 1e10 Msun (every ray hits one), HalfDome to 7.3e12 (hit fractions 64.9% all "
+            "halos, 53.7% for 1e13-1e14 against TNG's 52.6%). Lower panels: 100 (HD - TNG)/TNG per bin where both samples hold >= 10 "
+            "rays (thick), adjacent bins merged until they do elsewhere (thin steps); linear axis clipped to +-100%.")
+        finish(fig, stem, root, book, manifest, caption)
+    write_rows(root/"analysis/halo_pdf_publication_bins.csv", audit)
+    write_rows(root/"analysis/halo_hit_percentages_publication.csv", hits)
+
+
 def select_cross(rows, survey, model, n, unbeamed=False):
     return sorted([r for r in rows if r["survey"] == survey and r["model"] == model
                    and int(r["nrays"]) == n and r["filter"] == ("unbeamed" if unbeamed else survey)],
@@ -1098,6 +1185,8 @@ def main():
                         help="Only export the Battaglia16 1-5 R200c (plus 3R200c repeat) versus TNG halo-PDF figures")
     parser.add_argument("--lee22-1r200c-only", action="store_true",
                         help="Only export the TNG versus Battaglia16 versus Lee22 (two fits) 1R200c halo-PDF figures")
+    parser.add_argument("--publication-panels", action="store_true",
+                        help="Publication figure: TNG vs Battaglia16 (previous and inside sphere) vs Lee22 no-c, two or three mass panels")
     parser.add_argument("--sphere-b16-only", action="store_true",
                         help="Only the Battaglia16-vs-TNG like-for-like figures (projected vs inside-sphere), extended percent panel")
     parser.add_argument("--sphere-1r200c-only", action="store_true",
@@ -1108,8 +1197,9 @@ def main():
     (root/"analysis").mkdir(parents=True, exist_ok=True)
     pdf.parent.mkdir(parents=True, exist_ok=True)
     manifest = []
-    if args.aperture_only or args.aperture_series_only or args.lee22_1r200c_only or args.sphere_1r200c_only or args.sphere_b16_only:
-        maker = (halo_pdf_spherical_b16_figures if args.sphere_b16_only else
+    if args.aperture_only or args.aperture_series_only or args.lee22_1r200c_only or args.sphere_1r200c_only or args.sphere_b16_only or args.publication_panels:
+        maker = (halo_pdf_publication_panels if args.publication_panels else
+                 halo_pdf_spherical_b16_figures if args.sphere_b16_only else
                  halo_pdf_spherical_figures if args.sphere_1r200c_only else
                  halo_pdf_lee22_figures if args.lee22_1r200c_only else
                  halo_pdf_aperture_series_figures if args.aperture_series_only else halo_pdf_aperture_figures)

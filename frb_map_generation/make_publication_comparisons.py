@@ -722,6 +722,128 @@ def halo_pdf_spherical_figures(root, project, book, manifest):
     write_rows(root/"analysis/halo_hit_percentages_sphere_1r200c.csv", hits)
 
 
+ROBUST_BIN_COUNT = 10  # bins with at least this many rays in both samples are drawn as solid lines in the percent panel
+
+
+def percent_difference_extended(num_pdf, den_pdf, num_counts, den_counts, min_count=1):
+    """100*(num-den)/den wherever both samples have at least `min_count` rays in the bin."""
+    result = np.full_like(den_pdf, np.nan, dtype=float)
+    ok = (np.isfinite(num_pdf) & np.isfinite(den_pdf) & (den_pdf > 0.)
+          & (num_counts >= min_count) & (den_counts >= min_count))
+    result[ok] = 100. * (num_pdf[ok] - den_pdf[ok]) / den_pdf[ok]
+    return result
+
+
+def merged_percent_difference(num_counts, den_counts, edges, min_count=ROBUST_BIN_COUNT):
+    """Merge adjacent bins (low to high DM) until both samples hold >= min_count rays; return step edges and
+    100*(p_num/p_den - 1) per merged bin, with each PDF normalized over its in-range rays as in the figures."""
+    n_num, n_den = float(num_counts.sum()), float(den_counts.sum())
+    medges, values = [], []
+    i, n = 0, len(num_counts)
+    while i < n:
+        j, a, b = i, int(num_counts[i]), int(den_counts[i])
+        while (a < min_count or b < min_count) and j + 1 < n:
+            j += 1; a += int(num_counts[j]); b += int(den_counts[j])
+        if a >= min_count and b >= min_count and n_num > 0 and n_den > 0:
+            if not medges:
+                medges.append(edges[i])
+            elif medges[-1] != edges[i]:
+                medges.append(np.nan); values.append(np.nan); medges.append(edges[i])
+            medges.append(edges[j + 1]); values.append(100. * ((a / n_num) / (b / n_den) - 1.))
+        i = j + 1
+    return np.asarray(medges, float), np.asarray(values, float)
+
+
+def halo_pdf_spherical_b16_figures(root, project, book, manifest):
+    """Battaglia16 only: TNG within R200 versus the projected 1R200c product (previous) and the gas-inside-R200c-sphere product.
+    The percent panel is extended into the low tail (every bin where both samples have >= 1 ray) on a linear axis clipped to +-100%."""
+    direct = Lee22TngBattagliaComparison(project).direct
+    direct.validate_fixed_200c_input()
+    windows = tuple(dict.fromkeys(e[2] for e in UPPER_ENTRIES + TO_1E14_ENTRIES))
+    b16_proj = {w: direct.load_halfdome(1., 4096, 1.0, w, validated_200c=True) for w in windows}
+    sph = load_spherical_1r200c(project, "b16")
+    for w in windows:
+        np.testing.assert_allclose(sph[w]["edges"], b16_proj[w]["edges"], rtol=1e-12, atol=0)
+    audit, hits, seen = [], [], set()
+    for group_name, entries, xmax in (("upper_mass_limits", UPPER_ENTRIES, 5000.), ("to_1e14", TO_1E14_ENTRIES, 10000.)):
+        fig = plt.figure(figsize=(17.5, 12.5))
+        outer = fig.add_gridspec(2, 3, hspace=.38, wspace=.32, left=.075, right=.985, bottom=.065, top=.89)
+        for j, (label, tng_label, hd_label) in enumerate(entries):
+            inner = outer[j//3, j%3].subgridspec(2, 1, height_ratios=(2.5, 1.5), hspace=.06)
+            top = fig.add_subplot(inner[0]); bottom = fig.add_subplot(inner[1], sharex=top)
+            edges = b16_proj[hd_label]["edges"]
+            tng_pdf, tng_count, tng_zero = direct.histogram_from_values(direct.tng_values(tng_label, 1.), edges)
+            direct.draw_pdf(top, b16_proj[hd_label]["centers"], tng_pdf, color=".15", lw=2.7)
+            drawn = [("b16_projected", b16_proj[hd_label], "#0072B2", ":", 1.9),
+                     ("b16_sphere", sph[hd_label], "#0072B2", "-", 2.6)]
+            any_counts = False
+            for name, product, color, line, lw in drawn:
+                any_counts |= bool(np.any(product["counts"]))
+                direct.draw_pdf(top, product["centers"], product["pdf"], color=color, ls=line, lw=lw)
+                delta = percent_difference_extended(product["pdf"], tng_pdf, product["counts"], tng_count, 1)
+                robust = (product["counts"] >= ROBUST_BIN_COUNT) & (tng_count >= ROBUST_BIN_COUNT)
+                medges, mvals = merged_percent_difference(product["counts"], tng_count, edges)
+                if len(mvals):
+                    # steps of merged bins (thin); values above +100% are clipped to the top edge and flagged with triangles
+                    for k in range(len(mvals)):
+                        if np.isfinite(mvals[k]):
+                            lo, hi = medges[k], medges[k + 1]
+                            bottom.hlines(min(mvals[k], 100.), lo, hi, color=color, lw=1.1, alpha=.75, ls=line if line == "-" else (0, (1.5, 1.5)))
+                            if k + 1 < len(mvals) and np.isfinite(mvals[k + 1]):
+                                bottom.vlines(hi, min(mvals[k], 100.), min(mvals[k + 1], 100.), color=color, lw=.8, alpha=.6)
+                            if mvals[k] > 100.:
+                                bottom.plot(np.sqrt(lo * hi), 96., marker="^", ms=5.5, color=color, mec="white", mew=.5,
+                                            ls="none", clip_on=False, alpha=.9)
+                bottom.plot(product["centers"], np.where(robust, delta, np.nan), color=color, ls=line, lw=lw)
+                if (hd_label, name) not in seen:
+                    seen.add((hd_label, name))
+                    for b in range(len(tng_pdf)):
+                        audit.append(dict(window=hd_label, model=name, dm_low=edges[b], dm_high=edges[b+1], tng_pdf=tng_pdf[b],
+                            halfdome_pdf=product["pdf"][b], tng_count=int(tng_count[b]), halfdome_count=int(product["counts"][b]),
+                            percent_difference=delta[b], robust=bool(robust[b]), halfdome_zero_fraction=product["zero_fraction"]))
+                    hits.append(dict(window=hd_label, model=name, hit_percent=100.*(1.-product["zero_fraction"]),
+                                     tng_hit_percent=100.*(1.-tng_zero)))
+            lines = [("TNG", ".15", 100.*(1.-tng_zero)),
+                     ("B16 projected", "#0072B2", 100.*(1.-b16_proj[hd_label]["zero_fraction"])),
+                     ("B16 sphere", "#0072B2", 100.*(1.-sph[hd_label]["zero_fraction"]))]
+            for k2, (nm, color, hit) in enumerate(lines):
+                top.text(.03, .05+.075*(len(lines)-1-k2), "{}: {:.1f}%".format(nm, hit), transform=top.transAxes,
+                         ha="left", va="bottom", fontsize=11.5, color=color, fontweight="bold")
+            title = "Total" if j == 0 else label.replace(r"\,M_\odot", "")
+            top.set_title(title, pad=10); top.set_yscale("log")
+            common_axis(top, (.1, xmax)); common_axis(bottom, (.1, xmax), percent=True)
+            bottom.set_ylim(-100., 100.); bottom.set_yticks([-100, -50, 0, 50, 100])
+            top.yaxis.set_major_locator(LogLocator(base=10, numticks=4)); top.tick_params(labelbottom=False)
+            bottom.set_xlabel(r"DM [pc cm$^{-3}$]")
+            if j % 3 == 0:
+                top.set_ylabel(r"$p(\mathrm{DM})$"); bottom.set_ylabel(r"$\Delta p/p_{\rm TNG}$ [%]", fontsize=18)
+            if not any_counts:
+                top.text(.58, .3, "HD: no resolved halos", transform=top.transAxes, ha="center", fontsize=16, color=".35")
+                bottom.set_yticks([]); bottom.text(.5, .6, "Undefined", transform=bottom.transAxes, ha="center", fontsize=16, color=".4")
+        legend_ax = fig.add_subplot(outer[1, 2]); legend_ax.axis("off")
+        handles = [Line2D([], [], color=".15", lw=2.7, label="IllustrisTNG (within $R_{200}$)"),
+                   Line2D([], [], color="#0072B2", ls=":", lw=1.9, label=r"HalfDome: Battaglia16, projected $1\,R_{200c}$ (previous)"),
+                   Line2D([], [], color="#0072B2", ls="-", lw=2.6, label=r"HalfDome: Battaglia16, gas inside the $R_{200c}$ sphere (like-for-like)"),
+                   Line2D([], [], color="#0072B2", ls="-", lw=1.1, alpha=.75, label="thin steps: adjacent bins merged until both samples hold $\\geq$ 10 rays"),
+                   Line2D([], [], color="#0072B2", ls="none", marker="^", ms=5.5, label="above +100% (clipped)")]
+        legend_ax.legend(handles=handles, loc="upper center", frameon=False, fontsize=12.5, labelspacing=.8, handlelength=2.8, bbox_to_anchor=(.5, 1.03))
+        legend_ax.text(.5, .0, "Solid blue: line of sight limited to the chord inside the\n$R_{200c}$ sphere, so DM $\\to$ 0 for grazing rays.\n"
+                       "Percent panel: 100 (HD $-$ TNG)/TNG; thick line per bin where\nboth samples hold $\\geq$ 10 rays, thin steps on merged bins\n"
+                       "elsewhere; axis $\\pm$100%. Top-left %: rays with DM > 0.",
+                       transform=legend_ax.transAxes, ha="center", va="bottom", fontsize=11.5, color=".3")
+        fig.suptitle(r"Halo DM PDFs  |  $z_s=1$  |  $M_{200c}/M_\odot$  |  Battaglia16 versus IllustrisTNG, gas inside $R_{200c}$", y=.985)
+        stem = "halo_pdf_sphere_1r200c_b16_tng_" + group_name
+        caption = ("Battaglia16 only, like-for-like with TNG's within-R200 halo DM at z=1, NSIDE=4096, 120k uniform rays. Solid: gas counted "
+            "only inside the R200c sphere of each halo (chord-limited LOS, exact chord factor per ray, DM->0 at the edge). Dotted: previous "
+            "projected 1R200c aperture with the profile's LOS to 1e5 R200c (hard floor at the edge). Percent panel: 100*(HD-TNG)/TNG per bin "
+            "as a thick line where both samples hold at least 10 rays, and as thin steps on adjacent bins merged (low to high DM) until both "
+            "hold at least 10 rays elsewhere, which extends the comparison into both tails; linear axis clipped to +-100%, values above "
+            "+100% flagged with triangles. TNG is Ralf Konietzka's catalogue. PDFs normalized over in-range rays.")
+        finish(fig, stem, root, book, manifest, caption)
+    write_rows(root/"analysis/halo_pdf_sphere_b16_bins.csv", audit)
+    write_rows(root/"analysis/halo_hit_percentages_sphere_b16.csv", hits)
+
+
 def select_cross(rows, survey, model, n, unbeamed=False):
     return sorted([r for r in rows if r["survey"] == survey and r["model"] == model
                    and int(r["nrays"]) == n and r["filter"] == ("unbeamed" if unbeamed else survey)],
@@ -901,6 +1023,8 @@ def main():
                         help="Only export the Battaglia16 1-5 R200c (plus 3R200c repeat) versus TNG halo-PDF figures")
     parser.add_argument("--lee22-1r200c-only", action="store_true",
                         help="Only export the TNG versus Battaglia16 versus Lee22 (two fits) 1R200c halo-PDF figures")
+    parser.add_argument("--sphere-b16-only", action="store_true",
+                        help="Only the Battaglia16-vs-TNG like-for-like figures (projected vs inside-sphere), extended percent panel")
     parser.add_argument("--sphere-1r200c-only", action="store_true",
                         help="Only export the like-for-like (gas inside the R200c sphere) TNG versus Battaglia16 versus Lee22 figures")
     args = parser.parse_args()
@@ -909,8 +1033,9 @@ def main():
     (root/"analysis").mkdir(parents=True, exist_ok=True)
     pdf.parent.mkdir(parents=True, exist_ok=True)
     manifest = []
-    if args.aperture_only or args.aperture_series_only or args.lee22_1r200c_only or args.sphere_1r200c_only:
-        maker = (halo_pdf_spherical_figures if args.sphere_1r200c_only else
+    if args.aperture_only or args.aperture_series_only or args.lee22_1r200c_only or args.sphere_1r200c_only or args.sphere_b16_only:
+        maker = (halo_pdf_spherical_b16_figures if args.sphere_b16_only else
+                 halo_pdf_spherical_figures if args.sphere_1r200c_only else
                  halo_pdf_lee22_figures if args.lee22_1r200c_only else
                  halo_pdf_aperture_series_figures if args.aperture_series_only else halo_pdf_aperture_figures)
         with plt.rc_context(STYLE), PdfPages(pdf) as book:

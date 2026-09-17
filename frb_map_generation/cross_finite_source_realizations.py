@@ -249,7 +249,9 @@ def plot_cl_yy(out):
     axes[1].semilogx(ell[keep], (cl_lee / cl_b12)[keep], color=ORANGE, lw=2.2)
     axes[1].axhline(1, color=".5", lw=.9)
     axes[1].set_ylabel(r"$C_\ell^{yy}$ ratio  Lee22 / Battaglia12")
-    axes[1].set_ylim(0, 1.2)
+    ratio = cl_lee / np.maximum(cl_b12, 1e-300)
+    smooth = np.convolve(ratio[keep], np.ones(51) / 51, mode="same")
+    axes[1].set_ylim(0, 1.15 * np.nanmax(smooth[25:-25]))
     for ax in axes:
         ax.set_xlabel(r"$\ell$")
         ax.grid(alpha=.15, which="both")

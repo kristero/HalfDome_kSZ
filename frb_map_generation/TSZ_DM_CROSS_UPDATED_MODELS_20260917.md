@@ -310,6 +310,34 @@ y samples at the 100k positions were recomputed for this map with the same filte
 (`cross_finite_source_realizations.py sample-y`), and the cross-correlations below use them with the
 unchanged per-source DM vectors.
 
+Cross-correlation with the Lee22-pressure y (R200c sphere, all halos; 1e-5 pc cm^-3; the ratio is to the
+same DM model with the Battaglia12 y):
+
+| plane | annulus ['] | observed | Battaglia16 DM | ratio to B12 y | Lee22 DM | ratio to B12 y |
+|---|---|---:|---:|---:|---:|---:|
+| Planck | 10-17.8 | 4.28 +- 1.61 | 1.86 | 1.45 | 9.12 | 1.62 |
+| Planck | 17.8-31.6 | 2.48 +- 1.30 | 0.88 | 1.34 | 4.29 | 1.46 |
+| Planck | 31.6-56.2 | 1.08 +- 0.87 | 0.34 | 1.16 | 1.56 | 1.22 |
+| Planck | 56.2-100 | 1.21 +- 0.36 | 0.10 | 0.93 | 0.41 | 0.92 |
+| ACT | 1.78-3.16 | 3.79 +- 4.58 | 5.64 | 1.32 | 23.3 | 1.52 |
+| ACT | 3.16-5.62 | 2.21 +- 1.98 | 4.46 | 1.41 | 20.0 | 1.62 |
+| ACT | 5.62-10 | 2.65 +- 2.93 | 3.23 | 1.51 | 15.8 | 1.72 |
+| ACT | 10-17.8 | 5.37 +- 3.07 | 1.85 | 1.47 | 9.30 | 1.65 |
+
+Although the Lee22-pressure map has less than half the mean y of the Battaglia12 map, its
+cross-correlation with the halo DM is 1.3-1.7x higher at theta <= 30' and 10-15 % lower beyond 60'.
+The mean y is set by the many halos at z ~ 0.5-2, where the Lee22 amplitude (1+z)^-1.89 is small; the
+cross-correlation with the z < 0.3 FRB foreground is set by the massive low-redshift halos, where the
+Lee22 P0 ~ M^1.08 (against M^0.154 for Battaglia12) puts more pressure at fixed P200. The C_l^yy
+comparison (`cl_yy_lee22_pressure_vs_b12`) shows the same redistribution: the Lee22 map has 1.8-2.6
+times the Battaglia12 power at l = 30-1000 (the clustered, massive low-redshift halos), equal power
+near l = 2000, and 0.37 of it at l = 8000 (its profile is more compact, x_c = 2.1 with beta = 9.4
+against x_c = 0.5 with beta = 4.35, so the Poisson term of the small halos is weaker). Against the data, Battaglia16 DM with the Lee22 y is within 1.5 sigma
+of the Planck points at 10-56' (3 sigma low at 56-100') and within 1.1 sigma of ACT at 1.8-18';
+Lee22 DM with the Lee22 y is 3 sigma above Planck at 10-18' and 4-9 sigma above ACT at 1.8-10'.
+Indicative amplitudes (diagonal digitized errors): Planck A = 3.0 +- 0.7 (Battaglia16 DM) and
+0.61 +- 0.15 (Lee22 DM); ACT 0.76 +- 0.35 and 0.17 +- 0.08.
+
 ## 5e. What a 71- or 31-FRB measurement looks like on this sky
 
 `cross_finite_source_realizations.py` draws, for each survey plane, realizations that use exactly the

@@ -12,10 +12,12 @@ XGPaint-native Lee22 normalization), with
 
 Figures (PNG/PDF/SVG) under `outputs/tsz_dm_cross_updated_20260917/plots/`:
 
-- `takahashi_fig13_updated_models` - Planck and ACT panels, observed redshifts, y beamed: the inside-R200c
-  curves with, as dotted lines, the previous implementation of each (the 2026-09-14 products:
-  Battaglia16 and legacy Lee22, both with the 3R200c sphere).
-- `takahashi_fig13_updated_models_vs_3r200c` - the same with the recomputed updated models to 3R200c instead.
+- `takahashi_fig13_updated_models` - Planck and ACT panels, observed redshifts, y beamed. For each density
+  model the three truncations computed on the same rays: gas inside the R200c sphere (solid), inside the
+  3R200c sphere (dotted) and the old truncation, i.e. the full-line-of-sight column inside an angular
+  aperture of R200c, a cylinder (dash-dotted).
+- `takahashi_fig13_updated_models_vs_previous` - the inside-R200c curves with the 2026-09-14 products
+  (3R200c sphere; legacy Lee22 reading) as the previous implementation.
 - `medlock_fig5_updated_models` - ACT, Planck MILCA, Planck NILC panels, all sources at z = 2, no beam.
 - `updated_vs_previous_diagnostic` - the new products against the 2026-09-14 sightline products.
 
@@ -35,16 +37,18 @@ Reused unchanged from the 2026-09-14 test (`TAKAHASHI_100K_SIGHTLINES.md`):
   halo-only DM and the annular y, averaged over strata with equal weight; delete-one-source
   jackknife errors. These errors measure finite-source sampling on one simulated sky only.
 
-New: the per-source halo DM for six models (`sample_halfdome_updated_sightlines.jl`), plus a third
+New: the per-source halo DM for eight models (`sample_halfdome_updated_sightlines.jl`), plus a third
 source plane with every source at z = 2 for the Medlock & Nagai kernel. One pass over the
-85,224,251 catalogue rows (74,907,259 halos with 0 < z <= 2.148) took 56 s on 20 local threads.
+85,224,251 catalogue rows (74,907,259 halos with 0 < z <= 2.148) took about 60 s on 20 local threads.
 
 | label | density fit | electron normalization | gas counted | purpose |
 |---|---|---|---|---|
 | `b16_sphere1` | Battaglia16 (XGPaint parameters) | XGPaint `ne2d` | inside the R200c sphere | the implementation that matches TNG within R200 |
 | `b16_sphere3` | Battaglia16 | XGPaint `ne2d` | inside 3 R200c | the previous cross-correlation convention |
+| `b16_projected1` | Battaglia16 | XGPaint `ne2d` | full LOS (1e5 R200c) inside an angular aperture of R200c (cylinder) | the old truncation of the PDF products |
 | `lee22_noconc_sphere1` | Lee22 Table A2, no concentration | XGPaint-native (P0 = 200 n0, `ne2d`), M_cut pivot, fit-range shape clip | inside R200c | the Lee22 implementation that matches TNG |
 | `lee22_noconc_sphere3` | same | same | inside 3 R200c | extrapolation beyond the 0.04-1.34 R200c fit range |
+| `lee22_noconc_projected1` | same | same | full LOS inside an angular aperture of R200c (cylinder) | the old truncation, same fit and reading |
 | `lee22_pref_sphere1` | Lee22 Table 3 + TNG-mean concentration | same reading | inside R200c | diagnostic only (not plotted in the main figures) |
 | `lee22_legacy_sphere3` | Lee22 Table A2 | previous reading: literal eq. 9, 1e14 pivot, no clip | inside 3 R200c | regression against the 2026-09-14 product |
 
@@ -180,6 +184,69 @@ z = 2 plane averages over both regimes (mean DM per ray: Lee22/B16 = 1.4 at z = 
 the Planck plane). Settling the redshift dependence needs a TNG comparison at a low-redshift
 source plane (z_s ~ 0.3), which the PDF generator can produce with `ZSOURCE=0.3`, and a
 corresponding TNG catalogue at that redshift.
+
+## 5b. The old truncation on the same rays (cylinder versus sphere)
+
+`b16_projected1` and `lee22_noconc_projected1` reproduce the convention of the PDF products before the
+fix: XGPaint's full-line-of-sight column (to 1e5 R200c) credited to every ray inside an angular aperture
+of R200c, and nothing outside it. Compared with the R200c sphere on the same rays (Planck plane;
+values in 1e-5 pc cm^-3, ratios to the sphere in brackets):
+
+| annulus ['] | B16 cylinder | B16 sphere R200c | B16 sphere 3R200c | Lee22 cylinder | Lee22 sphere R200c | Lee22 sphere 3R200c |
+|---|---:|---:|---:|---:|---:|---:|
+| 10-17.8 | 1.53 (1.19) | 1.28 | 1.78 | 6.20 (1.10) | 5.62 | 6.71 |
+| 17.8-31.6 | 0.81 (1.23) | 0.66 | 1.01 | 3.31 (1.13) | 2.93 | 3.74 |
+| 31.6-56.2 | 0.38 (1.29) | 0.29 | 0.52 | 1.50 (1.18) | 1.27 | 1.82 |
+| 56.2-100 | 0.15 (1.33) | 0.11 | 0.25 | 0.55 (1.24) | 0.44 | 0.78 |
+
+The cylinder adds 35 % to the mean halo DM per ray for both models (Battaglia16 24.5 -> 33.1, Lee22
+59.1 -> 80.6 pc cm^-3) and 10-35 % to the cross-correlation, more at large angles where the outer gas
+matters. It sits between the two spheres everywhere: it contains the gas beyond R200c along the ray but
+not the gas at b > R200c that the 3R200c sphere adds. The ACT plane gives the same ratios within 0.02.
+
+## 5c. Why Battaglia16 is nearly self-similar and Lee22 is not
+
+Both fits are written in self-similar variables: radius in R200c and density in units of the critical
+density at the halo's redshift (Battaglia16 through `rho_gas = P0 f(x) f_b rho_cr(z)`, Lee22 through
+`n200 propto rho_cr(z)`). A halo whose gas fraction and shape do not depend on mass or redshift is a single
+curve in these variables. The two fits differ in how far their parameter power laws depart from that.
+
+Battaglia16 (XGPaint parameters, m = M200c/1e14 Msun): `P0 = 4e3 m^0.29 (1+z)^-0.66`,
+`alpha = 0.88 m^-0.03 (1+z)^0.19`, `beta = 3.83 m^0.04 (1+z)^-0.025`, `x_c = 0.5`, `gamma = -0.2`.
+The amplitude changes by 3.8x over 1e13-1e15 Msun and by 0.48x from z = 0 to 2, but the shape moves the
+other way: the outer slope `-(beta+gamma)/alpha` steepens from -3.5 at 1e13 to -4.9 at 1e15 Msun and
+flattens with redshift, so the gas inside R200c changes much less than P0. The enclosed gas fraction
+(Section 5 table) is 0.55-0.83 f_b over two decades in mass (M^0.09) and moves by less than 20 % between
+z = 0.05 and 2. In the (n_e/n200)(r/R200c)^3 plot the curve peaks at 1.5-3 R200c with amplitude 0.15 in
+every panel. This is by construction: the Battaglia simulations have gas fractions that rise gently with
+mass and hardly evolve, and the fitted exponents encode only those small departures.
+
+Lee22 no-concentration fit (M_cut = 10^13.61 h^-1 Msun): `n0 = 6.8 (M/M_cut)^0.68 (1+z)^-2.11`,
+`x_c = 7.9 (1+z)^-0.67 B(M; 0.47, -0.45)`, `beta' = 19.5 (1+z)^-0.31 B(M; 0.70, -0.18)`, `alpha = 1`,
+`gamma = -0.3`. Three things break the self-similarity:
+
+1. **Redshift.** `(1+z)^-2.11` on the amplitude is a factor 0.23 at z = 1 and 0.10 at z = 2 relative to
+   z = 0, in units that already scale with `rho_cr(z)`. Nothing in the shape compensates (x_c and beta'
+   also shrink with redshift, which removes gas from the outskirts rather than adding it), so the enclosed
+   fraction at 1e14 Msun falls from 2.4 f_b at z = 0.1 to 0.13 f_b at z = 2. TNG's gas fractions at fixed
+   M200c are nearly constant in redshift, so this exponent most likely absorbs a unit convention of the
+   fit (comoving versus physical densities, or rho_cr(0) versus rho_cr(z)), the open question of
+   `LEE22_NORMALIZATION_EQ7_EQ9_NOTE_20260917.md`.
+2. **Mass.** The amplitude grows as M^0.68 while the shape parameters follow broken power laws whose
+   slopes change sign at M_cut: below it the core radius and the cutoff steepness grow with mass
+   (x_c ~ M^0.47, beta' ~ M^0.70), above it both shrink (M^-0.45, M^-0.18). The enclosed fraction goes
+   from 0.9 f_b at 1e13 to 2.9 f_b at 1e15 Msun at z = 0.1, a factor 3 against Battaglia16's 1.5, and the
+   curve shapes in the grid change visibly from row to row.
+3. **Shape.** With x_c ~ 8 and beta' ~ 20 the profile is a shallow x^-0.3 power law that is cut off by
+   `(1 + x/x_c)^-19.5`. The cutoff scale lies far outside the fitted radii (0.04-1.34 R200c), so x_c and
+   beta' are strongly degenerate and only their combination is constrained; the logarithmic slope steepens
+   quickly from -2.5 at R200c to -5.7 at 3 R200c. That is why the volume-weighted Lee22 curve peaks
+   inside R200c and falls off steeply beyond it, while Battaglia16, with x_c = 0.5, has reached its
+   asymptotic slope by R200c and keeps a broad distribution out to 3 R200c.
+
+The practical consequence is the one seen in Sections 3 and 5: the two fits agree only in a narrow
+redshift window (z ~ 0.3-0.8 for the XGPaint-native reading), and any comparison that weights other
+redshifts, such as the z ~ 0.3 Takahashi samples or the z = 2 Medlock & Nagai kernel, separates them.
 
 ## 6. Limits that carry over
 

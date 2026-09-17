@@ -33,10 +33,12 @@ PAPER_CUT = {"planck": 10.0, "act": 10 ** .25}
 BLUE, ORANGE, GREY = "#0072B2", "#D55E00", ".45"
 # label: legend, colour, linestyle, linewidth, marker, in main figures
 STYLE = {
-    "b16_sphere1": ("Battaglia16, gas inside $R_{200c}$", BLUE, "-", 3.0, "o", True),
-    "lee22_noconc_sphere1": ("Lee22 no-c, gas inside $R_{200c}$", ORANGE, "--", 3.0, "s", True),
-    "b16_sphere3": ("Battaglia16, gas to $3R_{200c}$", BLUE, (0, (1.2, 1.6)), 1.9, None, True),
-    "lee22_noconc_sphere3": ("Lee22 no-c, extrapolated to $3R_{200c}$", ORANGE, (0, (1.2, 1.6)), 1.9, None, True),
+    "b16_sphere1": ("Battaglia16, gas inside $R_{200c}$ (sphere)", BLUE, "-", 3.0, "o", True),
+    "b16_sphere3": ("Battaglia16, gas inside $3R_{200c}$ (sphere)", BLUE, (0, (1.2, 1.6)), 2.0, None, True),
+    "b16_projected1": ("Battaglia16, old truncation ($R_{200c}$ cylinder)", BLUE, (0, (5, 2, 1.2, 2)), 2.0, None, True),
+    "lee22_noconc_sphere1": ("Lee22 no-c, gas inside $R_{200c}$ (sphere)", ORANGE, "-", 3.0, "s", True),
+    "lee22_noconc_sphere3": ("Lee22 no-c, gas inside $3R_{200c}$ (sphere)", ORANGE, (0, (1.2, 1.6)), 2.0, None, True),
+    "lee22_noconc_projected1": ("Lee22 no-c, old truncation ($R_{200c}$ cylinder)", ORANGE, (0, (5, 2, 1.2, 2)), 2.0, None, True),
     "lee22_legacy_sphere3": ("Lee22 previous reading, $3R_{200c}$", GREY, (0, (3, 2)), 1.6, None, False),
     "lee22_pref_sphere1": ("Lee22 + c (diagnostic), inside $R_{200c}$", "#7B3294", (0, (4, 2)), 1.6, None, False),
 }
@@ -146,16 +148,19 @@ def ordered_legend(fig, ax, model_labels, extra_labels):
                bbox_to_anchor=(0.5, 1.0), columnspacing=1.6, handlelength=2.6)
 
 
-def plot_takahashi(out, select, reference="previous"):
-    """reference="previous": overlay the 2026-09-14 products (Battaglia16 and legacy Lee22, both with the
-    3R200c sphere) as the previous implementation of each inside-R200c curve.
-    reference="sphere3": overlay the recomputed updated models with gas to 3R200c instead."""
+def plot_takahashi(out, select, reference="geometry"):
+    """reference="geometry": for each density model the three truncations computed on the same rays:
+    gas inside the R200c sphere, inside the 3R200c sphere, and the old truncation (full-LOS column
+    inside an angular aperture of R200c, i.e. a cylinder). reference="previous": inside-R200c curves
+    with the 2026-09-14 products (3R200c sphere; legacy Lee22 reading) as dotted lines."""
     observations = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
     previous = read_rows(PREVIOUS / "analysis/sightline_comparison.csv")
     plt.rcParams.update(RC)
-    fig, axes = plt.subplots(1, 2, figsize=(15.5, 6.9))
+    fig, axes = plt.subplots(1, 2, figsize=(15.5, 7.2))
     prev_style = {"battaglia16": (BLUE, "Battaglia16, previous implementation"),
                   "lee22_legacy": (ORANGE, "Lee22 no-c, previous implementation")}
+    geometry = ("b16_sphere1", "b16_sphere3", "b16_projected1",
+                "lee22_noconc_sphere1", "lee22_noconc_sphere3", "lee22_noconc_projected1")
     for ax, plane in zip(axes, ("planck", "act")):
         name, beam, count = PLANES[plane]
         obs = [r for r in observations if ("ACT" in r["series"]) == (plane == "act")]
@@ -167,11 +172,10 @@ def plot_takahashi(out, select, reference="previous"):
                 rows = [r for r in previous if r["survey"] == plane and r["filter"] == plane and r["model"] == old]
                 ax.plot(column(rows, "theta_arcmin"), column(rows, "cross_100k") / 1e-5, color=color,
                         ls=(0, (1.2, 1.6)), lw=2.0, label=legend, zorder=3)
+            drawn = ("b16_sphere1", "lee22_noconc_sphere1")
         else:
-            for label in ("b16_sphere3", "lee22_noconc_sphere3"):
-                x, value, error = select(plane, plane, label)
-                draw_model(ax, x, value, error, label)
-        for label in ("b16_sphere1", "lee22_noconc_sphere1"):
+            drawn = geometry
+        for label in drawn:
             x, value, error = select(plane, plane, label)
             draw_model(ax, x, value, error, label)
         ax.axvspan(1, PAPER_CUT[plane], color=".5", alpha=.12, zorder=0)
@@ -183,13 +187,14 @@ def plot_takahashi(out, select, reference="previous"):
     if reference == "previous":
         wanted = [STYLE["b16_sphere1"][0], prev_style["battaglia16"][1], STYLE["lee22_noconc_sphere1"][0],
                   prev_style["lee22_legacy"][1], "Takahashi+25 (digitized)"]
+        top = .78
     else:
-        wanted = [STYLE[m][0] for m in ("b16_sphere1", "b16_sphere3", "lee22_noconc_sphere1", "lee22_noconc_sphere3")]
-        wanted.append("Takahashi+25 (digitized)")
+        wanted = [STYLE[m][0] for m in geometry] + ["Takahashi+25 (digitized)"]
+        top = .76
     fig.legend([by_label[w] for w in wanted], wanted, loc="upper center", ncol=3, frameon=False,
-               bbox_to_anchor=(0.5, 1.0), columnspacing=1.6, handlelength=2.6)
-    fig.subplots_adjust(left=.07, right=.985, top=.78, bottom=.13, wspace=.2)
-    stem = "takahashi_fig13_updated_models" + ("" if reference == "previous" else "_vs_3r200c")
+               bbox_to_anchor=(0.5, 1.0), columnspacing=1.4, handlelength=2.8)
+    fig.subplots_adjust(left=.07, right=.985, top=top, bottom=.125, wspace=.2)
+    stem = "takahashi_fig13_updated_models" + ("" if reference == "geometry" else "_vs_previous")
     for ext in ("png", "pdf", "svg"):
         fig.savefig(str(out / "plots" / (stem + "." + ext)), dpi=200 if ext == "png" else None)
     plt.close(fig)
@@ -247,7 +252,9 @@ def plot_diagnostic(out, select):
                  ("lee22_legacy_sphere3", "lee22_legacy_sphere3", "lee22_legacy", GREY, "-", "Lee22 legacy 3R200c: rerun / 2026-09-14"),
                  ("lee22_noconc_sphere3", "lee22_legacy_sphere3", None, ORANGE, ":", "Lee22 updated / previous reading (3R200c)"),
                  ("b16_sphere1", "b16_sphere3", None, BLUE, "--", "B16: inside R200c / to 3R200c"),
-                 ("lee22_noconc_sphere1", "lee22_noconc_sphere3", None, ORANGE, "--", "Lee22: inside R200c / to 3R200c"))
+                 ("lee22_noconc_sphere1", "lee22_noconc_sphere3", None, ORANGE, "--", "Lee22: inside R200c / to 3R200c"),
+                 ("b16_projected1", "b16_sphere1", None, BLUE, (0, (5, 2, 1.2, 2)), "B16: old truncation (cylinder) / sphere R200c"),
+                 ("lee22_noconc_projected1", "lee22_noconc_sphere1", None, ORANGE, (0, (5, 2, 1.2, 2)), "Lee22: old truncation (cylinder) / sphere R200c"))
         for num, den, old, color, ls, legend in pairs:
             x, a, _ = select(plane, plane, num)
             if old is None:
@@ -261,7 +268,7 @@ def plot_diagnostic(out, select):
         ax.set_title("{}: {}, {} observed redshifts".format(name, beam, count))
         ax.set_ylabel(r"$w_{y\,\mathrm{DM}}\ [10^{-5}\,\mathrm{pc\,cm^{-3}}]$")
         ratio.set_ylabel("ratio $-$ 1 [%]")
-        ratio.set_ylim(-100, 20)
+        ratio.set_ylim(-100, 60)
         for a_ in (ax, ratio):
             style_axis(a_, 1)
             a_.axvspan(1, PAPER_CUT[plane], color=".5", alpha=.12, zorder=0)
@@ -276,15 +283,16 @@ def plot_diagnostic(out, select):
 def write_tables(out, rows, select, plane_z2):
     observations = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
     fits = read_rows(PREVIOUS / "references/medlock_fig5_best_fit_digitized.csv")
-    models = ("b16_sphere1", "lee22_noconc_sphere1", "b16_sphere3", "lee22_noconc_sphere3", "lee22_legacy_sphere3", "lee22_pref_sphere1")
+    models = ("b16_sphere1", "lee22_noconc_sphere1", "b16_sphere3", "lee22_noconc_sphere3", "b16_projected1",
+              "lee22_noconc_projected1", "lee22_legacy_sphere3", "lee22_pref_sphere1")
     lines = ["# Annulus means of w_yDM in 1e-5 pc cm^-3 (HalfDome halo-only; +- = finite-source jackknife)", ""]
     table_rows = []
     for plane in ("planck", "act"):
         name, beam, count = PLANES[plane]
         obs = [r for r in observations if ("ACT" in r["series"]) == (plane == "act")]
         lines += ["## Takahashi+25 {}: {}, {} observed redshifts".format(name, beam, count), "",
-                  "| annulus [arcmin] | observed | B16 inside R200c | Lee22 no-c inside R200c | B16 to 3R200c | Lee22 no-c to 3R200c | Lee22 previous reading 3R200c | Lee22+c inside R200c (diag.) |",
-                  "|---|---:|---:|---:|---:|---:|---:|---:|"]
+                  "| annulus [arcmin] | observed | B16 inside R200c | Lee22 no-c inside R200c | B16 to 3R200c | Lee22 no-c to 3R200c | B16 old truncation (R200c cylinder) | Lee22 no-c old truncation (R200c cylinder) | Lee22 previous reading 3R200c | Lee22+c inside R200c (diag.) |",
+                  "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
         values = {m: select(plane, plane, m) for m in models}
         for b in range(12):
             if EDGES[b] < PAPER_CUT[plane] - 1e-9:
@@ -336,8 +344,8 @@ def plot(args):
     rows, select = load_results(out)
     planes = sorted({r["plane"] for r in rows})
     plane_z2 = [p for p in planes if p not in PLANES][0]
+    plot_takahashi(out, select, reference="geometry")
     plot_takahashi(out, select, reference="previous")
-    plot_takahashi(out, select, reference="sphere3")
     plot_medlock(out, select, plane_z2)
     plot_diagnostic(out, select)
     write_tables(out, rows, select, plane_z2)

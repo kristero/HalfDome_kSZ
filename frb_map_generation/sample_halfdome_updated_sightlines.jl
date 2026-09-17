@@ -20,7 +20,8 @@ include(joinpath(@__DIR__, "sample_halfdome_observed_sightlines.jl"))
 struct UpdatedModelSpec
     label::String
     config::NamedTuple
-    cut::Float64
+    cut::Float64        # spherical boundary radius in R200c; 0 = no sphere (XGPaint projected convention)
+    aperture::Float64   # angular aperture in R200c inside which a ray receives this model's column
     note::String
 end
 
@@ -37,17 +38,21 @@ function updated_model_specs()
     lee_pref = merge(lee_new, (lee2022_concentration_mode="duffy2008", lee2022_concentration_source="tng_mean"))
     lee_legacy = merge(base, (dm_profile="lee2022",))
     return UpdatedModelSpec[
-        UpdatedModelSpec("b16_sphere1", base, 1.0,
+        UpdatedModelSpec("b16_sphere1", base, 1.0, 1.0,
             "Battaglia16; gas inside the R200c sphere (TNG like-for-like implementation)"),
-        UpdatedModelSpec("b16_sphere3", base, 3.0,
+        UpdatedModelSpec("b16_sphere3", base, 3.0, 3.0,
             "Battaglia16; gas inside 3 R200c (previous cross-correlation convention)"),
-        UpdatedModelSpec("lee22_noconc_sphere1", lee_new, 1.0,
+        UpdatedModelSpec("b16_projected1", base, 0.0, 1.0,
+            "Battaglia16; old truncation: full-LOS column (XGPaint, 1e5 R200c) inside an angular aperture of 1 R200c (cylinder)"),
+        UpdatedModelSpec("lee22_noconc_sphere1", lee_new, 1.0, 1.0,
             "Lee22 no-c fit; XGPaint-native normalization, M_cut pivot, fit-range shape clip; R200c sphere"),
-        UpdatedModelSpec("lee22_noconc_sphere3", lee_new, 3.0,
+        UpdatedModelSpec("lee22_noconc_sphere3", lee_new, 3.0, 3.0,
             "same Lee22 no-c fit extrapolated to 3 R200c (outside the 0.04-1.34 R200c fit range)"),
-        UpdatedModelSpec("lee22_pref_sphere1", lee_pref, 1.0,
+        UpdatedModelSpec("lee22_noconc_projected1", lee_new, 0.0, 1.0,
+            "same Lee22 no-c fit; old truncation: full-LOS column inside an angular aperture of 1 R200c (cylinder)"),
+        UpdatedModelSpec("lee22_pref_sphere1", lee_pref, 1.0, 1.0,
             "Lee22 Table-3 fit + TNG-mean concentration, same reading; R200c sphere (diagnostic)"),
-        UpdatedModelSpec("lee22_legacy_sphere3", lee_legacy, 3.0,
+        UpdatedModelSpec("lee22_legacy_sphere3", lee_legacy, 3.0, 3.0,
             "previous Lee22 reading (literal eq. 9, 1e14 pivot, no clip); 3 R200c regression"),
     ]
 end
@@ -55,7 +60,7 @@ end
 """Independent check of the radius cache against the profile-owned chord integral
 (`chord_dm_pc_cm3` in lee2022_frb_dm_profile.jl, the implementation compared with TNG). It shares
 no code with the cache's dimensionless-shape / amplitude split."""
-function validate_cache_against_profile_owned_chord(cache, runtime, cut; sample_count=60, tolerance=0.01, output_path)
+function validate_cache_against_profile_owned_chord(cache, runtime, cut, aperture; sample_count=60, tolerance=0.01, output_path)
     model = runtime.model
     inner = model isa ProfileSupport.AbstractLee2022DMProfile ? model :
             ProfileSupport.Battaglia16DensityDMProfile(model)
@@ -66,13 +71,16 @@ function validate_cache_against_profile_owned_chord(cache, runtime, cut; sample_
         for i in 1:sample_count
             mass = 10.0^(12.9 + rand(rng) * (15.5 - 12.9))
             z = 0.01 + rand(rng) * (last(cache.redshifts) - 0.02)
-            x = cut * (i % 4 == 0 ? 1 - 10.0^(-1 - 3rand(rng)) : max(rand(rng)^2, 1.0e-5))
-            prepared = prepare_painted_halo(cache, mass, z, cut)
+            x = aperture * (i % 4 == 0 ? 1 - 10.0^(-1 - 3rand(rng)) : max(rand(rng)^2, 1.0e-5))
+            prepared = prepare_painted_halo(cache, mass, z, aperture)
             r200 = XGPaint.R_Δ(model, mass * XGPaint.M_sun, z, 200)
             theta200 = Float64(XGPaint.angular_size(model, r200, z))
-            theta = atan(x * tan(theta200))
+            # spherical caches use the screen-plane radius tan(theta)/tan(theta200); the projected
+            # (XGPaint-convention) cache uses theta/theta200 and the full line of sight
+            theta = cut > 0 ? atan(x * tan(theta200)) : x * theta200
             cached = prepared.value(theta)
-            direct = ProfileSupport.chord_dm_pc_cm3(inner, x, sqrt((cut - x) * (cut + x)), mass, z)
+            half_chord = cut > 0 ? sqrt((cut - x) * (cut + x)) : ProfileSupport.LEE2022_LOS_MAX_R200C
+            direct = ProfileSupport.chord_dm_pc_cm3(inner, x, half_chord, mass, z)
             err = cached / direct - 1
             isfinite(err) || error("Non-finite profile-owned chord check")
             worst = max(worst, abs(err))
@@ -136,7 +144,8 @@ function updated_sightline_main()
     specs = updated_model_specs()
     nmodel = length(specs)
     cuts = [spec.cut for spec in specs]
-    maxcut = maximum(cuts)
+    apertures = [spec.aperture for spec in specs]
+    maxcut = maximum(apertures)
     println("Updated-model sightlines: $(nrays) rays x $(nsurvey) source planes ($(join(surveys, ", "))); " *
             "zmax=$(zmax); $(nmodel) models; threads=$(Threads.nthreads())")
     flush(stdout)
@@ -152,7 +161,7 @@ function updated_sightline_main()
         cache = build_radius_scaled_cache(runtime, path; refinement=2, zmax=zmax, spherical_cut=spec.cut)
         worst_grid = validate_radius_cache(cache; sample_count=100,
             output_path=joinpath(output, "analysis", spec.label * "_cache_check.csv"))
-        worst_chord = validate_cache_against_profile_owned_chord(cache, runtime, spec.cut;
+        worst_chord = validate_cache_against_profile_owned_chord(cache, runtime, spec.cut, spec.aperture;
             output_path=joinpath(output, "analysis", spec.label * "_profile_owned_chord_check.csv"))
         if spec.config.dm_profile == "lee2022" && spec.config.lee2022_normalization == "xgpaint_ne2d"
             check_xgpaint_native_routes(runtime)
@@ -162,6 +171,9 @@ function updated_sightline_main()
         provenance[spec.label * ".model_family"] = runtime.generated_model_family
         provenance[spec.label * ".cache_signature"] = runtime.cache_signature
         provenance[spec.label * ".sphere_r200c"] = spec.cut
+        provenance[spec.label * ".aperture_r200c"] = spec.aperture
+        provenance[spec.label * ".geometry"] = spec.cut > 0 ? "sphere; chord-limited LOS; DM -> 0 at the edge" :
+            "cylinder; full LOS to 1e5 R200c; angular aperture cut (XGPaint convention)"
         provenance[spec.label * ".note"] = spec.note
         provenance[spec.label * ".cache_file"] = path
         provenance[spec.label * ".cache_check_max_relative_error"] = worst_grid
@@ -213,13 +225,18 @@ function updated_sightline_main()
                 theta_max = ProfileSupport.compute_theta_max_r200c_external(model0, m[h], z[h], maxcut)
                 prepared = nothing
                 theta_r200c = 0.0
+                theta_aperture = nothing
                 visit_ray_disc(lookup, direction, theta_max) do ray, theta
                     any(source_z[ray, s] >= z[h] for s in 1:nsurvey) || return
                     if prepared === nothing
-                        prepared = [prepare_painted_halo(caches[p], m[h], z[h], cuts[p]) for p in 1:nmodel]
+                        prepared = [prepare_painted_halo(caches[p], m[h], z[h], apertures[p]) for p in 1:nmodel]
                         theta_r200c = ProfileSupport.compute_theta_max_r200c_external(model0, m[h], z[h], 1.0)
+                        # each model's own angular aperture: spheres are already zero outside their edge,
+                        # the projected (cylinder) models must be cut here, exactly as XGPaint's painter does
+                        theta_aperture = [apertures[p] == 1.0 ? theta_r200c :
+                            ProfileSupport.compute_theta_max_r200c_external(model0, m[h], z[h], apertures[p]) for p in 1:nmodel]
                     end
-                    values = [Float64(prepared[p].value(theta)) for p in 1:nmodel]
+                    values = [theta < theta_aperture[p] ? Float64(prepared[p].value(theta)) : 0.0 for p in 1:nmodel]
                     all(v -> isfinite(v) && 0 <= v <= 1.0e8, values) ||
                         error("Invalid single-halo DM; values are never clipped")
                     inside = theta < theta_r200c
@@ -265,11 +282,12 @@ function updated_sightline_main()
             "source_positions_sha256" => positions_digest, "source_positions_file" => positions_path,
             "nside" => nside, "model_labels" => join([spec.label for spec in specs], ","),
             "sphere_r200c_by_model" => join(string.(cuts), ","),
+            "aperture_r200c_by_model" => join(string.(apertures), ","),
             "outer_sphere_r200c" => maxcut, "source_planes" => join(surveys, ","),
             "common_source_redshift" => z_plane,
             "observed_planes" => "planck, act: 2026-09-14 stratified observed-redshift assignments (unchanged)",
             "selection" => "all resolved halos with 0 < z_halo <= individual z_source",
-            "impact_parameter" => "screen-plane b/R200c = tan(theta)/tan(theta200c); chord-limited LOS inside the sphere; DM -> 0 at the edge",
+            "impact_parameter" => "spheres: screen-plane b/R200c = tan(theta)/tan(theta200c), chord-limited LOS, DM -> 0 at the edge; projected models: theta/theta200c, full LOS to 1e5 R200c, zero outside the angular aperture",
             "dm_scope" => "halo-only; no host or diffuse IGM DM; observer-frame pc cm^-3",
             "direction_sampling" => "iid uniform NSIDE pixel centres; with replacement (from source_positions.h5)",
             "elapsed_seconds" => elapsed, "julia_threads" => Threads.nthreads())

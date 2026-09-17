@@ -55,7 +55,8 @@ def mass_note(m):
     return "inside Lee22 fit range"
 
 
-def plot_grid(data, masses, redshifts, out, quantity, ylabel, stem, xlabel=r"impact parameter  $b/R_{200c}$"):
+def plot_grid(data, masses, redshifts, out, quantity, ylabel, stem, xlabel=r"impact parameter  $b/R_{200c}$",
+              tag_left=False):
     plt.rcParams.update(RC)
     nrow, ncol = len(masses), len(redshifts)
     fig, axes = plt.subplots(nrow, ncol, figsize=(3.9 * ncol + 1.2, 3.35 * nrow + 1.6), sharex=True, sharey="row")
@@ -82,8 +83,8 @@ def plot_grid(data, masses, redshifts, out, quantity, ylabel, stem, xlabel=r"imp
             if z > LEE_ZMAX:
                 notes.append("z non calibr.")
             if notes:
-                ax.text(.97, .96, "\n".join(notes), transform=ax.transAxes, ha="right", va="top",
-                        color=RED, fontsize=13, fontweight="bold")
+                ax.text(.03 if tag_left else .97, .96, "\n".join(notes), transform=ax.transAxes,
+                        ha="left" if tag_left else "right", va="top", color=RED, fontsize=13, fontweight="bold")
             r200 = float(b16[0]["r200c_mpc"])
             theta = float(b16[0]["theta200c_arcmin"])
             ax.text(.03, .04, r"$R_{200c}$ = %.2f Mpc, $\theta_{200c}$ = %.1f$'$" % (r200, theta),
@@ -158,7 +159,7 @@ def main():
               r"$n_e(r)$  [cm$^{-3}$]", "electron_density_3d_b16_vs_lee22", xlabel=r"radius  $r/R_{200c}$")
     plot_grid(data, masses, redshifts, args.output, "ne_over_n200_x3",
               r"$(n_e/n_{200})\,(r/R_{200c})^3$", "electron_density_scaled_n200_x3_b16_vs_lee22",
-              xlabel=r"radius  $r/R_{200c}$")
+              xlabel=r"radius  $r/R_{200c}$", tag_left=True)
     plot_ratio(data, masses, redshifts, args.output)
     print("Saved figures in", args.output)
 

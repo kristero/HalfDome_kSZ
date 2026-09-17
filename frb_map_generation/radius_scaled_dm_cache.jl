@@ -47,7 +47,13 @@ function radius_column_amplitude(model, mass, z)
     mp = XGPaint.constants.ProtonMass
     if model isa ProfileSupport.AbstractLee2022DMProfile
         p = ProfileSupport.lee2022_parameters(model, mass, z)
-        column = p.n0 * 200 * rho / (model.hydrogen_mass_fraction * mp) *
+        # Printed eq. (9) n200 times the model's normalization reading (1 for the legacy
+        # literal reading, 0.9 X_H m_p / m_per_e for XGPaint-native electrons) and the
+        # optional redshift-scaling hypothesis (1 for physical). Both are model options,
+        # so a cache built for one reading is never reused for another (signature).
+        column = ProfileSupport.lee2022_normalization_factor(model) *
+                 ProfileSupport.lee2022_redshift_scaling_factor(model, z) *
+                 p.n0 * 200 * rho / (model.hydrogen_mass_fraction * mp) *
                  (model.omega_b / model.omega_m) * r200
     else
         # Match the installed Battaglia16 physical profile exactly. These
@@ -106,8 +112,14 @@ function build_radius_scaled_cache(runtime, path; refinement=2, zmax=1.0, spheri
         xmax = spherical_cut > 0 ? spherical_cut : 5.1
         logx = collect(range(log(1e-7), log(xmax); length=160*refinement+1))
         zs = collect(range(0.0, zmax; length=32*refinement+1))
-        logm = sort!(unique(vcat(collect(range(12.0, 15.7; length=64*refinement+1)),
-            [log10(10.0^13.61 / model.cosmo.h), log10(10.0^13.75 / model.cosmo.h)])))
+        # Put every mass where the model is only piecewise smooth on the grid: the two Lee22
+        # M_cut pivots and, when the model clips its shape parameters at the fit-range mass,
+        # that clip mass as well. Linear interpolation is then exact at each kink.
+        kinks = [log10(10.0^13.61 / model.cosmo.h), log10(10.0^13.75 / model.cosmo.h)]
+        if hasproperty(model, :shape_clip_mass_msun) && isfinite(model.shape_clip_mass_msun)
+            push!(kinks, log10(model.shape_clip_mass_msun))
+        end
+        logm = sort!(unique(vcat(collect(range(12.0, 15.7; length=64*refinement+1)), kinks)))
         values = Array{Float64}(undef, length(logx), length(zs), length(logm))
         physical_b16 = XGPaint.BattagliaTauProfilePhysical(Omega_c=0.261, Omega_b=0.049, h=0.68)
         pairs = collect(Iterators.product(eachindex(zs), eachindex(logm)))

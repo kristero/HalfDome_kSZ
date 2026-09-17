@@ -610,6 +610,16 @@ SPHERICAL_1R200C_VARIANTS = {
                             provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="hydrogen_count",
                             provenance_lee2022_concentration_source="tng_mean"),
                 label=r"Lee22 best fit  ($\times\,X_H^2$)", color="#009E73", ls="-.", lw=2.4),
+    # the same X_H^2 fits routed through XGPaint's own rho_2d/ne2d/compute_DM (DM_PROFILE=lee2022_xgpaint): drawn as markers
+    "lee22_noconc_xh2_xgp": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_noconc_xh2_xgp_seed42",
+                expect=dict(provenance_dm_profile="lee2022_xgpaint", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="none", provenance_lee2022_normalization="hydrogen_count"),
+                label=r"Lee22 no-c  ($\times\,X_H^2$), XGPaint pipeline", color="#D55E00", ls="none", lw=2.0, marker="o", ms=4.6),
+    "lee22_pref_xh2_xgp": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_pref_xh2_xgp_seed42",
+                expect=dict(provenance_dm_profile="lee2022_xgpaint", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="hydrogen_count",
+                            provenance_lee2022_concentration_source="tng_mean"),
+                label=r"Lee22 best fit  ($\times\,X_H^2$), XGPaint pipeline", color="#009E73", ls="none", lw=2.0, marker="s", ms=4.2),
 }
 SPHERICAL_CORE_KEYS = ("b16", "lee22_noconc", "lee22_pref")
 SPHERICAL_FIGURE_SETS = {
@@ -617,6 +627,7 @@ SPHERICAL_FIGURE_SETS = {
     "sensitivity_": SPHERICAL_CORE_KEYS + ("lee22_noconc_literalnorm", "lee22_pref_literalnorm"),
     "efix_": ("b16", "lee22_noconc_efix", "lee22_pref_efix"),
     "xh2_": ("b16", "lee22_noconc_xh2", "lee22_pref_xh2"),
+    "xgpaint_": ("lee22_noconc_xh2", "lee22_pref_xh2", "lee22_noconc_xh2_xgp", "lee22_pref_xh2_xgp"),
 }
 
 
@@ -653,11 +664,16 @@ def load_spherical_1r200c(project, key):
             for i, label in enumerate(labels)}
 
 
-def draw_percent_panel(ax, product, tng_count, edges, color, line, lw):
+def draw_percent_panel(ax, product, tng_count, edges, color, line, lw, marker=None, ms=4.):
     """Per-bin percent difference (thick where both samples hold >= 10 rays), merged-bin steps elsewhere,
-    triangles where the value exceeds +100%; the axis is linear and clipped to +-100%."""
+    triangles where the value exceeds +100%; the axis is linear and clipped to +-100%.
+    With `marker`, only the robust per-bin values are drawn, as hollow markers on every third bin."""
     delta = percent_difference_extended(product["pdf"], product["tng_pdf"], product["counts"], tng_count, 1)
     robust = (product["counts"] >= ROBUST_BIN_COUNT) & (tng_count >= ROBUST_BIN_COUNT)
+    if marker is not None:
+        ax.plot(product["centers"], np.where(robust, delta, np.nan), ls="none", marker=marker, ms=ms * .8, mfc="white",
+                mec=color, mew=1.0, markevery=3)
+        return delta, robust
     medges, mvals = merged_percent_difference(product["counts"], tng_count, edges)
     step_ls = line if line in ("-", "--", "-.") else (0, (1.2, 1.2))
     for k in range(len(mvals)):
@@ -701,14 +717,20 @@ def halo_pdf_spherical_figures(root, project, book, manifest):
                 edges = b16_proj[hd_label]["edges"]
                 tng_pdf, tng_count, tng_zero = direct.histogram_from_values(direct.tng_values(tng_label, 1.), edges)
                 direct.draw_pdf(top, b16_proj[hd_label]["centers"], tng_pdf, color=".15", lw=2.7)
-                drawn = [("b16_projected", b16_proj[hd_label], "#0072B2", (0, (1.2, 1.2)), 1.5)]
+                drawn = [("b16_projected", b16_proj[hd_label], "#0072B2", (0, (1.2, 1.2)), 1.5, None, 0.)] if "b16" in keys else []
                 drawn += [(k, sph[k][hd_label], SPHERICAL_1R200C_VARIANTS[k]["color"], SPHERICAL_1R200C_VARIANTS[k]["ls"],
-                           SPHERICAL_1R200C_VARIANTS[k]["lw"]) for k in keys]
+                           SPHERICAL_1R200C_VARIANTS[k]["lw"], SPHERICAL_1R200C_VARIANTS[k].get("marker"),
+                           SPHERICAL_1R200C_VARIANTS[k].get("ms", 0.)) for k in keys]
                 any_counts = False
-                for name, product, color, line, lw in drawn:
+                for name, product, color, line, lw, marker, ms in drawn:
                     any_counts |= bool(np.any(product["counts"]))
-                    direct.draw_pdf(top, product["centers"], product["pdf"], color=color, ls=line, lw=lw)
-                    delta, robust = draw_percent_panel(bottom, dict(product, tng_pdf=tng_pdf), tng_count, edges, color, line, lw)
+                    if marker is None:
+                        direct.draw_pdf(top, product["centers"], product["pdf"], color=color, ls=line, lw=lw)
+                    else:
+                        direct.draw_pdf(top, product["centers"], product["pdf"], color=color, ls="none", marker=marker, ms=ms,
+                                        mfc="white", mec=color, mew=1.1, markevery=3)
+                    delta, robust = draw_percent_panel(bottom, dict(product, tng_pdf=tng_pdf), tng_count, edges, color, line, lw,
+                                                       marker=marker, ms=ms)
                     if (hd_label, name) not in seen:
                         seen.add((hd_label, name))
                         for b in range(len(tng_pdf)):
@@ -732,15 +754,19 @@ def halo_pdf_spherical_figures(root, project, book, manifest):
                     top.text(.58, .3, "HD: no resolved halos", transform=top.transAxes, ha="center", fontsize=16, color=".35")
                     bottom.set_yticks([]); bottom.text(.5, .6, "Undefined", transform=bottom.transAxes, ha="center", fontsize=16, color=".4")
             legend_ax = fig.add_subplot(outer[1, 2]); legend_ax.axis("off")
-            handles = [Line2D([], [], color=".15", lw=2.7, label="IllustrisTNG, within $R_{200}$"),
-                       Line2D([], [], color="#0072B2", ls=(0, (1.2, 1.2)), lw=1.5, label="Battaglia16, projected (previous)")]
-            handles += [Line2D([], [], color=v["color"], ls=v["ls"], lw=v["lw"], label=v["label"])
+            handles = [Line2D([], [], color=".15", lw=2.7, label="IllustrisTNG, within $R_{200}$")]
+            if "b16" in keys:
+                handles.append(Line2D([], [], color="#0072B2", ls=(0, (1.2, 1.2)), lw=1.5, label="Battaglia16, projected (previous)"))
+            handles += [Line2D([], [], color=v["color"], ls=v["ls"], lw=v["lw"], label=v["label"], marker=v.get("marker"),
+                               ms=v.get("ms", 0.), mfc="white", mec=v["color"], mew=1.1)
                         for v in (SPHERICAL_1R200C_VARIANTS[k] for k in keys)]
             legend_ax.legend(handles=handles, loc="upper center", frameon=False, fontsize=14 if len(keys) <= 3 else 12.5,
                              labelspacing=.9 if len(keys) <= 3 else .6, handlelength=3.0, bbox_to_anchor=(.5, 1.03))
-            legend_ax.text(.5, .04, "HalfDome curves except the dotted one: gas inside the $R_{200c}$ sphere.\n"
-                           "Percent panel: thin steps merge bins to $\\geq$10 rays; $\\blacktriangle$ above +100%.",
-                           transform=legend_ax.transAxes, ha="center", va="bottom", fontsize=12, color=".35")
+            note = ("Markers: the same fits run through XGPaint's own pipeline\n(get_params returns $\\beta = \\alpha\\beta' - \\gamma$ and $P_0$ from $n_0$).\n"
+                    "All HalfDome models: gas inside the $R_{200c}$ sphere." if prefix == "xgpaint_" else
+                    "HalfDome curves except the dotted one: gas inside the $R_{200c}$ sphere.\n"
+                    "Percent panel: thin steps merge bins to $\\geq$10 rays; $\\blacktriangle$ above +100%.")
+            legend_ax.text(.5, .04, note, transform=legend_ax.transAxes, ha="center", va="bottom", fontsize=12, color=".35")
             fig.suptitle(r"Halo DM PDFs,  $z_s = 1$,  gas inside $R_{200c}$", y=.975)
             stem = "halo_pdf_sphere_1r200c_b16_lee22_tng_" + prefix + group_name
             caption = ("Like-for-like halo-only positive-DM PDFs at z=1, NSIDE=4096, 120k uniform rays. HalfDome curves (except the dotted "

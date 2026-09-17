@@ -128,7 +128,8 @@ function normalize_dm_profile_name(value::AbstractString)
     normalized = lowercase(replace(replace(strip(String(value)), "_" => ""), "-" => ""))
     normalized in ("battaglia", "battaglia16", "xgpaint") && return "battaglia16"
     normalized in ("lee2022", "leeetal2022", "lee22") && return "lee2022"
-    error("dm_profile must be battaglia16 or lee2022; got $(repr(value)).")
+    normalized in ("lee2022xgpaint", "lee22xgpaint", "xgpaintlee2022", "xgpaintlee22") && return "lee2022_xgpaint"
+    error("dm_profile must be battaglia16, lee2022 or lee2022_xgpaint; got $(repr(value)).")
 end
 
 function normalize_lee2022_concentration_mode(value::AbstractString)
@@ -192,7 +193,7 @@ if !EARLY_MODE
         config.halo_boundary == "spherical" || return runtime
         # Spherical boundary: profile-owned density inside the X R200c sphere. The cache
         # stores the chord-mean column; the generator applies the exact chord factor per ray.
-        inner = runtime.model isa HaloDMProfile ? Battaglia16DensityDMProfile(runtime.model) : runtime.model
+        inner = runtime.model isa Union{HaloDMProfile,Lee2022XGPaintDMProfile} ? Battaglia16DensityDMProfile(runtime.model) : runtime.model
         model = SphericalChordDMProfile(inner, config.dm_aperture_r200_multiplier)
         return (
             model=model,
@@ -204,6 +205,12 @@ if !EARLY_MODE
             provenance=profile_provenance(model),
         )
     end
+
+    # Lee22 routed through XGPaint's own rho_2d/ne2d/compute_DM: same Lee22 model, wrapped so that
+    # XGPaint.get_params returns the transformed parameters (see Lee2022XGPaintDMProfile).
+    maybe_wrap_lee2022_xgpaint(config, model) =
+        config.dm_profile == "lee2022_xgpaint" ? Lee2022XGPaintDMProfile(model) : model
+    xgpaint_suffix(config) = config.dm_profile == "lee2022_xgpaint" ? "; via XGPaint pipeline (get_params transform beta=alpha*beta'-gamma)" : ""
 
     function dm_profile_projected_runtime_configuration(config)
         if config.dm_profile == "battaglia16"
@@ -219,7 +226,7 @@ if !EARLY_MODE
                 implementation_path="",
                 provenance=Dict{String,Any}(),
             )
-        elseif config.dm_profile == "lee2022"
+        elseif config.dm_profile in ("lee2022", "lee2022_xgpaint")
             normalization = Symbol(config.lee2022_normalization)
             clip = config.lee2022_shape_mass_clip_msun
             zscaling = Symbol(config.lee2022_redshift_scaling)
@@ -232,15 +239,16 @@ if !EARLY_MODE
                     redshift_scaling=zscaling,
                 )
                 tokens = lee2022_variant_tokens(model)
+                model = maybe_wrap_lee2022_xgpaint(config, model)
                 return (
                     model=model,
-                    source="local Lee22 preferred concentration-dependent density fit",
-                    generated_model_family=lee2022_model_family(model),
-                    cache_signature=lee2022_cache_signature(model),
+                    source="local Lee22 preferred concentration-dependent density fit" * xgpaint_suffix(config),
+                    generated_model_family=profile_model_family(model),
+                    cache_signature=profile_cache_signature(model),
                     description="Lee22 preferred density fit (Table 3) + $(config.lee2022_concentration_source) concentration; Eq12 common mass pivot" *
-                        (isempty(tokens) ? "" : "; options: " * join(tokens, ", ")),
+                        (isempty(tokens) ? "" : "; options: " * join(tokens, ", ")) * xgpaint_suffix(config),
                     implementation_path=joinpath(@__DIR__, "lee2022_frb_dm_profile.jl"),
-                    provenance=lee2022_concentration_provenance(model),
+                    provenance=profile_provenance(model),
                 )
             end
             config.lee2022_concentration_mode == "none" || error("Unknown Lee22 concentration mode")
@@ -253,15 +261,16 @@ if !EARLY_MODE
             )
             tokens = lee2022_variant_tokens(model)
             implementation_path = joinpath(@__DIR__, "lee2022_frb_dm_profile.jl")
+            model = maybe_wrap_lee2022_xgpaint(config, model)
             return (
                 model=model,
-                source="local Lee2022 Appendix-A2 no-concentration electron-density profile",
-                generated_model_family=lee2022_model_family(model),
-                cache_signature=lee2022_cache_signature(model),
+                source="local Lee2022 Appendix-A2 no-concentration electron-density profile" * xgpaint_suffix(config),
+                generated_model_family=profile_model_family(model),
+                cache_signature=profile_cache_signature(model),
                 description="Lee2022NoConcentrationDMProfile(Appendix A Table A2; M200c/R200c)" *
-                    (isempty(tokens) ? "" : "; options: " * join(tokens, ", ")),
+                    (isempty(tokens) ? "" : "; options: " * join(tokens, ", ")) * xgpaint_suffix(config),
                 implementation_path=implementation_path,
-                provenance=lee2022_no_concentration_provenance(model),
+                provenance=profile_provenance(model),
             )
         end
         error("Unsupported dm_profile=$(repr(config.dm_profile)).")
@@ -438,6 +447,8 @@ Core options (both --key=value and key=value are accepted):
   --chunk-size=1000000               Catalog rows per HDF5 read
   --dm-profile=battaglia16           Existing production profile (default)
   --dm-profile=lee2022               Lee et al. 2022 Appendix-A2 electron-density fit
+  --dm-profile=lee2022_xgpaint       the same Lee22 fit routed through XGPaint's own rho_2d/ne2d/compute_DM
+                                      (XGPaint.get_params returns beta = alpha*beta' - gamma and P0 from n0)
   --lee2022-normalization=literal    literal eq. (9) n200 (legacy); baryon_fraction multiplies the
                                       Lee22 electron density by Omega_b/Omega_m (over-corrects, see
                                       LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md); electron_count replaces
@@ -1723,7 +1734,7 @@ function print_configuration(config)
     println("  dm_profile=$(config.dm_profile)")
     println("  lee2022_concentration_mode=$(config.lee2022_concentration_mode)")
     println("  halo_boundary=$(config.halo_boundary)")
-    if config.dm_profile == "lee2022"
+    if startswith(config.dm_profile, "lee2022")
         println("  lee2022_normalization=$(config.lee2022_normalization), n0_pivot=$(config.lee2022_n0_pivot), " *
                 "concentration_source=$(config.lee2022_concentration_source), " *
                 "shape_mass_clip_msun=$(config.lee2022_shape_mass_clip_msun), " *
@@ -1969,7 +1980,7 @@ function main(options)
         "finite node range=[$(interpolator_build.cache_grid_minimum), " *
         "$(interpolator_build.cache_grid_maximum)] pc cm^-3",
     )
-    if config.dm_profile == "lee2022" &&
+    if startswith(config.dm_profile, "lee2022") &&
        !startswith(interpolator_build.interpolation_scheme, "linear B-spline")
         error(
             "Lee2022 requires the bounded signed-cache interpolation path; got " *
@@ -1977,7 +1988,7 @@ function main(options)
             "DM_CACHE, and the profile-signature sidecar before processing halos.",
         )
     end
-    if config.dm_profile == "lee2022" &&
+    if startswith(config.dm_profile, "lee2022") &&
        interpolator_build.cache_grid_maximum > config.dm_value_sanity_max
         error(
             "Raw Lee2022 cache node maximum=$(interpolator_build.cache_grid_maximum) " *
@@ -1988,7 +1999,7 @@ function main(options)
     dm_model_interp = interpolator_build.profile
     dm_cache_spot = validate_dm_interpolator_spot_value(
         dm_model_interp;
-        direct_model=config.dm_profile == "lee2022" ? dm_model : nothing,
+        direct_model=startswith(config.dm_profile, "lee2022") ? dm_model : nothing,
         sanity_max=config.dm_value_sanity_max,
     )
     println(

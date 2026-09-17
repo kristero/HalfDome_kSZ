@@ -176,9 +176,14 @@ echo "============================================================"
 "${PYTHON}" -c 'import h5py, matplotlib, numpy'
 run_julia -e 'using HDF5, Healpix, XGPaint'
 run_julia --threads=1 "${GENERATOR}" --self-test
-if [[ "${DM_PROFILE}" == "lee2022" ]]; then
+if [[ "${DM_PROFILE}" == "lee2022" || "${DM_PROFILE}" == "lee2022_xgpaint" ]]; then
   run_julia --threads=1 -e \
     'using XGPaint; include(ARGS[1]); run_lee2022_no_concentration_profile_self_test()' \
+    "${PROJECT_DIR}/frb_map_generation/lee2022_frb_dm_profile.jl"
+fi
+if [[ "${DM_PROFILE}" == "lee2022_xgpaint" ]]; then
+  run_julia --threads=1 -e \
+    'using XGPaint; include(ARGS[1]); run_lee2022_xgpaint_self_test()' \
     "${PROJECT_DIR}/frb_map_generation/lee2022_frb_dm_profile.jl"
 fi
 if [[ "${HALO_BOUNDARY}" == "spherical" ]]; then

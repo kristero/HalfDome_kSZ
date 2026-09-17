@@ -142,7 +142,8 @@ Local checkout `/home/kn18001/.julia/dev/XGPaint` (XGPaint.jl v0.4.0, WebSky-CIT
   "correction to battaglia 2016 tau". Note the exponent convention: Lee22's eq. 10 uses `-beta'` directly, so a
   Lee22 `beta'` corresponds to an XGPaint `beta = alpha beta' - gamma` (`= beta' + 0.3` for `alpha = 1`,
   `gamma = -0.3`). This is why Lee22 cannot be dropped into XGPaint by changing `PowerLawParam` values alone:
-  `beta' + 0.3` is not a power law in mass and redshift.
+  `beta' + 0.3` is not a power law in mass and redshift. It can be dropped in by overriding `get_params` instead:
+  `Lee2022XGPaintDMProfile` (Section 7) does exactly that, and XGPaint's `compute_DM` then reproduces the Lee22 code to 2e-6.
 - `src/profiles_y.jl:100` (`_nfw_profile_los_quadrature`): the line-of-sight integral runs over the coordinate
   along the ray from 0 to `zmax = 1e5` in units of R200c (a length, not a redshift), i.e. the projected column
   contains all gas out to effectively infinite radius.
@@ -171,6 +172,10 @@ All in `frb_map_generation/lee2022_frb_dm_profile.jl` unless stated (line number
 - `generate_halfdome_z1_dm_mass_windows.jl:141` parses `--lee2022-normalization=literal|baryon_fraction|
   electron_count|hydrogen_count`; `:730` computes the aperture from M200c; `:1126` applies the angular selection
   and `:1132` the chord factor in spherical mode.
+- `Lee2022XGPaintDMProfile` (same file, section "Lee22 inside XGPaint's own pipeline"): an `XGPaint.AbstractFRBProfile` whose
+  `XGPaint.get_params` returns `beta = alpha beta' - gamma` and `P0 = N n0 200 m_per_e / (0.9 X_H m_p)`, so XGPaint's `rho_2d`,
+  `ne2d` and `compute_DM` run unchanged on the Lee22 fits (`--dm-profile=lee2022_xgpaint`; self-test `run_lee2022_xgpaint_self_test`).
+  The spherical products built this way are bin-for-bin identical to the Lee22-code products.
 - Runner `run_spherical_z1_nside4096_1r200c_variants_local.sh`: variants `lee22_{noconc,pref}` (D),
   `lee22_{noconc,pref}_literalnorm` (A), `lee22_{noconc,pref}_efix` (C), `lee22_{noconc,pref}_xh2` (B). Products in
   `frb_map_generation/outputs/zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_<variant>_seed42/`.

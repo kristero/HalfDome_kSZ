@@ -699,21 +699,134 @@ function spherical_dm_pc_cm3(model::SphericalChordDMProfile, theta_rad, mass_msu
     return chord_dm_pc_cm3(model.inner, x, spherical_chord_half_length(x, model.sphere_r200c), Float64(mass_msun), Float64(redshift))
 end
 
+# ---------------------------------------------------------------------------------------
+# Lee22 inside XGPaint's own pipeline: only get_params is provided for the new type
+# ---------------------------------------------------------------------------------------
+"""
+    Lee2022XGPaintDMProfile(lee::AbstractLee2022DMProfile)
+
+The Lee22 electron-density fit as an XGPaint FRB profile. XGPaint's `rho_2d`, `ne2d`,
+`compute_DM`, `compute_θmax`, interpolator and painter run unchanged; this type only supplies
+`XGPaint.get_params` (and `object_size`). `get_params` returns the Lee22 parameters translated
+to XGPaint's generalized-NFW convention,
+
+    XGPaint (profiles_y.jl):  x̄^γ (1 + x̄^α)^(-(β+γ)/α)
+    Lee22 eq. (10):           x̄^γ (1 + x̄^α)^(-β')          =>  β = α β' - γ   (= β' + 0.3),
+
+and an amplitude P0 such that XGPaint's `ne2d` reproduces n_e = N n0 f(x) n200 exactly:
+
+    XGPaint:  n_e = 0.9 P0 f(x) f_b rho_crit(z) / m_per_e         (profiles_tau.jl: rho_2d, ne2d)
+    Lee22:    n_e = N n0 f(x) 200 rho_crit(z) f_b / (X_H m_p)     (eq. 9 times the normalization reading N)
+    =>        P0  = N n0 200 m_per_e / (0.9 X_H m_p)              (times the redshift-scaling option factor).
+
+The full mass and redshift dependence (M_cut broken power laws, concentration term) is evaluated
+by `lee2022_parameters`, so the mapping is exact for both fits. A `PowerLawParam`
+representation could not be: β' + 0.3 and the broken power laws are not power laws.
+"""
+struct Lee2022XGPaintDMProfile{T,C,P<:AbstractLee2022DMProfile} <: XGPaint.AbstractFRBProfile{T}
+    f_b::T
+    cosmo::C
+    lee::P
+end
+
+function Lee2022XGPaintDMProfile(lee::AbstractLee2022DMProfile{T}) where {T}
+    return Lee2022XGPaintDMProfile{T,typeof(lee.cosmo),typeof(lee)}(T(lee.omega_b / lee.omega_m), lee.cosmo, lee)
+end
+
+const XGPAINT_NE2D_HYDROGEN_FRACTION = 0.76   # X_H hard-coded in XGPaint's ne2d (profiles_tau.jl)
+const XGPAINT_NE2D_GAS_FRACTION = 0.9         # the 0.9 hard-coded in XGPaint's ne2d
+
+"""Mass per free electron used by XGPaint's `ne2d` (profiles_tau.jl), in kg."""
+function xgpaint_mass_per_electron_kg()
+    me = XGPaint.constants.ElectronMass
+    mH = XGPaint.constants.ProtonMass
+    xH = XGPAINT_NE2D_HYDROGEN_FRACTION
+    return Float64(ustrip(uconvert(u"kg", me + (2xH / (xH + 1)) * mH + ((1 - xH) / (2(1 + xH))) * 4mH)))
+end
+
+function XGPaint.get_params(model::Lee2022XGPaintDMProfile{T}, M_200c, z) where {T}
+    mass_msun = Float64(M_200c / XGPaint.M_sun)
+    redshift = Float64(z)
+    pars = lee2022_parameters(model.lee, mass_msun, redshift)
+    beta = pars.alpha * pars.beta_prime - pars.gamma
+    mp_kg = Float64(ustrip(uconvert(u"kg", XGPaint.constants.ProtonMass)))
+    p0 = lee2022_normalization_factor(model.lee) * lee2022_redshift_scaling_factor(model.lee, redshift) *
+         pars.n0 * 200 * xgpaint_mass_per_electron_kg() /
+         (XGPAINT_NE2D_GAS_FRACTION * model.lee.hydrogen_mass_fraction * mp_kg)
+    return (xc=T(pars.x_c), α=T(pars.alpha), β=T(beta), γ=T(pars.gamma), P₀=T(p0))
+end
+
+XGPaint.object_size(model::Lee2022XGPaintDMProfile, physical_size, z) = XGPaint.angular_size(model, physical_size, z)
+
+"""Spherical-boundary support: the XGPaint-parameter density evaluator also serves this type."""
+function Battaglia16DensityDMProfile(inner::Lee2022XGPaintDMProfile{T,C}) where {T,C}
+    return Battaglia16DensityDMProfile{T,C,typeof(inner)}(inner.cosmo, inner)
+end
+
+lee2022_xgpaint_cache_signature(model::Lee2022XGPaintDMProfile) =
+    lee2022_cache_signature(model.lee) * "|via=xgpaint_get_params|beta=alpha*betaprime-gamma|P0=N*n0*200*m_per_e/(0.9*XH*mp)"
+lee2022_xgpaint_model_family(model::Lee2022XGPaintDMProfile) = lee2022_model_family(model.lee) * "_xgpaintpipeline"
+function lee2022_xgpaint_provenance(model::Lee2022XGPaintDMProfile)
+    return merge(profile_provenance(model.lee), Dict{String,Any}(
+        "lee2022_xgpaint_pipeline" => true,
+        "lee2022_xgpaint_beta_transform" => "beta_xgpaint = alpha*beta_prime - gamma (XGPaint exponent -(beta+gamma)/alpha)",
+        "lee2022_xgpaint_p0" => "P0 = N n0 200 m_per_e / (0.9 X_H m_p); XGPaint rho_2d, ne2d and compute_DM unchanged",
+    ))
+end
+
+function run_lee2022_xgpaint_self_test()
+    clip = LEE2022_FIT_MASS_MAX_MSUN_AT_H068
+    models = (
+        Lee2022NoConcentrationDMProfile(normalization=:hydrogen_count, n0_pivot=:mcut, shape_clip_mass_msun=clip),
+        Lee2022ConcentrationDMProfile(normalization=:hydrogen_count, concentration_source=:tng_mean, shape_clip_mass_msun=clip),
+        Lee2022NoConcentrationDMProfile(),
+    )
+    for lee in models
+        xgp = Lee2022XGPaintDMProfile(lee)
+        dens = Battaglia16DensityDMProfile(xgp)
+        for (mass, z, xb) in ((1.0e13, 0.1, 0.05), (3.0e13, 0.5, 0.3), (1.0e14, 0.5, 1.0), (7.327e12, 0.8, 0.7), (1.0e15, 1.0, 2.0))
+            par = XGPaint.get_params(xgp, mass * XGPaint.M_sun, z)
+            lp = lee2022_parameters(lee, mass, z)
+            abs((par.β + par.γ) / par.α - lp.beta_prime) <= 1e-12 * lp.beta_prime ||
+                error("Lee22->XGPaint exponent transform failed at M=$(mass), z=$(z)")
+            n_x = halo_electron_density_m3(dens, xb, mass, z)
+            n_l = halo_electron_density_m3(lee, xb, mass, z)
+            abs(n_x - n_l) <= 1e-9 * abs(n_l) ||
+                error("Lee22->XGPaint 3-D density mismatch at M=$(mass), z=$(z), x=$(xb): $(n_x) vs $(n_l)")
+            r200c = getfield(XGPaint, Symbol("R_", Char(0x0394)))(xgp, mass * XGPaint.M_sun, z, 200)
+            theta = xb * XGPaint.angular_size(xgp, r200c, z)
+            dm_x = xgp(theta, mass, z)      # XGPaint compute_DM -> ne2d -> rho_2d -> _nfw_profile_los_quadrature
+            dm_l = lee(theta, mass, z)      # this repository's projected column
+            abs(dm_x - dm_l) <= 2e-6 * abs(dm_l) ||
+                error("Lee22->XGPaint projected DM mismatch at M=$(mass), z=$(z), x=$(xb): $(dm_x) vs $(dm_l)")
+        end
+    end
+    println("PASS: Lee22 through XGPaint's pipeline (get_params: beta = alpha*beta' - gamma, P0 from n0) " *
+            "matches the Lee22 code: 3-D density to 1e-9, projected DM to 2e-6, for both fits.")
+    return true
+end
+
 profile_cache_signature(model::AbstractLee2022DMProfile) = lee2022_cache_signature(model)
-profile_cache_signature(::Battaglia16DensityDMProfile) = B16_DENSITY_CACHE_SIGNATURE
+profile_cache_signature(model::Battaglia16DensityDMProfile) =
+    model.inner isa Lee2022XGPaintDMProfile ? lee2022_xgpaint_cache_signature(model.inner) : B16_DENSITY_CACHE_SIGNATURE
+profile_cache_signature(model::Lee2022XGPaintDMProfile) = lee2022_xgpaint_cache_signature(model)
 profile_cache_signature(model::SphericalChordDMProfile) =
     profile_cache_signature(model.inner) * "|boundary=sphere$(model.sphere_r200c)R200c|cache=chord_mean"
 profile_model_family(model::AbstractLee2022DMProfile) = lee2022_model_family(model)
-profile_model_family(::Battaglia16DensityDMProfile) = B16_DENSITY_MODEL_FAMILY
+profile_model_family(model::Battaglia16DensityDMProfile) =
+    model.inner isa Lee2022XGPaintDMProfile ? lee2022_xgpaint_model_family(model.inner) : B16_DENSITY_MODEL_FAMILY
+profile_model_family(model::Lee2022XGPaintDMProfile) = lee2022_xgpaint_model_family(model)
 profile_model_family(model::SphericalChordDMProfile) =
     profile_model_family(model.inner) * "_sphere" * replace(string(model.sphere_r200c), "." => "p") * "r200c_chordmean"
 
 profile_provenance(model::Lee2022NoConcentrationDMProfile) = lee2022_no_concentration_provenance(model)
 profile_provenance(model::Lee2022ConcentrationDMProfile) = lee2022_concentration_provenance(model)
-profile_provenance(::Battaglia16DensityDMProfile) = Dict{String,Any}(
+profile_provenance(model::Battaglia16DensityDMProfile) = model.inner isa Lee2022XGPaintDMProfile ?
+    lee2022_xgpaint_provenance(model.inner) : Dict{String,Any}(
     "battaglia16_density_source" => "XGPaint BattagliaTauProfile parameters; rho_gas = P0 gNFW f_b rho_crit(z); ne2d composition",
     "battaglia16_los_max_r200c" => LEE2022_LOS_MAX_R200C,
 )
+profile_provenance(model::Lee2022XGPaintDMProfile) = lee2022_xgpaint_provenance(model)
 function profile_provenance(model::SphericalChordDMProfile)
     return merge(profile_provenance(model.inner), Dict{String,Any}(
         "halo_boundary" => "spherical",

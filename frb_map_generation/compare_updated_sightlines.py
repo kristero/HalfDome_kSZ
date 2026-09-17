@@ -209,16 +209,16 @@ def plot_calibrated(out, select):
     observations = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
     plt.rcParams.update(RC)
     fig, axes = plt.subplots(1, 2, figsize=(15.5, 7.0))
-    labels_all = {"lee22_noconc_sphere1": "Lee22 no-c, all resolved halos ($M \\geq 6.8\\times10^{12}\\,M_\\odot$, $z \\leq z_{\\rm FRB}$)",
-                  "b16_sphere1": "Battaglia16, all resolved halos"}
-    labels_cal = {"lee22_noconc_sphere1_calib": "Lee22 no-c, only calibrated halos ($1.5\\times10^{13}$-$9.3\\times10^{14}\\,M_\\odot$, $z \\leq 2$)",
-                  "b16_sphere1_calib": "Battaglia16, same calibrated-range halos"}
+    labels_all = {"lee22_noconc_sphere1": "Lee22, all halos",
+                  "b16_sphere1": "Battaglia16, all halos"}
+    labels_cal = {"lee22_noconc_sphere1_calib": "Lee22, calibrated halos only",
+                  "b16_sphere1_calib": "Battaglia16, calibrated halos only"}
     for ax, plane in zip(axes, ("planck", "act")):
         name, beam, count = PLANES[plane]
         obs = [r for r in observations if ("ACT" in r["series"]) == (plane == "act")]
         ax.errorbar(column(obs, "theta_plotted_arcmin"), column(obs, "w_yDM_pc_cm3") / 1e-5,
                     yerr=np.vstack([column(obs, "error_lower_pc_cm3"), column(obs, "error_upper_pc_cm3")]) / 1e-5,
-                    fmt="o", color="black", ms=6, capsize=2.5, lw=1.3, label="Takahashi+25 (digitized)", zorder=6)
+                    fmt="o", color="black", ms=6, capsize=2.5, lw=1.3, label="Takahashi+25", zorder=6)
         for label, legend in list(labels_all.items()) + list(labels_cal.items()):
             x, value, error = select(plane, plane, label)
             _, color, ls, lw, marker, _ = STYLE[label]
@@ -233,10 +233,10 @@ def plot_calibrated(out, select):
     handles, labels = axes[0].get_legend_handles_labels()
     by_label = dict(zip(labels, handles))
     wanted = [labels_all["lee22_noconc_sphere1"], labels_cal["lee22_noconc_sphere1_calib"],
-              labels_all["b16_sphere1"], labels_cal["b16_sphere1_calib"], "Takahashi+25 (digitized)"]
-    fig.legend([by_label[w] for w in wanted], wanted, loc="upper center", ncol=2, frameon=False,
-               bbox_to_anchor=(0.5, 1.0), columnspacing=1.4, handlelength=2.8)
-    fig.subplots_adjust(left=.07, right=.985, top=.76, bottom=.125, wspace=.2)
+              labels_all["b16_sphere1"], labels_cal["b16_sphere1_calib"], "Takahashi+25"]
+    fig.legend([by_label[w] for w in wanted], wanted, loc="upper center", ncol=3, frameon=False,
+               bbox_to_anchor=(0.5, 1.0), columnspacing=2.0, handlelength=2.8)
+    fig.subplots_adjust(left=.07, right=.985, top=.80, bottom=.125, wspace=.2)
     for ext in ("png", "pdf", "svg"):
         fig.savefig(str(out / "plots" / ("takahashi_fig13_lee22_calibrated_range." + ext)), dpi=200 if ext == "png" else None)
     plt.close(fig)

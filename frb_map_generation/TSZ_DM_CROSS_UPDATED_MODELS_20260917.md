@@ -20,6 +20,11 @@ Figures (PNG/PDF/SVG) under `outputs/tsz_dm_cross_updated_20260917/plots/`:
   (3R200c sphere; legacy Lee22 reading) as the previous implementation.
 - `takahashi_fig13_lee22_calibrated_range` - Lee22 (R200c sphere) with all resolved halos versus only the
   halos inside its calibration ranges, Battaglia16 under both selections as reference.
+- `takahashi_fig13_y_lee22p`, `takahashi_fig13_y_b12` - 100k curves and the mean of ten 71/31-FRB realizations,
+  for the Lee22-pressure and the Battaglia12 Compton-y maps (the other map dotted for reference).
+- `takahashi_fig13_realizations_y_lee22p`, `takahashi_fig13_realizations_y_b12` - the ten realizations
+  individually, with the median and 16-84 % band of 1000 realizations and the observations.
+- `cl_yy_lee22_pressure_vs_b12` - auto power spectra of the two y maps.
 - `medlock_fig5_updated_models` - ACT, Planck MILCA, Planck NILC panels, all sources at z = 2, no beam.
 - `updated_vs_previous_diagnostic` - the new products against the 2026-09-14 sightline products.
 
@@ -282,6 +287,66 @@ Lee22 no-concentration fit (M_cut = 10^13.61 h^-1 Msun): `n0 = 6.8 (M/M_cut)^0.6
 The practical consequence is the one seen in Sections 3 and 5: the two fits agree only in a narrow
 redshift window (z ~ 0.3-0.8 for the XGPaint-native reading), and any comparison that weights other
 redshifts, such as the z ~ 0.3 Takahashi samples or the z = 2 Medlock & Nagai kernel, separates them.
+
+## 5d. Compton-y from the Lee22 no-concentration pressure fit
+
+A second full-lightcone y map was painted with the Lee22 electron-pressure fit (arXiv v1 Table 7 =
+MNRAS Table A1; `lee2022_tsz_pressure_profile.jl`, option `--tsz-profile=lee2022_noconc` of the tSZ
+painter). Everything else equals the Battaglia12 map: all 85,224,251 halos, NSIDE 4096, XGPaint's
+projected 4R200c aperture, no beam. The fit is P_e/P200 = P0 (x/x_c)^-0.3 [1 + x/x_c]^-beta with the
+Battaglia P200 = 200 G M200 rho_cr f_b / (2 R200) and
+
+| parameter | Lee22 Table 7 (M_cut = 10^13.60 h^-1 Msun) | Battaglia12 (m = M/1e14 Msun) |
+|---|---|---|
+| P0 | 2.8 (M/M_cut)^1.08 [< M_cut], ^0.80 [> M_cut], (1+z)^-1.89 | 18.1 m^0.154 (1+z)^-0.758 |
+| x_c | 2.10 (M/M_cut)^-0.35 (1+z)^0.53 | 0.497 m^-0.00865 (1+z)^0.731 |
+| beta | 9.4 (M/M_cut)^-0.06 (1+z)^0.60 | 4.35 m^0.0393 (1+z)^0.415 |
+
+XGPaint paints 0.5176 P_th, so the wrapper passes P0/0.5176 (Lee22 fits the electron pressure) and
+beta + 0.3 (XGPaint's exponent convention); x_c and beta are frozen above the fit-range mass, as for
+the density fit. A self-test reproduces an independent eq. 9-10 Compton-y integral to 1e-6. The map
+took 810 s on 20 threads; its mean y is 4.56e-7 against 1.04e-6 for Battaglia12 (0.44x). The annular
+y samples at the 100k positions were recomputed for this map with the same filters
+(`cross_finite_source_realizations.py sample-y`), and the cross-correlations below use them with the
+unchanged per-source DM vectors.
+
+## 5e. What a 71- or 31-FRB measurement looks like on this sky
+
+`cross_finite_source_realizations.py` draws, for each survey plane, realizations that use exactly the
+observed number of FRBs: one random ray per observed redshift (71 for Planck, 31 for ACT), disjoint
+between realizations. Each realization is evaluated with the estimator of the full test,
+w_b = (1/G) sum_g (D_g - <D>_g)(Y_gb - <Y>_gb), where the stratum means come from all 100k rays (the
+analogue of the DM-z relation and the random-position y mean of the observational estimator). Ten
+realizations are shown individually; 1000 more (also disjoint) give the distribution of a single
+measurement. Battaglia12 y, R200c sphere, all halos, in 1e-5 pc cm^-3:
+
+| plane, DM model | annulus ['] | 100k (ensemble mean) | mean of 1000 | median | 16-84 % of one realization | fraction above the mean |
+|---|---|---:|---:|---:|---|---:|
+| Planck, Battaglia16 | 10-17.8 | 1.28 | 1.29 +- 0.19 | 0.37 | 0.06 to 1.39 | 18 % |
+| Planck, Battaglia16 | 31.6-56.2 | 0.29 | 0.30 +- 0.04 | 0.09 | -0.06 to 0.43 | 23 % |
+| Planck, Lee22 | 10-17.8 | 5.62 | 5.74 +- 1.27 | 1.21 | 0.24 to 5.14 | 14 % |
+| Planck, Lee22 | 31.6-56.2 | 1.27 | 1.33 +- 0.21 | 0.29 | -0.11 to 1.52 | 18 % |
+| ACT, Battaglia16 | 10-17.8 | 1.26 | 1.56 +- 0.42 | 0.23 | -0.11 to 1.21 | 15 % |
+| ACT, Lee22 | 10-17.8 | 5.63 | 7.69 +- 2.85 | 0.64 | -0.11 to 4.25 | 12 % |
+
+The estimator is unbiased: the mean over 1000 realizations agrees with the 100k value within its
+error. But the distribution of a single 71- or 31-source measurement is extremely skewed. Its median
+is 0.2-0.3 of the mean at theta <= 30', only 12-23 % of realizations exceed the mean, and the standard
+deviation of one realization is 5-15 times the mean (ACT, Lee22, 5.6-10': 145 against 9.2). The reason
+is the halo-only DM itself: 75 % of the rays intersect no halo inside R200c, and the cross-correlation at
+small angles is carried by the few sightlines through massive, high-y clusters. A set of 71 or 31
+sightlines usually contains none of them and then sits far below the ensemble mean; occasionally it
+contains one and then lies far above (single realizations reach 4x the mean at 8' in the figure). The
+ten realizations plotted happen to contain no such sightline, so their average is 0.5-0.6 of the mean
+for Planck and 0.2-0.5 for ACT; that is sampling, not a bias.
+
+Two consequences for the comparison with Takahashi et al. First, a halo-only ensemble-mean curve is
+not what a single 71-source measurement is expected to look like; the median curve and the 16-84 %
+band are the relevant reference, and the observed Planck points lie inside or above that band for
+both density models. Second, the jackknife error of a real 71-source measurement cannot capture the
+missing rare sightlines, as already noted in `PUBLICATION_COMPARISONS_20260915.md`. These
+realizations sample directions on one fixed sky; they contain no observational noise, mask, host or
+IGM scatter.
 
 ## 6. Limits that carry over
 

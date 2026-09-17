@@ -16,6 +16,7 @@ include(joinpath(@__DIR__, "paint_halfdome_matched_profile_dm_map.jl"))
 end
 const Support = MatchedMapSupport
 const ProfileSupport = Support.ProfileSupport
+include(joinpath(@__DIR__, "lee2022_tsz_pressure_profile.jl"))
 
 const H_VALUE = 0.68
 const OMEGA_B = 0.049
@@ -167,6 +168,13 @@ function main()
         Support.float_option(options, "interpolator_logmass_max", 15.7)
     cache_overwrite = Support.bool_option(options, "tsz_cache_overwrite", false)
     overwrite = Support.bool_option(options, "overwrite", false)
+    tsz_profile = lowercase(Support.option(options, "tsz_profile", "battaglia12"))
+    tsz_profile in ("battaglia12", "lee2022_noconc") || error("tsz-profile must be battaglia12 or lee2022_noconc")
+    if Support.bool_option(options, "self_test_only", false)
+        run_lee2022_tsz_self_test(Lee2022ThermalSZProfile(Omega_c=OMEGA_C, Omega_b=OMEGA_B, h=H_VALUE);
+                                  quad=ProfileSupport.lee2022_quadgk_function())
+        return
+    end
 
     cache_path = abspath(Support.option(options, "tsz_cache", default_cache()))
     output_map = abspath(Support.option(
@@ -200,7 +208,13 @@ function main()
     end
     mkpath(dirname(output_map))
 
-    model = build_battaglia12_fiducial_model()
+    model = tsz_profile == "battaglia12" ? build_battaglia12_fiducial_model() :
+        Lee2022ThermalSZProfile(Omega_c=OMEGA_C, Omega_b=OMEGA_B, h=H_VALUE)
+    if tsz_profile == "lee2022_noconc"
+        run_lee2022_tsz_self_test(model; quad=ProfileSupport.lee2022_quadgk_function())
+        (haskey(options, "tsz_cache") && haskey(options, "output_map")) ||
+            error("The Lee22 pressure map requires explicit --tsz-cache and --output-map (the defaults are Battaglia12 paths)")
+    end
     interpolated_profile, cache_action = build_or_load_interpolator(
         model,
         cache_path;
@@ -218,7 +232,7 @@ function main()
         "theta=$(spot_theta), M200c=1e14 Msun, z=0.5.",
     )
 
-    println("HalfDome Battaglia12 Compton-y map")
+    println("HalfDome Compton-y map, pressure profile: $(tsz_profile)")
     println("  catalogue=$(catalog)")
     println("  output_map=$(output_map)")
     redshift_description = isinf(maximum_halo_redshift) ?
@@ -337,6 +351,7 @@ function main()
         "observable" => "thermal SZ Compton-y",
         "profile_label" => "Battaglia12 fiducial thermal pressure",
         "xgpaint_profile_type" => "Battaglia16ThermalSZProfile",
+        "tsz_profile_option" => tsz_profile,
         "catalogue" => catalog,
         "output_map" => output_map,
         "catalog_mass_dataset" => "halo_mass_m200c",
@@ -395,9 +410,16 @@ function main()
         "beta_alpha_z" => 0.415,
         "gamma_amp" => -0.3,
     )
+    if tsz_profile == "lee2022_noconc"
+        for key in ("P0_amp", "P0_alpha_m", "P0_alpha_z", "x_c_amp", "x_c_alpha_m", "x_c_alpha_z", "alpha_amp",
+                    "beta_amp", "beta_alpha_m", "beta_alpha_z", "gamma_amp")
+            delete!(entries, key)
+        end
+        merge!(entries, lee2022_pressure_provenance(model))
+    end
     Support.write_provenance(provenance_path, entries)
 
-    println("Saved Battaglia12 Compton-y map: $(output_map)")
+    println("Saved Compton-y map ($(tsz_profile)): $(output_map)")
     println("Saved provenance: $(provenance_path)")
     println("Selected $(halos_selected) halos; elapsed $(round(elapsed_seconds; digits=1)) s")
 end

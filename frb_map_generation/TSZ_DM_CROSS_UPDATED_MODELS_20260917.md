@@ -12,7 +12,10 @@ XGPaint-native Lee22 normalization), with
 
 Figures (PNG/PDF/SVG) under `outputs/tsz_dm_cross_updated_20260917/plots/`:
 
-- `takahashi_fig13_updated_models` - Planck and ACT panels, observed redshifts, y beamed.
+- `takahashi_fig13_updated_models` - Planck and ACT panels, observed redshifts, y beamed: the inside-R200c
+  curves with, as dotted lines, the previous implementation of each (the 2026-09-14 products:
+  Battaglia16 and legacy Lee22, both with the 3R200c sphere).
+- `takahashi_fig13_updated_models_vs_3r200c` - the same with the recomputed updated models to 3R200c instead.
 - `medlock_fig5_updated_models` - ACT, Planck MILCA, Planck NILC panels, all sources at z = 2, no beam.
 - `updated_vs_previous_diagnostic` - the new products against the 2026-09-14 sightline products.
 

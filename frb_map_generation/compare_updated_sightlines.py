@@ -146,28 +146,52 @@ def ordered_legend(fig, ax, model_labels, extra_labels):
                bbox_to_anchor=(0.5, 1.0), columnspacing=1.6, handlelength=2.6)
 
 
-def plot_takahashi(out, select):
+def plot_takahashi(out, select, reference="previous"):
+    """reference="previous": overlay the 2026-09-14 products (Battaglia16 and legacy Lee22, both with the
+    3R200c sphere) as the previous implementation of each inside-R200c curve.
+    reference="sphere3": overlay the recomputed updated models with gas to 3R200c instead."""
     observations = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
+    previous = read_rows(PREVIOUS / "analysis/sightline_comparison.csv")
     plt.rcParams.update(RC)
     fig, axes = plt.subplots(1, 2, figsize=(15.5, 6.9))
+    prev_style = {"battaglia16": (BLUE, "Battaglia16, previous implementation"),
+                  "lee22_legacy": (ORANGE, "Lee22 no-c, previous implementation")}
     for ax, plane in zip(axes, ("planck", "act")):
         name, beam, count = PLANES[plane]
         obs = [r for r in observations if ("ACT" in r["series"]) == (plane == "act")]
         ax.errorbar(column(obs, "theta_plotted_arcmin"), column(obs, "w_yDM_pc_cm3") / 1e-5,
                     yerr=np.vstack([column(obs, "error_lower_pc_cm3"), column(obs, "error_upper_pc_cm3")]) / 1e-5,
                     fmt="o", color="black", ms=6, capsize=2.5, lw=1.3, label="Takahashi+25 (digitized)", zorder=6)
-        for label in ("b16_sphere3", "lee22_noconc_sphere3", "b16_sphere1", "lee22_noconc_sphere1"):
+        if reference == "previous":
+            for old, (color, legend) in prev_style.items():
+                rows = [r for r in previous if r["survey"] == plane and r["filter"] == plane and r["model"] == old]
+                ax.plot(column(rows, "theta_arcmin"), column(rows, "cross_100k") / 1e-5, color=color,
+                        ls=(0, (1.2, 1.6)), lw=2.0, label=legend, zorder=3)
+        else:
+            for label in ("b16_sphere3", "lee22_noconc_sphere3"):
+                x, value, error = select(plane, plane, label)
+                draw_model(ax, x, value, error, label)
+        for label in ("b16_sphere1", "lee22_noconc_sphere1"):
             x, value, error = select(plane, plane, label)
             draw_model(ax, x, value, error, label)
         ax.axvspan(1, PAPER_CUT[plane], color=".5", alpha=.12, zorder=0)
         style_axis(ax, 1)
         ax.set_title("{}: {}, {} FRB redshifts".format(name, beam, count), pad=10)
     axes[0].set_ylabel(r"$w_{y\,\mathrm{DM}}(\theta)\ \ [10^{-5}\ \mathrm{pc\,cm^{-3}}]$")
-    ordered_legend(fig, axes[0], ("b16_sphere1", "b16_sphere3", "lee22_noconc_sphere1", "lee22_noconc_sphere3"),
-                   ["Takahashi+25 (digitized)"])
+    handles, labels = axes[0].get_legend_handles_labels()
+    by_label = dict(zip(labels, handles))
+    if reference == "previous":
+        wanted = [STYLE["b16_sphere1"][0], prev_style["battaglia16"][1], STYLE["lee22_noconc_sphere1"][0],
+                  prev_style["lee22_legacy"][1], "Takahashi+25 (digitized)"]
+    else:
+        wanted = [STYLE[m][0] for m in ("b16_sphere1", "b16_sphere3", "lee22_noconc_sphere1", "lee22_noconc_sphere3")]
+        wanted.append("Takahashi+25 (digitized)")
+    fig.legend([by_label[w] for w in wanted], wanted, loc="upper center", ncol=3, frameon=False,
+               bbox_to_anchor=(0.5, 1.0), columnspacing=1.6, handlelength=2.6)
     fig.subplots_adjust(left=.07, right=.985, top=.78, bottom=.13, wspace=.2)
+    stem = "takahashi_fig13_updated_models" + ("" if reference == "previous" else "_vs_3r200c")
     for ext in ("png", "pdf", "svg"):
-        fig.savefig(str(out / "plots" / ("takahashi_fig13_updated_models." + ext)), dpi=200 if ext == "png" else None)
+        fig.savefig(str(out / "plots" / (stem + "." + ext)), dpi=200 if ext == "png" else None)
     plt.close(fig)
 
 
@@ -312,7 +336,8 @@ def plot(args):
     rows, select = load_results(out)
     planes = sorted({r["plane"] for r in rows})
     plane_z2 = [p for p in planes if p not in PLANES][0]
-    plot_takahashi(out, select)
+    plot_takahashi(out, select, reference="previous")
+    plot_takahashi(out, select, reference="sphere3")
     plot_medlock(out, select, plane_z2)
     plot_diagnostic(out, select)
     write_tables(out, rows, select, plane_z2)

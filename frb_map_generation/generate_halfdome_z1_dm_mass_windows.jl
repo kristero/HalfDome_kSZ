@@ -143,7 +143,8 @@ function normalize_lee2022_normalization(value::AbstractString)
     normalized in ("literal", "eq9", "") && return "literal"
     normalized in ("baryon_fraction", "fb", "f_b") && return "baryon_fraction"
     normalized in ("electron_count", "electrons", "ne") && return "electron_count"
-    error("lee2022_normalization must be literal, baryon_fraction or electron_count; got $(repr(value)).")
+    normalized in ("hydrogen_count", "xh2", "nh") && return "hydrogen_count"
+    error("lee2022_normalization must be literal, baryon_fraction, electron_count or hydrogen_count; got $(repr(value)).")
 end
 
 function normalize_lee2022_n0_pivot(value::AbstractString)
@@ -441,7 +442,9 @@ Core options (both --key=value and key=value are accepted):
                                       Lee22 electron density by Omega_b/Omega_m (over-corrects, see
                                       LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md); electron_count replaces
                                       the 1/(X_H m_p) of eq. (9) by the free electrons per unit mass of
-                                      ionized H+He, (1+X_H)/(2 m_p), i.e. a factor X_H(1+X_H)/2 = 0.669
+                                      ionized H+He, (1+X_H)/(2 m_p), i.e. a factor X_H(1+X_H)/2 = 0.669;
+                                      hydrogen_count uses n200 = 200 rho_cr f_b X_H/m_p (eq. 9 in the form of
+                                      eq. 7 with unit electron abundance), i.e. a factor X_H^2 = 0.578
   --lee2022-n0-pivot=legacy_1e14     no-concentration n0 pivot: legacy 1e14 Msun or mcut (eq. 12)
   --lee2022-concentration-source=duffy2008  duffy2008 or tng_mean (Lee22 sec. 2.3 quoted means)
   --lee2022-shape-mass-clip=none     none, fit (freeze x_c/beta' above 10^14.8 h^-1 Msun), or Msun

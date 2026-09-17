@@ -565,46 +565,58 @@ def halo_pdf_lee22_figures(root, project, book, manifest):
 
 
 SPHERICAL_1R200C_VARIANTS = {
+    # key: run directory, expected provenance, short legend label, colour, line style, width.
+    # Line style encodes the fit family (Battaglia16 solid, Lee22 no-c dashed, Lee22 best fit dash-dot);
+    # the bracket in the label names the eq. 9 normalization reading.
     "b16": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_b16_seed42",
                 expect=dict(provenance_dm_profile="battaglia16", provenance_halo_boundary="spherical"),
-                label=r"HalfDome: Battaglia16, gas inside $R_{200c}$ sphere", color="#0072B2", ls="-", lw=2.6),
+                label="Battaglia16", color="#0072B2", ls="-", lw=2.6),
     "lee22_noconc": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_noconc_seed42",
                 expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
                             provenance_lee2022_concentration_mode="none", provenance_lee2022_normalization="baryon_fraction"),
-                label=r"HalfDome: Lee22 no-c (corrected), inside $R_{200c}$ sphere", color="#D55E00", ls="-", lw=2.4),
+                label=r"Lee22 no-c  ($\times\,\Omega_b/\Omega_m$)", color="#D55E00", ls="--", lw=2.4),
     "lee22_pref": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_pref_seed42",
                 expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
                             provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="baryon_fraction",
                             provenance_lee2022_concentration_source="tng_mean"),
-                label=r"HalfDome: Lee22 best fit (corrected), inside $R_{200c}$ sphere", color="#009E73", ls="-", lw=2.4),
-    # sensitivity: identical conventions and geometry, but the literal eq. 9 normalization (no Omega_b/Omega_m factor)
+                label=r"Lee22 best fit  ($\times\,\Omega_b/\Omega_m$)", color="#009E73", ls="-.", lw=2.4),
     "lee22_noconc_literalnorm": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_noconc_literalnorm_seed42",
                 expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
                             provenance_lee2022_concentration_mode="none", provenance_lee2022_normalization="literal",
                             provenance_lee2022_n0_pivot="mcut"),
-                label=r"HalfDome: Lee22 no-c, literal eq. 9 norm. (no $\Omega_b/\Omega_m$), sphere", color="#D55E00", ls=":", lw=2.0),
+                label="Lee22 no-c  (eq. 9 literal)", color="#D55E00", ls=(0, (1.2, 1.2)), lw=2.0),
     "lee22_pref_literalnorm": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_pref_literalnorm_seed42",
                 expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
                             provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="literal",
                             provenance_lee2022_concentration_source="tng_mean"),
-                label=r"HalfDome: Lee22 best fit, literal eq. 9 norm. (no $\Omega_b/\Omega_m$), sphere", color="#009E73", ls=":", lw=2.0),
-    # electron-count fix: eq. 9 with the free electrons per unit mass of ionized H+He, (1+X_H)/(2 m_p), instead of 1/(X_H m_p)
+                label="Lee22 best fit  (eq. 9 literal)", color="#009E73", ls=(0, (4, 1.2, 1, 1.2, 1, 1.2)), lw=2.0),
     "lee22_noconc_efix": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_noconc_efix_seed42",
                 expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
                             provenance_lee2022_concentration_mode="none", provenance_lee2022_normalization="electron_count",
                             provenance_lee2022_n0_pivot="mcut"),
-                label=r"HalfDome: Lee22 no-c, eq. 9 with $(1+X_H)/2m_p$ electrons, inside $R_{200c}$ sphere", color="#D55E00", ls="-", lw=2.4),
+                label=r"Lee22 no-c  ($\times\,X_H(1+X_H)/2$)", color="#D55E00", ls="--", lw=2.4),
     "lee22_pref_efix": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_pref_efix_seed42",
                 expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
                             provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="electron_count",
                             provenance_lee2022_concentration_source="tng_mean"),
-                label=r"HalfDome: Lee22 best fit, eq. 9 with $(1+X_H)/2m_p$ electrons, inside $R_{200c}$ sphere", color="#009E73", ls="-", lw=2.4),
+                label=r"Lee22 best fit  ($\times\,X_H(1+X_H)/2$)", color="#009E73", ls="-.", lw=2.4),
+    "lee22_noconc_xh2": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_noconc_xh2_seed42",
+                expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="none", provenance_lee2022_normalization="hydrogen_count",
+                            provenance_lee2022_n0_pivot="mcut"),
+                label=r"Lee22 no-c  ($\times\,X_H^2$)", color="#D55E00", ls="--", lw=2.4),
+    "lee22_pref_xh2": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_pref_xh2_seed42",
+                expect=dict(provenance_dm_profile="lee2022", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="hydrogen_count",
+                            provenance_lee2022_concentration_source="tng_mean"),
+                label=r"Lee22 best fit  ($\times\,X_H^2$)", color="#009E73", ls="-.", lw=2.4),
 }
 SPHERICAL_CORE_KEYS = ("b16", "lee22_noconc", "lee22_pref")
 SPHERICAL_FIGURE_SETS = {
     "": SPHERICAL_CORE_KEYS,
     "sensitivity_": SPHERICAL_CORE_KEYS + ("lee22_noconc_literalnorm", "lee22_pref_literalnorm"),
     "efix_": ("b16", "lee22_noconc_efix", "lee22_pref_efix"),
+    "xh2_": ("b16", "lee22_noconc_xh2", "lee22_pref_xh2"),
 }
 
 
@@ -641,6 +653,25 @@ def load_spherical_1r200c(project, key):
             for i, label in enumerate(labels)}
 
 
+def draw_percent_panel(ax, product, tng_count, edges, color, line, lw):
+    """Per-bin percent difference (thick where both samples hold >= 10 rays), merged-bin steps elsewhere,
+    triangles where the value exceeds +100%; the axis is linear and clipped to +-100%."""
+    delta = percent_difference_extended(product["pdf"], product["tng_pdf"], product["counts"], tng_count, 1)
+    robust = (product["counts"] >= ROBUST_BIN_COUNT) & (tng_count >= ROBUST_BIN_COUNT)
+    medges, mvals = merged_percent_difference(product["counts"], tng_count, edges)
+    step_ls = line if line in ("-", "--", "-.") else (0, (1.2, 1.2))
+    for k in range(len(mvals)):
+        if np.isfinite(mvals[k]):
+            lo, hi = medges[k], medges[k + 1]
+            ax.hlines(min(mvals[k], 100.), lo, hi, color=color, lw=1.0, alpha=.7, ls=step_ls)
+            if k + 1 < len(mvals) and np.isfinite(mvals[k + 1]):
+                ax.vlines(hi, min(mvals[k], 100.), min(mvals[k + 1], 100.), color=color, lw=.7, alpha=.55)
+            if mvals[k] > 100.:
+                ax.plot(np.sqrt(lo * hi), 96., marker="^", ms=5, color=color, mec="white", mew=.5, ls="none", clip_on=False, alpha=.9)
+    ax.plot(product["centers"], np.where(robust, delta, np.nan), color=color, ls=line, lw=lw)
+    return delta, robust
+
+
 def halo_pdf_spherical_figures(root, project, book, manifest):
     """Like-for-like: TNG within R200 versus HalfDome models with gas counted only inside the R200c sphere."""
     direct = Lee22TngBattagliaComparison(project).direct
@@ -663,77 +694,64 @@ def halo_pdf_spherical_figures(root, project, book, manifest):
             continue
         for group_name, entries, xmax in (("upper_mass_limits", UPPER_ENTRIES, 5000.), ("to_1e14", TO_1E14_ENTRIES, 10000.)):
             fig = plt.figure(figsize=(17.5, 12.5))
-            outer = fig.add_gridspec(2, 3, hspace=.38, wspace=.32, left=.075, right=.985, bottom=.065, top=.89)
+            outer = fig.add_gridspec(2, 3, hspace=.36, wspace=.32, left=.075, right=.985, bottom=.065, top=.91)
             for j, (label, tng_label, hd_label) in enumerate(entries):
-                inner = outer[j//3, j%3].subgridspec(2, 1, height_ratios=(2.7, 1.25), hspace=.06)
+                inner = outer[j//3, j%3].subgridspec(2, 1, height_ratios=(2.5, 1.5), hspace=.06)
                 top = fig.add_subplot(inner[0]); bottom = fig.add_subplot(inner[1], sharex=top)
                 edges = b16_proj[hd_label]["edges"]
                 tng_pdf, tng_count, tng_zero = direct.histogram_from_values(direct.tng_values(tng_label, 1.), edges)
                 direct.draw_pdf(top, b16_proj[hd_label]["centers"], tng_pdf, color=".15", lw=2.7)
-                drawn = [("b16_projected", b16_proj[hd_label], "#0072B2", ":", 1.6)]
+                drawn = [("b16_projected", b16_proj[hd_label], "#0072B2", (0, (1.2, 1.2)), 1.5)]
                 drawn += [(k, sph[k][hd_label], SPHERICAL_1R200C_VARIANTS[k]["color"], SPHERICAL_1R200C_VARIANTS[k]["ls"],
                            SPHERICAL_1R200C_VARIANTS[k]["lw"]) for k in keys]
                 any_counts = False
                 for name, product, color, line, lw in drawn:
                     any_counts |= bool(np.any(product["counts"]))
                     direct.draw_pdf(top, product["centers"], product["pdf"], color=color, ls=line, lw=lw)
-                    delta = direct.percent_difference(product["pdf"], tng_pdf, product["counts"], tng_count)
-                    bottom.plot(product["centers"], delta, color=color, ls=line, lw=lw)
+                    delta, robust = draw_percent_panel(bottom, dict(product, tng_pdf=tng_pdf), tng_count, edges, color, line, lw)
                     if (hd_label, name) not in seen:
                         seen.add((hd_label, name))
                         for b in range(len(tng_pdf)):
                             audit.append(dict(window=hd_label, model=name, dm_low=edges[b], dm_high=edges[b+1], tng_pdf=tng_pdf[b],
                                 halfdome_pdf=product["pdf"][b], tng_count=int(tng_count[b]), halfdome_count=int(product["counts"][b]),
-                                percent_difference=delta[b], halfdome_zero_fraction=product["zero_fraction"]))
+                                percent_difference=delta[b], robust=bool(robust[b]), halfdome_zero_fraction=product["zero_fraction"]))
                         hits.append(dict(window=hd_label, model=name, hit_percent=100.*(1.-product["zero_fraction"]),
                                          tng_hit_percent=100.*(1.-tng_zero)))
-                short = {"b16": "B16 sphere", "lee22_noconc": "Lee22 no-c sphere", "lee22_pref": "Lee22 best sphere",
-                         "lee22_noconc_efix": "Lee22 no-c (e-count) sphere", "lee22_pref_efix": "Lee22 best (e-count) sphere"}
-                lines = [("TNG", ".15", 100.*(1.-tng_zero))] + [(short[k], SPHERICAL_1R200C_VARIANTS[k]["color"],
-                          100.*(1.-sph[k][hd_label]["zero_fraction"])) for k in (keys if prefix == "efix_" else SPHERICAL_CORE_KEYS)]
-                for k2, (nm, color, hit) in enumerate(lines):
-                    top.text(.03, .05+.068*(len(lines)-1-k2), "{}: {:.1f}%".format(nm, hit), transform=top.transAxes,
-                             ha="left", va="bottom", fontsize=11.5, color=color, fontweight="bold")
+                # one line: every spherical model shares the hit fraction (same halos, same R200c selection)
+                top.text(.03, .05, "hit: TNG {:.1f}%,  HD {:.1f}%".format(100.*(1.-tng_zero), 100.*(1.-sph[keys[0]][hd_label]["zero_fraction"])),
+                         transform=top.transAxes, ha="left", va="bottom", fontsize=11.5, color=".25")
                 title = "Total" if j == 0 else label.replace(r"\,M_\odot", "")
                 top.set_title(title, pad=10); top.set_yscale("log")
                 common_axis(top, (.1, xmax)); common_axis(bottom, (.1, xmax), percent=True)
-                bottom.set_yscale("symlog", linthresh=100., linscale=1.2)
-                bottom.set_yticks([-100, 0, 100, 1000]); bottom.set_yticklabels(["-100", "0", "100", "1000"])
+                bottom.set_ylim(-100., 100.); bottom.set_yticks([-100, -50, 0, 50, 100])
                 top.yaxis.set_major_locator(LogLocator(base=10, numticks=4)); top.tick_params(labelbottom=False)
                 bottom.set_xlabel(r"DM [pc cm$^{-3}$]")
                 if j % 3 == 0:
-                    top.set_ylabel(r"$p(\mathrm{DM})$"); bottom.set_ylabel(r"$\Delta p/p_{\rm TNG}$ [%]", fontsize=18)
+                    top.set_ylabel(r"$p(\mathrm{DM})$"); bottom.set_ylabel(r"$\Delta p/p_{\rm TNG}$ [%]", fontsize=16)
                 if not any_counts:
                     top.text(.58, .3, "HD: no resolved halos", transform=top.transAxes, ha="center", fontsize=16, color=".35")
                     bottom.set_yticks([]); bottom.text(.5, .6, "Undefined", transform=bottom.transAxes, ha="center", fontsize=16, color=".4")
             legend_ax = fig.add_subplot(outer[1, 2]); legend_ax.axis("off")
-            handles = [Line2D([], [], color=".15", label="IllustrisTNG (within $R_{200}$)"),
-                       Line2D([], [], color="#0072B2", ls=":", lw=1.6, label=r"HalfDome: Battaglia16, projected $1\,R_{200c}$ (previous)")]
+            handles = [Line2D([], [], color=".15", lw=2.7, label="IllustrisTNG, within $R_{200}$"),
+                       Line2D([], [], color="#0072B2", ls=(0, (1.2, 1.2)), lw=1.5, label="Battaglia16, projected (previous)")]
             handles += [Line2D([], [], color=v["color"], ls=v["ls"], lw=v["lw"], label=v["label"])
                         for v in (SPHERICAL_1R200C_VARIANTS[k] for k in keys)]
-            legend_ax.legend(handles=handles, loc="upper center", frameon=False, fontsize=14.5 if not prefix else 12.5,
-                             labelspacing=.9 if not prefix else .6, handlelength=2.8, bbox_to_anchor=(.5, 1.02))
-            legend_ax.text(.5, .02, "Solid HalfDome curves: line of sight limited to the chord inside the\n$R_{200c}$ sphere, so DM $\\to$ 0 for grazing rays. Panel %: rays with DM > 0",
-                           transform=legend_ax.transAxes, ha="center", va="bottom", fontsize=13.5, color=".3")
-            fig.suptitle(r"Halo DM PDFs  |  $z_s=1$  |  $M_{200c}/M_\odot$  |  gas inside $R_{200c}$", y=.985)
+            legend_ax.legend(handles=handles, loc="upper center", frameon=False, fontsize=14 if len(keys) <= 3 else 12.5,
+                             labelspacing=.9 if len(keys) <= 3 else .6, handlelength=3.0, bbox_to_anchor=(.5, 1.03))
+            legend_ax.text(.5, .04, "HalfDome curves except the dotted one: gas inside the $R_{200c}$ sphere.\n"
+                           "Percent panel: thin steps merge bins to $\\geq$10 rays; $\\blacktriangle$ above +100%.",
+                           transform=legend_ax.transAxes, ha="center", va="bottom", fontsize=12, color=".35")
+            fig.suptitle(r"Halo DM PDFs,  $z_s = 1$,  gas inside $R_{200c}$", y=.975)
             stem = "halo_pdf_sphere_1r200c_b16_lee22_tng_" + prefix + group_name
-            caption = ("Like-for-like halo-only positive-DM PDFs at z=1, NSIDE=4096, 120k uniform rays. Solid HalfDome curves count only the gas "
-                "inside the R200c sphere of each halo: the cached quantity is the chord-mean electron column and the exact chord length "
-                "2 sqrt(R200c^2 - b^2) is applied per ray, so the DM of a grazing ray goes to zero continuously, as for a simulation "
-                "catalogue that assigns gas cells to halos inside R200. Battaglia16 uses XGPaint's parameters and f_b rho_crit normalization "
-                "with a profile-owned LOS (verified against XGPaint's projected DM to 1e-5); Lee22 fits use the corrected conventions "
-                "(Omega_b/Omega_m factor, common M_cut pivot, TNG-mean concentration, shape clip above 10^14.8 h^-1 Msun). The dotted "
-                "curve is the previous projected-aperture Battaglia16 product with the profile's long LOS. TNG is Ralf Konietzka's "
-                "catalogue; its exact within-r200 recipe is not documented here. PDFs normalized over in-range rays; percentages 100*(HD-TNG)/TNG "
-                "only where both counts >= 10, on a symmetric-log axis linear within +-100%.")
-            if prefix == "efix_":
-                caption += (" Lee22 curves here use eq. 9 with the free electrons per unit mass of ionized H+He, (1+X_H)/(2 m_p), in "
-                            "place of 1/(X_H m_p): a factor X_H(1+X_H)/2 = 0.669 on the literal reading and no Omega_b/Omega_m factor; "
-                            "otherwise the corrected conventions (M_cut pivot, TNG-mean concentration, shape clip above 10^14.8 h^-1 Msun).")
-            elif prefix:
-                caption += (" Dotted orange/green curves: the same Lee22 fits with the literal eq. 9 normalization (no Omega_b/Omega_m "
-                            "factor), otherwise identical conventions and geometry; together with the solid curves they bracket the "
-                            "normalization question discussed in LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md.")
+            caption = ("Like-for-like halo-only positive-DM PDFs at z=1, NSIDE=4096, 120k uniform rays. HalfDome curves (except the dotted "
+                "previous projected Battaglia16) count only the gas inside the R200c sphere of each halo: chord-limited LOS with the exact "
+                "chord factor per ray, so DM->0 for grazing rays, as for a simulation catalogue that assigns gas cells to halos inside R200. "
+                "Battaglia16 uses XGPaint's parameters and f_b rho_crit normalization; Lee22 fits use the M_cut pivot, TNG-mean concentration "
+                "and the shape clip above 10^14.8 h^-1 Msun, with the eq. 9 normalization reading given in brackets: x Omega_b/Omega_m "
+                "(the earlier 'corrected' reading, over-corrects), eq. 9 literal, x X_H(1+X_H)/2 (electron count of ionized H+He), "
+                "x X_H^2 (n200 written like eq. 7 with unit electron abundance). TNG is Ralf Konietzka's catalogue. Percent panel: "
+                "100*(HD-TNG)/TNG per bin as a thick line where both samples hold >= 10 rays, thin steps on adjacent bins merged until both do, "
+                "linear axis clipped to +-100%, triangles above +100%. 'hit' is the fraction of rays with DM > 0.")
             finish(fig, stem, root, book, manifest, caption)
     write_rows(root/"analysis/halo_pdf_sphere_1r200c_bins.csv", audit)
     write_rows(root/"analysis/halo_hit_percentages_sphere_1r200c.csv", hits)

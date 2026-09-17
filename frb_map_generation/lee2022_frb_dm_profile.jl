@@ -39,6 +39,8 @@ abstract type AbstractLee2022DMProfile{T} <: XGPaint.AbstractGNFW{T} end
 #                      :electron_count   replaces the 1/(X_H m_p) of eq. (9) by the free electrons
 #                                        per unit mass of ionized H+He, (1+X_H)/(2 m_p): factor
 #                                        X_H(1+X_H)/2 = 0.669 on the literal reading
+#                      :hydrogen_count   n200 = 200 rho_cr f_b X_H/m_p (eq. 9 written like eq. 7 with unit
+#                                        electron abundance): factor X_H^2 = 0.578 on the literal reading
 #   n0_pivot           :legacy_1e14      no-concentration n0 uses the eq. (11) 1e14 Msun pivot
 #                      :mcut             all parameters share M_cut, the literal eq. (12) form
 #   concentration_source :duffy2008      Duffy08 median NFW c200c
@@ -51,7 +53,7 @@ abstract type AbstractLee2022DMProfile{T} <: XGPaint.AbstractGNFW{T} end
 #                                        the fitted n_e were comoving densities normalized by the z=0
 #                                        critical density; this reproduces the fitted alpha_z of n0 and
 #                                        is a hypothesis about the paper's bookkeeping, not a documented fact
-const LEE2022_NORMALIZATIONS = (:literal, :baryon_fraction, :electron_count)
+const LEE2022_NORMALIZATIONS = (:literal, :baryon_fraction, :electron_count, :hydrogen_count)
 const LEE2022_REDSHIFT_SCALINGS = (:physical, :comoving_hypothesis)
 const LEE2022_N0_PIVOTS = (:legacy_1e14, :mcut)
 const LEE2022_CONCENTRATION_SOURCES = (:duffy2008, :tng_mean)
@@ -187,6 +189,11 @@ function lee2022_normalization_factor(model::AbstractLee2022DMProfile)
         xh = model.hydrogen_mass_fraction
         return xh * (1 + xh) / 2
     end
+    if model.normalization == :hydrogen_count
+        # hypothesis that the fit's n200 mirrored eq. (7) with unit electron abundance,
+        # n200 = 200 rho_cr f_b X_H / m_p, instead of the printed 1/(X_H m_p): factor X_H^2
+        return model.hydrogen_mass_fraction^2
+    end
     return one(model.omega_b)
 end
 
@@ -203,6 +210,7 @@ function lee2022_variant_tokens(model::AbstractLee2022DMProfile)
     tokens = String[]
     model.normalization == :baryon_fraction && push!(tokens, "norm=fb")
     model.normalization == :electron_count && push!(tokens, "norm=necount")
+    model.normalization == :hydrogen_count && push!(tokens, "norm=nhcount")
     if model isa Lee2022NoConcentrationDMProfile && model.n0_pivot == :mcut
         push!(tokens, "n0pivot=mcut")
     end

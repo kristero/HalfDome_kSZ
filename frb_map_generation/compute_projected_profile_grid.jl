@@ -25,12 +25,15 @@ function projected_profile_main()
     models = (("battaglia16", b16), ("lee22_noconc", lee))
     path = joinpath(output, "projected_profiles.csv")
     open(path, "w") do io
-        println(io, "model,mass_msun,redshift,r200c_mpc,theta200c_arcmin,impact_r200c,column_rest_pc_cm3,column_inside_r200c_rest_pc_cm3,ne_3d_cm3,mass_cut_msun,n0")
+        println(io, "model,mass_msun,redshift,r200c_mpc,theta200c_arcmin,impact_r200c,column_rest_pc_cm3,column_inside_r200c_rest_pc_cm3,ne_3d_cm3,mass_cut_msun,n0,n200_eq9_cm3")
         for (label, model) in models, z in redshifts, mass in masses
             r200c = XGPaint.R_Δ(model, mass * XGPaint.M_sun, z, 200)
             r200c_mpc = Float64(ustrip(uconvert(u"Mpc", r200c)))
             theta200c = Float64(XGPaint.angular_size(model, r200c, z)) * 180 / pi * 60
             mcut, n0 = NaN, NaN
+            # Lee22 eq. 9 as printed: n200 = 200 rho_cr(z) Omega_b / (X_H m_p Omega_m), X_H = 0.76 (same for both models)
+            rho_cr = getfield(XGPaint, Symbol(Char(0x03c1), "_crit"))(model, z)
+            n200 = Float64(ustrip(uconvert(u"cm^-3", 200 * rho_cr * (0.049 / 0.31) / (0.76 * XGPaint.constants.ProtonMass))))
             if model isa PS.AbstractLee2022DMProfile
                 p = PS.lee2022_parameters(model, mass, z)
                 mcut, n0 = p.mass_cut_msun, p.n0
@@ -40,7 +43,7 @@ function projected_profile_main()
                 full = PS.chord_dm_pc_cm3(model, x, PS.LEE2022_LOS_MAX_R200C, mass, z) * (1 + z)
                 inside = x < 1 ? PS.chord_dm_pc_cm3(model, x, sqrt(1 - x^2), mass, z) * (1 + z) : 0.0
                 ne3d = PS.halo_electron_density_m3(model, x, mass, z) * 1e-6
-                println(io, join((label, mass, z, r200c_mpc, theta200c, x, full, inside, ne3d, mcut, n0), ','))
+                println(io, join((label, mass, z, r200c_mpc, theta200c, x, full, inside, ne3d, mcut, n0, n200), ','))
             end
         end
     end

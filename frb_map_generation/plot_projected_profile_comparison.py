@@ -26,6 +26,8 @@ RC = {"font.size": 14, "axes.labelsize": 17, "axes.titlesize": 15, "xtick.labels
 
 def load(path):
     rows = list(csv.DictReader(open(path)))
+    for r in rows:  # Lee22 Figure-5 scaling: dimensionless density weighted by the shell volume
+        r["ne_over_n200_x3"] = str(float(r["ne_3d_cm3"]) / float(r["n200_eq9_cm3"]) * float(r["impact_r200c"]) ** 3)
     data = {}
     for r in rows:
         key = (r["model"], float(r["mass_msun"]), float(r["redshift"]))
@@ -154,6 +156,9 @@ def main():
               r"$\int n_e\,dl$  [pc cm$^{-3}$]", "projected_electron_column_b16_vs_lee22")
     plot_grid(data, masses, redshifts, args.output, "ne_3d_cm3",
               r"$n_e(r)$  [cm$^{-3}$]", "electron_density_3d_b16_vs_lee22", xlabel=r"radius  $r/R_{200c}$")
+    plot_grid(data, masses, redshifts, args.output, "ne_over_n200_x3",
+              r"$(n_e/n_{200})\,(r/R_{200c})^3$", "electron_density_scaled_n200_x3_b16_vs_lee22",
+              xlabel=r"radius  $r/R_{200c}$")
     plot_ratio(data, masses, redshifts, args.output)
     print("Saved figures in", args.output)
 

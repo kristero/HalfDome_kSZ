@@ -18,7 +18,9 @@ printed inherits a constant factor.
 The size of that factor is testable. With HalfDome's halo catalogue and the same spherical R200c membership as
 the TNG within-R200 catalogue, eq. 9 as printed predicts 1.66 times TNG's own halo DM in the mass range the
 fits cover; writing `n200` with `X_H` in the numerator (a factor `X_H^2 = 0.578`) reproduces TNG to 2-4% in the
-mean and 1% in the median. A residual redshift-dependence problem remains (Section 5) and should be put to the
+mean and 1% in the median, and treating the profile exactly as XGPaint treats Battaglia16 (no Lee22-side hydrogen
+factor, XGPaint's own electron conversion, a factor 0.602) reproduces it to 0-2%. A residual redshift-dependence problem
+remains (Section 5) and should be put to the
 authors together with the `X_H` question.
 
 ## 2. What the paper defines (arXiv v1, Section 2.3, page 4-5)
@@ -70,6 +72,7 @@ bar when eq. 9 was written down from the same quantities as eq. 7.
 | B. eq. 7 form, unit electron abundance | `200 rho_cr f_b X_H / m_p` | `X_H^2 = 0.578` | hydrogen electrons only, the direct analogue of eq. 7 with `x = 1` |
 | C. ionized H+He electron count | `200 rho_cr f_b (1+X_H) / (2 m_p)` | `X_H (1+X_H)/2 = 0.669` | what XGPaint uses for Battaglia16 (Section 6) |
 | D. an extra `Omega_b/Omega_m` | `f_b * (A)` | `0.158` | the "corrected" reading of `LEE22_IMPLEMENTATION_CHECK_20260916.md`, since retracted |
+| E. XGPaint-native | none on the Lee22 side: `P0 = 200 n0`, XGPaint `ne2d` converts | `0.9 X_H m_p / m_per_e = 0.602` | Lee22 treated exactly like Battaglia16 in XGPaint (Section 6); no assumption about eq. 9 |
 
 Because `n0 = <n_e/n200>` was fitted with the code's own `n200`, the fit is internally consistent whatever that
 `n200` was; the question is only which one it was, and the paper's text does not allow deciding it. The
@@ -91,10 +94,13 @@ HalfDome 53.7%), so the geometry is matched and the residual is the gas profile 
 | Lee22, reading B (`X_H^2`) | 133.1 / 135.2 | 0.96 / 0.98 | 80.1 | 0.42 / 4.3 / 20.4 |
 | Lee22, reading C (`X_H(1+X_H)/2`) | 154.1 / 156.5 | 1.11 / 1.13 | 94.8 | 0.33 / 3.3 / 17 |
 | Lee22, reading D (`x Omega_b/Omega_m`) | 36.4 / 37.0 | 0.26 / 0.27 | 22 | 4.8 / 26 / 61 |
+| Lee22, reading E (XGPaint-native, `ne2d`) | 138.6 / 140.8 | 1.00 / 1.02 | 83.5 | 0.39 / 4.0 / 19.5 |
 | Battaglia16 (XGPaint normalization) | 92.9 | 0.67 | 59.6 | 0.53 / 5.4 / 26 |
 
-(The two Lee22 numbers are the no-concentration fit of Table A2 and the best fit of Table 3.) Reading B
-reproduces the simulation the profiles were fitted to; reading A, the printed one, does not. Figures:
+(The two Lee22 numbers are the no-concentration fit of Table A2 and the best fit of Table 3.) Readings B and E
+reproduce the simulation the profiles were fitted to (E to 0-2%); reading A, the printed one, does not. Reading E makes no
+assumption about eq. 9: it treats the Lee22 profile exactly as XGPaint treats Battaglia16 and lets XGPaint's electron
+conversion act, which is the consistent choice when both profiles are used in the same pipeline. Figures:
 `outputs/publication_comparison_20260916_sphere_1r200c/plots/halo_pdf_sphere_1r200c_b16_lee22_tng_{xh2_,efix_,sensitivity_,}{upper_mass_limits,to_1e14}.png`.
 
 ## 5. The part a constant factor does not fix: redshift dependence
@@ -160,7 +166,8 @@ All in `frb_map_generation/lee2022_frb_dm_profile.jl` unless stated (line number
   `lee2022_normalization_factor(model)`. `hydrogen_mass_fraction` defaults to 0.76 (`:263`).
 - `:56` and `:184-197` (`LEE2022_NORMALIZATIONS`, `lee2022_normalization_factor`): the four readings as options,
   `:literal` (A, factor 1), `:hydrogen_count` (B, `X_H^2`), `:electron_count` (C, `X_H(1+X_H)/2`),
-  `:baryon_fraction` (D, `Omega_b/Omega_m`). The option name enters the cache signature, the model family and the
+  `:baryon_fraction` (D, `Omega_b/Omega_m`), `:xgpaint_ne2d` (E, `P0 = 200 n0` in the
+  XGPaint wrapper and XGPaint's `ne2d` does the electron conversion; factor `0.9 X_H m_p / m_per_e = 0.602`). The option name enters the cache signature, the model family and the
   provenance (`lee2022_normalization`, `lee2022_normalization_factor` in every product's `*_provenance.txt`).
 - `:338-349` (`lee2022_dimensionless_density`): eq. 10 with the `-beta'` exponent, i.e. the paper's convention,
   not XGPaint's.

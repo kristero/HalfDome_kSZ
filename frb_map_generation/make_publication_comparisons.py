@@ -620,6 +620,17 @@ SPHERICAL_1R200C_VARIANTS = {
                             provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="hydrogen_count",
                             provenance_lee2022_concentration_source="tng_mean"),
                 label=r"Lee22 best fit  ($\times\,X_H^2$), XGPaint pipeline", color="#009E73", ls="none", lw=2.0, marker="s", ms=4.2),
+    # XGPaint-native: P0 = 200 n0 (the dimensionless Lee22 profile taken as gas density / 200 f_b rho_cr, as XGPaint takes
+    # Battaglia16's rho_fit) and XGPaint's own ne2d electron conversion (0.9, X_H = 0.76); no Lee22-side hydrogen factor
+    "lee22_noconc_xgpnative": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_noconc_xgpnative_seed42",
+                expect=dict(provenance_dm_profile="lee2022_xgpaint", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="none", provenance_lee2022_normalization="xgpaint_ne2d"),
+                label="Lee22 no-c  (XGPaint ne2d electrons)", color="#D55E00", ls="--", lw=2.4),
+    "lee22_pref_xgpnative": dict(run="zsrc1p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_pref_xgpnative_seed42",
+                expect=dict(provenance_dm_profile="lee2022_xgpaint", provenance_halo_boundary="spherical",
+                            provenance_lee2022_concentration_mode="duffy2008", provenance_lee2022_normalization="xgpaint_ne2d",
+                            provenance_lee2022_concentration_source="tng_mean"),
+                label="Lee22 best fit  (XGPaint ne2d electrons)", color="#009E73", ls="-.", lw=2.4),
 }
 SPHERICAL_CORE_KEYS = ("b16", "lee22_noconc", "lee22_pref")
 SPHERICAL_FIGURE_SETS = {
@@ -628,6 +639,7 @@ SPHERICAL_FIGURE_SETS = {
     "efix_": ("b16", "lee22_noconc_efix", "lee22_pref_efix"),
     "xh2_": ("b16", "lee22_noconc_xh2", "lee22_pref_xh2"),
     "xgpaint_": ("lee22_noconc_xh2", "lee22_pref_xh2", "lee22_noconc_xh2_xgp", "lee22_pref_xh2_xgp"),
+    "xgpnative_": ("b16", "lee22_noconc_xgpnative", "lee22_pref_xgpnative"),
 }
 
 
@@ -762,7 +774,9 @@ def halo_pdf_spherical_figures(root, project, book, manifest):
                         for v in (SPHERICAL_1R200C_VARIANTS[k] for k in keys)]
             legend_ax.legend(handles=handles, loc="upper center", frameon=False, fontsize=14 if len(keys) <= 3 else 12.5,
                              labelspacing=.9 if len(keys) <= 3 else .6, handlelength=3.0, bbox_to_anchor=(.5, 1.03))
-            note = ("Markers: the same fits run through XGPaint's own pipeline\n(get_params returns $\\beta = \\alpha\\beta' - \\gamma$ and $P_0$ from $n_0$).\n"
+            note = ("All models through XGPaint's pipeline with its own electron conversion\n($P_0 = 200\\,n_0$ for Lee22; ne2d: 0.9 and $X_H = 0.76$).\n"
+                    "Gas inside the $R_{200c}$ sphere; dotted: previous projected Battaglia16." if prefix == "xgpnative_" else
+                    "Markers: the same fits run through XGPaint's own pipeline\n(get_params returns $\\beta = \\alpha\\beta' - \\gamma$ and $P_0$ from $n_0$).\n"
                     "All HalfDome models: gas inside the $R_{200c}$ sphere." if prefix == "xgpaint_" else
                     "HalfDome curves except the dotted one: gas inside the $R_{200c}$ sphere.\n"
                     "Percent panel: thin steps merge bins to $\\geq$10 rays; $\\blacktriangle$ above +100%.")

@@ -145,7 +145,8 @@ function normalize_lee2022_normalization(value::AbstractString)
     normalized in ("baryon_fraction", "fb", "f_b") && return "baryon_fraction"
     normalized in ("electron_count", "electrons", "ne") && return "electron_count"
     normalized in ("hydrogen_count", "xh2", "nh") && return "hydrogen_count"
-    error("lee2022_normalization must be literal, baryon_fraction, electron_count or hydrogen_count; got $(repr(value)).")
+    normalized in ("xgpaint_ne2d", "xgpaintne2d", "xgpaint_native", "xgpaintnative") && return "xgpaint_ne2d"
+    error("lee2022_normalization must be literal, baryon_fraction, electron_count, hydrogen_count or xgpaint_ne2d; got $(repr(value)).")
 end
 
 function normalize_lee2022_n0_pivot(value::AbstractString)
@@ -455,7 +456,10 @@ Core options (both --key=value and key=value are accepted):
                                       the 1/(X_H m_p) of eq. (9) by the free electrons per unit mass of
                                       ionized H+He, (1+X_H)/(2 m_p), i.e. a factor X_H(1+X_H)/2 = 0.669;
                                       hydrogen_count uses n200 = 200 rho_cr f_b X_H/m_p (eq. 9 in the form of
-                                      eq. 7 with unit electron abundance), i.e. a factor X_H^2 = 0.578
+                                      eq. 7 with unit electron abundance), i.e. a factor X_H^2 = 0.578;
+                                      xgpaint_ne2d treats n0 f(x) as gas density / (200 f_b rho_cr) (P0 = 200 n0,
+                                      as XGPaint treats Battaglia16) and lets XGPaint's ne2d convert to electrons
+                                      with its own 0.9 and X_H = 0.76, i.e. a factor 0.9 X_H m_p / m_per_e = 0.602
   --lee2022-n0-pivot=legacy_1e14     no-concentration n0 pivot: legacy 1e14 Msun or mcut (eq. 12)
   --lee2022-concentration-source=duffy2008  duffy2008 or tng_mean (Lee22 sec. 2.3 quoted means)
   --lee2022-shape-mass-clip=none     none, fit (freeze x_c/beta' above 10^14.8 h^-1 Msun), or Msun

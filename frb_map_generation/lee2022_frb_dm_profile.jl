@@ -41,6 +41,10 @@ abstract type AbstractLee2022DMProfile{T} <: XGPaint.AbstractGNFW{T} end
 #                                        X_H(1+X_H)/2 = 0.669 on the literal reading
 #                      :hydrogen_count   n200 = 200 rho_cr f_b X_H/m_p (eq. 9 written like eq. 7 with unit
 #                                        electron abundance): factor X_H^2 = 0.578 on the literal reading
+#                      :xgpaint_ne2d     XGPaint-native: n0 f(x) taken as gas density / (200 f_b rho_cr), i.e.
+#                                        P0 = 200 n0 exactly as XGPaint treats Battaglia16's rho_fit, and
+#                                        XGPaint's ne2d does the electron conversion (0.9, X_H = 0.76 mass per
+#                                        electron): factor 0.9 X_H m_p / m_per_e = 0.602 on the literal reading
 #   n0_pivot           :legacy_1e14      no-concentration n0 uses the eq. (11) 1e14 Msun pivot
 #                      :mcut             all parameters share M_cut, the literal eq. (12) form
 #   concentration_source :duffy2008      Duffy08 median NFW c200c
@@ -53,7 +57,7 @@ abstract type AbstractLee2022DMProfile{T} <: XGPaint.AbstractGNFW{T} end
 #                                        the fitted n_e were comoving densities normalized by the z=0
 #                                        critical density; this reproduces the fitted alpha_z of n0 and
 #                                        is a hypothesis about the paper's bookkeeping, not a documented fact
-const LEE2022_NORMALIZATIONS = (:literal, :baryon_fraction, :electron_count, :hydrogen_count)
+const LEE2022_NORMALIZATIONS = (:literal, :baryon_fraction, :electron_count, :hydrogen_count, :xgpaint_ne2d)
 const LEE2022_REDSHIFT_SCALINGS = (:physical, :comoving_hypothesis)
 const LEE2022_N0_PIVOTS = (:legacy_1e14, :mcut)
 const LEE2022_CONCENTRATION_SOURCES = (:duffy2008, :tng_mean)
@@ -194,6 +198,14 @@ function lee2022_normalization_factor(model::AbstractLee2022DMProfile)
         # n200 = 200 rho_cr f_b X_H / m_p, instead of the printed 1/(X_H m_p): factor X_H^2
         return model.hydrogen_mass_fraction^2
     end
+    if model.normalization == :xgpaint_ne2d
+        # XGPaint-native reading: n0 f(x) is a gas density in units of 200 f_b rho_cr (P0 = 200 n0, like
+        # Battaglia16's rho_fit) and XGPaint's ne2d converts gas mass to electrons with its own constants
+        # (0.9 and the mass per free electron of ionized H+He at X_H = 0.76). Relative to the printed
+        # 1/(X_H m_p) of eq. (9) this is 0.9 X_H m_p / m_per_e = 0.602.
+        mp_kg = Float64(ustrip(uconvert(u"kg", XGPaint.constants.ProtonMass)))
+        return XGPAINT_NE2D_GAS_FRACTION * model.hydrogen_mass_fraction * mp_kg / xgpaint_mass_per_electron_kg()
+    end
     return one(model.omega_b)
 end
 
@@ -211,6 +223,7 @@ function lee2022_variant_tokens(model::AbstractLee2022DMProfile)
     model.normalization == :baryon_fraction && push!(tokens, "norm=fb")
     model.normalization == :electron_count && push!(tokens, "norm=necount")
     model.normalization == :hydrogen_count && push!(tokens, "norm=nhcount")
+    model.normalization == :xgpaint_ne2d && push!(tokens, "norm=xgpaintne2d")
     if model isa Lee2022NoConcentrationDMProfile && model.n0_pivot == :mcut
         push!(tokens, "n0pivot=mcut")
     end
@@ -749,10 +762,16 @@ function XGPaint.get_params(model::Lee2022XGPaintDMProfile{T}, M_200c, z) where 
     redshift = Float64(z)
     pars = lee2022_parameters(model.lee, mass_msun, redshift)
     beta = pars.alpha * pars.beta_prime - pars.gamma
-    mp_kg = Float64(ustrip(uconvert(u"kg", XGPaint.constants.ProtonMass)))
-    p0 = lee2022_normalization_factor(model.lee) * lee2022_redshift_scaling_factor(model.lee, redshift) *
-         pars.n0 * 200 * xgpaint_mass_per_electron_kg() /
-         (XGPAINT_NE2D_GAS_FRACTION * model.lee.hydrogen_mass_fraction * mp_kg)
+    zfac = lee2022_redshift_scaling_factor(model.lee, redshift)
+    if model.lee.normalization == :xgpaint_ne2d
+        # XGPaint-native: the dimensionless Lee22 profile is the gas density in units of 200 f_b rho_cr;
+        # no Lee22-side hydrogen factor, XGPaint's ne2d supplies the electron conversion.
+        p0 = 200 * pars.n0 * zfac
+    else
+        mp_kg = Float64(ustrip(uconvert(u"kg", XGPaint.constants.ProtonMass)))
+        p0 = lee2022_normalization_factor(model.lee) * zfac * pars.n0 * 200 * xgpaint_mass_per_electron_kg() /
+             (XGPAINT_NE2D_GAS_FRACTION * model.lee.hydrogen_mass_fraction * mp_kg)
+    end
     return (xc=T(pars.x_c), α=T(pars.alpha), β=T(beta), γ=T(pars.gamma), P₀=T(p0))
 end
 
@@ -780,6 +799,8 @@ function run_lee2022_xgpaint_self_test()
         Lee2022NoConcentrationDMProfile(normalization=:hydrogen_count, n0_pivot=:mcut, shape_clip_mass_msun=clip),
         Lee2022ConcentrationDMProfile(normalization=:hydrogen_count, concentration_source=:tng_mean, shape_clip_mass_msun=clip),
         Lee2022NoConcentrationDMProfile(),
+        Lee2022NoConcentrationDMProfile(normalization=:xgpaint_ne2d, n0_pivot=:mcut, shape_clip_mass_msun=clip),
+        Lee2022ConcentrationDMProfile(normalization=:xgpaint_ne2d, concentration_source=:tng_mean, shape_clip_mass_msun=clip),
     )
     for lee in models
         xgp = Lee2022XGPaintDMProfile(lee)
@@ -787,6 +808,9 @@ function run_lee2022_xgpaint_self_test()
         for (mass, z, xb) in ((1.0e13, 0.1, 0.05), (3.0e13, 0.5, 0.3), (1.0e14, 0.5, 1.0), (7.327e12, 0.8, 0.7), (1.0e15, 1.0, 2.0))
             par = XGPaint.get_params(xgp, mass * XGPaint.M_sun, z)
             lp = lee2022_parameters(lee, mass, z)
+            if lee.normalization == :xgpaint_ne2d
+                par.P₀ == 200 * lp.n0 || error("XGPaint-native Lee22 must have P0 = 200 n0 exactly; got $(par.P₀) vs $(200 * lp.n0)")
+            end
             abs((par.β + par.γ) / par.α - lp.beta_prime) <= 1e-12 * lp.beta_prime ||
                 error("Lee22->XGPaint exponent transform failed at M=$(mass), z=$(z)")
             n_x = halo_electron_density_m3(dens, xb, mass, z)

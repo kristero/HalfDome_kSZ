@@ -231,6 +231,9 @@ Requested changes and where they are:
   (Lee22 x Lee22 is up to 6.4 times Battaglia12 x Battaglia16).
 - The ten shown realizations each have their own colour and marker (`BEST_STYLE`, `OUTLIER_STYLE`), the two
   highest as crimson/dark-red lines with x/+ markers, the eight best fits ranked 1-8 in the legend.
+- Reduced version requested afterwards (`realizations_best3_{battaglia,lee22}`, stage `plot-simple`): only the
+  Takahashi points and the three best-fitting realizations, linear axis, percentage panel below, large labels;
+  this is the version in the PDF book. The full ten-realization figures remain in `plots/`.
 - Computations on idark (`run_fullsky_tsz_dm_cluster.pbs`, working root
   `/lustre/work/kristero10/frb_data/fullsky_20260918`, code snapshot = commit f0a1626): stage `y` repaints the two
   Lee22 pressure maps, stage `dm` paints the six kernel-weighted DM maps (with the brute-force self-test first) and

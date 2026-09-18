@@ -551,9 +551,83 @@ def plot_selected_residuals(args):
     print("Saved selected-realization residual figures to " + str(PAIRS_OUT / "plots"))
 
 
+def plot_selected_simple(args, n_best=3):
+    """Reduced version: only the Takahashi points and the n_best best-fitting realizations, with the percentage
+    panel below; large labels, minimal text."""
+    from fullsky_tsz_dm_comparison import draw_percent, residual_axis
+    arrays = dict(np.load(str(PAIRS_OUT / "analysis/finite_source_pairs.npz")))
+    summary = json.loads((PAIRS_OUT / "analysis/finite_source_pairs_summary.json").read_text())
+    (PAIRS_OUT / "plots").mkdir(exist_ok=True)
+    plt.rcParams.update({"font.size": 19, "axes.labelsize": 22, "axes.titlesize": 22, "xtick.labelsize": 18,
+                         "ytick.labelsize": 18, "legend.fontsize": 19, "axes.linewidth": 1.2})
+    short = {"battaglia": "Battaglia", "lee22": "Lee22, all halos", "lee22_calib": "Lee22, calibrated range"}
+    for stem, pairs in (("battaglia", ["battaglia"]), ("lee22", ["lee22", "lee22_calib"])):
+        pairs = [q for q in pairs if q in summary["pairs"]]
+        if not pairs:
+            continue
+        nrow = len(pairs)
+        ratios = []
+        for i in range(nrow):
+            ratios += ([0.8] if nrow > 1 else []) + [3.0, 1.4]
+        fig = plt.figure(figsize=(16, 8.6 * nrow + 1.2))
+        gs = fig.add_gridspec(len(ratios), 2, height_ratios=ratios, hspace=.08, wspace=.16,
+                              left=.08, right=.985, top=.88 if nrow == 1 else .95, bottom=.09 if nrow == 1 else .05)
+        legend_handles = None
+        for i, pair in enumerate(pairs):
+            r0 = (3 if nrow > 1 else 2) * i + (1 if nrow > 1 else 0)
+            if nrow > 1:
+                lab = fig.add_subplot(gs[r0 - 1, :])
+                lab.axis("off")
+                lab.text(0.0, 0.62, short[pair], transform=lab.transAxes, fontsize=23, fontweight="bold", ha="left", va="center")
+            for j, plane in enumerate(("planck", "act")):
+                ax_w = fig.add_subplot(gs[r0, j])
+                ax_p = fig.add_subplot(gs[r0 + 1, j], sharex=ax_w)
+                key = "{}__{}".format(pair, plane)
+                many, best = arrays[key + "__realizations"], arrays[key + "__best"][:n_best]
+                x = np.sqrt(EDGES[:-1] * EDGES[1:])
+                obs = observed_bins(plane)
+                denominator = np.abs(obs["w"])
+                band = np.minimum(100 * obs["sigma"] / denominator, 100)
+                ax_p.fill_between(x, -band, band, color=".72", alpha=.4, lw=0, zorder=1)
+                for k, idx in enumerate(best):
+                    c, marker = BEST_STYLE[k]
+                    ax_w.plot(x, many[idx] / 1e-5, color=c, lw=2.6, marker=marker, ms=8.5, zorder=3, label="best fit {}".format(k + 1))
+                    draw_percent(ax_p, x, 100 * (many[idx] - obs["w"]) / denominator, c, marker, lw=2.0, ms=7.5, annotate=False, zorder=3)
+                ax_w.errorbar(obs["x"], obs["w"] / 1e-5, yerr=obs["err"] / 1e-5, fmt="o", color="black", ms=8, capsize=3, lw=1.6,
+                              label="Takahashi+25", zorder=6)
+                for ax in (ax_w, ax_p):
+                    ax.axvspan(1, PAPER_CUT[plane], color=".5", alpha=.12, zorder=0)
+                    ax.set_xscale("log")
+                    ax.set_xlim(1, 1000)
+                    ax.grid(alpha=.15, which="both")
+                    ax.tick_params(direction="in", which="both", top=True, right=True, length=6, width=1.1)
+                ax_w.axhline(0, color=".55", lw=.9)
+                plt.setp(ax_w.get_xticklabels(), visible=False)
+                ax_w.set_title("{}, {:g}′ beam".format("Planck" if plane == "planck" else "ACT", FILTERS_FWHM[plane]), pad=10)
+                residual_axis(ax_p, "")
+                if i == nrow - 1:
+                    ax_p.set_xlabel(r"$\theta$ [arcmin]")
+                if j == 0:
+                    ax_w.set_ylabel(r"$w_{y\,\mathrm{DM}}\ \ [10^{-5}\ \mathrm{pc\,cm^{-3}}]$")
+                    ax_p.set_ylabel("Δ [%]")
+                if legend_handles is None:
+                    legend_handles = ax_w.get_legend_handles_labels()
+        handles, labels = legend_handles
+        order = ["Takahashi+25"] + ["best fit {}".format(k + 1) for k in range(n_best)]
+        by_label = dict(zip(labels, handles))
+        fig.legend([by_label[l] for l in order], order, loc="upper center", ncol=len(order), frameon=False,
+                   bbox_to_anchor=(0.5, 1.0), columnspacing=2.4, handlelength=2.8)
+        if nrow == 1:
+            fig.text(.5, .905, short[pairs[0]], ha="center", va="bottom", fontsize=23, fontweight="bold")
+        for ext in ("png", "pdf", "svg"):
+            fig.savefig(str(PAIRS_OUT / "plots" / ("realizations_best{}_{}.{}".format(n_best, stem, ext))), dpi=200 if ext == "png" else None)
+        plt.close(fig)
+    print("Saved best-{} realization figures to {}".format(n_best, PAIRS_OUT / "plots"))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("stage", choices=("sample-y", "analyze", "plot", "all", "analyze-pairs", "plot-selected"))
+    parser.add_argument("stage", choices=("sample-y", "analyze", "plot", "all", "analyze-pairs", "plot-selected", "plot-simple"))
     parser.add_argument("--ymap", type=Path, help="full-sky Compton-y FITS map for sample-y")
     parser.add_argument("--ykey", default="lee22p", choices=tuple(k for k in Y_SOURCES if k != "b12"),
                         help="which Y_SOURCES entry sample-y writes")
@@ -575,6 +649,9 @@ def main():
     if args.stage == "plot-selected":
         plot_selected(args)
         plot_selected_residuals(args)
+        plot_selected_simple(args)
+    if args.stage == "plot-simple":
+        plot_selected_simple(args)
 
 
 if __name__ == "__main__":

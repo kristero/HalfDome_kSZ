@@ -1,0 +1,36 @@
+{
+ "rows": 8192,
+ "validation_rows": 843,
+ "reused_design_points": 663,
+ "imported_spectra": 23,
+ "fresh_points": 7529,
+ "generated_maps_in_logs": 8169,
+ "median_seconds": 261.45075568556786,
+ "max_seconds": 361.26070653647184,
+ "worker_hours": 602.3942451514163,
+ "negative_noisy_bin_fraction": 0.02890625,
+ "target_quantile_in_design_ell3000": {
+  "HalfDome": 0.21142578125,
+  "L1_m9": 0.2451171875,
+  "fgas-8sigma": 0.19970703125,
+  "Mstar-1sigma": 0.247314453125
+ },
+ "target_quantile_range_over_bins": {
+  "HalfDome": [
+   0.168701171875,
+   0.3680419921875
+  ],
+  "L1_m9": [
+   0.1900634765625,
+   0.3304443359375
+  ],
+  "fgas-8sigma": [
+   0.1768798828125,
+   0.227783203125
+  ],
+  "Mstar-1sigma": [
+   0.1934814453125,
+   0.325927734375
+  ]
+ }
+}

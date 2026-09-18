@@ -152,3 +152,7 @@ Notes. "Lowest DM seen" is the raw minimum for TNG and the lower edge of the fir
 - Figures: `frb_map_generation/outputs/publication_comparison_20260916_sphere_1r200c/plots/halo_pdf_sphere_1r200c_b16_lee22_tng_{upper_mass_limits,to_1e14}.{png,svg}` (core: TNG, projected Battaglia16, and the three spherical products) and `..._sensitivity_{upper_mass_limits,to_1e14}` (adds the literal-normalization Lee22 fits inside the sphere); PDF `output/pdf/halfdome_sphere_1r200c_b16_lee22_vs_tng_20260916.pdf`; tables under `analysis/`.
 - Sensitivity products: `..._sphere1p0_m200c_lee22_{noconc,pref}_literalnorm_seed42/` (runner variants `lee22_noconc_literalnorm`, `lee22_pref_literalnorm`).
 - Electron-count products: `..._sphere1p0_m200c_lee22_{noconc,pref}_efix_seed42/` (runner variants `lee22_noconc_efix`, `lee22_pref_efix`); figures `..._efix_{upper_mass_limits,to_1e14}`.
+
+## Addendum (2026-09-17): the same truncation issue in the tSZ and kSZ painters
+
+The projected-disc / infinite-LOS construction described in Section 1 is not specific to the FRB code: XGPaint's `Battaglia16ThermalSZProfile` (Compton-y) and `BattagliaTauProfile` (tau, used for kSZ) integrate the 3-D profile with the same `_nfw_profile_los_quadrature` (LOS to 1e5 R200c) and are painted inside `theta_max = 4 R200c`. The spherical (chord-limited) fix was ported to both and compared against CLASS-SZ with a matching 3-D truncation; see `truncation_comparison/TSZ_KSZ_TRUNCATION_COMPARISON_20260917.md`.

@@ -1,0 +1,62 @@
+{
+ "ell~293": {
+  "yy_sphere_over_projected": 0.9959437700140384,
+  "ksz_sphere_over_projected": 0.8915654959974016,
+  "yy_projected_over_classsz": 0.9723912539858538,
+  "yy_sphere_over_classsz": 0.9684470114233495,
+  "ksz_projected_over_classsz": 0.7778423576116831,
+  "ksz_sphere_over_classsz": 0.6934974073718484,
+  "1e12_Dl_yy_sphere": 0.31364323841204694,
+  "Dl_ksz_sphere_uK2": 0.12395228868661762,
+  "Dl_ksz_classsz_tot_uK2": 0.17873504265338266,
+  "1e12_Dl_yy_classsz_tot": 0.3238620541056531,
+  "ksz_poisson_projected_over_classsz_1h": 0.9888925352766942,
+  "yy_poisson_projected_over_classsz_1h": 1.032765060125506,
+  "ksz_map_projected_over_poisson_projected": 1.1589346828077107
+ },
+ "ell~945": {
+  "yy_sphere_over_projected": 0.9989455884480388,
+  "ksz_sphere_over_projected": 0.9248002897491538,
+  "yy_projected_over_classsz": 0.8997811894128624,
+  "yy_sphere_over_classsz": 0.8988324497325082,
+  "ksz_projected_over_classsz": 0.9276579973851398,
+  "ksz_sphere_over_classsz": 0.857898384769897,
+  "1e12_Dl_yy_sphere": 0.7117222649104855,
+  "Dl_ksz_sphere_uK2": 0.3546288777031942,
+  "Dl_ksz_classsz_tot_uK2": 0.41336932671613746,
+  "1e12_Dl_yy_classsz_tot": 0.7918297399279404,
+  "ksz_poisson_projected_over_classsz_1h": 0.9938752250269614,
+  "yy_poisson_projected_over_classsz_1h": 0.907437850198458,
+  "ksz_map_projected_over_poisson_projected": 1.051840865360086
+ },
+ "ell~3040": {
+  "yy_sphere_over_projected": 0.9999912494595963,
+  "ksz_sphere_over_projected": 0.97741309131263,
+  "yy_projected_over_classsz": 0.9569192145484745,
+  "yy_sphere_over_classsz": 0.9569108409882244,
+  "ksz_projected_over_classsz": 0.9979397346403036,
+  "ksz_sphere_over_classsz": 0.9753993609784848,
+  "1e12_Dl_yy_sphere": 1.1922032038913666,
+  "Dl_ksz_sphere_uK2": 0.6729410647752073,
+  "Dl_ksz_classsz_tot_uK2": 0.689913374661367,
+  "1e12_Dl_yy_classsz_tot": 1.245887446170168,
+  "ksz_poisson_projected_over_classsz_1h": 0.9618194949757426,
+  "yy_poisson_projected_over_classsz_1h": 0.9007465579398077,
+  "ksz_map_projected_over_poisson_projected": 1.0601533922225046
+ },
+ "ell~6130": {
+  "yy_sphere_over_projected": 1.000084617058397,
+  "ksz_sphere_over_projected": 1.0063294183308784,
+  "yy_projected_over_classsz": 1.2075972007192475,
+  "yy_sphere_over_classsz": 1.2076993840421006,
+  "ksz_projected_over_classsz": 1.2513695659181372,
+  "ksz_sphere_over_classsz": 1.2592900073873627,
+  "1e12_Dl_yy_sphere": 1.32751920041102,
+  "Dl_ksz_sphere_uK2": 0.8046484827482142,
+  "Dl_ksz_classsz_tot_uK2": 0.638969957696727,
+  "1e12_Dl_yy_classsz_tot": 1.0992132793575575,
+  "ksz_poisson_projected_over_classsz_1h": 0.9390197972535207,
+  "yy_poisson_projected_over_classsz_1h": 0.9047512641276931,
+  "ksz_map_projected_over_poisson_projected": 1.3401766351778244
+ }
+}

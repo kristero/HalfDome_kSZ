@@ -1,0 +1,26 @@
+Omega_b=0.0486
+Omega_c=0.2603
+aperture=theta_max = 4.0 R200c for both truncations (XGPaint compute_thetamax default mult=4)
+catalog=/home/cbllover/HalfDome/lightcone_100.hdf5
+created_utc=2026-09-17T14:06:34
+elapsed_seconds=2881.7
+h=0.6774
+halos_painted=85224251
+interpolator_caches=/home/cbllover/HalfDome/truncation_comparison/caches/tsz_projected_interpolator.jld2;/home/cbllover/HalfDome/truncation_comparison/caches/tsz_sphere4p0_chordmean_interpolator.jld2;/home/cbllover/HalfDome/truncation_comparison/caches/tau_projected_interpolator.jld2;/home/cbllover/HalfDome/truncation_comparison/caches/tau_sphere4p0_chordmean_interpolator.jld2
+julia_threads=20
+ksz_profile=BattagliaTauProfile defaults (Battaglia16 AGN feedback density, Delta=200c), map = -tau * v_los/c (dimensionless Delta T/T)
+mass_definition=M200c, catalogue halo_mass_m200c / h -> physical Msun
+max_halos_option=0
+nside=4096
+pixel_updates_per_map=4589822044
+projected_truncation=XGPaint _nfw_profile_los_quadrature: LOS integral to 1e5 R200c, disc cut at theta_max only (previous code)
+selected_mass_max_msun=3.799764768299033e15
+selected_mass_max_msun_h=2.573960654045765e15
+selected_mass_min_msun=6.582277777538806e12
+selected_mass_min_msun_h=4.458834966504787e12
+selected_redshift_max=3.8554277420043945
+selected_redshift_min=0.002141594886779785
+spherical_truncation=gas inside the 4.0 R200c sphere only: chord-mean cache times 2 X sqrt(1-(theta/theta_max)^2) per pixel
+theta_min_rad=1.0181517217181816e-9
+tsz_profile=Battaglia16ThermalSZProfile defaults (Battaglia12 fiducial pressure), Compton-y
+velocity=catalogue Velocity [km/s], projected on the unit position vector; rms v_los = 271.76280620906175 km/s

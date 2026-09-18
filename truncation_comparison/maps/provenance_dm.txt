@@ -1,0 +1,19 @@
+Omega_b=0.0486
+Omega_c=0.2603
+aperture=theta_max = 4.0 R200c for both truncations
+catalog=/home/cbllover/HalfDome/lightcone_100.hdf5
+created_utc=2026-09-18T07:44:46
+dm_b16=XGPaint HaloDMProfile(BattagliaTauProfile) = Battaglia16 AGN density, ne2d electrons, /(1+z)
+dm_lee22noc=Lee22 no-concentration fit (Table A2), XGPaint-native reading (P0 = 200 n0, ne2d electrons), M_cut n0 pivot, shape clip at 10^14.8/h Msun, via Lee2022XGPaintDMProfile
+elapsed_seconds=56334.4
+h=0.6774
+halos_painted=85224251
+interpolator_caches=/home/cbllover/HalfDome/truncation_comparison/caches/dm_b16_projected_interpolator.jld2;/home/cbllover/HalfDome/truncation_comparison/caches/dm_b16_sphere4p0_chordmean_interpolator.jld2;/home/cbllover/HalfDome/truncation_comparison/caches/dm_lee22noc_xgpnative_projected_interpolator.jld2;/home/cbllover/HalfDome/truncation_comparison/caches/dm_lee22noc_xgpnative_sphere4p0_chordmean_interpolator.jld2
+julia_threads=20
+mass_definition=M200c, halo_mass_m200c / h -> physical Msun (h = 0.6774, matching the y maps; FRB products used 0.68)
+nside=4096
+pixel_updates_per_map=4589821776
+projected_truncation=infinite LOS, disc cut only (previous code)
+spherical_truncation=chord-mean cache times 2 X sqrt(1-(theta/theta_max)^2)
+theta_min_rad=1.0181517217181816e-9
+units=observer-frame DM [pc cm^-3]

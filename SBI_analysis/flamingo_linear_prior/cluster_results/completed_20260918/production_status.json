@@ -1,0 +1,504 @@
+{
+  "utc": "2026-09-15T14:42:48.446199+00:00",
+  "states": {
+    "R": 12,
+    "Q": 10,
+    "H": 43,
+    "E": 0
+  },
+  "jobs": {
+    "597793.idark": {
+      "Job_Name": "lp994333d0",
+      "job_state": "Q",
+      "queue": "mini",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597794.idark": {
+      "Job_Name": "lp994333d1",
+      "job_state": "Q",
+      "queue": "mini",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597795.idark": {
+      "Job_Name": "lp994333d2",
+      "job_state": "Q",
+      "queue": "mini",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597796.idark": {
+      "Job_Name": "lp994333d3",
+      "job_state": "Q",
+      "queue": "mini",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597797.idark": {
+      "Job_Name": "lp994333d4",
+      "job_state": "Q",
+      "queue": "mini",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597798.idark": {
+      "Job_Name": "lp994333d5",
+      "job_state": "Q",
+      "queue": "mini",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597799.idark": {
+      "Job_Name": "lp994333d6",
+      "job_state": "Q",
+      "queue": "mini_B",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597800.idark": {
+      "Job_Name": "lp994333d7",
+      "job_state": "Q",
+      "queue": "mini_B",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597801.idark": {
+      "Job_Name": "lp994333d8",
+      "job_state": "Q",
+      "queue": "mini_B",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597802.idark": {
+      "Job_Name": "lp994333d9",
+      "job_state": "Q",
+      "queue": "mini_B",
+      "comment": "Not Running: Insufficient amount of resource: ncpus "
+    },
+    "597803.idark": {
+      "Job_Name": "lp994333d10",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys14:ncpus=26:mem=67108864kb)"
+    },
+    "597804.idark": {
+      "Job_Name": "lp994333d11",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys19:ncpus=26:mem=67108864kb)"
+    },
+    "597805.idark": {
+      "Job_Name": "lp994333d12",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys20:ncpus=26:mem=67108864kb)"
+    },
+    "597806.idark": {
+      "Job_Name": "lp994333d13",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys21:ncpus=26:mem=67108864kb)"
+    },
+    "597807.idark": {
+      "Job_Name": "lp994333d14",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys23:ncpus=26:mem=67108864kb)"
+    },
+    "597808.idark": {
+      "Job_Name": "lp994333d15",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys24:ncpus=26:mem=67108864kb)"
+    },
+    "597809.idark": {
+      "Job_Name": "lp994333d16",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys02:ncpus=26:mem=67108864kb)"
+    },
+    "597810.idark": {
+      "Job_Name": "lp994333d17",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys03:ncpus=26:mem=67108864kb)"
+    },
+    "597811.idark": {
+      "Job_Name": "lp994333d18",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys28:ncpus=26:mem=67108864kb)"
+    },
+    "597812.idark": {
+      "Job_Name": "lp994333d19",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (db05:ncpus=26:mem=67108864kb)"
+    },
+    "597813.idark": {
+      "Job_Name": "lp994333d20",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys08:ncpus=26:mem=67108864kb)"
+    },
+    "597814.idark": {
+      "Job_Name": "lp994333d21",
+      "job_state": "R",
+      "queue": "mini_B",
+      "comment": "Job run at Tue Sep 15 at 14:37 on (ansys13:ncpus=26:mem=67108864kb)"
+    },
+    "597815.idark": {
+      "Job_Name": "lp994333d22",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597816.idark": {
+      "Job_Name": "lp994333d23",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597817.idark": {
+      "Job_Name": "lp994333d24",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597818.idark": {
+      "Job_Name": "lp994333d25",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597819.idark": {
+      "Job_Name": "lp994333d26",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597820.idark": {
+      "Job_Name": "lp994333d27",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597821.idark": {
+      "Job_Name": "lp994333d28",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597822.idark": {
+      "Job_Name": "lp994333d29",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597823.idark": {
+      "Job_Name": "lp994333d30",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597824.idark": {
+      "Job_Name": "lp994333d31",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597825.idark": {
+      "Job_Name": "lp994333d32",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597826.idark": {
+      "Job_Name": "lp994333d33",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597827.idark": {
+      "Job_Name": "lp994333d34",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597828.idark": {
+      "Job_Name": "lp994333d35",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597829.idark": {
+      "Job_Name": "lp994333d36",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597830.idark": {
+      "Job_Name": "lp994333d37",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597831.idark": {
+      "Job_Name": "lp994333d38",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597832.idark": {
+      "Job_Name": "lp994333d39",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597833.idark": {
+      "Job_Name": "lp994333d40",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597834.idark": {
+      "Job_Name": "lp994333d41",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597835.idark": {
+      "Job_Name": "lp994333d42",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597836.idark": {
+      "Job_Name": "lp994333d43",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597837.idark": {
+      "Job_Name": "lp994333d44",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597838.idark": {
+      "Job_Name": "lp994333d45",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597839.idark": {
+      "Job_Name": "lp994333d46",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597840.idark": {
+      "Job_Name": "lp994333d47",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597841.idark": {
+      "Job_Name": "lp994333d48",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597842.idark": {
+      "Job_Name": "lp994333d49",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    },
+    "597843.idark": {
+      "Job_Name": "lp994333d50",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597844.idark": {
+      "Job_Name": "lp994333d51",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597845.idark": {
+      "Job_Name": "lp994333d52",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597846.idark": {
+      "Job_Name": "lp994333d53",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597847.idark": {
+      "Job_Name": "lp994333d54",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597848.idark": {
+      "Job_Name": "lp994333d55",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597849.idark": {
+      "Job_Name": "lp994333d56",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597850.idark": {
+      "Job_Name": "lp994333d57",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597851.idark": {
+      "Job_Name": "lp994333d58",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597852.idark": {
+      "Job_Name": "lp994333d59",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597853.idark": {
+      "Job_Name": "lp994333d60",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597854.idark": {
+      "Job_Name": "lp994333d61",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597855.idark": {
+      "Job_Name": "lp994333d62",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597856.idark": {
+      "Job_Name": "lp994333d63",
+      "job_state": "H",
+      "queue": "mini_B",
+      "comment": null
+    },
+    "597857.idark": {
+      "Job_Name": "linear_collect",
+      "job_state": "H",
+      "queue": "mini",
+      "comment": null
+    }
+  },
+  "target_rows": 8192,
+  "reused_rows": 23,
+  "newly_generated_rows_observed": 12,
+  "generated_rows": [
+    {
+      "file": "chunks/chunk_00010/row_0001280.h5",
+      "sha256": "01ba810ffaed4a5931d2ca3dbd4eacb11da2d80e473fd3108f6d6c33a3206ecf",
+      "seconds": 257.6818251721561,
+      "peak_rss_GiB": 11.467456817626953,
+      "column_error": 3.1086244689504383e-15,
+      "noise_seed_row_id": 1822
+    },
+    {
+      "file": "chunks/chunk_00011/row_0001408.h5",
+      "sha256": "f257c547fcffe52cca31a8154b5cd9a420a06931af2d20afea8da9ed6c373087",
+      "seconds": 264.0063764601946,
+      "peak_rss_GiB": 11.5740966796875,
+      "column_error": 1.6653345369377348e-15,
+      "noise_seed_row_id": 1988
+    },
+    {
+      "file": "chunks/chunk_00012/row_0001536.h5",
+      "sha256": "5054eb27a0f5390c08439eec9f167a3456788831caeb632ad710a0a943c6274b",
+      "seconds": 266.97009352222085,
+      "peak_rss_GiB": 12.032783508300781,
+      "column_error": 1.887379141862766e-15,
+      "noise_seed_row_id": 2261
+    },
+    {
+      "file": "chunks/chunk_00013/row_0001664.h5",
+      "sha256": "c02037f38e94cfa52a1f94fb229ed6c1e4b1b9db579318277d42e6f2e022fd9a",
+      "seconds": 289.46619268506765,
+      "peak_rss_GiB": 11.5521240234375,
+      "column_error": 1.1102230246251565e-15,
+      "noise_seed_row_id": 2491
+    },
+    {
+      "file": "chunks/chunk_00014/row_0001792.h5",
+      "sha256": "6e4910da1f9f7b41a380c53e7e1132e513638c4a545bf415c74eaf317f2fe4eb",
+      "seconds": 269.178026964888,
+      "peak_rss_GiB": 11.781909942626953,
+      "column_error": 1.2212453270876722e-15,
+      "noise_seed_row_id": 2659
+    },
+    {
+      "file": "chunks/chunk_00015/row_0001920.h5",
+      "sha256": "f1e1cde6f96fa9ba6a18dbb7f67526757be21cbc91529d5248436349e7cb69d9",
+      "seconds": 289.00013402476907,
+      "peak_rss_GiB": 11.455509185791016,
+      "column_error": 1.3322676295501878e-15,
+      "noise_seed_row_id": 2884
+    },
+    {
+      "file": "chunks/chunk_00016/row_0002048.h5",
+      "sha256": "0b51447a730b8512050c0448296c372241265fe1743b72c1e14f8128911dd21c",
+      "seconds": 258.7404930740595,
+      "peak_rss_GiB": 11.624950408935547,
+      "column_error": 1.9984014443252818e-15,
+      "noise_seed_row_id": 3109
+    },
+    {
+      "file": "chunks/chunk_00017/row_0002176.h5",
+      "sha256": "0908c26eb46a7cfe8b1251f0af8df874d8b6a3190676c5e51c94bc73b5084497",
+      "seconds": 269.9884343147278,
+      "peak_rss_GiB": 11.471565246582031,
+      "column_error": 1.9984014443252818e-15,
+      "noise_seed_row_id": 3326
+    },
+    {
+      "file": "chunks/chunk_00018/row_0002304.h5",
+      "sha256": "4713b880297f812359b9dea6b73b2ef1cab8e6bafe9516da3bb84c492e88d013",
+      "seconds": 270.81126498803496,
+      "peak_rss_GiB": 11.463638305664062,
+      "column_error": 1.3322676295501878e-15,
+      "noise_seed_row_id": 3491
+    },
+    {
+      "file": "chunks/chunk_00019/row_0002432.h5",
+      "sha256": "3824ddf707bb201ba6d0684094bbaad872ba0de7c0b34e2d72950ba1bcc91d78",
+      "seconds": 231.9420873466879,
+      "peak_rss_GiB": 11.537612915039062,
+      "column_error": 8.881784197001252e-16,
+      "noise_seed_row_id": 3687
+    },
+    {
+      "file": "chunks/chunk_00020/row_0002560.h5",
+      "sha256": "94a0616db26b844d3da1503e9eedad057cc0912a40c5e31c3d088d270fddd880",
+      "seconds": 319.81852930784225,
+      "peak_rss_GiB": 11.374893188476562,
+      "column_error": 1.4432899320127035e-15,
+      "noise_seed_row_id": 3949
+    },
+    {
+      "file": "chunks/chunk_00021/row_0002688.h5",
+      "sha256": "936014fae48451301c921c744210bab41dcbee3a17eb2b1aeb2584583095065b",
+      "seconds": 270.1354104671627,
+      "peak_rss_GiB": 11.458473205566406,
+      "column_error": 1.7763568394002505e-15,
+      "noise_seed_row_id": 4145
+    }
+  ],
+  "manifest_sha256": "994333174a0c5a1e636a5cc065d000464ea3b4ddee2bb0082ccb4cfdd70cc600",
+  "old_jobs_remaining": 0
+}

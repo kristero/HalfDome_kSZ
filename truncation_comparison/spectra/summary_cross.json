@@ -1,0 +1,58 @@
+{
+ "ell~293": {
+  "y_x_lee22_sphere_over_projected": 0.9957515952513329,
+  "Dl_y_x_lee22_sphere_pc_cm3": 6.568072656712685e-05,
+  "r_lee22_sphere": 0.7857831741456269,
+  "dm_lee22noc_auto_sphere_over_projected": 0.9891543086294573,
+  "y_x_b16_sphere_over_projected": 0.9664385922510609,
+  "Dl_y_x_b16_sphere_pc_cm3": 2.3347289858349676e-05,
+  "r_b16_sphere": 0.7564382387078437,
+  "dm_b16_auto_sphere_over_projected": 0.9095580802557938,
+  "y_x_lee22_over_y_x_b16_sphere": 2.8132055996913703,
+  "y_x_lee22_over_y_x_b16_projected": 2.7303902624351735,
+  "map_over_poisson_y_x_lee22_sphere": 1.0026316053444966,
+  "map_over_poisson_y_x_b16_sphere": 1.0866947710921944
+ },
+ "ell~945": {
+  "y_x_lee22_sphere_over_projected": 0.9984271219343468,
+  "Dl_y_x_lee22_sphere_pc_cm3": 0.00010336998331474398,
+  "r_lee22_sphere": 0.7380177065782785,
+  "dm_lee22noc_auto_sphere_over_projected": 0.9937433335437436,
+  "y_x_b16_sphere_over_projected": 0.9848497260392116,
+  "Dl_y_x_b16_sphere_pc_cm3": 4.930281211648651e-05,
+  "r_b16_sphere": 0.7517158149360657,
+  "dm_b16_auto_sphere_over_projected": 0.9466606826518543,
+  "y_x_lee22_over_y_x_b16_sphere": 2.0966346315198883,
+  "y_x_lee22_over_y_x_b16_projected": 2.0681229476781624,
+  "map_over_poisson_y_x_lee22_sphere": 1.0009730393457308,
+  "map_over_poisson_y_x_b16_sphere": 1.0254177322146212
+ },
+ "ell~3040": {
+  "y_x_lee22_sphere_over_projected": 0.9996466821735197,
+  "Dl_y_x_lee22_sphere_pc_cm3": 9.867035492721333e-05,
+  "r_lee22_sphere": 0.7367613465825836,
+  "dm_lee22noc_auto_sphere_over_projected": 1.0001893666353843,
+  "y_x_b16_sphere_over_projected": 0.9984904494602526,
+  "Dl_y_x_b16_sphere_pc_cm3": 7.419949130289457e-05,
+  "r_b16_sphere": 0.7530402082568256,
+  "dm_b16_auto_sphere_over_projected": 0.9900218004975426,
+  "y_x_lee22_over_y_x_b16_sphere": 1.3297982667350732,
+  "y_x_lee22_over_y_x_b16_projected": 1.3282601670389864,
+  "map_over_poisson_y_x_lee22_sphere": 1.0538021999302072,
+  "map_over_poisson_y_x_b16_sphere": 1.063406323246393
+ },
+ "ell~6130": {
+  "y_x_lee22_sphere_over_projected": 1.000488787744002,
+  "Dl_y_x_lee22_sphere_pc_cm3": 6.701419019790652e-05,
+  "r_lee22_sphere": 0.7519553336539208,
+  "dm_lee22noc_auto_sphere_over_projected": 1.000597514071907,
+  "y_x_b16_sphere_over_projected": 1.0016251210540346,
+  "Dl_y_x_b16_sphere_pc_cm3": 7.947934490030888e-05,
+  "r_b16_sphere": 0.7733966719621578,
+  "dm_b16_auto_sphere_over_projected": 1.0051591353892928,
+  "y_x_lee22_over_y_x_b16_sphere": 0.8431648534844187,
+  "y_x_lee22_over_y_x_b16_projected": 0.8441225017065678,
+  "map_over_poisson_y_x_lee22_sphere": 1.2655454947940759,
+  "map_over_poisson_y_x_b16_sphere": 1.3310907660339106
+ }
+}

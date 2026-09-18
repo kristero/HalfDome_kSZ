@@ -1,5 +1,27 @@
 # Why the M ~ 1e14 density comparison does not look like Lee+2022 Figure 5
 
+**AMENDMENT (2026-09-19, later the same day): the "divide by f_b" conclusion below is retracted.** A
+reviewer correctly pointed out that Fig. 5 does not show Battaglia (2016) above the simulation/best-fit curve
+at *every* radius — it shows a single crossover: cyan above at small r ("the profile parameters overestimated
+n_e/n200 in the inner region, especially at low masses", Lee+2022 Sec. 5) and a good match at large r/large
+mass. Checked directly against the actual figure (page 5/11 of the arXiv PDF) at the paper's own z = 0 and
+both of its exact mass bins (3.0e13 and 1.17e14 Msun, from 10^13.2-13.4 and 10^13.8-14.0 h^-1 Msun with
+h = 0.6774): **neither the physical (f_b-included) Battaglia16 nor Battaglia16/f_b reproduces this crossover.**
+Physical B16 has Lee/TNG higher at *every* radius in both bins (opposite of the low-r part of Fig. 5); B16/f_b
+overshoots even further, since the Lee/B16 ratio never reaches 1/f_b ≈ 6.3 at either mass, so B16/f_b also
+never crosses below Lee. A separate, smaller, and better-motivated factor was found instead: our comparison's
+`lee2022_normalization="xgpaint_ne2d"` reading of Lee's n0 (chosen for TNG-matching, see
+`LEE22_NORMALIZATION_EQ7_EQ9_NOTE_20260917.md`) uses XGPaint's own electron-per-mass convention
+(0.9 / m_per_e for ionized H+He, `lee2022_frb_dm_profile.jl` lines 731-733, 749-758), not Lee+2022's own
+literal eq. 9 electron definition (1/(X_H m_p)). The two differ by a factor of exactly 1.662 (X_H(1+X_H)/(2·0.9)
+inverted). Applying that 1.662x to Battaglia16 (not f_b's 6.3x) reproduces a crossover close to the
+low-mass-panel's shape (~0.18 R200c) but not cleanly at the high-mass panel (crossover pushed to/below the
+plotted range's left edge) — so this explains part, not all, of the effect. **Open**: the residual mass-dependence
+means this is not a single constant-factor fix; a genuine shape (mass/redshift-scaling) difference between our
+implementation and whatever Battaglia/Lee actually used for their own Fig. 5 curve remains unresolved. The
+production comparison plots and power spectra are unaffected either way (Section 4 below still holds for that
+part). See the conversation record for the full numeric tables at z=0 across masses 7.3e12-1e15 Msun.
+
 Date: 2026-09-19. Prompted by a reviewer comment: at M ~ 1e14 Msun our Battaglia16-vs-Lee22 electron-density
 comparison shows Lee22 with a higher amplitude than Battaglia16 at essentially every radius, while in Lee et
 al. 2022 (arXiv:2205.01710, hereafter Lee22) Figure 5 the "Battaglia (2016)" reference curve is *bigger* than

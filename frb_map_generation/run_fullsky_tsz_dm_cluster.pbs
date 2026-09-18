@@ -1,0 +1,100 @@
+#!/bin/bash
+#PBS -N fullsky_tsz_dm
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mpiprocs=1:mem=48gb
+#PBS -l walltime=12:00:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+# idark version of run_fullsky_tsz_dm_20260918.sh, split into three stages so that the two map-painting
+# stages can run in parallel and the post-processing waits for both (qsub -W depend=afterok:<y>:<dm>):
+#   STAGE=y    Lee22 no-c pressure Compton-y maps: all halos, and only the Lee22 calibration ranges
+#   STAGE=dm   six kernel-weighted full-sky DM maps + the 10-model individual sightlines
+#   STAGE=post annular y samples at the 100k positions, spectra, map-mean check, pair realizations, figures
+# ROOT holds a frb_map_generation/ code snapshot and frb_map_generation/outputs/... (symlinks to lustre for
+# the large existing inputs); every script is run from ROOT so that the repository-relative paths resolve.
+set -euo pipefail
+: "${STAGE:?Set STAGE=y|dm|post}"
+: "${ROOT:?Set ROOT to the working root containing frb_map_generation/}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${PYTHON:=/home/kristero10/.conda/envs/SZ/bin/python}"
+NCPU="${PBS_NCPUS:-8}"
+export JULIA_NUM_THREADS="$NCPU" OMP_NUM_THREADS="$NCPU" OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE MPLBACKEND=Agg GKSwstype=100 PYTHONNOUSERSITE=1
+cd "$ROOT"
+OUT=frb_map_generation/outputs/tsz_dm_fullsky_20260918
+UPD=frb_map_generation/outputs/tsz_dm_cross_updated_20260917
+mkdir -p "$OUT/logs" "$OUT/maps" "$OUT/analysis" "$OUT/plots" "$OUT/spectra" "$UPD/rays" "$UPD/inputs" "$UPD/cache"
+JOB="${PBS_JOBID:-manual}"
+exec > >(tee -a "$OUT/logs/cluster_${STAGE}_${JOB}.log") 2>&1
+finish() {
+    status=$?
+    printf '%s\n' "$status" > "$OUT/logs/cluster_${STAGE}_exit_status.txt"
+    printf 'Finished %s stage=%s exit=%s\n' "$(date -Is)" "$STAGE" "$status"
+}
+trap finish EXIT
+printf 'Started %s host=%s job=%s stage=%s ncpus=%s\n' "$(date -Is)" "$(hostname)" "$JOB" "$STAGE" "$NCPU"
+sha256sum frb_map_generation/*.jl frb_map_generation/*.py frb_map_generation/*.pbs > "$OUT/logs/cluster_${STAGE}_source_sha256.txt"
+"$JULIA" --version
+
+YALL=$UPD/inputs/lee22_noconc_pressure_compton_y_allz_nside4096_m200c_r200cx4.fits
+YCAL=$OUT/maps/lee22_noconc_pressure_compton_y_calib_zmax2p0_nside4096_m200c_r200cx4.fits
+TSZ_CACHE=frb_map_generation/outputs/halfdome_frb_inputs/lee22_noconc_pressure_m200c_logm15p7_tsz_interpolator.jld2
+
+case "$STAGE" in
+y)
+    MASS_MIN=$("$PYTHON" -c "print(1e13/0.68)")
+    MASS_MAX=$("$PYTHON" -c "print(10**14.8/0.68)")
+    mkdir -p "$(dirname "$TSZ_CACHE")"
+    "$JULIA" --threads="$NCPU" frb_map_generation/paint_halfdome_battaglia12_tsz_map.jl --self-test-only=true
+    if [[ ! -f "$YALL" ]]; then
+        "$JULIA" --threads="$NCPU" frb_map_generation/paint_halfdome_battaglia12_tsz_map.jl \
+            --halfdome-path="$HALFDOME_PATH" --tsz-profile=lee2022_noconc --tsz-cache="$TSZ_CACHE" \
+            --output-map="$YALL" --nside=4096 --maximum-halo-redshift=Inf --halo-extension-r200-multiplier=4 \
+            --max-catalog-halos=0 --chunk-size=100000 --progress-every=100 --overwrite=false
+        sha256sum "$YALL" > "${YALL%.fits}.sha256"
+    fi
+    if [[ ! -f "$YCAL" ]]; then
+        "$JULIA" --threads="$NCPU" frb_map_generation/paint_halfdome_battaglia12_tsz_map.jl \
+            --halfdome-path="$HALFDOME_PATH" --tsz-profile=lee2022_noconc --tsz-cache="$TSZ_CACHE" \
+            --output-map="$YCAL" --nside=4096 --maximum-halo-redshift=2.0 \
+            --minimum-halo-mass-msun="$MASS_MIN" --maximum-halo-mass-msun="$MASS_MAX" \
+            --halo-extension-r200-multiplier=4 --max-catalog-halos=0 --chunk-size=100000 --progress-every=100 --overwrite=false
+        sha256sum "$YCAL" > "${YCAL%.fits}.sha256"
+    fi
+    ;;
+dm)
+    if [[ ! -f "$OUT/maps/lee22_noconc_sphere1_calib_act.fits" ]]; then
+        # brute-force self-test on a low-redshift subset at the production resolution, then the full pass
+        "$JULIA" --threads="$NCPU" frb_map_generation/paint_halfdome_kernel_weighted_dm_maps.jl \
+            --output-dir="$OUT" --cache-dir="$OUT/cache" --halfdome-path="$HALFDOME_PATH" --nside=4096 \
+            --rows=85000001:85012000 --self-test-pixels=400 --map-tag=_selftest
+        rm -f "$OUT"/maps/*_selftest.fits
+        "$JULIA" --threads="$NCPU" frb_map_generation/paint_halfdome_kernel_weighted_dm_maps.jl \
+            --output-dir="$OUT" --cache-dir="$OUT/cache" --halfdome-path="$HALFDOME_PATH" --nside=4096 --chunk-size=100000
+    fi
+    if [[ ! -f "$UPD/rays/individual_dm_updated.h5" ]]; then
+        "$JULIA" --threads="$NCPU" frb_map_generation/sample_halfdome_updated_sightlines.jl \
+            --output-dir="$UPD" --cache-dir="$UPD/cache" --halfdome-path="$HALFDOME_PATH" \
+            --positions=frb_map_generation/outputs/takahashi_100k_20260914/rays/source_positions.h5
+    fi
+    ;;
+post)
+    "$PYTHON" frb_map_generation/compare_halfdome_takahashi.py self-test
+    [[ -f "$UPD/rays/annular_y_samples_lee22_pressure.npz" ]] || \
+        "$PYTHON" frb_map_generation/cross_finite_source_realizations.py sample-y --ykey lee22p --ymap "$YALL"
+    [[ -f "$UPD/rays/annular_y_samples_lee22_pressure_calib.npz" ]] || \
+        "$PYTHON" frb_map_generation/cross_finite_source_realizations.py sample-y --ykey lee22p_calib --ymap "$YCAL"
+    [[ -f "$OUT/spectra/fullsky_spectra.npz" ]] || \
+        "$PYTHON" frb_map_generation/fullsky_tsz_dm_comparison.py spectra --lmax 8192 --iter 3
+    "$PYTHON" frb_map_generation/fullsky_tsz_dm_comparison.py check
+    "$PYTHON" frb_map_generation/fullsky_tsz_dm_comparison.py plot
+    "$PYTHON" frb_map_generation/cross_finite_source_realizations.py analyze-pairs
+    "$PYTHON" frb_map_generation/cross_finite_source_realizations.py plot-selected
+    ;;
+*)
+    echo "Unknown STAGE=$STAGE" >&2
+    exit 2
+    ;;
+esac

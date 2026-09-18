@@ -43,6 +43,11 @@ PAIRS = {
 }
 PAIRS_OUT = Path("frb_map_generation/outputs/tsz_dm_fullsky_20260918")
 SYMLOG_LINTHRESH = 10.0  # 1e-5 pc cm^-3; linear part of the selected-realization axes
+# distinct colour + marker for each shown realization (chosen away from the model colours)
+BEST_STYLE = [("#4B0082", "o"), ("#8B4513", "s"), ("#FF1493", "^"), ("#556B2F", "v"), ("#00A5A5", "D"), ("#9ACD32", "p"),
+              ("#708090", "*"), ("#DAA520", "h")]
+OUTLIER_STYLE = [("#B2182B", "-", "X"), ("#7F0000", (0, (4, 1.5)), "P")]
+FILTERS_FWHM = {"planck": 10.0, "act": 1.6}
 
 
 def sample_y(args):
@@ -442,6 +447,110 @@ def plot_selected(args):
     print("Saved selected-realization figures to " + str(PAIRS_OUT / "plots"))
 
 
+def draw_selected_distinct(ax_w, ax_p, arrays, pair, plane, n_diag):
+    """Like draw_selected, with every shown realization in its own colour/marker and a bottom panel with the
+    percentage difference from the observations, (w - obs) / |obs|, inside -100..100 %."""
+    from fullsky_tsz_dm_comparison import draw_percent, residual_axis
+    legend, color = PAIRS[pair][2], PAIRS[pair][3]
+    key = "{}__{}".format(pair, plane)
+    many, outliers, best = arrays[key + "__realizations"], arrays[key + "__outliers"], arrays[key + "__best"]
+    full = arrays[key + "__cross_100k"]
+    x = np.sqrt(EDGES[:-1] * EDGES[1:])
+    name, beam, count = PLANES[plane]
+    obs = observed_bins(plane)
+    denominator = np.abs(obs["w"])
+    percent = lambda curve: 100 * (curve - obs["w"]) / denominator
+    band = np.minimum(100 * obs["sigma"] / denominator, 100)
+    ax_p.fill_between(x, -band, band, color=".7", alpha=.35, lw=0, label="observed ±1σ", zorder=1)
+    for j, i in enumerate(best):
+        c, marker = BEST_STYLE[j % len(BEST_STYLE)]
+        ax_w.plot(x, many[i] / 1e-5, color=c, lw=1.5, marker=marker, ms=5.5, alpha=.95, zorder=3, label="best fit {}".format(j + 1))
+        draw_percent(ax_p, x, percent(many[i]), c, marker, lw=1.2, ms=5, annotate=False, alpha=.95, zorder=3)
+    for j, i in enumerate(outliers):
+        c, ls, marker = OUTLIER_STYLE[j % len(OUTLIER_STYLE)]
+        ax_w.plot(x, many[i] / 1e-5, color=c, lw=2.0, ls=ls, marker=marker, ms=6.5, zorder=3.2,
+                  label="highest of {}".format(n_diag) if j == 0 else "{}. highest".format(j + 1))
+        draw_percent(ax_p, x, percent(many[i]), c, marker, ls=ls, lw=1.4, ms=6, annotate=False, zorder=3.2)
+    mean = many.mean(axis=0)
+    ax_w.plot(x, mean / 1e-5, color=color, lw=3.4, zorder=4, label="mean of {} realizations".format(n_diag))
+    draw_percent(ax_p, x, percent(mean), color, None, lw=3.0, annotate=True, zorder=4)
+    ax_w.plot(x, full / 1e-5, color=".15", ls=(0, (1.5, 1.5)), lw=1.8, zorder=3.5, label="ensemble mean, 100k sightlines")
+    draw_percent(ax_p, x, percent(full), ".15", None, ls=(0, (1.5, 1.5)), lw=1.8, annotate=False, zorder=3.5)
+    ax_w.errorbar(obs["x"], obs["w"] / 1e-5, yerr=obs["err"] / 1e-5, fmt="o", color="black", ms=6, capsize=2.5, lw=1.3,
+                  label="Takahashi+25", zorder=6)
+    for ax in (ax_w, ax_p):
+        ax.axvspan(1, PAPER_CUT[plane], color=".5", alpha=.12, zorder=0)
+    style_axis(ax_w, 1)
+    ax_w.set_xlabel("")
+    ax_w.set_yscale("symlog", linthresh=SYMLOG_LINTHRESH, linscale=1.4)
+    top = max(np.max(many[outliers]) / 1e-5, np.max(obs["w"] + obs["err"][1]) / 1e-5) * 2.0
+    bottom = min(-4.0, 1.3 * min(np.min(many[best]) / 1e-5, np.min(obs["w"] - obs["err"][0]) / 1e-5))
+    ax_w.set_ylim(bottom, top)
+    ax_w.axhline(SYMLOG_LINTHRESH, color=".6", lw=.8, ls=(0, (2, 3)), zorder=1)
+    ax_w.text(0.985, SYMLOG_LINTHRESH, "log scale above ", transform=ax_w.get_yaxis_transform(), ha="right", va="bottom",
+              fontsize=11, color=".4")
+    ax_w.set_title("{}: {:g}′ Gaussian beam on y, {} FRBs".format(name, FILTERS_FWHM[plane], count), pad=8)
+    residual_axis(ax_p, "")
+    ax_p.set_xscale("log")
+    ax_p.set_xlim(1, 1000)
+    ax_p.set_xlabel(r"$\theta$ [arcmin]")
+
+
+def plot_selected_residuals(args):
+    arrays = dict(np.load(str(PAIRS_OUT / "analysis/finite_source_pairs.npz")))
+    summary = json.loads((PAIRS_OUT / "analysis/finite_source_pairs_summary.json").read_text())
+    n_diag = summary["n_realizations"]
+    (PAIRS_OUT / "plots").mkdir(exist_ok=True)
+    plt.rcParams.update(RC)
+    for stem, pairs, title in (("battaglia", ["battaglia"], "Battaglia12 pressure × Battaglia16 density"),
+                               ("lee22", ["lee22", "lee22_calib"], "Lee22 pressure × Lee22 density")):
+        pairs = [p for p in pairs if p in summary["pairs"]]
+        if not pairs:
+            continue
+        nrow = len(pairs)
+        # one block per pair: w panel, residual panel; a spacer row between blocks carries the pair label
+        spacer = nrow > 1  # a label row above every pair block
+        ratios = []
+        for i in range(nrow):
+            ratios += ([0.5] if spacer else []) + [3.0, 1.5]
+        fig = plt.figure(figsize=(15.5, 9.6 * nrow + 1.9))
+        gs = fig.add_gridspec(len(ratios), 2, height_ratios=ratios, hspace=.1, wspace=.2,
+                              left=.075, right=.985, top=.85 if nrow == 1 else .91, bottom=.075 if nrow == 1 else .04)
+        first_w = {}
+        for i, pair in enumerate(pairs):
+            r0 = (3 if spacer else 2) * i + (1 if spacer else 0)
+            for j, plane in enumerate(("planck", "act")):
+                ax_w = fig.add_subplot(gs[r0, j], sharex=first_w.get(j))
+                first_w.setdefault(j, ax_w)
+                ax_p = fig.add_subplot(gs[r0 + 1, j], sharex=ax_w)
+                draw_selected_distinct(ax_w, ax_p, arrays, pair, plane, n_diag)
+                plt.setp(ax_w.get_xticklabels(), visible=False)
+                if j == 0:
+                    ax_w.set_ylabel(r"$w_{y\,\mathrm{DM}}(\theta)\ \ [10^{-5}\ \mathrm{pc\,cm^{-3}}]$")
+                    ax_p.set_ylabel("realization − observed\n[% of |observed|]")
+                if i == 0 and j == 0:
+                    legend_axes = (ax_w, ax_p)
+            if spacer:
+                label_ax = fig.add_subplot(gs[r0 - 1, :])
+                label_ax.axis("off")
+                label_ax.text(0.0, 0.2, PAIRS[pair][2], transform=label_ax.transAxes, fontsize=16, fontweight="bold",
+                              ha="left", va="center")
+        handles, labels = legend_axes[0].get_legend_handles_labels()
+        h2, l2 = legend_axes[1].get_legend_handles_labels()
+        by_label = dict(zip(labels + l2, handles + h2))
+        order = ["Takahashi+25", "observed ±1σ", "mean of {} realizations".format(n_diag), "ensemble mean, 100k sightlines",
+                 "highest of {}".format(n_diag), "2. highest"] + ["best fit {}".format(k + 1) for k in range(len(BEST_STYLE))]
+        order = [l for l in order if l in by_label]
+        fig.legend([by_label[l] for l in order], order, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.5, 1.0),
+                   columnspacing=1.6, handlelength=2.6)
+        fig.suptitle("{}:  realizations with the observed number of FRBs;  triangles at the panel edge: beyond ±100 %".format(title),
+                     y=.905 if nrow == 1 else .95, fontsize=15.5)
+        for ext in ("png", "pdf", "svg"):
+            fig.savefig(str(PAIRS_OUT / "plots" / ("realizations_selected_{}_residuals.{}".format(stem, ext))), dpi=200 if ext == "png" else None)
+        plt.close(fig)
+    print("Saved selected-realization residual figures to " + str(PAIRS_OUT / "plots"))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("stage", choices=("sample-y", "analyze", "plot", "all", "analyze-pairs", "plot-selected"))
@@ -465,6 +574,7 @@ def main():
         analyze_pairs(args)
     if args.stage == "plot-selected":
         plot_selected(args)
+        plot_selected_residuals(args)
 
 
 if __name__ == "__main__":

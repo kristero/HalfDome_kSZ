@@ -56,6 +56,8 @@ PAIRS = {
     "lee22_calib": ("lee22p_calib", "lee22_noconc_sphere1_calib", "Lee22 y × Lee22 DM, calibrated range only", GREEN, "--", "D"),
 }
 KERNEL_STYLE = {"planck": ("-", "Planck FRB redshifts, 71"), "act": ((0, (1.6, 1.6)), "ACT FRB redshifts, 31")}
+BEAMS = {"planck": 10.0, "act": 1.6}  # Gaussian FWHM [arcmin] applied to y only
+SURVEY_LABEL = {"planck": "Planck: 71 FRB redshifts, 10′ beam on y", "act": "ACT: 31 FRB redshifts, 1.6′ beam on y"}
 SPECTRA = OUT / "spectra/fullsky_spectra.npz"
 
 
@@ -292,11 +294,165 @@ def summary(data, meta, annuli):
     print(json.dumps(out["spectra_ratios"], indent=1))
 
 
+
+
+# ---------------------------------------------------------------------------------------------
+# Versions with a percentage-difference panel (-100 to 100 %) and the survey beams made explicit
+# ---------------------------------------------------------------------------------------------
+def residual_axis(ax, ylabel):
+    ax.axhline(0, color=".4", lw=.9, zorder=2)
+    ax.set_ylim(-100, 100)
+    ax.set_yticks([-100, -50, 0, 50, 100])
+    ax.set_ylabel(ylabel)
+    ax.grid(alpha=.15, which="both")
+    ax.tick_params(direction="in", which="both", top=True, right=True, length=5)
+
+
+def draw_percent(ax, x, percent, color, marker, ls="-", lw=1.8, label=None, ms=6.5, mfc=None, annotate=True, zorder=4, alpha=1.0,
+                 text_slot=0):
+    """Percentage differences inside [-100, 100]; a value outside is drawn as an open triangle at the
+    edge (with the value written next to it when annotate is True) so that nothing is silently lost."""
+    x = np.asarray(x, dtype=float)
+    percent = np.asarray(percent, dtype=float)
+    inside = np.abs(percent) <= 100
+    shown = np.where(inside, percent, np.nan)
+    ax.plot(x, shown, color=color, ls=ls, lw=lw, marker=marker, ms=ms, mfc=mfc or color, mew=1.3, label=label, zorder=zorder, alpha=alpha)
+    for xi, p in zip(x[~inside], percent[~inside]):
+        edge = 92.0 if p > 0 else -92.0
+        ax.plot([xi], [edge], marker="^" if p > 0 else "v", ms=8, color=color, mfc="white", mew=1.5, ls="none", zorder=zorder + 1, alpha=alpha)
+        if annotate:
+            # one text row per curve (text_slot) so that several clipped values at the same angle stay readable
+            offset = -15 - 11 * text_slot if p > 0 else 7 + 11 * text_slot
+            ax.annotate("{:+.0f}".format(p), (xi, edge), textcoords="offset points", xytext=(0, offset), ha="center",
+                        fontsize=9.5, color=color, zorder=zorder + 1)
+
+
+def plot_takahashi_residuals(data, meta):
+    """Figure 1 with a bottom panel: (model - observed) / |observed| in percent, per annulus; grey band = observed 1 sigma."""
+    plt.rcParams.update(RC)
+    fig, axes = plt.subplots(2, 2, figsize=(15.5, 9.8), sharex="col", gridspec_kw={"height_ratios": [3, 1.5], "hspace": .06, "wspace": .2})
+    theta = np.geomspace(1, 1000, 500)
+    for j, plane in enumerate(SURVEYS):
+        name, beam_label, count = PLANES[plane]
+        beam = BEAMS[plane]
+        obs = observations(plane)
+        x = np.sqrt(obs["lo"] * obs["hi"])
+        sigma = obs["err"].mean(axis=0)
+        top, bot = axes[0, j], axes[1, j]
+        top.errorbar(obs["x"], obs["w"] / 1e-5, yerr=obs["err"] / 1e-5, fmt="o", color="black", ms=6, capsize=2.5, lw=1.3,
+                     label="Takahashi+25", zorder=6)
+        band = np.minimum(100 * sigma / np.abs(obs["w"]), 100)
+        bot.fill_between(x, -band, band, color=".7", alpha=.35, lw=0, label="observed ±1σ", zorder=1)
+        for k, (pair, (ykey, model, legend, color, ls, marker)) in enumerate(PAIRS.items()):
+            cl = data["cl_y_{}__dm_{}_{}".format(ykey, model, plane)]
+            smooth = angular_correlation(cl, theta, beam)
+            binned = annular_correlation(cl, obs["lo"], obs["hi"], beam)
+            calib = pair == "lee22_calib"
+            top.plot(theta, smooth / 1e-5, color=color, ls=ls, lw=2.8 if not calib else 2.4, label=legend, zorder=4)
+            top.plot(x, binned / 1e-5, marker=marker, ls="none", color=color, ms=6.5, mfc="white" if calib else color, mew=1.6, zorder=5)
+            draw_percent(bot, x, 100 * (binned - obs["w"]) / np.abs(obs["w"]), color, marker, ls=ls, lw=1.6,
+                         mfc="white" if calib else None, text_slot=k)
+        for ax in (top, bot):
+            ax.axvspan(1, PAPER_CUT[plane], color=".5", alpha=.12, zorder=0)
+        style_axis(top, 1)
+        top.set_xlabel("")
+        top.set_title("{}: {:g}′ Gaussian beam on y, {} FRB redshifts".format(name, beam, count), pad=10)
+        residual_axis(bot, "model − observed\n[% of |observed|]" if j == 0 else "")
+        bot.set_xscale("log")
+        bot.set_xlim(1, 1000)
+        bot.set_xlabel(r"$\theta$ [arcmin]")
+    axes[0, 0].set_ylabel(r"$w_{y\,\mathrm{DM}}(\theta)\ \ [10^{-5}\ \mathrm{pc\,cm^{-3}}]$")
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    h2, l2 = axes[1, 0].get_legend_handles_labels()
+    by_label = dict(zip(labels + l2, handles + h2))
+    order = [PAIRS[p][2] for p in PAIRS] + ["Takahashi+25", "observed ±1σ"]
+    fig.legend([by_label[l] for l in order], order, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(0.5, 1.0),
+               columnspacing=2.0, handlelength=2.8)
+    fig.text(.5, .875, "Full-sky halo-only prediction, gas inside $R_{200c}$;  markers: annulus means;  "
+             "triangles at the panel edge: values beyond ±100 %", ha="center", va="bottom", fontsize=13.5, color=".25")
+    fig.subplots_adjust(left=.075, right=.985, top=.815, bottom=.085)
+    for ext in ("png", "pdf", "svg"):
+        fig.savefig(str(OUT / "plots" / ("fullsky_takahashi_fig13_residuals." + ext)), dpi=200 if ext == "png" else None)
+    plt.close(fig)
+
+
+def plot_spectra_beamed(data, meta):
+    """Three columns with the survey beams on the tSZ side (Planck 10′ with the Planck kernel, ACT 1.6′ with
+    the ACT kernel); bottom panels: percentage difference relative to the Lee22 x Lee22 all-halo pair, and
+    the beam suppression alone (grey)."""
+    plt.rcParams.update(RC)
+    ell = data["ell"].astype(float)
+    nside = 4096
+    beam = {s: gaussian_beam(ell, BEAMS[s]) for s in SURVEYS}
+    ref_y, ref_dm = PAIRS["lee22"][0], PAIRS["lee22"][1]
+    fig, axes = plt.subplots(2, 3, figsize=(21, 9.6), sharex="col", gridspec_kw={"height_ratios": [3, 1.6], "hspace": .06, "wspace": .24})
+    rows = []
+    for pair, (ykey, model, legend, color, _, _) in PAIRS.items():
+        for survey in SURVEYS:
+            ls = KERNEL_STYLE[survey][0]
+            spectra = {
+                "yy": (data["cl_y_" + ykey] * beam[survey] ** 2, data["cl_y_" + ref_y] * beam[survey] ** 2),
+                "DMDM": (data["cl_dm_{}_{}".format(model, survey)], data["cl_dm_{}_{}".format(ref_dm, survey)]),
+                "yDM": (data["cl_y_{}__dm_{}_{}".format(ykey, model, survey)] * beam[survey],
+                        data["cl_y_{}__dm_{}_{}".format(ref_y, ref_dm, survey)] * beam[survey]),
+            }
+            for col, key in enumerate(("yy", "DMDM", "yDM")):
+                lc, dl = log_bin(ell, spectra[key][0])
+                _, dref = log_bin(ell, spectra[key][1])
+                axes[0, col].plot(lc, dl, color=color, ls=ls, lw=2.5)
+                if pair != "lee22":
+                    axes[1, col].plot(lc, 100 * (dl / dref - 1), color=color, ls=ls, lw=2.2)
+                for i in range(len(lc)):
+                    rows.append(dict(pair=pair, spectrum=key, survey=survey, beam_fwhm_arcmin=BEAMS[survey] if key != "DMDM" else 0.0,
+                                     ell=lc[i], D_ell=dl[i], percent_vs_lee22_all=100 * (dl[i] / dref[i] - 1)))
+    for survey in SURVEYS:
+        ls = KERNEL_STYLE[survey][0]
+        keep = ell >= 30
+        axes[1, 0].plot(ell[keep], 100 * (beam[survey][keep] ** 2 - 1), color=".55", ls=ls, lw=1.3, zorder=1)
+        axes[1, 2].plot(ell[keep], 100 * (beam[survey][keep] - 1), color=".55", ls=ls, lw=1.3, zorder=1)
+    titles = [r"tSZ auto with beam:  $\ell(\ell+1)C_\ell^{yy}B_\ell^2/2\pi$",
+              r"FRB DM auto, no beam:  $\ell(\ell+1)C_\ell^{\rm DM\,DM}/2\pi$  [pc$^2$ cm$^{-6}$]",
+              r"tSZ × FRB DM with beam:  $\ell(\ell+1)C_\ell^{y\,\rm DM}B_\ell/2\pi$  [pc cm$^{-3}$]"]
+    for col, title in enumerate(titles):
+        top, bot = axes[0, col], axes[1, col]
+        top.set_yscale("log")
+        if col != 1:  # the beams suppress the high-l tSZ power by many decades; show five
+            peak = max(np.nanmax(line.get_ydata()) for line in top.get_lines())
+            top.set_ylim(peak * 10 ** -5.2, peak * 3)
+        top.set_title(title, pad=10, fontsize=14.5)
+        for ax in (top, bot):
+            ax.set_xscale("log")
+            ax.set_xlim(30, ell[-1])
+            ax.axvspan(nside, ell[-1], color=".5", alpha=.1, zorder=0)
+            ax.grid(alpha=.15, which="both")
+            ax.tick_params(direction="in", which="both", top=True, right=True, length=5)
+        residual_axis(bot, "relative to Lee22 × Lee22,\nall halos [%]" if col == 0 else "")
+        bot.set_xlabel(r"multipole $\ell$")
+    model_handles = [Line2D([], [], color=PAIRS[p][3], lw=2.5) for p in PAIRS]
+    model_labels = ["Battaglia12 pressure, Battaglia16 density", "Lee22 pressure, Lee22 density",
+                    "Lee22 pressure and density, calibrated range only"]
+    survey_handles = [Line2D([], [], color=".25", ls=KERNEL_STYLE[s][0], lw=2.4) for s in SURVEYS]
+    survey_labels = [SURVEY_LABEL[s] for s in SURVEYS]
+    axes[0, 0].legend(model_handles, model_labels, loc="lower left", frameon=False, fontsize=12)
+    axes[0, 1].legend(survey_handles, survey_labels, loc="lower left", frameon=False, fontsize=12)
+    axes[1, 0].legend([Line2D([], [], color=".55", lw=1.3)], ["beam alone: $B_\\ell^2 - 1$ (left), $B_\\ell - 1$ (right)"],
+                      loc="lower left", frameon=False, fontsize=11)
+    fig.suptitle("Full-sky HalfDome maps, NSIDE 4096, monopoles removed; Gaussian beams on y only;  shaded: $\\ell > N_{\\rm side}$",
+                 fontsize=15, y=.985)
+    fig.subplots_adjust(left=.055, right=.99, top=.9, bottom=.085)
+    for ext in ("png", "pdf", "svg"):
+        fig.savefig(str(OUT / "plots" / ("fullsky_power_spectra_three_column_beamed." + ext)), dpi=200 if ext == "png" else None)
+    plt.close(fig)
+    write_rows(OUT / "analysis/fullsky_binned_spectra_beamed.csv", rows)
+
+
 def plot(args):
     (OUT / "plots").mkdir(exist_ok=True)
     data, meta = load_spectra()
     annuli = plot_takahashi(data, meta)
     plot_spectra(data, meta)
+    plot_takahashi_residuals(data, meta)
+    plot_spectra_beamed(data, meta)
     summary(data, meta, annuli)
     print("Saved figures to " + str(OUT / "plots"))
 

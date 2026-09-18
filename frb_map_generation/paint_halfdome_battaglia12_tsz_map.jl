@@ -159,6 +159,11 @@ function main()
     end
     aperture_r200c =
         Support.float_option(options, "halo_extension_r200_multiplier", 3.0)
+    # Optional physical-mass selection (Msun, after the catalogue Msun/h -> Msun conversion):
+    # minimum <= M200c < maximum. Used to paint the Lee22 pressure map with only the halos inside
+    # the Lee22 calibration mass range (1e13-10^14.8 h^-1 Msun); the defaults keep every halo.
+    minimum_halo_mass = Support.float_option(options, "minimum_halo_mass_msun", 0.0)
+    maximum_halo_mass = Support.float_option(options, "maximum_halo_mass_msun", Inf)
     chunk_size = Support.int_option(options, "chunk_size", 100_000)
     maximum_catalog_rows = Support.int_option(options, "max_catalog_halos", 0)
     progress_every = Support.int_option(options, "progress_every", 5)
@@ -192,6 +197,8 @@ function main()
     nside > 0 || error("nside must be positive.")
     maximum_halo_redshift > 0.0 ||
         error("maximum_halo_redshift must be positive or Inf.")
+    0.0 <= minimum_halo_mass < maximum_halo_mass ||
+        error("Need 0 <= minimum_halo_mass_msun < maximum_halo_mass_msun.")
     aperture_r200c > 0.0 ||
         error("halo_extension_r200_multiplier must be positive.")
     chunk_size > 0 || error("chunk_size must be positive.")
@@ -238,7 +245,10 @@ function main()
     redshift_description = isinf(maximum_halo_redshift) ?
         "complete catalogue lightcone" : "0 < z_halo <= $(maximum_halo_redshift)"
     println("  halo redshift selection: $(redshift_description)")
-    println("  mass selection: complete resolved catalogue range")
+    mass_description = minimum_halo_mass == 0.0 && isinf(maximum_halo_mass) ?
+        "complete resolved catalogue range; no science mass cut" :
+        "$(minimum_halo_mass) <= M200c/Msun < $(maximum_halo_mass)"
+    println("  mass selection: $(mass_description)")
     println("  profile mass: physical M200c (catalogue halo_mass_m200c / h)")
     println("  aperture=$(aperture_r200c) R200c, externally enforced")
     println("  NSIDE=$(nside), threads=$(Threads.nthreads())")
@@ -292,6 +302,12 @@ function main()
             keep .&= redshifts .> 0.0
             if isfinite(maximum_halo_redshift)
                 keep .&= redshifts .<= maximum_halo_redshift
+            end
+            if minimum_halo_mass > 0.0
+                keep .&= masses .>= minimum_halo_mass
+            end
+            if isfinite(maximum_halo_mass)
+                keep .&= masses .< maximum_halo_mass
             end
             selected_count = count(keep)
             selected_count == 0 && continue
@@ -368,7 +384,9 @@ function main()
         "halo_redshift_selection" => redshift_description,
         "maximum_halo_redshift_requested" => maximum_halo_redshift,
         "catalog_truncated" => maximum_catalog_rows != 0,
-        "mass_selection" => "complete resolved catalogue range; no science mass cut",
+        "mass_selection" => mass_description,
+        "minimum_halo_mass_msun_requested" => minimum_halo_mass,
+        "maximum_halo_mass_msun_requested" => maximum_halo_mass,
         "nside" => nside,
         "ordering" => "RING",
         "map_units" => "dimensionless Compton-y",

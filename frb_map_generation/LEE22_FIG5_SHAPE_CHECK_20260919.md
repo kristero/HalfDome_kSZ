@@ -22,6 +22,38 @@ implementation and whatever Battaglia/Lee actually used for their own Fig. 5 cur
 production comparison plots and power spectra are unaffected either way (Section 4 below still holds for that
 part). See the conversation record for the full numeric tables at z=0 across masses 7.3e12-1e15 Msun.
 
+**AMENDMENT 3 (2026-09-19, later still): resolved.** Digitized Lee+2022's Fig. 5 directly (pixel-color
+extraction from the rendered PDF page, calibrated against the axis tick labels) for both mass bins and both
+of its curves ("Battaglia (2016)", cyan, and "Simulation", red), then compared against XGPaint's own
+`generalized_nfw`/`get_params`/`ρ_crit` machinery with two normalization choices:
+
+- **Battaglia16, without f_b.** Using XGPaint's `BattagliaTauProfile` shape and its own electron conversion
+  (0.9 / mass-per-free-electron for ionized H+He), but *not* multiplying by `f_b = Ωb/Ωm`, matches the
+  digitized cyan curve to ~15% RMS (mean ratio 1.18-1.22, essentially identical between the two independent
+  mass bins) across the whole plotted range r/R200c = 0.035-1.4. I.e. Lee+2022 plotted Battaglia's ρ0-normalized
+  gNFW shape times ρcrit(z) directly as if it were already a gas/electron density, without the baryon-fraction
+  correction XGPaint's own comment flags as needed for a *physical* gas density.
+- **Lee22, `:literal` normalization** (already this codebase's default for `Lee2022NoConcentrationDMProfile`,
+  before the comparison script overrode it to `:xgpaint_ne2d` for TNG-matching purposes): n_e = n0 f(x) n200
+  with n200 exactly as eq. (9) prints it, no XGPaint-specific electron-conversion factor. Matches the digitized
+  red/"Simulation" curve to ~10-20% RMS in both mass bins (the residual matches the paper's own Δne/ne panels,
+  since Lee+2022's fit is not a perfect match to their own simulation either).
+
+Script: `compute_fig5_match_grid.jl` (also verifies, to floating-point exactness, that this file's
+`lee2022_dimensionless_density` and `XGPaint.generalized_nfw` with `β = α·β' - γ` agree at every radius tested,
+i.e. both curves' radial shape genuinely is the same XGPaint building block, only the amplitude normalization
+differs). Verification figure: `plot_fig5_match_verification.py` ->
+`outputs/fig5_match_20260919/fig5_match_verification.png`.
+
+**This is a Fig.-5-reproduction convention only, not a change to the production pipeline.** Our physical/DM
+comparison plots and power spectra correctly keep f_b on Battaglia16 (needed to get an absolute gas density
+right, separately validated against TNG's own R200c-sphere DM to ~33%, `LEE22_NORMALIZATION_EQ7_EQ9_NOTE_20260917.md`
+Section 4) and `:xgpaint_ne2d` on Lee22 (0-2% agreement with TNG there). The `:literal` reading that matches
+Lee+2022's own printed Fig. 5 is *higher* than the TNG-validated physical reading by 1/0.602 = 1.66x -- i.e.
+Lee+2022's own eq.-9-literal fit and the true physical TNG gas density are not identical either, a ~1.66x gap
+between "printed equation taken at face value" and "actual simulated electron density", separate from anything
+in our own implementation.
+
 Date: 2026-09-19. Prompted by a reviewer comment: at M ~ 1e14 Msun our Battaglia16-vs-Lee22 electron-density
 comparison shows Lee22 with a higher amplitude than Battaglia16 at essentially every radius, while in Lee et
 al. 2022 (arXiv:2205.01710, hereafter Lee22) Figure 5 the "Battaglia (2016)" reference curve is *bigger* than

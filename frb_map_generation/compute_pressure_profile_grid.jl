@@ -12,7 +12,7 @@ function pressure_profile_main()
     options = Support.parse_options(ARGS)
     output = abspath(Support.option(options, "output_dir", joinpath(@__DIR__, "outputs", "pressure_profiles_20260919")))
     mkpath(output)
-    masses = parse.(Float64, split(Support.option(options, "masses_msun", "7.327e12,3e13,1e14,1e15"), ','))
+    masses = parse.(Float64, split(Support.option(options, "masses_msun", "7.327e12,3e13,1e14,1e15,3.785236255949654e15"), ','))
     redshifts = parse.(Float64, split(Support.option(options, "redshifts", "0.1,0.5,1.0,2.0"), ','))
     radii = 10 .^ range(-2.0, log10(5.0); length=70)
 

@@ -20,6 +20,8 @@ H = 0.68
 LEE_RADII = (0.04, 1.34)
 LEE_MASS = (1e13 / H, 10 ** 14.8 / H)
 LEE_ZMAX = 2.0
+MOST_MASSIVE_HALO_MSUN = 3.785236255949654e15  # true global max of halo_mass_m200c in lightcone_100.hdf5 (at z=0.344)
+MOST_MASSIVE_HALO_Z = 0.344
 BLUE, ORANGE, RED = "#0072B2", "#D55E00", "#B2182B"
 RC = {"font.size": 14, "axes.labelsize": 17, "axes.titlesize": 15, "xtick.labelsize": 13,
       "ytick.labelsize": 13, "legend.fontsize": 14, "axes.linewidth": 1.0}
@@ -43,7 +45,7 @@ def arrays(rows, key):
 def mass_label(m):
     e = int(np.floor(np.log10(m)))
     a = m / 10 ** e
-    return (r"$10^{%d}\,M_\odot$" % e) if abs(a - 1) < 1e-6 else (r"$%.1f\times10^{%d}\,M_\odot$" % (a, e))
+    return (r"$10^{%d}\,M_\odot$" % e) if abs(a - 1) < 1e-6 else (r"$%.2f\times10^{%d}\,M_\odot$" % (a, e))
 
 
 def mass_note(m):
@@ -86,13 +88,20 @@ def plot_grid(data, masses, redshifts, out, quantity, ylabel, stem, xlabel=r"imp
                         ha="left" if tag_left else "right", va="top", color=RED, fontsize=13, fontweight="bold")
             r200 = float(b12[0]["r200c_mpc"])
             theta = float(b12[0]["theta200c_arcmin"])
-            ax.text(.03, .04, r"$R_{200c}$ = %.2f Mpc, $\theta_{200c}$ = %.1f$'$" % (r200, theta),
-                    transform=ax.transAxes, ha="left", va="bottom", fontsize=11, color=".3")
+            info = r"$R_{200c}$ = %.2f Mpc, $\theta_{200c}$ = %.1f$'$" % (r200, theta)
+            if abs(m / MOST_MASSIVE_HALO_MSUN - 1) < 1e-6:
+                info += "; host $z$=%.2f" % MOST_MASSIVE_HALO_Z
+            ax.text(.03, .04, info, transform=ax.transAxes, ha="left", va="bottom", fontsize=11, color=".3")
             if i == 0:
                 ax.set_title("$z$ = %.1f" % z + ("" if z <= LEE_ZMAX else "  (Lee22 fit: $z \\leq 2$)"), pad=8)
             if j == 0:
                 ax.set_ylabel(ylabel)
-                ax.text(-.36, .5, mass_label(m) + ("\n(HalfDome floor)" if abs(m - 7.327e12) < 1e9 else "") +
+                extra = ""
+                if abs(m - 7.327e12) < 1e9:
+                    extra = "\n(HalfDome floor)"
+                elif abs(m / MOST_MASSIVE_HALO_MSUN - 1) < 1e-6:
+                    extra = "\n(most massive halo)"
+                ax.text(-.36, .5, mass_label(m) + extra +
                         "\n" + mass_note(m).replace(": ", ":\n"), transform=ax.transAxes, rotation=90,
                         ha="center", va="center", fontsize=13, color=RED if "non" in mass_note(m) else ".15")
             if i == nrow - 1:

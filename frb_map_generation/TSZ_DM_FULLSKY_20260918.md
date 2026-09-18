@@ -208,5 +208,66 @@ kernel (dotted). Shaded l > N_side.
 - `frb_map_generation/cross_finite_source_realizations.py` - `sample-y --ykey`, `analyze-pairs`,
   `plot-selected`
 - `frb_map_generation/run_fullsky_tsz_dm_20260918.sh` - the local production chain
+- `frb_map_generation/run_fullsky_tsz_dm_cluster.pbs` - the idark chain (stages y, dm, post); products under
+  `/lustre/work/kristero10/frb_data/fullsky_20260918`, small products copied to `outputs/tsz_dm_fullsky_20260918/cluster_results/`
 - `outputs/tsz_dm_fullsky_20260918/{maps,spectra,analysis,plots,logs,kernels}` (maps and spectra are
   not git-tracked)
+
+## 8. Addendum 18 September (afternoon): beams made explicit, percentage panels, distinguishable realizations, idark run
+
+Requested changes and where they are:
+
+- Every tSZ-side quantity carries the survey's Gaussian beam: 10' FWHM for Planck, 1.6' for ACT, applied to y only
+  (FRB positions are not smeared). The Takahashi-type figures always had these beams; their titles now say so.
+  The three-column spectra figure now exists in a beamed version, `fullsky_power_spectra_three_column_beamed`:
+  C_l^yy B_l^2 and C_l^{yDM} B_l with the Planck beam on the Planck-kernel curves and the ACT beam on the ACT-kernel
+  curves (the DM auto-spectrum has no beam). The unbeamed figure is kept.
+- Percentage-difference panels (-100 to +100 %) under every panel: `fullsky_takahashi_fig13_residuals` and
+  `realizations_selected_{battaglia,lee22}_residuals` show (model - observed) / |observed| per annulus with the
+  observed 1 sigma as a grey band; a value beyond +-100 % is drawn as an open triangle at the panel edge (with the
+  number for the model curves), so nothing is clipped silently. The spectra figure shows each pair relative to the
+  Lee22 x Lee22 all-halo pair (the largest, so every curve stays inside the range) and, in grey, the beam
+  suppression alone (B_l^2 - 1 and B_l - 1): a percentage panel relative to Battaglia would leave the range
+  (Lee22 x Lee22 is up to 6.4 times Battaglia12 x Battaglia16).
+- The ten shown realizations each have their own colour and marker (`BEST_STYLE`, `OUTLIER_STYLE`), the two
+  highest as crimson/dark-red lines with x/+ markers, the eight best fits ranked 1-8 in the legend.
+- Computations on idark (`run_fullsky_tsz_dm_cluster.pbs`, working root
+  `/lustre/work/kristero10/frb_data/fullsky_20260918`, code snapshot = commit f0a1626): stage `y` repaints the two
+  Lee22 pressure maps, stage `dm` paints the six kernel-weighted DM maps (with the brute-force self-test first) and
+  the 10-model individual sightlines, stage `post` (dependent on both) samples the annular y at the 100k positions,
+  computes the spectra, the map-mean check, the pair realizations and all figures. The Battaglia12 y map is the
+  13 September cluster repaint (`battaglia12_full_lightcone_repaint.fits`, sha256 9ea83f55...; the local map used
+  above has sha256 1213ee84..., a different painting of the same model), the 100k positions and Battaglia12
+  annular samples are the 14 September cluster products. The cluster XGPaint fork is the same commit (5dd0b57)
+  with the same syntax patches in `profiles.jl`.
+
+Cluster run (PBS jobs 598127 `y`, 598128 `dm`, 598129 `post`; 8 CPUs, 48 GB each; queue `mini`, started at once):
+
+| stage | node | wall time | content |
+|---|---|---|---|
+| y | ansys19 | 32 min | Lee22 pressure self-test; all-halo map 1014 s; calibrated-range map 458 s |
+| dm | ansys20 | 69 min | two caches; brute-force self-test (500 pixels x 6 maps, 2168 non-zero entries, worst relative difference 0.0); six maps 936 s; ten sightline caches + 100k x 3 planes x 10 models scan 141 s |
+| post | ansys19 | 47 min | 72 annular y syntheses at the 100k positions (two Lee22 maps); nine `map2alm`; check; pair realizations; all figures |
+
+Cluster products against the local run of the morning (`analysis/*` in
+`outputs/tsz_dm_fullsky_20260918/cluster_results/`): the six map means are identical to 1e-13, the annulus values
+agree to 1.2e-10 relative, the 1000 realizations select the same outlier and best-fit indices with identical chi^2,
+and the binned spectrum ratios agree to four digits. The Julia 1.6 / 1.12 and the two independent Battaglia12
+paintings therefore make no visible difference; the cluster figures are the ones delivered
+(`cluster_results/.../plots/*_residuals.*`, `*_beamed.*`).
+
+Reading the new panels:
+
+- Full-sky percentages (Planck 10-17.8', 17.8-31.6', 31.6-56.2'): Battaglia12 x Battaglia16 -72, -74, -73 %;
+  Lee22 x Lee22 +83, +69, +47 %; calibrated range -18, -27, -30 %. On ACT (1.8-3.2', 3.2-5.6', 5.6-10'):
+  Battaglia +5, +34, -26 %; Lee22 +424, +646, +358 % (edge triangles); calibrated +188, +285, +118 %. Beyond 56'
+  every model is 65-95 % below the data on both surveys.
+- Realizations: the two highest are 100-1800 % above the data (Battaglia) and up to 1.6e4 % (Lee22 all halos) in
+  every annulus of the paper's range; the eight best fits scatter within about +-60 % of the observed values, i.e.
+  inside the observed 1 sigma band, with no systematic sign, while the mean of 1000 lies at -70 % (Battaglia, Planck
+  beyond 10'), +80 to -90 % (Lee22 all halos, from small to large angles) and -10 to -90 % (Lee22 calibrated).
+- Beamed spectra: the 10' Planck beam removes half of the tSZ auto power at l ~ 700 and half of the cross power at
+  l ~ 1000; the 1.6' ACT beam does the same at l ~ 4400 and ~ 6300, i.e. only inside the pixel-limited range. The
+  model-to-model ratios are unchanged by the beams, so the percentage panels equal those of the unbeamed figure:
+  Battaglia12 x Battaglia16 sits 80-85 % below Lee22 x Lee22 in the cross power at l < 1000, the calibrated pair
+  45-55 % below.

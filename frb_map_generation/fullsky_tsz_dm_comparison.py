@@ -59,6 +59,8 @@ KERNEL_STYLE = {"planck": ("-", "Planck FRB redshifts, 71"), "act": ((0, (1.6, 1
 BEAMS = {"planck": 10.0, "act": 1.6}  # Gaussian FWHM [arcmin] applied to y only
 SURVEY_LABEL = {"planck": "Planck: 71 FRB redshifts, 10′ beam on y", "act": "ACT: 31 FRB redshifts, 1.6′ beam on y"}
 SPECTRA = OUT / "spectra/fullsky_spectra.npz"
+TAKAHASHI25_REAL = Path("frb_map_generation/outputs/takahashi25_real_observations")
+TAKAHASHI25_SURVEY_KEY = {"planck": "planck_milca", "act": "act"}
 
 
 def dm_map_path(model, survey):
@@ -147,11 +149,14 @@ def check(args):
 
 
 def observations(plane):
-    obs = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
-    obs = [r for r in obs if ("ACT" in r["series"]) == (plane == "act")]
-    return dict(x=column(obs, "theta_plotted_arcmin"), w=column(obs, "w_yDM_pc_cm3"),
-                err=np.vstack([column(obs, "error_lower_pc_cm3"), column(obs, "error_upper_pc_cm3")]),
-                lo=column(obs, "theta_bin_lower_arcmin"), hi=column(obs, "theta_bin_upper_arcmin"))
+    """Real Takahashi+25 w_yDM(theta) measurement and jackknife covariance (Eq. 27's first term
+    minus its second term), replacing the earlier plot-digitized Fig. 13 approximation. See
+    prepare_takahashi25_real_observations.py; all 13 author bins are used here (the fullsky
+    method's annular_correlation accepts arbitrary bin edges)."""
+    with np.load(str(TAKAHASHI25_REAL / (TAKAHASHI25_SURVEY_KEY[plane] + ".npz"))) as obs:
+        sigma = obs["sigma_pc_cm3"]
+        return dict(x=obs["theta_mean_arcmin"], w=obs["w_yDM_pc_cm3"], err=np.vstack([sigma, sigma]),
+                    lo=obs["theta_lo_arcmin"], hi=obs["theta_hi_arcmin"], covariance=obs["covariance_pc2_cm6"])
 
 
 def load_spectra():

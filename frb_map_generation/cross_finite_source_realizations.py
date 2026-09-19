@@ -42,6 +42,8 @@ PAIRS = {
     "lee22_calib": ("lee22p_calib", "lee22_noconc_sphere1_calib", "Lee22 y × Lee22 DM, calibrated range only", GREEN),
 }
 PAIRS_OUT = Path("frb_map_generation/outputs/tsz_dm_fullsky_20260918")
+TAKAHASHI25_REAL = Path("frb_map_generation/outputs/takahashi25_real_observations")
+TAKAHASHI25_SURVEY_KEY = {"planck": "planck_milca", "act": "act"}
 SYMLOG_LINTHRESH = 10.0  # 1e-5 pc cm^-3; linear part of the selected-realization axes
 # distinct colour + marker for each shown realization (chosen away from the model colours)
 BEST_STYLE = [("#4B0082", "o"), ("#8B4513", "s"), ("#FF1493", "^"), ("#556B2F", "v"), ("#00A5A5", "D"), ("#9ACD32", "p"),
@@ -159,10 +161,10 @@ def analyze(args):
 
 
 def observed(plane):
-    obs = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
-    obs = [r for r in obs if ("ACT" in r["series"]) == (plane == "act")]
-    return (column(obs, "theta_plotted_arcmin"), column(obs, "w_yDM_pc_cm3"),
-            np.vstack([column(obs, "error_lower_pc_cm3"), column(obs, "error_upper_pc_cm3")]))
+    """Real Takahashi+25 measurement, the same 12 EDGES-matching bins as observed_bins, for the
+    plot_main overlay (no covariance/chi2 use here, display only)."""
+    obs = observed_bins(plane)
+    return obs["x"], obs["w"], obs["err"]
 
 
 def plot_main(rows, ykey, reference_key, out):
@@ -297,21 +299,33 @@ def plot(args):
 # and the realizations that fit the Takahashi points best (output under PAIRS_OUT).
 # ---------------------------------------------------------------------------------------------
 def observed_bins(plane):
-    obs = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
-    obs = [r for r in obs if ("ACT" in r["series"]) == (plane == "act")]
-    lo, hi = column(obs, "theta_bin_lower_arcmin"), column(obs, "theta_bin_upper_arcmin")
-    if not (np.allclose(lo, EDGES[:-1]) and np.allclose(hi, EDGES[1:])):
-        raise ValueError("Observed annuli differ from the simulation annuli")
-    err = np.vstack([column(obs, "error_lower_pc_cm3"), column(obs, "error_upper_pc_cm3")])
-    return dict(x=column(obs, "theta_plotted_arcmin"), w=column(obs, "w_yDM_pc_cm3"), err=err, sigma=err.mean(axis=0),
-                use=EDGES[:-1] >= PAPER_CUT[plane] - 1e-9)
+    """Real Takahashi+25 w_yDM(theta) measurement and jackknife covariance, restricted to the 12
+    bins that match this repository's fixed EDGES annuli (author bin indices 1-12; author bin 0,
+    theta ~ 0.75' < 1', falls outside EDGES's range and is not used here). See
+    prepare_takahashi25_real_observations.py, which verifies indices 1-12 equal EDGES bins 0-11."""
+    survey_key = TAKAHASHI25_SURVEY_KEY[plane]
+    with np.load(str(TAKAHASHI25_REAL / (survey_key + ".npz"))) as f:
+        lo, hi = f["theta_lo_arcmin"][1:], f["theta_hi_arcmin"][1:]
+        if not (np.allclose(lo, EDGES[:-1]) and np.allclose(hi, EDGES[1:])):
+            raise ValueError("Observed annuli differ from the simulation annuli")
+        x = f["theta_mean_arcmin"][1:]
+        w = f["w_yDM_pc_cm3"][1:]
+        sigma = f["sigma_pc_cm3"][1:]
+        covariance = f["covariance_pc2_cm6"][1:, 1:]
+    use = EDGES[:-1] >= PAPER_CUT[plane] - 1e-9
+    inv_covariance = np.linalg.inv(covariance[np.ix_(use, use)])
+    return dict(x=x, w=w, err=np.vstack([sigma, sigma]), sigma=sigma, covariance=covariance,
+                inv_covariance=inv_covariance, use=use)
 
 
 def chi_square(curves, obs):
-    """curves: (..., 12). Diagonal chi^2 against the digitized points above the paper's angular cut
-    (symmetrized digitized errors; the observed bins are correlated, so this ranks, it does not test)."""
+    """curves: (..., 12). Generalized chi^2 against the real Takahashi+25 measurement, using the
+    full jackknife covariance (inverted once, in observed_bins) of the bins above the paper's
+    angular cut -- a real goodness-of-fit weighting, not the earlier diagonal/symmetrized-error
+    approximation forced by the plot-digitized data."""
     use = obs["use"]
-    return np.sum(((curves[..., use] - obs["w"][use]) / obs["sigma"][use]) ** 2, axis=-1)
+    delta = curves[..., use] - obs["w"][use]
+    return np.einsum("...i,ij,...j->...", delta, obs["inv_covariance"], delta)
 
 
 def analyze_pairs(args):

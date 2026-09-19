@@ -46,10 +46,25 @@ STYLE = {
 }
 RC = {"font.size": 15, "axes.labelsize": 18, "axes.titlesize": 17, "xtick.labelsize": 14,
       "ytick.labelsize": 14, "legend.fontsize": 13.5, "axes.linewidth": 1.1}
+TAKAHASHI25_REAL = Path("frb_map_generation/outputs/takahashi25_real_observations")
+TAKAHASHI25_SURVEY_KEY = {"planck": "planck_milca", "act": "act"}
 
 
 def column(rows, key):
     return np.asarray([float(row[key]) for row in rows])
+
+
+def observations(plane):
+    """Real Takahashi+25 w_yDM(theta), restricted to the 12 EDGES-matching bins (author bin
+    indices 1-12; index 0, below 1 arcmin, is outside this repo's fixed annulus grid). Replaces
+    the plot-digitized Fig. 13 approximation; see prepare_takahashi25_real_observations.py."""
+    with np.load(str(TAKAHASHI25_REAL / (TAKAHASHI25_SURVEY_KEY[plane] + ".npz"))) as f:
+        lo, hi = f["theta_lo_arcmin"][1:], f["theta_hi_arcmin"][1:]
+        if not (np.allclose(lo, EDGES[:-1]) and np.allclose(hi, EDGES[1:])):
+            raise ValueError("Observed annuli differ from the simulation annuli")
+        sigma = f["sigma_pc_cm3"][1:]
+        return dict(x=f["theta_mean_arcmin"][1:], w=f["w_yDM_pc_cm3"][1:], sigma=sigma,
+                    err=np.vstack([sigma, sigma]))
 
 
 def analyze(args):
@@ -155,7 +170,6 @@ def plot_takahashi(out, select, reference="geometry"):
     gas inside the R200c sphere, inside the 3R200c sphere, and the old truncation (full-LOS column
     inside an angular aperture of R200c, i.e. a cylinder). reference="previous": inside-R200c curves
     with the 2026-09-14 products (3R200c sphere; legacy Lee22 reading) as dotted lines."""
-    observations = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
     previous = read_rows(PREVIOUS / "analysis/sightline_comparison.csv")
     plt.rcParams.update(RC)
     fig, axes = plt.subplots(1, 2, figsize=(15.5, 7.2))
@@ -165,10 +179,9 @@ def plot_takahashi(out, select, reference="geometry"):
                 "lee22_noconc_sphere1", "lee22_noconc_sphere3", "lee22_noconc_projected1")
     for ax, plane in zip(axes, ("planck", "act")):
         name, beam, count = PLANES[plane]
-        obs = [r for r in observations if ("ACT" in r["series"]) == (plane == "act")]
-        ax.errorbar(column(obs, "theta_plotted_arcmin"), column(obs, "w_yDM_pc_cm3") / 1e-5,
-                    yerr=np.vstack([column(obs, "error_lower_pc_cm3"), column(obs, "error_upper_pc_cm3")]) / 1e-5,
-                    fmt="o", color="black", ms=6, capsize=2.5, lw=1.3, label="Takahashi+25 (digitized)", zorder=6)
+        obs = observations(plane)
+        ax.errorbar(obs["x"], obs["w"] / 1e-5, yerr=obs["err"] / 1e-5,
+                    fmt="o", color="black", ms=6, capsize=2.5, lw=1.3, label="Takahashi+25", zorder=6)
         if reference == "previous":
             for old, (color, legend) in prev_style.items():
                 rows = [r for r in previous if r["survey"] == plane and r["filter"] == plane and r["model"] == old]
@@ -188,10 +201,10 @@ def plot_takahashi(out, select, reference="geometry"):
     by_label = dict(zip(labels, handles))
     if reference == "previous":
         wanted = [STYLE["b16_sphere1"][0], prev_style["battaglia16"][1], STYLE["lee22_noconc_sphere1"][0],
-                  prev_style["lee22_legacy"][1], "Takahashi+25 (digitized)"]
+                  prev_style["lee22_legacy"][1], "Takahashi+25"]
         top = .78
     else:
-        wanted = [STYLE[m][0] for m in geometry] + ["Takahashi+25 (digitized)"]
+        wanted = [STYLE[m][0] for m in geometry] + ["Takahashi+25"]
         top = .76
     fig.legend([by_label[w] for w in wanted], wanted, loc="upper center", ncol=3, frameon=False,
                bbox_to_anchor=(0.5, 1.0), columnspacing=1.4, handlelength=2.8)
@@ -206,7 +219,6 @@ def plot_calibrated(out, select):
     """Lee22 with all resolved halos versus only the halos inside its calibration ranges
     (1e13-10^14.8 h^-1 Msun, z <= 2; the R200c sphere keeps radii inside 0.04-1.34 R200c),
     with Battaglia16 under the same two selections as reference."""
-    observations = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
     plt.rcParams.update(RC)
     fig, axes = plt.subplots(1, 2, figsize=(15.5, 7.0))
     labels_all = {"lee22_noconc_sphere1": "Lee22, all halos",
@@ -215,9 +227,8 @@ def plot_calibrated(out, select):
                   "b16_sphere1_calib": "Battaglia16, calibrated halos only"}
     for ax, plane in zip(axes, ("planck", "act")):
         name, beam, count = PLANES[plane]
-        obs = [r for r in observations if ("ACT" in r["series"]) == (plane == "act")]
-        ax.errorbar(column(obs, "theta_plotted_arcmin"), column(obs, "w_yDM_pc_cm3") / 1e-5,
-                    yerr=np.vstack([column(obs, "error_lower_pc_cm3"), column(obs, "error_upper_pc_cm3")]) / 1e-5,
+        obs = observations(plane)
+        ax.errorbar(obs["x"], obs["w"] / 1e-5, yerr=obs["err"] / 1e-5,
                     fmt="o", color="black", ms=6, capsize=2.5, lw=1.3, label="Takahashi+25", zorder=6)
         for label, legend in list(labels_all.items()) + list(labels_cal.items()):
             x, value, error = select(plane, plane, label)
@@ -323,7 +334,6 @@ def plot_diagnostic(out, select):
 
 
 def write_tables(out, rows, select, plane_z2):
-    observations = read_rows(INPUTS / "digitized/takahashi_fig13_approximate.csv")
     fits = read_rows(PREVIOUS / "references/medlock_fig5_best_fit_digitized.csv")
     models = ("b16_sphere1", "lee22_noconc_sphere1", "b16_sphere3", "lee22_noconc_sphere3", "b16_projected1",
               "lee22_noconc_projected1", "lee22_legacy_sphere3", "lee22_pref_sphere1")
@@ -331,7 +341,7 @@ def write_tables(out, rows, select, plane_z2):
     table_rows = []
     for plane in ("planck", "act"):
         name, beam, count = PLANES[plane]
-        obs = [r for r in observations if ("ACT" in r["series"]) == (plane == "act")]
+        obs = observations(plane)
         lines += ["## Takahashi+25 {}: {}, {} observed redshifts".format(name, beam, count), "",
                   "| annulus [arcmin] | observed | B16 inside R200c | Lee22 no-c inside R200c | B16 to 3R200c | Lee22 no-c to 3R200c | B16 old truncation (R200c cylinder) | Lee22 no-c old truncation (R200c cylinder) | Lee22 previous reading 3R200c | Lee22+c inside R200c (diag.) |",
                   "|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
@@ -339,11 +349,10 @@ def write_tables(out, rows, select, plane_z2):
         for b in range(12):
             if EDGES[b] < PAPER_CUT[plane] - 1e-9:
                 continue
-            o = obs[b]
             cells = ["{:.2f}-{:.2f}".format(EDGES[b], EDGES[b + 1]),
-                     "{:.2f} (-{:.2f}/+{:.2f})".format(float(o["w_yDM_pc_cm3"]) / 1e-5, float(o["error_lower_pc_cm3"]) / 1e-5, float(o["error_upper_pc_cm3"]) / 1e-5)]
+                     "{:.2f} +- {:.2f}".format(obs["w"][b] / 1e-5, obs["sigma"][b] / 1e-5)]
             record = dict(plane=plane, theta_lower_arcmin=EDGES[b], theta_upper_arcmin=EDGES[b + 1],
-                          observed_1e5=float(o["w_yDM_pc_cm3"]) / 1e-5)
+                          observed_1e5=obs["w"][b] / 1e-5)
             for m in models:
                 cells.append("{:.2f} +- {:.2f}".format(values[m][1][b] / 1e-5, values[m][2][b] / 1e-5))
                 record[m + "_1e5"] = values[m][1][b] / 1e-5

@@ -1,0 +1,13 @@
+#!/bin/bash
+#PBS -N lee22_tsz_obs
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=06:00:00
+#PBS -j oe
+#PBS -o /lustre/work/kristero10/lee22_tsz_observation_20260918/logs/
+#PBS -S /bin/bash
+set -euo pipefail
+: "${LEE22_SHA256:?set LEE22_SHA256}"
+mkdir -p /lustre/work/kristero10/lee22_tsz_observation_20260918/logs
+export PYTHONUNBUFFERED=1
+exec /home/anaconda3/bin/python3 /lustre/work/kristero10/sbi_linear_8k_20260918/code/run_lee22_observation.py "${LEE22_SHA256}"

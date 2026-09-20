@@ -38,6 +38,12 @@ qsub -v SBI_CASES=masked_no_noise,CASE_DATASET_TAG=dataset_row_metadata_verified
 Do not enable `ALLOW_SOBOL_IDENTITY_FALLBACK`: the consolidated profiles use
 the verified source ordering/mapping rather than an assumed identity ordering.
 
+The project-supplied SO Sobol bounds are the authoritative inference domain.
+The existing simulations that extend slightly beyond that domain are retained
+without clipping as boundary support; they do not widen the bounds stored in
+the emulator artifact. Counts, extrema, and the first such row are recorded in
+`input_provenance.json`.
+
 ## Split and model selection
 
 For 524,288 rows, the seeded random outer split contains:
@@ -100,6 +106,10 @@ The held-out test report includes:
 - the same error audit in each fixed prior quartile of every input parameter;
 - per-profile metrics, including the worst test profiles.
 
+The primary report and quality gate use only held-out rows inside the
+authoritative prior. Separate `all_training_support` and
+`outside_prior_buffer` reports audit the wider simulation support.
+
 The default quality gate requires:
 
 - overall median absolute percentage difference <= 1%;
@@ -122,6 +132,11 @@ test_metrics_overall.json
 test_metrics_by_bin.csv
 test_metrics_by_parameter_quartile.csv
 test_profile_metrics.csv
+test_metrics_all_training_support.json
+test_metrics_by_bin_all_training_support.csv
+test_profile_metrics_all_training_support.csv
+test_metrics_outside_prior_buffer.json
+test_metrics_by_bin_outside_prior_buffer.csv
 test_predictions.npz
 quality_gate.json
 training_history.csv
@@ -144,5 +159,5 @@ python emulator_tSZ/so_noiseless_emulator.py \
 ```
 
 The output key `dl` contains the linear 40-bin noiseless `D_ell` profiles. The
-inference command rejects parameters outside the training prior unless
+inference command rejects parameters outside the authoritative prior unless
 `--allow-extrapolation` is explicitly passed.

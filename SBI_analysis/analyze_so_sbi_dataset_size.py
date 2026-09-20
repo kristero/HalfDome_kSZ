@@ -133,6 +133,13 @@ def read_csv(path: Path) -> list[dict[str, Any]]:
         return list(csv.DictReader(handle))
 
 
+def read_json_if_exists(path: Path) -> Any:
+    if not path.is_file():
+        return {}
+    with path.open("r", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
 def to_float(value: Any) -> float:
     return float(value)
 
@@ -211,7 +218,12 @@ def sample_posterior_at_x(posterior: Any, x_obs: np.ndarray, num_samples: int, d
 
     if torch.is_tensor(samples):
         samples = samples.detach().cpu().numpy()
-    return np.asarray(samples, dtype=np.float64)
+    samples = np.asarray(samples, dtype=np.float64)
+    if samples.ndim == 1:
+        samples = samples.reshape(1, -1)
+    elif samples.ndim > 2:
+        samples = samples.reshape(-1, samples.shape[-1])
+    return samples
 
 
 def find_case_dataset(case: str, dataset_dir: Path, index_json: Path | None) -> Path:
@@ -325,6 +337,30 @@ def load_x_transform(run_dir: Path) -> dict[str, Any]:
     out["mode"] = scalar_string(out.get("mode", "none"), "none")
     out["path"] = str(transform_path)
     return out
+
+
+def train_index_stats(transform: dict[str, Any]) -> dict[str, Any]:
+    if "train_indices" not in transform:
+        return {
+            "train_indices_count": "",
+            "train_indices_unique_count": "",
+            "train_indices_min": "",
+            "train_indices_max": "",
+        }
+    indices = np.asarray(transform["train_indices"], dtype=np.int64).reshape(-1)
+    if indices.size == 0:
+        return {
+            "train_indices_count": 0,
+            "train_indices_unique_count": 0,
+            "train_indices_min": "",
+            "train_indices_max": "",
+        }
+    return {
+        "train_indices_count": int(indices.size),
+        "train_indices_unique_count": int(np.unique(indices).size),
+        "train_indices_min": int(np.min(indices)),
+        "train_indices_max": int(np.max(indices)),
+    }
 
 
 def apply_x_transform(x_values: np.ndarray, transform: dict[str, Any]) -> np.ndarray:
@@ -463,7 +499,17 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
             posterior = load_posterior(run_dir)
             x_transform = load_x_transform(run_dir)
             x_rescale_mode = str(x_transform.get("mode", "none"))
+            run_metadata = read_json_if_exists(run_dir / "run_metadata.json")
+            index_stats = train_index_stats(x_transform)
             print(f"    x rescale mode: {x_rescale_mode}")
+            if run_metadata:
+                print(
+                    "    run metadata: "
+                    f"order={run_metadata.get('dataset_order', '')}, "
+                    f"exclude_last_n={run_metadata.get('exclude_last_n_from_training', '')}, "
+                    f"training_pool_rows={run_metadata.get('training_pool_rows', '')}, "
+                    f"best_validation_loss={run_metadata.get('best_validation_loss', '')}"
+                )
             require_no_train_eval_overlap(
                 transform=x_transform,
                 eval_indices=eval_indices,
@@ -498,6 +544,16 @@ def compute_metrics(args: argparse.Namespace, root: Path) -> tuple[list[dict[str
                         "test_index": str(eval_label),
                         "analysis_target": args.analysis_target,
                         "x_rescale_mode": x_rescale_mode,
+                        "run_dataset_order": run_metadata.get("dataset_order", ""),
+                        "run_exclude_last_n_from_training": run_metadata.get("exclude_last_n_from_training", ""),
+                        "run_training_pool_rows": run_metadata.get("training_pool_rows", ""),
+                        "run_available_rows": run_metadata.get("available_rows", ""),
+                        "run_x_dim": run_metadata.get("x_dim", ""),
+                        "run_theta_dim": run_metadata.get("theta_dim", ""),
+                        "run_density_estimator": run_metadata.get("density_estimator", ""),
+                        "run_stop_after_epochs": run_metadata.get("stop_after_epochs", ""),
+                        "run_best_validation_loss": run_metadata.get("best_validation_loss", ""),
+                        **index_stats,
                         "mse": mse,
                         "rmse": float(np.sqrt(mse)),
                         "rmse_over_prior_range": float(np.sqrt(np.nanmean(error_over_prior_range**2))),
@@ -963,6 +1019,19 @@ def main() -> int:
                 "test_index",
                 "analysis_target",
                 "x_rescale_mode",
+                "run_dataset_order",
+                "run_exclude_last_n_from_training",
+                "run_training_pool_rows",
+                "run_available_rows",
+                "run_x_dim",
+                "run_theta_dim",
+                "run_density_estimator",
+                "run_stop_after_epochs",
+                "run_best_validation_loss",
+                "train_indices_count",
+                "train_indices_unique_count",
+                "train_indices_min",
+                "train_indices_max",
                 "mse",
                 "rmse",
                 "rmse_over_prior_range",

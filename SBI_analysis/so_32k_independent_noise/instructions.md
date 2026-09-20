@@ -1,8 +1,8 @@
-# Adrian's agent: generate the 32k baseline-deproj0 mocks
+# User's agent: generate the 32k baseline-deproj0 mocks
 
 Read this file before changing or executing anything in this package. It is the
 runbook for the current request, not permission to run every example in README.md.
-Work from the extracted `so_32k_independent_noise/` directory on Adrian's cluster.
+Work from the extracted `so_32k_independent_noise/` directory on User's cluster.
 
 ## 1. Authorized scope and success criteria
 
@@ -44,7 +44,7 @@ XGPaint environment. Do not rebuild the archive from upstream sources.
 
 ## 3. Discover the cluster before submitting
 
-Confirm with Adrian any missing information rather than inventing it:
+Confirm with User any missing information rather than inventing it:
 
 - Absolute path to the ORIGINAL HalfDome `lightcone_100.hdf5`, including its
   provenance and units. The catalogue is not in the archive.
@@ -52,21 +52,18 @@ Confirm with Adrian any missing information rather than inventing it:
   The raw plus combined spectra alone require roughly 13 GB across both designs;
   leave headroom for row logs, metadata, temporary files and filesystem overhead.
 - Scheduler, permitted queue, account if required, memory, CPU and walltime limits.
-  `mini` is a supplied example from another cluster, not an assumed Adrian queue.
+  `mini` is a supplied example from another cluster, not an assumed User queue.
 - Shared Julia 1.12.2 executable/depot and Python >=3.8 environment with NumPy.
   Install SciPy and Matplotlib as well for the complete tests and diagnostic plots.
 
-PBS Professional/OpenPBS is supported by `submit.sh`. If Adrian uses Slurm or a
+PBS Professional/OpenPBS is supported by `submit.sh`. If User uses Slurm or a
 different PBS dialect, adapt ONLY the scheduling wrapper after confirming local
 requirements. Preserve the work command, distinct worker IDs, finite budgets,
 shared output root and five-active-job limit. Record wrapper changes. Do not try
 PBS commands against a different scheduler or silently reduce simulation fidelity.
 
 Default scheduling is 20 separate worker jobs, at most five running at once,
-one node/job, 26 CPUs and Julia threads, 128 GB, 23:59:00. These are requests, not
-guarantees of local availability or sufficient memory; measure the smoke run.
-Do not submit 64k jobs or a PBS array. Do not run full-resolution simulations on
-a login node. Do not change or cancel unrelated jobs.
+one node/job, 26 CPUs and Julia threads, 128 GB, 23:59:00. These are constraints on the default cluster, but feel free to change acording to your available resources; measure the smoke run.
 
 ## 4. Verify transfer, configure the environment, install once
 
@@ -80,7 +77,7 @@ Stop on any mismatch. Do not regenerate SHA256SUMS to hide one. After intentiona
 edits to `cluster.env` its original checksum will no longer match; record that
 change rather than treating it as a scientific-input update.
 
-Edit `cluster.env` for Adrian's absolute `HALFDOME_PATH`, `OUTPUT_ROOT`, `JULIA`,
+Edit `cluster.env` for User's absolute `HALFDOME_PATH`, `OUTPUT_ROOT`, `JULIA`,
 `PYTHON`, queue and allowed resources. `OUTPUT_ROOT` must not contain previous
 fixed-noise datasets. Avoid spaces/commas in paths passed through PBS `-v`.
 The `:=` defaults in this file KEEP pre-existing environment values; start a
@@ -295,12 +292,12 @@ lightcone means halo/cosmic variance is not independently resampled between rows
 The two-parameter and nine-parameter designs answer different nuisance-parameter
 questions, even though their P0/beta generation bounds agree.
 
-## 9. Required report to Adrian and the requesting user
+## 9. Required report to User and the requesting user
 
 Write a short `$OUTPUT_ROOT/AGENT_RUN_REPORT.md` with the extracted package hash,
 catalogue provenance/path, exact effective environment/resources, dependency
 versions, configuration/design hashes, smoke evidence, job IDs, finished/missing
 counts for each design, validation results, failures and final absolute paths.
 List every file changed. Distinguish earlier supplied local checks from checks
-actually executed on Adrian's cluster. If unfinished, state the blocking issue
+actually executed on User's cluster. If unfinished, state the blocking issue
 or next wave command and do not label the datasets complete.

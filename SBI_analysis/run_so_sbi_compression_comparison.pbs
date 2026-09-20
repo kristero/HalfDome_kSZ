@@ -24,7 +24,7 @@ DATA_DIR="${PROJECT_ROOT}/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell8
 cd "${PROJECT_ROOT}"
 mkdir -p "${COMPRESSION_ROOT}/logs"
 exec > >(tee -a "${COMPRESSION_ROOT}/logs/${COMPRESSION_STAGE}_${COMPRESSION_METHOD}_${PBS_JOBID:-manual}.log") 2>&1
-export OMP_NUM_THREADS="${PBS_NCPUS:-26}"
+export OMP_NUM_THREADS="${COMPRESSION_THREADS:-${PBS_NCPUS:-26}}"
 export OPENBLAS_NUM_THREADS="${OMP_NUM_THREADS}"
 export MKL_NUM_THREADS="${OMP_NUM_THREADS}"
 export NUMEXPR_NUM_THREADS="${OMP_NUM_THREADS}"
@@ -57,7 +57,11 @@ case "${COMPRESSION_STAGE}" in
     "${PYTHON}" "${SCRIPT}" check-runtime
     set -- "$@" --method "${COMPRESSION_METHOD}"
     ;;
-  summarize) ;;
+  summarize)
+    if [[ "${ALLOW_INCOMPLETE_SUMMARY:-0}" == "1" ]]; then
+      set -- "$@" --allow-incomplete
+    fi
+    ;;
   *) echo "Invalid COMPRESSION_STAGE: ${COMPRESSION_STAGE}" >&2; exit 2 ;;
 esac
 "${PYTHON}" "${SCRIPT}" "$@"

@@ -220,6 +220,35 @@ The downloader waits for a completion/failure marker and transfers plots,
 CSV tables, logs and provenance using `ssh idark`. It does not download the
 large training arrays. A failed summary is labelled failed, not complete.
 
+### Explicit preliminary comparison
+
+If sampling failures leave incomplete evaluations, the normal summary still
+refuses to report full-test metrics. An explicit diagnostic alternative is:
+
+```bash
+python SBI_analysis/run_so_sbi_compression_comparison.py summarize \
+  --output-root /path/to/downloaded/experiment --allow-incomplete
+```
+
+Download `shared.npz`, both compression diagnostics NPZs, and every method's
+`evaluation/` directory and `training_complete.json`, in addition to
+`experiment.json`. Plotting does not require the density estimators, original
+spectra, or Torch/SBI. GetDist is optional; `--skip-corner` skips that plot.
+
+This mode uses the intersection of completed rows for all three methods,
+records missing/omitted identities in `comparison_scope.json`, and writes
+only to `summary_preliminary/`. Every figure has a preliminary/subset warning;
+CSV tables record the actual test count and preliminary status. It creates
+`preliminary_summary_complete.json`, never a full-evaluation completion marker.
+Malformed or stale checkpoints still cause errors, rather than being dropped.
+Since sampling failures preferentially remove difficult cases, these subset
+metrics may be optimistic and are not unbiased full-test performance estimates.
+
+For a plotting-only cluster job, pass `COMPRESSION_STAGE=summarize`,
+`ALLOW_INCOMPLETE_SUMMARY=1`, and the existing `COMPRESSION_ROOT` with `qsub -v`.
+If requesting fewer CPUs than the standard job, also set `COMPRESSION_THREADS`
+to that allocation. No training or sampling is performed by the summary stage.
+
 The entire workflow can run locally in WSL, not only the summary. On your
 machine, use the HalfDome Python environment:
 

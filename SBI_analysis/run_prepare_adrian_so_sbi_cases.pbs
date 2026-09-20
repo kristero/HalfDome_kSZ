@@ -42,8 +42,8 @@ fi
 : ${NO_COMPRESS:=1}
 : ${ALLOW_MISSING_PRODUCTS:=1}
 : ${ALLOW_SOBOL_IDENTITY_FALLBACK:=0}
-: ${CASE_DATASET_TAG:=dataset_row_sobolrow}
-: ${SBI_CASES:=masked_no_noise,masked_baseline_noise_cross_deproj0}
+: ${CASE_DATASET_TAG:=dataset_row_metadata_verified}
+: ${SBI_CASES:=masked_baseline_noise_cross_deproj0}
 
 ELL_TAG=$("$PYTHON" - "$ELL_MIN" "$ELL_MAX" <<'PY'
 import sys

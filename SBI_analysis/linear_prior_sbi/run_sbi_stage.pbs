@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N sbi_linear8k
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -o /lustre/work/kristero10/sbi_linear_8k_20260918/logs/
+#PBS -S /bin/bash
+set -euo pipefail
+: "${SBI_STAGE:=all}"; : "${SBI_METHOD:=bins40}"; : "${SBI_EXTRA:=}"
+CODE=/lustre/work/kristero10/sbi_linear_8k_20260918/code
+mkdir -p /lustre/work/kristero10/sbi_linear_8k_20260918/logs
+export OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=26 MKL_NUM_THREADS=26 TORCH_NUM_THREADS=26 TORCH_NUM_INTEROP_THREADS=1 PYTHONUNBUFFERED=1 MPLBACKEND=Agg
+echo "stage=${SBI_STAGE} method=${SBI_METHOD} host=$(hostname) start=$(date -Is)"
+/home/anaconda3/bin/python3 "${CODE}/sbi_linear_prior_pipeline.py" "${SBI_STAGE}" --method "${SBI_METHOD}" ${SBI_EXTRA}
+echo "done $(date -Is)"

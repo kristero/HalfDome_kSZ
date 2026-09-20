@@ -34,6 +34,29 @@ def synthetic_data(n=1200):
 
 
 class CompressionTests(unittest.TestCase):
+    def test_preliminary_rows_require_opt_in_and_use_common_intersection(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config = dict(experiment_id="fixture")
+            shared = dict(test_indices=np.arange(10, 15))
+            for method in METHODS:
+                rows = root / method / "evaluation/profiles"
+                rows.mkdir(parents=True)
+                for idx in shared["test_indices"]:
+                    if (method, idx) not in [("pca", 11), ("moped", 12)]:
+                        (rows / f"row{idx}.npz").touch()
+            with self.assertRaises(FileNotFoundError):
+                runner.comparison_rows(root, config, shared)
+            selected, scope = runner.comparison_rows(root, config, shared, True)
+            np.testing.assert_array_equal(selected, [10, 13, 14])
+            self.assertEqual(scope["omitted_indices"], [11, 12])
+            self.assertEqual(scope["missing_by_method"]["bins40"], [])
+            self.assertEqual(scope["n_requested"], 5)
+            self.assertTrue(scope["preliminary"])
+            write_json(root / "pca/evaluation/evaluation_complete.json", dict(experiment_id="stale"))
+            with self.assertRaisesRegex(ValueError, "Stale"):
+                runner.comparison_rows(root, config, shared, True)
+
     def test_best_validation_weights_restored_at_epoch_cap(self):
         try:
             import torch
@@ -201,6 +224,24 @@ class CompressionTests(unittest.TestCase):
             runner.summarize(args, config, shared)
             self.assertTrue((args.output_root / "summary/summary_complete.json").is_file())
             self.assertEqual(len(list((args.output_root / "summary").glob("*.png"))), 11)
+            original_marker = (args.output_root / "summary/summary_complete.json").read_bytes()
+            for method, idx in zip(("pca", "moped"), shared["test_indices"][-2:]):
+                (args.output_root / method / f"evaluation/profiles/row{idx}.npz").unlink()
+                (args.output_root / method / "evaluation/evaluation_complete.json").unlink()
+            with self.assertRaises(FileNotFoundError):
+                runner.summarize(args, config, shared)
+            args.allow_incomplete = True
+            runner.summarize(args, config, shared)
+            preliminary = args.output_root / "summary_preliminary"
+            scope = json.loads((preliminary / "comparison_scope.json").read_text())
+            self.assertEqual(scope["n_compared"], 8)
+            self.assertEqual(scope["n_requested"], 10)
+            self.assertTrue((preliminary / "preliminary_summary_complete.json").is_file())
+            completion = json.loads((preliminary / "preliminary_summary_complete.json").read_text())
+            self.assertEqual(completion["n_compared"], 8)
+            self.assertFalse((preliminary / "summary_complete.json").exists())
+            self.assertEqual((args.output_root / "summary/summary_complete.json").read_bytes(), original_marker)
+            self.assertEqual(len(list(preliminary.glob("*.png"))), 11)
             args.pca_components = 8
             with self.assertRaisesRegex(ValueError, "differs"):
                 runner.prepare(args)

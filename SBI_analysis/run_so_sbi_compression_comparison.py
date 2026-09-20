@@ -59,6 +59,8 @@ def parse_args():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--skip-corner", action="store_true",
                         help="Summary plots need only numpy/scipy/matplotlib; skip optional GetDist.")
+    parser.add_argument("--allow-incomplete", action="store_true",
+                        help="Summarize common completed rows as labelled preliminary plots in summary_preliminary.")
     return parser.parse_args()
 
 
@@ -366,7 +368,10 @@ def evaluate(root, method, config, shared):
                dict(experiment_id=config["experiment_id"], n_test=len(shared["test_indices"])))
 
 
-def save_figure(fig, output, name):
+def save_figure(fig, output, name, notice=None):
+    if notice:
+        fig.text(.5, 1.015, notice, ha="center", va="bottom", fontsize=7,
+                 color="#9C2929", transform=fig.transFigure)
     for suffix in ("png", "jpg"):
         fig.savefig(output / f"{name}.{suffix}", dpi=300, bbox_inches="tight")
 
@@ -378,23 +383,62 @@ def write_csv(path, rows):
         writer.writerows(rows)
 
 
+def comparison_rows(root, config, shared, allow_incomplete=False):
+    """Use identical rows for every method; incomplete comparisons require opt-in."""
+    requested = [int(idx) for idx in shared["test_indices"]]
+    missing, marker_present = {}, {}
+    for method in METHODS:
+        marker = root / method / "evaluation/evaluation_complete.json"
+        marker_present[method] = marker.is_file()
+        if marker.exists() and json.loads(marker.read_text())["experiment_id"] != config["experiment_id"]:
+            raise ValueError(f"Stale evaluation marker: {marker}")
+        if not marker.exists() and not allow_incomplete:
+            raise FileNotFoundError(f"Incomplete evaluation: {marker}. Rerun stage 'run', or explicitly "
+                                    "use --allow-incomplete for a preliminary common-subset comparison.")
+        missing[method] = [idx for idx in requested
+                           if not (root / method / f"evaluation/profiles/row{idx}.npz").is_file()]
+    omitted = set(idx for rows in missing.values() for idx in rows)
+    if omitted and not allow_incomplete:
+        raise FileNotFoundError(f"Missing posterior checkpoints: {missing}")
+    selected = np.asarray([idx for idx in requested if idx not in omitted], dtype=np.int64)
+    if len(selected) < 3:
+        raise ValueError("At least three common completed profiles are needed for comparison")
+    scope = dict(experiment_id=config["experiment_id"], preliminary=bool(allow_incomplete),
+                 n_requested=len(requested), n_compared=len(selected),
+                 selected_indices=selected.tolist(), omitted_indices=sorted(omitted),
+                 missing_by_method=missing, evaluation_marker_present=marker_present,
+                 selection="intersection of completed profiles across all methods",
+                 warning=("Sampling failures are not random omissions; metrics on the successful "
+                          "subset can be optimistic. This is not a complete held-out evaluation.")
+                         if allow_incomplete else None)
+    return selected, scope
+
+
 def summarize(args, config, shared):
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
     root = args.output_root
-    out = root / "summary"
+    preliminary = getattr(args, "allow_incomplete", False)
+    selected, scope = comparison_rows(root, config, shared, preliminary)
+    out = root / ("summary_preliminary" if preliminary else "summary")
     out.mkdir(exist_ok=True)
-    # Validate every expected row first. Never compare different successful subsets.
+    write_json(out / "comparison_scope.json", scope)
+    np.save(out / "compared_test_indices.npy", selected)
+    config = dict(config, n_test=len(selected))
+    notice = None
+    if preliminary:
+        notice = (f"PRELIMINARY: common successful subset ({len(selected)}/{scope['n_requested']} profiles)\n"
+                  f"{len(scope['omitted_indices'])} omitted; metrics may be optimistic.")
+        print(notice)
+        print("Omitted dataset rows:", scope["omitted_indices"])
+    # Validate all used checkpoints; never silently discard malformed samples.
     all_metrics, all_records, stats = {}, [], []
     for method in METHODS:
         run = root / method
-        marker = run / "evaluation/evaluation_complete.json"
-        if not marker.exists() or json.loads(marker.read_text())["experiment_id"] != config["experiment_id"]:
-            raise FileNotFoundError(f"Incomplete or stale evaluation: {marker}. Rerun stage 'run'.")
         collected = []
-        for idx in shared["test_indices"]:
+        for idx in selected:
             saved = load_npz(run / f"evaluation/profiles/row{idx}.npz")
             if str(saved["experiment_id"].item()) != config["experiment_id"]:
                 raise ValueError("Posterior checkpoint is from another experiment")
@@ -405,16 +449,19 @@ def summarize(args, config, shared):
             metric = metrics_from_samples(saved["samples"], shared["theta"][idx], shared["low"], shared["high"])
             collected.append(metric)
             for j, name in enumerate(PARAM_NAMES):
-                all_records.append(dict(method=method, test_index=int(idx), param=name,
+                all_records.append(dict(method=method, test_index=int(idx), param=name, preliminary=preliminary,
                                         **{key: float(value[j]) for key, value in metric.items()}))
         values = {key: np.stack([item[key] for item in collected]) for key in collected[0]}
         values["pearson"] = pearson_columns(values["truth"], values["mean"])
         all_metrics[method] = values
         train_meta = json.loads((run / "training_complete.json").read_text())
+        if train_meta["experiment_id"] != config["experiment_id"]:
+            raise ValueError(f"Stale training marker: {run}")
         if not train_meta.get("converged_by_early_stopping", False):
             print(f"WARNING: {method} has no recorded early-stopping convergence; inspect its training summary.")
         for j, name in enumerate(PARAM_NAMES):
             stats.append(dict(method=method, param=name, n_train=config["n_train"], n_test=config["n_test"],
+                              n_requested=scope["n_requested"], preliminary=preliminary,
                               pearson_r=float(values["pearson"][j]),
                               rmse=float(np.sqrt(np.mean(values["error"][:, j]**2))),
                               rmse_prior=float(np.sqrt(np.mean(values["normalized_error_prior"][:, j]**2))),
@@ -434,6 +481,7 @@ def summarize(args, config, shared):
     for method in METHODS:
         v = all_metrics[method]
         aggregate.append(dict(method=method, n_train=config["n_train"], n_test=config["n_test"],
+                              n_requested=scope["n_requested"], preliminary=preliminary,
                               rmse_prior=float(np.sqrt(np.mean(v["normalized_error_prior"]**2))),
                               rmse_std=float(np.sqrt(np.mean(v["pull"]**2))),
                               mean_std_prior=float(v["std_over_prior"].mean()),
@@ -461,7 +509,7 @@ def summarize(args, config, shared):
         ax.set_title(title)
         ax.grid(axis="y", alpha=.2)
     fig.tight_layout()
-    save_figure(fig, out, "aggregate_metrics_comparison")
+    save_figure(fig, out, "aggregate_metrics_comparison", notice)
     plt.close(fig)
     for key, ylabel, filename in (
         ("pearson_r", r"Pearson $r(\theta_{\rm true},\bar\theta)$", "correlation_comparison"),
@@ -490,27 +538,27 @@ def summarize(args, config, shared):
         ax.margins(y=.25)
         ax.legend(fontsize=7)
         fig.tight_layout()
-        save_figure(fig, out, filename)
+        save_figure(fig, out, filename, notice)
         plt.close(fig)
 
-    for selected, filename in ((METHODS, "true_vs_mean_comparison"),
+    for selected_methods, filename in ((METHODS, "true_vs_mean_comparison"),
                                 *[((method,), f"true_vs_mean_{method}") for method in METHODS]):
         fig, axes = plt.subplots(3, 3, figsize=(18 / 2.54, 18 / 2.54))
         for j, ax in enumerate(axes.flat):
             ax.plot([shared["low"][j], shared["high"][j]],
                     [shared["low"][j], shared["high"][j]], "k:", lw=.8)
-            for method in selected:
+            for method in selected_methods:
                 k, v = METHODS.index(method), all_metrics[method]
                 ax.scatter(v["truth"][:, j], v["mean"][:, j], s=5, alpha=.28,
                            color=COLORS[k], rasterized=True)
-                ax.text(.03, .97 - .085*k if len(selected) > 1 else .97,
+                ax.text(.03, .97 - .085*k if len(selected_methods) > 1 else .97,
                         f"{display[method]}: r = {v['pearson'][j]:.3f}", color=COLORS[k],
                         transform=ax.transAxes, va="top", fontsize=6)
             ax.set_xlabel(f"True ${LABELS[j]}$")
             ax.set_ylabel(f"Posterior mean ${LABELS[j]}$")
             ax.grid(alpha=.2)
         fig.tight_layout()
-        save_figure(fig, out, filename)
+        save_figure(fig, out, filename, notice)
         plt.close(fig)
 
     pca = load_npz(root / "pca_diagnostics.npz")
@@ -522,7 +570,7 @@ def summarize(args, config, shared):
     axes[1].semilogy(np.arange(1, 10), moped["singular_values"], "o-")
     axes[1].set(xlabel="MOPED sensitivity mode", ylabel="Whitened derivative singular value")
     fig.tight_layout()
-    save_figure(fig, out, "compression_diagnostics")
+    save_figure(fig, out, "compression_diagnostics", notice)
     plt.close(fig)
 
     corner_created = False
@@ -533,6 +581,11 @@ def summarize(args, config, shared):
             print("GetDist unavailable; metric plots saved. Install getdist and rerun summarize for the corner.")
         else:
             idx = int(shared["example_index"])
+            if idx not in selected:
+                distance = np.linalg.norm((shared["theta"][selected] - FIDUCIAL)
+                                          / (shared["high"] - shared["low"]), axis=1)
+                idx = int(selected[np.argmin(distance)])
+                print("Original corner example is incomplete; using common held-out row", idx)
             names = [f"p{j}" for j in range(9)]
             ranges = {name: (float(shared["low"][j]), float(shared["high"][j])) for j, name in enumerate(names)}
             roots = []
@@ -555,16 +608,20 @@ def summarize(args, config, shared):
                 legend.set_bbox_to_anchor((.93, .91), transform=g.fig.transFigure)
             g.fig.text(.60, .97, f"Shared held-out row {idx}, not Battaglia12",
                        ha="center", va="top", fontsize=9)
-            save_figure(g.fig, out, "heldout_constraints_corner")
+            save_figure(g.fig, out, "heldout_constraints_corner", notice)
             plt.close(g.fig)
             corner_created = True
-    write_json(out / "summary_complete.json", dict(experiment_id=config["experiment_id"],
-                                                   corner_created=corner_created))
+    marker_name = "preliminary_summary_complete.json" if preliminary else "summary_complete.json"
+    write_json(out / marker_name, dict(experiment_id=config["experiment_id"],
+                                     preliminary=preliminary, n_compared=len(selected),
+                                     n_requested=scope["n_requested"], corner_created=corner_created))
     print("Summary plots and CSVs:", out)
 
 
 def main():
     args = parse_args()
+    if args.allow_incomplete and args.stage != "summarize":
+        raise ValueError("--allow-incomplete is only valid for summarize; it never changes evaluation")
     if args.stage == "check-runtime":
         # Test the actual imports used here. Newer sbi does not need ArviZ/Numba.
         import torch
@@ -585,7 +642,8 @@ def main():
         train(args.output_root, args.method, config, shared)
         evaluate(args.output_root, args.method, config, shared)
     else:
-        failure = args.output_root / "summary/summary_failure.json"
+        folder = "summary_preliminary" if args.allow_incomplete else "summary"
+        failure = args.output_root / folder / "summary_failure.json"
         try:
             summarize(args, config, shared)
         except Exception as error:

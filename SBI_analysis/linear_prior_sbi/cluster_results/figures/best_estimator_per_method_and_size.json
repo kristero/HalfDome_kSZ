@@ -1,0 +1,20 @@
+{
+ "bins40_N1024": "maf",
+ "bins40_N2048": "maf",
+ "bins40_N256": "maf",
+ "bins40_N4096": "maf",
+ "bins40_N512": "maf",
+ "bins40_N7349": "maf",
+ "moped_N1024": "maf",
+ "moped_N2048": "maf",
+ "moped_N256": "maf",
+ "moped_N4096": "maf",
+ "moped_N512": "maf",
+ "moped_N7349": "maf",
+ "pca_N1024": "maf",
+ "pca_N2048": "maf",
+ "pca_N256": "maf",
+ "pca_N4096": "maf",
+ "pca_N512": "maf",
+ "pca_N7349": "maf"
+}

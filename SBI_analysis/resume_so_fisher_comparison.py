@@ -112,6 +112,23 @@ def parse_args() -> argparse.Namespace:
         help="Raw density-estimator draws used to measure prior-support leakage.",
     )
     parser.add_argument(
+        "--minimum-raw-prior-fraction",
+        type=float,
+        default=1e-3,
+        help=(
+            "Minimum fraction of raw density-estimator draws that must lie inside "
+            "the training prior before posterior sampling is allowed."
+        ),
+    )
+    parser.add_argument(
+        "--allow-low-prior-support",
+        action="store_true",
+        help=(
+            "Continue despite a failed raw-prior-support diagnostic. Use only to "
+            "produce explicitly labelled diagnostic outputs."
+        ),
+    )
+    parser.add_argument(
         "--force-resample",
         action="store_true",
         help="Ignore any completed or partial saved NPE chain.",
@@ -219,6 +236,35 @@ def raw_density_leakage_diagnostic(
         "raw_min": np.nanmin(raw, axis=0).tolist(),
         "raw_max": np.nanmax(raw, axis=0).tolist(),
     }
+
+
+def validate_raw_prior_support(
+    leakage: dict[str, Any],
+    minimum_fraction: float,
+    allow_failure: bool,
+    preflight_path: Path,
+) -> None:
+    status = str(leakage.get("status", "missing"))
+    raw_fraction = float(leakage.get("fraction_within_prior", 0.0))
+    support_failed = status != "ok" or raw_fraction < minimum_fraction
+    if not support_failed:
+        return
+
+    message = (
+        "Unreliable NPE posterior: the raw density diagnostic status is "
+        f"{status!r} and only {raw_fraction:.3%} of draws lie inside the "
+        f"training prior (required {minimum_fraction:.3%}). This usually means "
+        "the observation is outside the NPE training distribution or its "
+        "preprocessing/simulation contract does not match training. Inspect "
+        f"{preflight_path}. Do not use MCMC to hide this failure."
+    )
+    if allow_failure:
+        print(f"WARNING: {message}", flush=True)
+        return
+    raise RuntimeError(
+        message
+        + " Pass --allow-low-prior-support only for a labelled diagnostic run."
+    )
 
 
 def sample_posterior_configured(
@@ -524,6 +570,18 @@ def main() -> int:
         )
     sampling_preflight_path = output_dir / f"npe_sampling_preflight_N{n_train}.json"
     if final_path.is_file() and not args.force_resample:
+        if sampling_preflight_path.is_file():
+            with sampling_preflight_path.open("r", encoding="utf-8") as handle:
+                saved_preflight = json.load(handle)
+            saved_leakage = saved_preflight.get("leakage", {})
+        else:
+            saved_leakage = {"status": "missing"}
+        validate_raw_prior_support(
+            saved_leakage,
+            args.minimum_raw_prior_fraction,
+            args.allow_low_prior_support,
+            sampling_preflight_path,
+        )
         sbi_samples = load_sample_array(final_path, n_parameters)
         print(
             f"Reusing completed NPE chain: {final_path} ({sbi_samples.shape[0]} samples)",
@@ -560,6 +618,13 @@ def main() -> int:
         }
         write_json(sampling_preflight_path, preflight)
         print(f"NPE sampling preflight: {json.dumps(preflight, indent=2)}", flush=True)
+
+        validate_raw_prior_support(
+            leakage,
+            args.minimum_raw_prior_fraction,
+            args.allow_low_prior_support,
+            sampling_preflight_path,
+        )
 
         sample_kwargs: dict[str, Any] = {}
         if args.sampling_method == "mcmc":

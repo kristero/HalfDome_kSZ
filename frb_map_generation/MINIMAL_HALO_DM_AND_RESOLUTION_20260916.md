@@ -44,3 +44,35 @@ For a like-for-like comparison with TNG's within-R200 quantity, the HalfDome mod
 
 - `frb_map_generation/compute_minimal_halo_dm.jl`, `plot_minimal_halo_dm.py`, `plot_nside_low_dm_tail.py`, `run_battaglia16_z1_1r200c_nside_series_local.sh`.
 - `frb_map_generation/outputs/minimal_dm_20260916/`: `minimal_halo_dm.{png,svg}`, `minimal_halo_dm_grid.csv`, `minimal_halo_dm_summary.txt`, `nside_low_dm_tail_b16_1r200c.{png,svg}`, `nside_low_dm_tail_counts.csv`.
+
+## 6. Addendum (2026-09-18): interpolator grid resolution
+
+A different "resolution" question: the generator does not evaluate the profile exactly at
+every (theta, M, z) either -- it evaluates a cached `LogInterpolatorProfile` (cubic B-spline,
+log-theta x z x log10-mass grid; production defaults `N_logtheta=512`, `N_z=256`, `N_logM=128`
+over `logM=[12,15.7]`, `z=[0.001,5]`). Checked this against exact (non-interpolated) direct
+quadrature for the spherical Battaglia16 X=1 R200c chord profile (the model used for the TNG
+like-for-like comparison), at 288 (theta, M, z) points spanning the full production mass range
+(1e13-1e15 Msun), z = 0.05-3.5, and impact parameter x = theta/theta200c = 0.001-0.999 R200c
+(`interpolator_resolution_check3.jl` in the session scratchpad; not committed).
+
+- Median relative error of the production interpolator against direct quadrature: ~1e-7,
+  consistent with the repository's existing self-tests (chord-mean reconstruction to 1e-9,
+  direct/cache spot checks to ~1e-7). A 4x finer theta grid and a 2x finer mass/redshift grid
+  both reproduce direct quadrature to the same ~1e-7 level: the interpolator is converged at
+  production resolution over essentially the whole domain.
+- One narrow exception: at the single most extreme grazing bin tested (x = 0.999 R200c, the
+  outer 0.1% of the aperture radius) for the single most massive halo bin (1e15 Msun) at the
+  lowest redshift tested (z = 0.05), the production interpolator differs from direct quadrature
+  by up to 13%. Refining the mass/redshift grid removes this (2x finer N_z/N_logM: 1.6% at that
+  same corner); refining the theta grid does not. It is therefore a mass/redshift grid-density
+  effect at an extreme, rare corner (very massive, very nearby, right at the aperture edge where
+  the chord-mean function is not perfectly smooth by construction -- the profile's own self-test
+  already allows up to 5% edge-continuity deviation), not a general property of the interpolator.
+
+Conclusion: interpolator grid resolution is not a contributor to the HalfDome-vs-TNG P(DM)
+comparison. Its typical effect (~1e-7) is many orders of magnitude below the ~30-300% amplitude
+difference already attributed to the profile being a smooth analytic fit rather than TNG's
+actual clumpy gas distribution (Section 5.3 of `LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md`), and
+even its rare worst case (13%, one grazing bin, one halo-mass bin, lowest redshift) is far
+smaller and confined to a tiny sliver of aperture area that contributes little to the histogram.

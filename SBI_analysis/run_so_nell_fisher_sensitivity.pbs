@@ -4,6 +4,8 @@
 #PBS -l select=1:ncpus=26:mem=32gb
 #PBS -l walltime=23:59:00
 #PBS -j oe
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
 
 set -euo pipefail
 

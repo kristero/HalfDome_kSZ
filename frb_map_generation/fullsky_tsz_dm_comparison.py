@@ -151,12 +151,15 @@ def check(args):
 def observations(plane):
     """Real Takahashi+25 w_yDM(theta) measurement and jackknife covariance (Eq. 27's first term
     minus its second term), replacing the earlier plot-digitized Fig. 13 approximation. See
-    prepare_takahashi25_real_observations.py; all 13 author bins are used here (the fullsky
-    method's annular_correlation accepts arbitrary bin edges)."""
+    prepare_takahashi25_real_observations.py; author bin 0 (theta ~ 0.75', below this figure's
+    1 arcmin lower limit) is dropped -- its marker would be off-axis anyway, but its (large,
+    noisy) error bar was otherwise dragging the y-autoscale down (e.g. ACT bin 0 has sigma
+    ~1.7x |w|, pulling the axis to w - sigma ~ -13e-5 with nothing visibly plotted there)."""
     with np.load(str(TAKAHASHI25_REAL / (TAKAHASHI25_SURVEY_KEY[plane] + ".npz"))) as obs:
-        sigma = obs["sigma_pc_cm3"]
-        return dict(x=obs["theta_mean_arcmin"], w=obs["w_yDM_pc_cm3"], err=np.vstack([sigma, sigma]),
-                    lo=obs["theta_lo_arcmin"], hi=obs["theta_hi_arcmin"], covariance=obs["covariance_pc2_cm6"])
+        sigma = obs["sigma_pc_cm3"][1:]
+        return dict(x=obs["theta_mean_arcmin"][1:], w=obs["w_yDM_pc_cm3"][1:], err=np.vstack([sigma, sigma]),
+                    lo=obs["theta_lo_arcmin"][1:], hi=obs["theta_hi_arcmin"][1:],
+                    covariance=obs["covariance_pc2_cm6"][1:, 1:])
 
 
 def load_spectra():

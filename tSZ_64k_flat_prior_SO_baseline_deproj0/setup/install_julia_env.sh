@@ -36,6 +36,9 @@ export LD_LIBRARY_PATH="${PREFIX}/julia-1.12.2/lib/julia:${LD_LIBRARY_PATH:-}"
 export JULIA_PKG_PRECOMPILE_AUTO=0
 unset JULIA_PROJECT JULIA_LOAD_PATH
 
+# Pkg warns that "the project dependencies or compat requirements have changed since
+# the manifest was last resolved". The validated runtime printed the same warning:
+# ignore it, and never run Pkg.resolve() or Pkg.update() on this environment.
 "${JULIA}" --startup-file=no --project="${BUNDLE}/julia_env" -e 'using Pkg; Pkg.instantiate()'
 "${JULIA}" --startup-file=no --project="${BUNDLE}/julia_env" "${BUNDLE}/setup/verify_env.jl"
 if [[ "${PRECOMPILE}" == 1 ]]; then

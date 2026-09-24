@@ -230,7 +230,10 @@ Nothing is silently retried, redrawn or dropped.
   lists the deferred ones in the plan and in the collected `meta.json`.
 - Do not edit files in `engine/`, `halfdome_sources/`, `julia_env/` or
   `design/`, and do not `Pkg.update` or `Pkg.resolve` the environment. The
-  launcher refuses to run with a changed file.
+  launcher refuses to run with a changed file. `Pkg.instantiate()` warns that
+  "the project dependencies or compat requirements have changed since the
+  manifest was last resolved" and suggests `Pkg.resolve()`: the validated
+  runtime printed the same warning, so ignore it.
 - The HalfDome configuration lets environment variables override its command
   line. The launcher therefore strips every variable the Julia sources read
   (121 names such as `NSIDE`, `BATTAGLIA_P0_AMP`, `BATTAGLIA_SOBOL_ROW`,

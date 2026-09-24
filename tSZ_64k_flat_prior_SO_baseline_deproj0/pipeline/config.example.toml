@@ -1,0 +1,25 @@
+# Copy this file to pipeline/config.toml and edit the four paths. All paths
+# must be absolute. Nothing else in the bundle needs editing.
+
+[paths]
+# Julia 1.12.2 exactly (setup/install_julia_env.sh installs it). The noise
+# random-number stream and the validated package versions depend on it.
+julia = "/path/to/julia_tsz64k/julia-1.12.2/bin/julia"
+
+# Julia depot for this bundle only, filled by setup/install_julia_env.sh.
+julia_depot = "/path/to/julia_tsz64k/depot"
+
+# HalfDome halo lightcone used by the test. The engine stops unless exactly
+# 85,224,251 halos pass the M200c/h >= 1e12 Msun cut. README lists its size
+# and SHA-256.
+halfdome_catalogue = "/path/to/halfdome/full_res/halos/lightcone_100.hdf5"
+
+# All outputs: tasks, audits, batches, per-row spectra, logs, collected dataset.
+# About 20 GB for 65,536 rows plus about 8 GB per collected float64 array pair.
+run_root = "/path/to/scratch/tsz_64k_flat_prior"
+
+[run]
+threads = 26               # Julia threads per production batch (the test used 26)
+audit_threads = 6          # threads per audit task (the test used 6)
+batch_size = 4             # rows sharing one catalogue pass (validated with 4; about 40 GiB peak RSS)
+audit_rows_per_task = 256  # 256 audit tasks for 65,536 rows

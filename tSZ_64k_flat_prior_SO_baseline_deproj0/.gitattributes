@@ -1,0 +1,3 @@
+# Check out every file byte for byte: pipeline/common.py compares the SHA-256 of
+# the frozen inputs (some of which have CRLF line endings) before every job.
+* -text

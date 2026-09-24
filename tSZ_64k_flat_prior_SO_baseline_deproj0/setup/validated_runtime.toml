@@ -1,0 +1,36 @@
+# Runtime of the validated 256-row test (flamingo_tsz_comparison_20260914/runtime on idark).
+# setup/verify_env.jl checks the instantiated julia_env against these values.
+julia_version = "1.12.2"
+
+[package_versions]
+Cosmology = "1.0.4"
+DataInterpolations = "8.8.0"
+FFTW = "1.10.0"
+HDF5 = "0.17.2"
+Healpix = "4.2.4"
+Interpolations = "0.16.2"
+Libsharp = "0.2.0"
+NonlinearSolve = "4.12.0"
+QuadGK = "2.11.2"
+Unitful = "1.25.1"
+XGPaint = "0.4.0"
+libsharp2_jll = "1.0.2+2"
+
+[xgpaint_sha256]
+"Artifacts.toml" = "e09be71238ec710d234d287ead7d7ab6016f2db86e8fbff2147b84488d3940a2"
+"Project.toml" = "182b6998ada1c3c7583439aa5c929f538e9dc37ed73aceaddbfcbd3134d360e5"
+"src/XGPaint.jl" = "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664"
+"src/cib.jl" = "24fb58fddf510e638ca0a3eec0768fa52c7e7806b05c44e8015ea5d9e4f726cc"
+"src/co_broadband.jl" = "46d89704a3c1cb78ab668dcb160ef8345375b9be9c57a77362dfd690cdaeb1d5"
+"src/healpixworkspace.jl" = "e1a30d8cee9f2e8f5973c3ce50f89b7d2b3c13b16162f6fb34be8ca221bf16ef"
+"src/lrg.jl" = "3c3033ae273530e0015dd1f21e8846cddba28707e5050e68af8e8169284dd81a"
+"src/model.jl" = "ef9e50de2508febf9e9b48f43e17a9acd2cf17f507723c6521bf1145bd25a856"
+"src/profiles.jl" = "0c6dd605c3ad4d2a85c07a474b234f7b6178d8b0139bbd14e706b262126179d3"
+"src/profiles_frb.jl" = "c0344c11e905eed071da9b62532a0d3652df04b0dd187960974cc0e348343e8e"
+"src/profiles_rksz.jl" = "fd907722031b58a3570f8917c38ad7c2b349767ace47027e59a00c77ec5fcfa0"
+"src/profiles_rsz.jl" = "7ac16ac45599eaaabaf309ac0c42dcfe7e3ee5cda9bfa8a0efe256a2449002d5"
+"src/profiles_szp.jl" = "dd3a8f14369873881f962292eb67a8b5ba09b4cd98ca0529bf427afb6ed44c3e"
+"src/profiles_tau.jl" = "54de594bfc092e064b171eede6eca5db3788598bfdeda4f38fdf5591a933053b"
+"src/profiles_y.jl" = "98d034e7ebacf8f37c252f1448dd77d71ee26412b7a9694e20106bcb82c4891c"
+"src/radio.jl" = "52b403d456155d2d3c2f264e6baa27382f32f0c866af3fcb2908ab810efe17dc"
+"src/util.jl" = "564e240b435f8e8c04a25b0af6ca0a7c25b6bf9b2c221bbdca5c2c6eef648e9e"

@@ -1,0 +1,7 @@
+# The repository ignores *.npy and *.png; this folder ships its design,
+# reference spectra and prior plot, so re-include them here.
+!*.npy
+!*.png
+# Local files of a run.
+pipeline/config.toml
+__pycache__/

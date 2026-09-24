@@ -1,0 +1,17 @@
+{
+  "sha256": {
+    "manage.py": "37aeb22c1915007c17cc848ad43a3322913e433707b93159c38752b786774920",
+    "dispatch.py": "883c6998448d2ea568e6cb86c1d7c2e3b2036b7f1386d0a0bc6a7818d9adcfd8",
+    "diagnostic_analysis.py": "dee841a729fdfc222f10af04984213deeb1e7f356ba8f4fea0d95db797de40bc",
+    "unbinned_moped.py": "992b3250e664afd411bd9a84fee4416200325112a614865f325f5be19459d494",
+    "forward_checks.py": "3ac35b17d4dfae7454d5497b1424780d635c9af8ab6ecdf5152b0a88244440da",
+    "report.py": "21028315c94e7edff41c1150d6d43b0a0243d60ff9496f3f30f6b740bb190fe0",
+    "design_tests.py": "a788da1b70d951afcf74e9203be0dfb9f434ca18654f7121c4d407184fc3337f",
+    "final_gate.py": "73d32f6f8a6d5f6799544a7f943dce96bce7a6a897b6295a54953e92f45fea78",
+    "production.pbs": "41d3ede2140cc684cba716b764bddcadd047a9d720728e2b14ccac50ddda57a6",
+    "analysis.pbs": "8817f555cbc9e01c310fe8119b2e046f19d80ac22bd4715cee9d68481ca6ca38",
+    "forward.pbs": "99a3deb90bb0d972d2c32ee9111397c8b2e3399f93f365a6722cab0c5bf3db12",
+    "reference/compression_context.npz": "b99c42fb1f8c33bd62d0681fafa8e0ff2a93e00984dbb01580ac003dedf69f42",
+    "reference/raw_resolution_spectra.npz": "528a1cde2c7702174696338666518117dd0582a7c69314bfda2ae08c7b322de8"
+  }
+}

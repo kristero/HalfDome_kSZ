@@ -1,0 +1,6 @@
+#!/bin/bash
+#PBS -N tsz64k_audit
+#PBS -l select=1:ncpus=6:mem=16gb
+#PBS -l walltime=08:00:00
+# Submit with jobs/pbs/submit.sh audit (sets -J and ARRAY_OFFSET).
+exec bash "${BUNDLE:?submit with jobs/pbs/submit.sh}/jobs/stage.sh" audit

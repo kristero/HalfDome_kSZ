@@ -1,0 +1,264 @@
+{
+  "passed": true,
+  "output_nside": 4096,
+  "raw_nside": 8192,
+  "ell_min": 80,
+  "ell_max": 7979,
+  "metrics": [
+    {
+      "label": "Battaglia12",
+      "kind": "scheduling",
+      "relative_Dell_l2": 6.749781326288142e-16,
+      "max_fractional_Dell": 9.136289823710221e-15,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 6.723436112088533e-15,
+        "Battaglia12_rcond1e-06": 2.1304429685824544e-14,
+        "FL_L1_m9_rcond0.001": 3.7135337631186625e-15,
+        "FL_L1_m9_rcond1e-06": 1.3455987177365426e-14
+      },
+      "distance9": 2.1304429685824544e-14,
+      "passed": true
+    },
+    {
+      "label": "Battaglia12",
+      "kind": "cache",
+      "relative_Dell_l2": 2.924997849520408e-07,
+      "max_fractional_Dell": 6.018225187496089e-07,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 0.00011925832408147696,
+        "Battaglia12_rcond1e-06": 0.00012107604110405066,
+        "FL_L1_m9_rcond0.001": 0.00011157673289774053,
+        "FL_L1_m9_rcond1e-06": 0.00011397821969935175
+      },
+      "distance9": 0.00012107604110405066,
+      "passed": true
+    },
+    {
+      "label": "Battaglia12",
+      "kind": "output_resolution",
+      "relative_Dell_l2": 8.049911531213563e-08,
+      "max_fractional_Dell": 2.683016032933826e-05,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 2.516783707179724e-06,
+        "Battaglia12_rcond1e-06": 2.7409886811172882e-06,
+        "FL_L1_m9_rcond0.001": 2.2682781296449132e-06,
+        "FL_L1_m9_rcond1e-06": 2.5580925690214466e-06
+      },
+      "distance9": 2.7409886811172882e-06,
+      "passed": true
+    },
+    {
+      "label": "FL_L1_m9",
+      "kind": "scheduling",
+      "relative_Dell_l2": 7.892483266798367e-16,
+      "max_fractional_Dell": 1.2711400331036075e-14,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 1.861748002561917e-14,
+        "Battaglia12_rcond1e-06": 2.869697050371674e-14,
+        "FL_L1_m9_rcond0.001": 2.916921558439675e-14,
+        "FL_L1_m9_rcond1e-06": 3.571665585413541e-14
+      },
+      "distance9": 3.571665585413541e-14,
+      "passed": true
+    },
+    {
+      "label": "FL_L1_m9",
+      "kind": "cache",
+      "relative_Dell_l2": 2.4535790708287847e-07,
+      "max_fractional_Dell": 9.011648531668995e-07,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 0.00020778645050822345,
+        "Battaglia12_rcond1e-06": 0.0002121043081251155,
+        "FL_L1_m9_rcond0.001": 0.00020415342800796538,
+        "FL_L1_m9_rcond1e-06": 0.000212247796506007
+      },
+      "distance9": 0.000212247796506007,
+      "passed": true
+    },
+    {
+      "label": "FL_L1_m9",
+      "kind": "output_resolution",
+      "relative_Dell_l2": 1.6912881312485058e-07,
+      "max_fractional_Dell": 2.6623860118483766e-05,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 7.971609015753955e-06,
+        "Battaglia12_rcond1e-06": 9.835548072762335e-06,
+        "FL_L1_m9_rcond0.001": 5.670740683519805e-06,
+        "FL_L1_m9_rcond1e-06": 8.526617318069585e-06
+      },
+      "distance9": 9.835548072762335e-06,
+      "passed": true
+    },
+    {
+      "label": "compact",
+      "kind": "scheduling",
+      "relative_Dell_l2": 4.882447763610913e-16,
+      "max_fractional_Dell": 2.429140359683589e-15,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 6.82145524396024e-23,
+        "Battaglia12_rcond1e-06": 9.456470936795821e-23,
+        "FL_L1_m9_rcond0.001": 7.205051199268537e-23,
+        "FL_L1_m9_rcond1e-06": 9.947625748229683e-23
+      },
+      "distance9": 9.947625748229683e-23,
+      "passed": true
+    },
+    {
+      "label": "compact",
+      "kind": "cache",
+      "relative_Dell_l2": 8.771937558247855e-07,
+      "max_fractional_Dell": 9.481195016141157e-07,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 1.6973030693382213e-12,
+        "Battaglia12_rcond1e-06": 1.7859532522941611e-12,
+        "FL_L1_m9_rcond0.001": 1.6891057859402957e-12,
+        "FL_L1_m9_rcond1e-06": 1.7036568557327205e-12
+      },
+      "distance9": 1.7859532522941611e-12,
+      "passed": true
+    },
+    {
+      "label": "compact",
+      "kind": "output_resolution",
+      "relative_Dell_l2": 5.38573020510924e-07,
+      "max_fractional_Dell": 5.0897394907429705e-05,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 5.875998823497446e-15,
+        "Battaglia12_rcond1e-06": 6.2118451478770446e-15,
+        "FL_L1_m9_rcond0.001": 5.654870151792438e-15,
+        "FL_L1_m9_rcond1e-06": 5.689172950185601e-15
+      },
+      "distance9": 6.2118451478770446e-15,
+      "passed": true
+    },
+    {
+      "label": "extended_shallow",
+      "kind": "scheduling",
+      "relative_Dell_l2": 7.897590066092498e-16,
+      "max_fractional_Dell": 1.4640020455881798e-13,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 3.9402269471546206e-12,
+        "Battaglia12_rcond1e-06": 5.439564146942926e-12,
+        "FL_L1_m9_rcond0.001": 3.1178868872921567e-12,
+        "FL_L1_m9_rcond1e-06": 4.076025313024322e-12
+      },
+      "distance9": 5.439564146942926e-12,
+      "passed": true
+    },
+    {
+      "label": "extended_shallow",
+      "kind": "cache",
+      "relative_Dell_l2": 7.459607305891897e-08,
+      "max_fractional_Dell": 2.411307670322387e-07,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 0.006928583550921557,
+        "Battaglia12_rcond1e-06": 0.007487850841370365,
+        "FL_L1_m9_rcond0.001": 0.006964371930038014,
+        "FL_L1_m9_rcond1e-06": 0.007050589529456132
+      },
+      "distance9": 0.007487850841370365,
+      "passed": true
+    },
+    {
+      "label": "extended_shallow",
+      "kind": "output_resolution",
+      "relative_Dell_l2": 3.718815160859056e-07,
+      "max_fractional_Dell": 0.00014486342104601529,
+      "conditional_moped": {
+        "Battaglia12_rcond0.001": 0.003627863038775551,
+        "Battaglia12_rcond1e-06": 0.003767195200824853,
+        "FL_L1_m9_rcond0.001": 0.003109036127133931,
+        "FL_L1_m9_rcond1e-06": 0.003992212854617319
+      },
+      "distance9": 0.003992212854617319,
+      "passed": true
+    },
+    {
+      "label": "row148",
+      "kind": "prior_spot_cache",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "relative_Dell_l2": 1.2573896495913253e-07,
+      "max_fractional_Dell": 3.4054392519431164e-07,
+      "passed": true
+    },
+    {
+      "label": "row218",
+      "kind": "prior_spot_cache",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "relative_Dell_l2": 2.21820387481275e-06,
+      "max_fractional_Dell": 4.627982229873144e-06,
+      "passed": true
+    },
+    {
+      "label": "row90",
+      "kind": "prior_spot_cache",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "relative_Dell_l2": 4.575310584883684e-07,
+      "max_fractional_Dell": 7.599344042346303e-07,
+      "passed": true
+    },
+    {
+      "label": "row253",
+      "kind": "prior_spot_cache",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "relative_Dell_l2": 2.353269218424214e-06,
+      "max_fractional_Dell": 1.6879865367478903e-05,
+      "passed": true
+    }
+  ],
+  "rows_directly_probed": 256,
+  "cache_counts": {
+    "256x128x64": 215,
+    "512x256x128": 41
+  },
+  "max_profile_visible_relative_error": 0.003864546255248902,
+  "max_sampled_radial_L1_relative_error": 0.0010489124451447663,
+  "target": "Less than 1 percent clean per-ell accelerated-versus-reference error",
+  "caveats": [
+    "Finite sampled tests, not a proof across continuous halo coordinates",
+    "Pixel-sampling residual at NSIDE8192 remains; separate 16384 reference results apply",
+    "Bright/shallow noise-unit budget explicitly advisory; fractional target still required"
+  ],
+  "input_sha256": {
+    "tests/anchors/Battaglia12/output4096/masked_clean_cl.npy": "6480f2cefbf60a64cc51ee5e5fbab85958bf1f53001e070eea956816d13a2480",
+    "tests/anchors/Battaglia12/output8192/masked_clean_cl.npy": "962515f5dd6f9406497d37b13f02ff4b7897d711daf3511babb8f1f99606af83",
+    "reference/Battaglia12/smooth_half_cl.npy": "3c8055968fdd44d905c09377f91a49d675f42c85c8bba5fe6d09a891302b749b",
+    "reference/Battaglia12/smooth_double_cl.npy": "f6c28c88c57c7d625a82f18f870a9a187f116474100203428cf3646c2283132e",
+    "tests/anchors/FL_L1_m9/output4096/masked_clean_cl.npy": "578e77ee21a74918fe474d877f9a1ae8ba9088a79568ec02d7689cd981a3f58e",
+    "tests/anchors/FL_L1_m9/output8192/masked_clean_cl.npy": "81496d3ab0dd8aad1cde05022cac50c5368d1dd5c91e1a72a27d49992f1d0785",
+    "reference/FL_L1_m9/smooth_half_cl.npy": "f20d4080c3952b6174cac6c19e299efce6325cec38ce6e8f6520af2f1c69fc83",
+    "reference/FL_L1_m9/smooth_double_cl.npy": "51f345b58f0350e78c75f68c486ab3b7299d9dadaceb9791e98fe4738368da81",
+    "tests/anchors/compact/output4096/masked_clean_cl.npy": "94c07ab0df4eaa41994fa5ce5556bca0c7069f91e1409796d6515f1b3b9912a2",
+    "tests/anchors/compact/output8192/masked_clean_cl.npy": "3c9283a92e9ec0118f42753f2e9b0137496279723339d4f36b2ebd340edfa2c0",
+    "reference/compact/smooth_half_cl.npy": "0e2b3d738b852facda4d0a6ab9a1dafb47253998543e04ae5007aa6c645568a8",
+    "reference/compact/smooth_double_cl.npy": "e80b639cba4d97cba864eb5adbc3e5891239dca6158e2683b4fc7d8a61788a8a",
+    "tests/anchors/extended_shallow/output4096/masked_clean_cl.npy": "17e1ad963d5eb47ad0c38dd7aa79068501709f27c91274ea76b8bed9f93caefe",
+    "tests/anchors/extended_shallow/output8192/masked_clean_cl.npy": "aba64d6d8d3d63da047d1c83c7fd4bfa24f7572d0d28532d9b57ecd760624b11",
+    "reference/extended_shallow/smooth_half_cl.npy": "31e2bd810118a19e87c368eabbc7252005b947be2691d2d305a3ab5257ce6153",
+    "reference/extended_shallow/smooth_double_cl.npy": "0d297681f51897dd32dbd0e23b3dbad71f9a2383f513f49b8d1afca4bacadc14",
+    "tests/spot0/00148_candidate/masked_clean_cl.npy": "94158dc35abc4dd0a3416ccaf55e22061237b836b584001966847a4e0c9801bd",
+    "tests/spot0/00148_reference/masked_clean_cl.npy": "367a0f0f7b3fed7bdcb7e5e02f1fa83ddc3c498386452c099dda5cce43205771",
+    "tests/spot0/00218_candidate/masked_clean_cl.npy": "148fb2ee2f10311f565a1b78bc448a85129db2f798521698a5bcea98a54e9217",
+    "tests/spot0/00218_reference/masked_clean_cl.npy": "0a488857fd4e4f3d68fe5b6ca5e6aeffb2e7aa7f6535806a49605b915ca33227",
+    "tests/spot1/00090_candidate/masked_clean_cl.npy": "e5cb89e82804f28d76921dbb392e6597b7c8d996def8ae6aee11f29bbe87ad4b",
+    "tests/spot1/00090_reference/masked_clean_cl.npy": "0d752eb32dd3b925226af85883bfd4aecdb793ab7e9bb4c260832db4517b5421",
+    "tests/spot1/00253_candidate/masked_clean_cl.npy": "b9dba3efbfe5846862ea54ca24bf579269e681d78a8b36712f9759bf887d2d39",
+    "tests/spot1/00253_reference/masked_clean_cl.npy": "c9503e9f95b72274c9d1cda09611c5a7b568bdb90d5d0f43e005460c415bf096"
+  }
+}

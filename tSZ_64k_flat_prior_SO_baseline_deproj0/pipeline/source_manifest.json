@@ -1,0 +1,307 @@
+{
+  "purpose": "SHA-256 of every input copied from the validated 256-row test. pipeline/common.py refuses to run if any of these files differs.",
+  "frozen_sha256": {
+    "design/design_tests.py": "a788da1b70d951afcf74e9203be0dfb9f434ca18654f7121c4d407184fc3337f",
+    "engine/balanced_painter.jl": "f00a343e5238847bab38a66c607136ccf8fea65432ce3abac379a5ae8b991e7e",
+    "engine/benchmark.jl": "8731925142bc7436b314a1a57f303200f985dfeeecd25ee0db91d23c59b5b287",
+    "engine/engine.jl": "3629533ea98749b5126125dede780c8d0b933fe2ebca507bfd64c0cc2de1cde2",
+    "engine/fullsky_test.jl": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+    "engine/legendre16.csv": "0b18841f9593a94062abcece049cc4b2194fc88f200c5bea66fb718e5ec8a8db",
+    "engine/smooth_exterior.jl": "3fbea72cce31c64523d0f76eec165b4476c75b31bee567167f171d22ae2e7a4e",
+    "engine/spherical_truncation_profiles.jl": "d76ddb2bcbb90e1335ef1f80593b9a9a4a1f2892277bd30d91eb05850e8bd487",
+    "halfdome_sources/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+    "halfdome_sources/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt": "5564becc9520374159655f46f26a8b19c025195ebc7ec4791f93300ec2522681",
+    "halfdome_sources/code/halfdome/tSZ_visuals/HalfDome_tSZ.jl": "211d17a59fcae9f53f7ba225ca2ff9167946d34b2d94f0c5795843089ace8411",
+    "halfdome_sources/code/halfdome/tSZ_visuals/HalfDome_tSZ_legacy_monolith.jl": "4b64e9f92241c22ada733b2f4c6941a06aef64575a5655fa29e0c84bbc52674c",
+    "halfdome_sources/code/halfdome/tSZ_visuals/binning.jl": "39d9fd05378bad60553231263b83dedf9b72d552cec04680e5b9aa016783394a",
+    "halfdome_sources/code/halfdome/tSZ_visuals/build_interpolator_cache.jl": "55e4c5b40e19b022899a58b9656ef33913011197ee903cbecac1b55623012e5e",
+    "halfdome_sources/code/halfdome/tSZ_visuals/catalog_halfdome.jl": "bae2d0e20e50e68e33396298b3dadd9f2d8106983818d81b503fb2ca0ad9d334",
+    "halfdome_sources/code/halfdome/tSZ_visuals/catalog_websky.jl": "0a2db62935f40c679cc676c37a0c0ba1936874b359338e36462b1b8a97f19e24",
+    "halfdome_sources/code/halfdome/tSZ_visuals/config.jl": "a2e15531003b4360472d5173d538ddd9f9ec62a4072846308570922e30f8b3e8",
+    "halfdome_sources/code/halfdome/tSZ_visuals/cosmology_helpers.jl": "6c3adc30d45cbd6ce43d309068093181f599cde7dc479b631edbc964d303c8d9",
+    "halfdome_sources/code/halfdome/tSZ_visuals/generate_battaglia_5pct_variations.jl": "572b3d8a0b0c3ec4921a11749d736ebc1586af098f8f531c66e08e9f3a71b63d",
+    "halfdome_sources/code/halfdome/tSZ_visuals/generate_cosmology_0p05pct_variations.jl": "71249a16b17424d0dc76fca8071039f90f5284ae638f0bc860c668a9af19302b",
+    "halfdome_sources/code/halfdome/tSZ_visuals/instrumentation.jl": "7294e60ba35ea21c50063dc0f8caaf05cde1eb90f07d4a956f769c39dcaa250c",
+    "halfdome_sources/code/halfdome/tSZ_visuals/model.jl": "1b2ce8c6cafdd78b10e72b0d7466fa08e01bdd45bd63baa63f3cce569fc0f7dc",
+    "halfdome_sources/code/halfdome/tSZ_visuals/output.jl": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+    "halfdome_sources/code/halfdome/tSZ_visuals/paint_battaglia_redshift_slice.jl": "c415fd70bca319a2582dfb06c5d9b9981cd7b4f995a954ff107dedea8514bb0c",
+    "halfdome_sources/code/halfdome/tSZ_visuals/painting.jl": "09d6abe4fff6c7bcbf2facdfebd4f072ed4c0d52ba895302d0aa86b409a9df9c",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_by_mass.jl": "52becc6d59948e6fc42b93975ff4d6c53e903b66ec9f8959b0f91685525d89fc",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_by_redshift.jl": "5299f3562cc384c3f1dcae7cfaa1cbcf3ba403ce6c3eda6220d58da2f16a93da",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_full_map.jl": "7c63e1426f8f4ea33a0b0746b021d4b8b515932f50b57c9b944cdce055f6a1c8",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_halfdome_fullsky_so_noise.jl": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_initial_batches.jl": "695fb52406eefd669c28c59f85e252cfd8ed695c0dffafcf84754073a7ab79a1",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_single_profile.jl": "2d67b40b2551526af072f1db99a274b6b5a51863b58dee13bf81b3b6677c7533",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_sobol_full_maps.jl": "536bdd0f74475723ce5d61ec20fcc2829ebbdf748c5d3a27834e27f611f05e1d",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_tSZ_visuals.jl": "a610742bc184f19d19c10b43b92a11856d7034f79ebf205db43af0cdc34216b9",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_unphysical_vs_fiducial_full_map_default_grid.jl": "c466826ee33e1dbe8a3e5b8170a933a89a2a5d358e1eb629429d3ccdaefd8a21",
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_xgpaint_binned40_edge_profiles.jl": "4c439a01867e0433552d548a3e1eab3d79a3e5bd3dd745a0c4eecc058dca27b0",
+    "halfdome_sources/code/process_maps.jl": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+    "julia_env/Manifest.toml": "3b7cdbb8db5d650795390c2938d25d37621274d9b8b1218b05ccf6ee1f43a133",
+    "julia_env/Project.toml": "ae3a6b09989b0b26c240f405a6c88a38d2d4f813dd5528a8831cbd4da8c3f984",
+    "reference/test256/base_command.json": "fe5e8b32c1d8f5d7102a2ae80dff521bef948b9ba8298630424ffccfb37c5b57"
+  },
+  "modified_relative_to_test": {
+    "julia_env/Manifest.toml": "XGPaint entry only: `path = \"/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint\"` replaced by repo-url https://github.com/kristero/XGPaint.jl.git, repo-rev validated-tsz256-20260922, git-tree-sha1 3b57cacb5f824269f1cae22e7fd2085788d14eee; that git tree is byte-identical to the XGPaint directory used by the test (commit ce1d239, the snapshot in runtime/XGPaint)"
+  },
+  "not_recorded_in_test_manifests": [
+    "halfdome_sources/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt",
+    "halfdome_sources/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt"
+  ],
+  "test256": {
+    "root": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922",
+    "campaign_runtime": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime",
+    "orchestration_replaced": "launch.py/manage.py/dispatch.py -> pipeline/common.py and pipeline/manage.py (same engine argv; local paths; scrubbed environment; SLURM/PBS arrays instead of six fixed workers)"
+  },
+  "xgpaint": {
+    "repository": "https://github.com/kristero/XGPaint.jl",
+    "tag": "validated-tsz256-20260922",
+    "git_tree": "3b57cacb5f824269f1cae22e7fd2085788d14eee",
+    "tested_snapshot_commit": "ce1d239ed43b007062f64f92ad7d5df73712f6b2",
+    "note": "src/, Project.toml and Artifacts.toml hashes: setup/validated_runtime.toml"
+  },
+  "halfdome_catalogue": {
+    "file": "lightcone_100.hdf5",
+    "bytes": 15425622199,
+    "sha256": "de7ad631ca4552d9e723c7b0c146a5267d90a6cf8f4a843273ab4b4a97c0828f",
+    "idark_path": "/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5",
+    "selected_halos": 85224251,
+    "selection": "M200c/h >= 1e12 Msun with h = 0.68"
+  },
+  "test256_provenance": {
+    "design/design_tests.py": {
+      "test256_path": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922/design_tests.py",
+      "sha256": "a788da1b70d951afcf74e9203be0dfb9f434ca18654f7121c4d407184fc3337f",
+      "sha256_recorded_by_test": "a788da1b70d951afcf74e9203be0dfb9f434ca18654f7121c4d407184fc3337f",
+      "identical_copy": true
+    },
+    "engine/balanced_painter.jl": {
+      "test256_path": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922/balanced_painter.jl",
+      "sha256": "f00a343e5238847bab38a66c607136ccf8fea65432ce3abac379a5ae8b991e7e",
+      "sha256_recorded_by_test": "f00a343e5238847bab38a66c607136ccf8fea65432ce3abac379a5ae8b991e7e",
+      "identical_copy": true
+    },
+    "engine/benchmark.jl": {
+      "test256_path": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922/benchmark.jl",
+      "sha256": "8731925142bc7436b314a1a57f303200f985dfeeecd25ee0db91d23c59b5b287",
+      "sha256_recorded_by_test": "8731925142bc7436b314a1a57f303200f985dfeeecd25ee0db91d23c59b5b287",
+      "identical_copy": true
+    },
+    "engine/engine.jl": {
+      "test256_path": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922/engine.jl",
+      "sha256": "3629533ea98749b5126125dede780c8d0b933fe2ebca507bfd64c0cc2de1cde2",
+      "sha256_recorded_by_test": "3629533ea98749b5126125dede780c8d0b933fe2ebca507bfd64c0cc2de1cde2",
+      "identical_copy": true
+    },
+    "engine/fullsky_test.jl": {
+      "test256_path": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922/fullsky_test.jl",
+      "sha256": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+      "sha256_recorded_by_test": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+      "identical_copy": true
+    },
+    "engine/legendre16.csv": {
+      "test256_path": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922/legendre16.csv",
+      "sha256": "0b18841f9593a94062abcece049cc4b2194fc88f200c5bea66fb718e5ec8a8db",
+      "sha256_recorded_by_test": "0b18841f9593a94062abcece049cc4b2194fc88f200c5bea66fb718e5ec8a8db",
+      "identical_copy": true
+    },
+    "engine/smooth_exterior.jl": {
+      "test256_path": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922/smooth_exterior.jl",
+      "sha256": "3fbea72cce31c64523d0f76eec165b4476c75b31bee567167f171d22ae2e7a4e",
+      "sha256_recorded_by_test": "3fbea72cce31c64523d0f76eec165b4476c75b31bee567167f171d22ae2e7a4e",
+      "identical_copy": true
+    },
+    "engine/spherical_truncation_profiles.jl": {
+      "test256_path": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922/spherical_truncation_profiles.jl",
+      "sha256": "d76ddb2bcbb90e1335ef1f80593b9a9a4a1f2892277bd30d91eb05850e8bd487",
+      "sha256_recorded_by_test": "d76ddb2bcbb90e1335ef1f80593b9a9a4a1f2892277bd30d91eb05850e8bd487",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt",
+      "sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+      "sha256_recorded_by_test": null,
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt",
+      "sha256": "5564becc9520374159655f46f26a8b19c025195ebc7ec4791f93300ec2522681",
+      "sha256_recorded_by_test": null,
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/HalfDome_tSZ.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/HalfDome_tSZ.jl",
+      "sha256": "211d17a59fcae9f53f7ba225ca2ff9167946d34b2d94f0c5795843089ace8411",
+      "sha256_recorded_by_test": "211d17a59fcae9f53f7ba225ca2ff9167946d34b2d94f0c5795843089ace8411",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/HalfDome_tSZ_legacy_monolith.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/HalfDome_tSZ_legacy_monolith.jl",
+      "sha256": "4b64e9f92241c22ada733b2f4c6941a06aef64575a5655fa29e0c84bbc52674c",
+      "sha256_recorded_by_test": "4b64e9f92241c22ada733b2f4c6941a06aef64575a5655fa29e0c84bbc52674c",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/binning.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/binning.jl",
+      "sha256": "39d9fd05378bad60553231263b83dedf9b72d552cec04680e5b9aa016783394a",
+      "sha256_recorded_by_test": "39d9fd05378bad60553231263b83dedf9b72d552cec04680e5b9aa016783394a",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/build_interpolator_cache.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/build_interpolator_cache.jl",
+      "sha256": "55e4c5b40e19b022899a58b9656ef33913011197ee903cbecac1b55623012e5e",
+      "sha256_recorded_by_test": "55e4c5b40e19b022899a58b9656ef33913011197ee903cbecac1b55623012e5e",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/catalog_halfdome.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/catalog_halfdome.jl",
+      "sha256": "bae2d0e20e50e68e33396298b3dadd9f2d8106983818d81b503fb2ca0ad9d334",
+      "sha256_recorded_by_test": "bae2d0e20e50e68e33396298b3dadd9f2d8106983818d81b503fb2ca0ad9d334",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/catalog_websky.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/catalog_websky.jl",
+      "sha256": "0a2db62935f40c679cc676c37a0c0ba1936874b359338e36462b1b8a97f19e24",
+      "sha256_recorded_by_test": "0a2db62935f40c679cc676c37a0c0ba1936874b359338e36462b1b8a97f19e24",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/config.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/config.jl",
+      "sha256": "a2e15531003b4360472d5173d538ddd9f9ec62a4072846308570922e30f8b3e8",
+      "sha256_recorded_by_test": "a2e15531003b4360472d5173d538ddd9f9ec62a4072846308570922e30f8b3e8",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/cosmology_helpers.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/cosmology_helpers.jl",
+      "sha256": "6c3adc30d45cbd6ce43d309068093181f599cde7dc479b631edbc964d303c8d9",
+      "sha256_recorded_by_test": "6c3adc30d45cbd6ce43d309068093181f599cde7dc479b631edbc964d303c8d9",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/generate_battaglia_5pct_variations.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/generate_battaglia_5pct_variations.jl",
+      "sha256": "572b3d8a0b0c3ec4921a11749d736ebc1586af098f8f531c66e08e9f3a71b63d",
+      "sha256_recorded_by_test": "572b3d8a0b0c3ec4921a11749d736ebc1586af098f8f531c66e08e9f3a71b63d",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/generate_cosmology_0p05pct_variations.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/generate_cosmology_0p05pct_variations.jl",
+      "sha256": "71249a16b17424d0dc76fca8071039f90f5284ae638f0bc860c668a9af19302b",
+      "sha256_recorded_by_test": "71249a16b17424d0dc76fca8071039f90f5284ae638f0bc860c668a9af19302b",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/instrumentation.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/instrumentation.jl",
+      "sha256": "7294e60ba35ea21c50063dc0f8caaf05cde1eb90f07d4a956f769c39dcaa250c",
+      "sha256_recorded_by_test": "7294e60ba35ea21c50063dc0f8caaf05cde1eb90f07d4a956f769c39dcaa250c",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/model.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/model.jl",
+      "sha256": "1b2ce8c6cafdd78b10e72b0d7466fa08e01bdd45bd63baa63f3cce569fc0f7dc",
+      "sha256_recorded_by_test": "1b2ce8c6cafdd78b10e72b0d7466fa08e01bdd45bd63baa63f3cce569fc0f7dc",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/output.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/output.jl",
+      "sha256": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+      "sha256_recorded_by_test": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/paint_battaglia_redshift_slice.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/paint_battaglia_redshift_slice.jl",
+      "sha256": "c415fd70bca319a2582dfb06c5d9b9981cd7b4f995a954ff107dedea8514bb0c",
+      "sha256_recorded_by_test": "c415fd70bca319a2582dfb06c5d9b9981cd7b4f995a954ff107dedea8514bb0c",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/painting.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/painting.jl",
+      "sha256": "09d6abe4fff6c7bcbf2facdfebd4f072ed4c0d52ba895302d0aa86b409a9df9c",
+      "sha256_recorded_by_test": "09d6abe4fff6c7bcbf2facdfebd4f072ed4c0d52ba895302d0aa86b409a9df9c",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_by_mass.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_by_mass.jl",
+      "sha256": "52becc6d59948e6fc42b93975ff4d6c53e903b66ec9f8959b0f91685525d89fc",
+      "sha256_recorded_by_test": "52becc6d59948e6fc42b93975ff4d6c53e903b66ec9f8959b0f91685525d89fc",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_by_redshift.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_by_redshift.jl",
+      "sha256": "5299f3562cc384c3f1dcae7cfaa1cbcf3ba403ce6c3eda6220d58da2f16a93da",
+      "sha256_recorded_by_test": "5299f3562cc384c3f1dcae7cfaa1cbcf3ba403ce6c3eda6220d58da2f16a93da",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_full_map.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_full_map.jl",
+      "sha256": "7c63e1426f8f4ea33a0b0746b021d4b8b515932f50b57c9b944cdce055f6a1c8",
+      "sha256_recorded_by_test": "7c63e1426f8f4ea33a0b0746b021d4b8b515932f50b57c9b944cdce055f6a1c8",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_halfdome_fullsky_so_noise.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_halfdome_fullsky_so_noise.jl",
+      "sha256": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+      "sha256_recorded_by_test": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_initial_batches.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_initial_batches.jl",
+      "sha256": "695fb52406eefd669c28c59f85e252cfd8ed695c0dffafcf84754073a7ab79a1",
+      "sha256_recorded_by_test": "695fb52406eefd669c28c59f85e252cfd8ed695c0dffafcf84754073a7ab79a1",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_single_profile.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_single_profile.jl",
+      "sha256": "2d67b40b2551526af072f1db99a274b6b5a51863b58dee13bf81b3b6677c7533",
+      "sha256_recorded_by_test": "2d67b40b2551526af072f1db99a274b6b5a51863b58dee13bf81b3b6677c7533",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_sobol_full_maps.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_sobol_full_maps.jl",
+      "sha256": "536bdd0f74475723ce5d61ec20fcc2829ebbdf748c5d3a27834e27f611f05e1d",
+      "sha256_recorded_by_test": "536bdd0f74475723ce5d61ec20fcc2829ebbdf748c5d3a27834e27f611f05e1d",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_tSZ_visuals.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_tSZ_visuals.jl",
+      "sha256": "a610742bc184f19d19c10b43b92a11856d7034f79ebf205db43af0cdc34216b9",
+      "sha256_recorded_by_test": "a610742bc184f19d19c10b43b92a11856d7034f79ebf205db43af0cdc34216b9",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_unphysical_vs_fiducial_full_map_default_grid.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_unphysical_vs_fiducial_full_map_default_grid.jl",
+      "sha256": "c466826ee33e1dbe8a3e5b8170a933a89a2a5d358e1eb629429d3ccdaefd8a21",
+      "sha256_recorded_by_test": "c466826ee33e1dbe8a3e5b8170a933a89a2a5d358e1eb629429d3ccdaefd8a21",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/halfdome/tSZ_visuals/run_xgpaint_binned40_edge_profiles.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_xgpaint_binned40_edge_profiles.jl",
+      "sha256": "4c439a01867e0433552d548a3e1eab3d79a3e5bd3dd745a0c4eecc058dca27b0",
+      "sha256_recorded_by_test": "4c439a01867e0433552d548a3e1eab3d79a3e5bd3dd745a0c4eecc058dca27b0",
+      "identical_copy": true
+    },
+    "halfdome_sources/code/process_maps.jl": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/process_maps.jl",
+      "sha256": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+      "sha256_recorded_by_test": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+      "identical_copy": true
+    },
+    "julia_env/Manifest.toml": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/julia_env/Manifest.toml",
+      "sha256": "49ea9883ffc378b87cf19f2091e64974ca74347d8d8a3bba3e32e3439eab23f1",
+      "sha256_recorded_by_test": "49ea9883ffc378b87cf19f2091e64974ca74347d8d8a3bba3e32e3439eab23f1",
+      "identical_copy": false
+    },
+    "julia_env/Project.toml": {
+      "test256_path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/julia_env/Project.toml",
+      "sha256": "ae3a6b09989b0b26c240f405a6c88a38d2d4f813dd5528a8831cbd4da8c3f984",
+      "sha256_recorded_by_test": "ae3a6b09989b0b26c240f405a6c88a38d2d4f813dd5528a8831cbd4da8c3f984",
+      "identical_copy": true
+    },
+    "reference/test256/base_command.json": {
+      "test256_path": "/lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922/reference/base_command.json",
+      "sha256": "fe5e8b32c1d8f5d7102a2ae80dff521bef948b9ba8298630424ffccfb37c5b57",
+      "sha256_recorded_by_test": "fe5e8b32c1d8f5d7102a2ae80dff521bef948b9ba8298630424ffccfb37c5b57",
+      "identical_copy": true
+    }
+  }
+}

@@ -1,0 +1,6 @@
+#!/bin/bash
+#PBS -N tsz64k_prod
+#PBS -l select=1:ncpus=26:mem=64gb
+#PBS -l walltime=04:00:00
+# Submit with jobs/pbs/submit.sh production|pool (sets -J, ARRAY_OFFSET and TSZ64K_STAGE).
+exec bash "${BUNDLE:?submit with jobs/pbs/submit.sh}/jobs/stage.sh" "${TSZ64K_STAGE:-production}"

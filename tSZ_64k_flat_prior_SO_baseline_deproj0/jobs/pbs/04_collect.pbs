@@ -1,0 +1,6 @@
+#!/bin/bash
+#PBS -N tsz64k_collect
+#PBS -l select=1:ncpus=4:mem=32gb
+#PBS -l walltime=12:00:00
+# Submit with jobs/pbs/submit.sh collect.
+exec bash "${BUNDLE:?submit with jobs/pbs/submit.sh}/jobs/stage.sh" collect

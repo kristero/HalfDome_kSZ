@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "base": "fit_L1_m9_iter2",
+  "scaled": "fit_Mstar-1sigma_iter0",
+  "amplitude_ratio": 1.004347519221662,
+  "maximum_clean_relative_error": 2.3314683517128287e-14,
+  "maximum_noisy_absolute_error_over_peak": 3.2080766264861265e-15,
+  "scope": "Two independently painted maps; ell>=80; same fixed noise and exact quadratic/linear cross terms"
+}

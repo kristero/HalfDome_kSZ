@@ -1,0 +1,59 @@
+[
+  {
+    "chunk": 0,
+    "command": [
+      "qsub",
+      "-q",
+      "mini",
+      "-N",
+      "xp441060p0",
+      "-v",
+      "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=0,PREFLIGHT=1,PREFLIGHT_THREADS=26",
+      "-o",
+      "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+      "-l",
+      "select=1:ncpus=26:mpiprocs=1:mem=64gb",
+      "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+    ],
+    "preflight": true,
+    "job_id": "597624.idark"
+  },
+  {
+    "chunk": 1,
+    "command": [
+      "qsub",
+      "-q",
+      "mini",
+      "-N",
+      "xp441060p1",
+      "-v",
+      "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=1,PREFLIGHT=1,PREFLIGHT_THREADS=26",
+      "-o",
+      "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+      "-l",
+      "select=1:ncpus=26:mpiprocs=1:mem=64gb",
+      "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+    ],
+    "preflight": true,
+    "job_id": "597625.idark"
+  },
+  {
+    "chunk": 2,
+    "command": [
+      "qsub",
+      "-q",
+      "mini",
+      "-N",
+      "xp441060p2",
+      "-v",
+      "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=2,PREFLIGHT=1,PREFLIGHT_THREADS=26",
+      "-o",
+      "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+      "-l",
+      "select=1:ncpus=26:mpiprocs=1:mem=64gb",
+      "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+    ],
+    "preflight": true,
+    "job_id": "597626.idark"
+  }
+]

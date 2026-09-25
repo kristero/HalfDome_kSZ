@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "maximum_formula_relative_error": 0.0,
+  "sigma8_integral_errors": {
+    "halfdome_native": 0.00019669855057502517,
+    "flamingo_D3A": 0.00018778854076662022
+  },
+  "response_relative_resolution_errors": {
+    "Battaglia12": 0.0008522357675235792,
+    "L1_m9": 0.0003030038295804838,
+    "fgas-8sigma": 0.0005379898984734233,
+    "Mstar-1sigma": 0.0005259966712614084
+  },
+  "coarse": [
+    32,
+    24,
+    128
+  ],
+  "fine": [
+    48,
+    36,
+    256
+  ],
+  "radial_rule": "order also increases with halo angular size to resolve Hankel oscillations",
+  "response_ranges": {
+    "Battaglia12": [
+      0.9183221936727122,
+      0.9274705056523674
+    ],
+    "L1_m9": [
+      0.9528763437846729,
+      0.9647556598142094
+    ],
+    "fgas-8sigma": [
+      0.9426624196446,
+      0.9487525276151298
+    ],
+    "Mstar-1sigma": [
+      0.9482674665521512,
+      0.9548237301963436
+    ]
+  },
+  "fiducial_two_halo_fraction_range": [
+    0.0011421523162200152,
+    0.08164527083705542
+  ],
+  "seconds": 51.36148341372609,
+  "scope": "numerical halo-model validation; not validation against independent N-body cosmologies"
+}

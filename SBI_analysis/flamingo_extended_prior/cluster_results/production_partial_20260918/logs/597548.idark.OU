@@ -1,0 +1,11 @@
+Starting preflight_4
+Completed preflight_4 seconds 406.13134395331144
+Starting preflight_5
+Traceback (most recent call last):
+  File "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/worker.py", line 222, in <module>
+    main()
+  File "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/worker.py", line 197, in main
+    data,status,log = run_row(root,run,values,label)
+  File "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/worker.py", line 105, in run_row
+    raise RuntimeError("Invalid spectrum: " + name)
+RuntimeError: Invalid spectrum: unmasked_clean_cl

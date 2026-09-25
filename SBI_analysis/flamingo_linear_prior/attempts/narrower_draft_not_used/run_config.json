@@ -1,0 +1,16 @@
+{
+  "count": 8192,
+  "chunk_size": 128,
+  "campaign": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914",
+  "pilot": "/lustre/work/kristero10/flamingo_prior_pilot_20260914",
+  "cosmology_refit": "/lustre/work/kristero10/flamingo_cosmology_refit_20260915",
+  "previous_run": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915",
+  "catalogue": "/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5",
+  "threads": 26,
+  "row_timeout_seconds": 1200,
+  "worker_budget_seconds": 82800,
+  "retain_full_cl": false,
+  "training_noise_mode": "independent_per_row",
+  "noise_master_seed": 12345,
+  "notes": "Prepare a fresh root with --count 524288 for the larger design. Preserve catalogue, beam, mask, noise algorithm, pixel sampling, and 4 R200c painting definition."
+}

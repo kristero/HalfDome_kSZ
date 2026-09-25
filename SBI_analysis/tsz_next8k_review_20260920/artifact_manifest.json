@@ -1,0 +1,333 @@
+{
+  "input_hashes": {
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/historical1/status.json": {
+      "bytes": 3250,
+      "sha256": "593c46bbe5b196ebd5e8c804cb504485559c93851e77f67b800d7046a29cad20"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/historical1/time.txt": {
+      "bytes": 3197,
+      "sha256": "65321ee12e7361ac958d26b2bb4a5e0885fd2dad45dfb7ab13220ab98ac4f4f4"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/historical1/run.log": {
+      "bytes": 1670,
+      "sha256": "a2b3cc293e547878c63b67d2398847c75b347211ff645b19c54fa6b68f1973f9"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/logz2/status.json": {
+      "bytes": 3232,
+      "sha256": "3aa0298d46d342a8c115cf74c32dd4aca3a0d91fa5ab642bb6efba09f1538c2b"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/logz2/time.txt": {
+      "bytes": 3177,
+      "sha256": "5b4775bacf3148bab5d5e056da618225ae24b1b787169600a6201fb6c4c72794"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/logz2/run.log": {
+      "bytes": 1355,
+      "sha256": "2ac7472d45d01172896a7ed18aedf8c2792f1f60b7f2ce7fd8d87d270fe2ad83"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/logz2/masked_clean_cl.npy": {
+      "bytes": 63920,
+      "sha256": "a2d67b74981184be47bf94f6d74519742c831d882b6b62a76924e9de167b23f2"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/pixel8192_2/status.json": {
+      "bytes": 3584,
+      "sha256": "b9ae4db134e82a16d7a114fac32c84885962a68bd194646cbfbff436c2cf85f7"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/pixel8192_2/time.txt": {
+      "bytes": 3221,
+      "sha256": "97417d0af44cc2746c91d1b0b47de42aea855a2da9a4cd93a523ab4612cf1a32"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/pixel8192_2/run.log": {
+      "bytes": 1368,
+      "sha256": "edbc98906a534aa4ccc0e4e6262aaa13996c9d68c84e39cfbf69b45d6ac31bb7"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/pixel8192_2/masked_clean_cl.npy": {
+      "bytes": 63920,
+      "sha256": "7c79e8b4febf2d4215275362900da149503b11ddd35674d8de77b97b870e45ca"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/pixel16384_2/status.json": {
+      "bytes": 3586,
+      "sha256": "fed8123328f9ccc78f3608e021103353f896e43b9b972e98fefdab59704aca3c"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/pixel16384_2/time.txt": {
+      "bytes": 3233,
+      "sha256": "306b2b848bea8439296d5b90920d32de4e05a3c5837183c5e6987fa78a9d64a2"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/pixel16384_2/run.log": {
+      "bytes": 1372,
+      "sha256": "19f1612b3ccd68c77d2f77a02cf360dbd5017c9eeb9c9c82aa2f38bcde6f6e8a"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/pixel16384_2/masked_clean_cl.npy": {
+      "bytes": 63920,
+      "sha256": "027514f936f3b4cbf995d28278f1bcea275c11e8adea596070957d22a29d6355"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/Battaglia12/pixel16384_2/unmasked_clean_cl.npy": {
+      "bytes": 63920,
+      "sha256": "0b08693ab7df079eeec72f83d4492007ad5dc35565d972bb6b1c64f275a1f8a7"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/historical1/status.json": {
+      "bytes": 3384,
+      "sha256": "fc65773945b4d452e04df37e3c0e3e31c30742727ac38fb8d6cc2c11fa526595"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/historical1/time.txt": {
+      "bytes": 3214,
+      "sha256": "5e8a5d9129129a5df4a33f9547ac810f47d2bb27f6075af90187bdc478dc11dd"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/historical1/run.log": {
+      "bytes": 1658,
+      "sha256": "e4c214304a8180393cbaf0aeb2458d9440fefb01a89ef513e13c6d82556f4ac1"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/logz2/status.json": {
+      "bytes": 3366,
+      "sha256": "cce5d721bcb726cbd053332b8c39085fe1abc45d783005d2b439ff2eef58a458"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/logz2/time.txt": {
+      "bytes": 3195,
+      "sha256": "e98bd9c0435aefb854a9f3a6ffdf1516b8ad414a4b70fee577d5d7f440a0d3dd"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/logz2/run.log": {
+      "bytes": 1347,
+      "sha256": "06bde2fb7bcbc0dd6dfea00decb1d91a8cdbf174d01ce422669bb4e5fe5927b3"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/logz2/masked_clean_cl.npy": {
+      "bytes": 63920,
+      "sha256": "e9ccc04f4277755a5864c11a6b04dcfb40268512f6c7dc82f3926d6b49c915d4"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/pixel8192_2/status.json": {
+      "bytes": 3717,
+      "sha256": "1c533a7ee4215effe1eb8562e18942b78526521a72b5640738fd050a73a89d63"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/pixel8192_2/time.txt": {
+      "bytes": 3236,
+      "sha256": "6a4513faffdf592e18b6766f24363917f5c511f8968fc18374418801091ca74e"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/pixel8192_2/run.log": {
+      "bytes": 1365,
+      "sha256": "eda6b4ed85dd8ecfcc15c896c59ba560cbea1efcf021f079dd64df7af6b569de"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/pixel8192_2/masked_clean_cl.npy": {
+      "bytes": 63920,
+      "sha256": "8af5136d54f186d7b26bfcef8c0357f0d5cc3b2933d0211d1aee9e41560c7903"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/pixel16384_2/status.json": {
+      "bytes": 3716,
+      "sha256": "fa375558be9a5a021b2e06ca4a11c26ddeb22dd1f9cc7c0343d43f29b01004ab"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/pixel16384_2/time.txt": {
+      "bytes": 3248,
+      "sha256": "1a9964167bd2aa9a2aa606703e09773e1de31a7886acb6d39be400d288399cbd"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/pixel16384_2/run.log": {
+      "bytes": 1368,
+      "sha256": "4e9818859ec5026ec0678a55963fcf645b946de0ef04fb1ede07aa043b29a5ed"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/pixel16384_2/masked_clean_cl.npy": {
+      "bytes": 63920,
+      "sha256": "e63efe38c22a7c75f296806d9ee5eab6e6729e8e33b53e3d4cd6c7b9244dfc6a"
+    },
+    "SBI_analysis/tsz_guardrail_study/maps/FL_L1_m9/pixel16384_2/unmasked_clean_cl.npy": {
+      "bytes": 63920,
+      "sha256": "9367d51f27d26ea6e8e595e5a58572ea705e5150f0ff7d1cec90a787d4331fa6"
+    },
+    "SBI_analysis/tsz_guardrail_study/audit/noise_covariance.npz": {
+      "bytes": 2608264,
+      "sha256": "a62783d3479b6687915f08d346abd6c8f76cdee9a71969b168d62488e93d3b7b"
+    },
+    "SBI_analysis/tsz_guardrail_study/audit/noise_covariance.json": {
+      "bytes": 19777,
+      "sha256": "2cda17f007f27b65e0364e6f75016a3650934735564f36f0d27cf6f554fd55ce"
+    },
+    "SBI_analysis/tsz_guardrail_study/METHODS.md": {
+      "bytes": 21627,
+      "sha256": "71ef4ca919e41dd9186d9a081d413e71abe47c03f6163ca6d2914cbf4e8320d1"
+    },
+    "SBI_analysis/tsz_guardrail_study/RESULTS.md": {
+      "bytes": 8634,
+      "sha256": "d1924457ddb6de8f6b257fb171f79b66aa8958099a5910ec5f460fd22b952775"
+    },
+    "SBI_analysis/tsz_guardrail_study/map_experiment.jl": {
+      "bytes": 4948,
+      "sha256": "c104b195e1aa549189afe19f9308f70cb2b0badcbcf2ac6452e96d4cb7cae7b0"
+    },
+    "SBI_analysis/flamingo_linear_prior/prior.py": {
+      "bytes": 7293,
+      "sha256": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0"
+    },
+    "SBI_analysis/flamingo_linear_prior/prior.json": {
+      "bytes": 1686,
+      "sha256": "b4868a66630009e51bcadeed544f13cb3af49e13dab3b83f3c440933260574a9"
+    },
+    "SBI_analysis/flamingo_linear_prior/stable_los.jl": {
+      "bytes": 3042,
+      "sha256": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca"
+    },
+    "SBI_analysis/flamingo_linear_prior/paint_row.jl": {
+      "bytes": 2530,
+      "sha256": "a390825874831907aa492852ac93a6142e6595735bb31a27123dfc32f86f5cec"
+    },
+    "SBI_analysis/flamingo_linear_prior/independent_noise.jl": {
+      "bytes": 3840,
+      "sha256": "daca9ecc61eb7f08f10554e82950f8d95e5ae0d2e1cd6ec09c2e434848e2d0a9"
+    },
+    "SBI_analysis/flamingo_linear_prior/cluster_results/completed_20260918/summary.json": {
+      "bytes": 753,
+      "sha256": "6e485f546a0aa43e23117d07c9d8c6528292d336fce81aafec0c4dd22f6236e6"
+    },
+    "SBI_analysis/flamingo_linear_prior/cluster_results/completed_20260918/manifest.json": {
+      "bytes": 14049,
+      "sha256": "994333174a0c5a1e636a5cc065d000464ea3b4ddee2bb0082ccb4cfdd70cc600"
+    },
+    "SBI_analysis/flamingo_linear_prior/cluster_results/completed_20260918/dataset/theta.npy": {
+      "bytes": 589952,
+      "sha256": "ecac74ace38af76f06bb91f4e00c239302a30738c8338de2d317c7196c2d22b8"
+    },
+    "SBI_analysis/flamingo_linear_prior/cluster_results/completed_20260918/dataset/validation_split.npy": {
+      "bytes": 8320,
+      "sha256": "97fe238a2ce81d3120d04d29ff29c78df5f20d00429a1766fcf68471e3c3bd75"
+    },
+    "SBI_analysis/tsz_beta_flat_followup_20260920/RESULTS.md": {
+      "bytes": 19675,
+      "sha256": "d3032b3e7836f9b250241624c86e887cd9de6ac5c9fbd2076f1eeb02aa8b0774"
+    },
+    "SBI_analysis/tsz_beta_flat_followup_20260920/continuous_flat.py": {
+      "bytes": 6710,
+      "sha256": "7a185e66ccad5dbb1a83054ab780652d25f7fa22844e227b90978705830a5144"
+    },
+    "SBI_analysis/tsz_beta_flat_followup_20260920/results/summary.json": {
+      "bytes": 7158,
+      "sha256": "062677110ffb5f44fcb039b6fa9ed296f0b1daa22503b43a2f4ac7b4a6deea94"
+    },
+    "SBI_analysis/tsz_beta_flat_followup_20260920/results/continuous_flat_validation.json": {
+      "bytes": 741,
+      "sha256": "b230f0da6f3b777886846774d6de6a2b4518fd5dd3d468fd3d4d4811622ff2e9"
+    },
+    "SBI_analysis/tsz_beta_flat_followup_20260920/results/production_integrity.json": {
+      "bytes": 131,
+      "sha256": "3978cfe3cc62c47b99d8776fbd6fc1603c8abfae5185e6e5ae10a735666324fd"
+    },
+    "SBI_analysis/linear_prior_sbi/SBI_LINEAR_8K_ANALYSIS_20260918.md": {
+      "bytes": 6560,
+      "sha256": "2415547c1d86c33c802c24e5e50443e3d9c1667de5e214755655e89510f09f45"
+    },
+    "SBI_analysis/linear_prior_sbi/sbi_linear_prior_pipeline.py": {
+      "bytes": 27259,
+      "sha256": "4113bcb8d398af51c62a0f12e7a76b4130e70dc436909b6e597e3296e7e86318"
+    },
+    "SBI_analysis/linear_prior_sbi/cluster_results/figures/convergence_metrics.csv": {
+      "bytes": 17291,
+      "sha256": "81220fdce390773b87c9c525c02f296df83340ec2c4507827c2388a3e3c02672"
+    },
+    "truncation_comparison/spherical_truncation_profiles.jl": {
+      "bytes": 4324,
+      "sha256": "94df8165f3a6fa26480534e1ed56c23dfdfd552b7408706ad7cce792941e018a"
+    },
+    "frb_map_generation/compare_takahashi_sightlines.py": {
+      "bytes": 13292,
+      "sha256": "3d3b9ba2b050eb689e1992e8b985e14ce91a60f54abe43bf0d20f78514f1c5ce"
+    },
+    "other_sims/SO/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt": {
+      "bytes": 418233,
+      "sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64"
+    }
+  },
+  "output_hashes": {
+    "SBI_analysis/tsz_next8k_review_20260920/PRE_RUN_TESTS.md": {
+      "bytes": 8949,
+      "sha256": "2acb18cfa788eb328db953677908e98034e0ce25a2ea2599fe68b82f38f9c590"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/REVIEW.md": {
+      "bytes": 36018,
+      "sha256": "db9fea89251d092cdaf51a94379123838ce1d10379b4cbe259acb712fb2d3e4f"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/analyze.py": {
+      "bytes": 11848,
+      "sha256": "c2aa11f0b03306d819fbbd1a43bc6f5fdc8584a1ea3f4a4288ab356a8fb06478"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/build_report.py": {
+      "bytes": 37611,
+      "sha256": "4de467fb3f88e40344f737e47fb8fb92f6f5dd345701f074d7e25fa8759996ae"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/finalize.py": {
+      "bytes": 4723,
+      "sha256": "98a2b652839a3db431824ea1e77f31dff2192fa8e8f7f1974678f5d8ebdfe413"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/inputs/upstream_profiles.jl": {
+      "bytes": 26854,
+      "sha256": "9801dbac85fd078d890fa953349db3b555db510b7d70697317a4566f19ccd4a1"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/inputs/upstream_profiles_y.jl": {
+      "bytes": 8708,
+      "sha256": "98d034e7ebacf8f37c252f1448dd77d71ee26412b7a9694e20106bcb82c4891c"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/plots/beam_noise_resolution.pdf": {
+      "bytes": 35909,
+      "sha256": "ac58c58edc232a1c9f7dc9676a101b1a279bc9536e2433f9d0d5defe673da368"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/plots/beam_noise_resolution.png": {
+      "bytes": 223937,
+      "sha256": "082bb7b166bfed7c88f52fa7d54cba3213a732dcba886fdb03b6a66a07cf62b6"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/plots/prior_only_baseline.pdf": {
+      "bytes": 22125,
+      "sha256": "cf77930acb0e4d2417965d75f820bbb458ffa664c3ea1a8e482a736b192cb4ed"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/plots/prior_only_baseline.png": {
+      "bytes": 186420,
+      "sha256": "08bc77661be508e8386c3d9c583429ce1a3248d38744de57ba48476ee367c4f2"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/plots/resolution_costs.pdf": {
+      "bytes": 17497,
+      "sha256": "d5302ee7842e99d705fa3aeca7fd6d4ee58fc313ce78409d9e767e5c64568d31"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/plots/resolution_costs.png": {
+      "bytes": 69894,
+      "sha256": "6246ded11653219de01e4cf66436dd66cec8892bae3653e658d94754871472f6"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/results/bandpower_diagnostics.csv": {
+      "bytes": 14700,
+      "sha256": "4fc77674a2b63d7900436534b7f917c16a0a65bdb323b619a0b2fbb07ae2f29d"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/results/beam_noise_resolution.json": {
+      "bytes": 3598,
+      "sha256": "bc9dcb3ec23eb929453e4b04c37917acafc3bf8b039a0701ec6b1892774b29ad"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/results/costs.json": {
+      "bytes": 3401,
+      "sha256": "c19f4eb65b83a29aac48c5c0d90ea67db47bae0990e8b19fc4509308695ad15e"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/results/document_checks.json": {
+      "bytes": 286,
+      "sha256": "ebe7cd8833f74475265d93cce6e10d9ce016f38a330bafafa7a4784740dcc7b3"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/results/prior_only_baseline.json": {
+      "bytes": 4197,
+      "sha256": "3e2fe1929e0a0ef758aa1393ddf32613991616473a063f496d1dd936dad3e473"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/results/source_review.json": {
+      "bytes": 1475,
+      "sha256": "55fce656fb9791dcd6f1257d6dae3593eb3f212fcb33c63b04bfcc37f0b4ebcb"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/test_plan.json": {
+      "bytes": 9671,
+      "sha256": "5f1b9fbe4bcf1adafddb6f19f78438f78a708c094c92a5118675099cfc857608"
+    },
+    "output/pdf/tsz_prior_pipeline_review_20260920.pdf": {
+      "bytes": 660468,
+      "sha256": "49e41f065a05c4a57e008f6c86d63998fda51e680c7f5eda5cd104dae635a259"
+    },
+    "SBI_analysis/tsz_next8k_review_20260920/changed_files.txt": {
+      "bytes": 1521,
+      "sha256": "3146c89a1dbe4b8200989610a46733ba2bed75863c9975c94a096e111cbe62a5"
+    }
+  },
+  "halfdome_commit": "10947ce33efadbe8431af54d5fb9b92fe6649fc5",
+  "tracked_changes": "",
+  "new_cluster_jobs_submitted": 0,
+  "cluster_execution": "Unavailable this turn: SSH timed out twice",
+  "document_checks": {
+    "pages": 18,
+    "all_19_test_ids_present": true,
+    "no_unicode_replacement_character": true,
+    "visual_review": "All 18 pages rendered and inspected; revised pages checked again",
+    "scientific_scope": "Reanalysis of saved experiments; new spherical full-sky tests remain pending"
+  }
+}

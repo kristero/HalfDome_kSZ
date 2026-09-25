@@ -1,0 +1,589 @@
+{
+  "schema_version": 1,
+  "checked_utc": "2026-09-14T09:59:22.271122+00:00",
+  "host": "idark",
+  "approval_status": "awaiting_user_download_approval",
+  "simulation_downloads_performed_by_this_script": 0,
+  "script_sha256": "70177723b6b7e73ca469cce3a388d55e0a7106556ca04c0e0705e46a54a3c8d4",
+  "variants": [
+    {
+      "variant": "L1_m9",
+      "description": "Fiducial thermal AGN feedback",
+      "remote_path": "FLAMINGO/L1_m9/L1_m9/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "status": "available",
+      "file_bytes": 1520700487,
+      "last_modified_ms": 1773081600000,
+      "dataset": "data",
+      "shape": [
+        201326592
+      ],
+      "dtype": "<f8",
+      "nside": 4096,
+      "uncompressed_array_bytes": 1610612736,
+      "dataset_attributes": {},
+      "map_convention_source": "FLAMINGO integrated-lightcones documentation",
+      "download_url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/download/FLAMINGO/L1_m9/L1_m9/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5"
+    },
+    {
+      "variant": "fgas+2sigma",
+      "description": "Cluster gas fraction calibration shifted +2 sigma",
+      "remote_path": "FLAMINGO/L1_m9/fgas+2sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "status": "unavailable_or_unverified",
+      "error": "404 Client Error:  for url: https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/fgas%2B2sigma/integrated_maps/yang26/lightcone0_shells?data_size_limit=0&max_depth=1"
+    },
+    {
+      "variant": "fgas-2sigma",
+      "description": "Cluster gas fraction calibration shifted -2 sigma",
+      "remote_path": "FLAMINGO/L1_m9/fgas-2sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "status": "unavailable_or_unverified",
+      "error": "404 Client Error:  for url: https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/fgas-2sigma/integrated_maps/yang26/lightcone0_shells?data_size_limit=0&max_depth=1"
+    },
+    {
+      "variant": "fgas-4sigma",
+      "description": "Cluster gas fraction calibration shifted -4 sigma",
+      "remote_path": "FLAMINGO/L1_m9/fgas-4sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "status": "unavailable_or_unverified",
+      "error": "404 Client Error:  for url: https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/fgas-4sigma/integrated_maps/yang26/lightcone0_shells?data_size_limit=0&max_depth=1"
+    },
+    {
+      "variant": "fgas-8sigma",
+      "description": "Cluster gas fraction calibration shifted -8 sigma",
+      "remote_path": "FLAMINGO/L1_m9/fgas-8sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "status": "available",
+      "file_bytes": 1516150395,
+      "last_modified_ms": 1773084454000,
+      "dataset": "data",
+      "shape": [
+        201326592
+      ],
+      "dtype": "<f8",
+      "nside": 4096,
+      "uncompressed_array_bytes": 1610612736,
+      "dataset_attributes": {},
+      "map_convention_source": "FLAMINGO integrated-lightcones documentation",
+      "download_url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/download/FLAMINGO/L1_m9/fgas-8sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5"
+    },
+    {
+      "variant": "Mstar-1sigma",
+      "description": "Stellar mass calibration shifted -1 sigma",
+      "remote_path": "FLAMINGO/L1_m9/Mstar-1sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "status": "available",
+      "file_bytes": 1519858814,
+      "last_modified_ms": 1773085861000,
+      "dataset": "data",
+      "shape": [
+        201326592
+      ],
+      "dtype": "<f8",
+      "nside": 4096,
+      "uncompressed_array_bytes": 1610612736,
+      "dataset_attributes": {},
+      "map_convention_source": "FLAMINGO integrated-lightcones documentation",
+      "download_url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/download/FLAMINGO/L1_m9/Mstar-1sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5"
+    },
+    {
+      "variant": "Mstar-1sigma_fgas-4sigma",
+      "description": "Stellar mass -1 sigma and gas fraction -4 sigma",
+      "remote_path": "FLAMINGO/L1_m9/Mstar-1sigma_fgas-4sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "status": "unavailable_or_unverified",
+      "error": "404 Client Error:  for url: https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/Mstar-1sigma_fgas-4sigma/integrated_maps/yang26/lightcone0_shells?data_size_limit=0&max_depth=1"
+    },
+    {
+      "variant": "Jet",
+      "description": "Jet AGN feedback",
+      "remote_path": "FLAMINGO/L1_m9/Jet/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "status": "unavailable_or_unverified",
+      "error": "404 Client Error:  for url: https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/Jet/integrated_maps/yang26/lightcone0_shells?data_size_limit=0&max_depth=1"
+    },
+    {
+      "variant": "Jet_fgas-4sigma",
+      "description": "Jet AGN feedback with gas fraction -4 sigma",
+      "remote_path": "FLAMINGO/L1_m9/Jet_fgas-4sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "status": "unavailable_or_unverified",
+      "error": "404 Client Error:  for url: https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/Jet_fgas-4sigma/integrated_maps/yang26/lightcone0_shells?data_size_limit=0&max_depth=1"
+    }
+  ],
+  "budget": {
+    "available_maps": 3,
+    "requested_maps": 9,
+    "download_bytes": 4556709696,
+    "download_GB": 4.556709696,
+    "download_GiB": 4.243766605854034,
+    "float64_map_bytes": 1610612736,
+    "float64_map_GiB": 1.5,
+    "complex128_alm_bytes_at_lmax7979": 509507040,
+    "planned_array_allowance_GiB": 16.898061633110046,
+    "expected_process_peak_GiB_range": [
+      24,
+      32
+    ],
+    "ram_estimate_measured": false,
+    "proposed_PBS_memory_gb": 64,
+    "proposed_PBS_ncpus": 26,
+    "proposed_PBS_queue": "mini",
+    "proposed_PBS_walltime": "23:59:00",
+    "simultaneous_map_jobs": 1,
+    "planned_noise_and_mask_cache_GiB": 4.5,
+    "proposed_workspace_reservation_GiB": 20,
+    "disk_budget_includes": "Available raw inputs, 4.5 GiB reusable mask/noise cache, one optional working map, compact spectra/posteriors/plots, and margin",
+    "notes": "Process feedback variants sequentially. Retain raw inputs; do not persist every beam/noise/split map. Measure peak RSS in the first approved map job."
+  },
+  "metadata_requests": [
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/L1_m9/integrated_maps/yang26/lightcone0_shells",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1
+      },
+      "received_bytes": 1208,
+      "http_status": 200,
+      "sha256": "32fc64bd8a6f7b2c2f7eb6bd3a8bb84a2987bfda3cef40487c15eff1511b282c"
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/L1_m9/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1,
+        "object": "/"
+      },
+      "received_bytes": 105,
+      "http_status": 200,
+      "sha256": "0c6443f283b219f27efd89225c80ed11cdb2ecd5e0da5cadf732d52470975312"
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/fgas%2B2sigma/integrated_maps/yang26/lightcone0_shells",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1
+      },
+      "received_bytes": 0,
+      "http_status": 404
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/fgas-2sigma/integrated_maps/yang26/lightcone0_shells",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1
+      },
+      "received_bytes": 0,
+      "http_status": 404
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/fgas-4sigma/integrated_maps/yang26/lightcone0_shells",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1
+      },
+      "received_bytes": 0,
+      "http_status": 404
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/fgas-8sigma/integrated_maps/yang26/lightcone0_shells",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1
+      },
+      "received_bytes": 1208,
+      "http_status": 200,
+      "sha256": "49f0531d5da7933967dea898351b5c9e7aa2f01d8bf3bc7ce526d5c467092d08"
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/fgas-8sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1,
+        "object": "/"
+      },
+      "received_bytes": 105,
+      "http_status": 200,
+      "sha256": "0c6443f283b219f27efd89225c80ed11cdb2ecd5e0da5cadf732d52470975312"
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/Mstar-1sigma/integrated_maps/yang26/lightcone0_shells",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1
+      },
+      "received_bytes": 1208,
+      "http_status": 200,
+      "sha256": "9880cb35c4405267302da1697c1de9f74f2dd084d8ffaac7367964821039dac8"
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/Mstar-1sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1,
+        "object": "/"
+      },
+      "received_bytes": 105,
+      "http_status": 200,
+      "sha256": "0c6443f283b219f27efd89225c80ed11cdb2ecd5e0da5cadf732d52470975312"
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/Mstar-1sigma_fgas-4sigma/integrated_maps/yang26/lightcone0_shells",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1
+      },
+      "received_bytes": 0,
+      "http_status": 404
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/Jet/integrated_maps/yang26/lightcone0_shells",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1
+      },
+      "received_bytes": 0,
+      "http_status": 404
+    },
+    {
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/msgpack/FLAMINGO/L1_m9/Jet_fgas-4sigma/integrated_maps/yang26/lightcone0_shells",
+      "params": {
+        "data_size_limit": 0,
+        "max_depth": 1
+      },
+      "received_bytes": 0,
+      "http_status": 404
+    }
+  ],
+  "observation_contract": {
+    "nside": 4096,
+    "signal_beam_fwhm_arcmin": 2.0,
+    "mask_support_fsky": 0.4,
+    "mask_apodization_arcmin": 60.0,
+    "mask_seed": 12345,
+    "noise_root_seed": 12345,
+    "baseline_deproj0_split_seeds": [
+      22446,
+      22447
+    ],
+    "noise_and_spectrum_lmax": 7979,
+    "cl_niter": 0,
+    "spectrum": "raw masked split cross pseudo-Cl, no fsky or mode-coupling correction",
+    "noise": "SO baseline deproj0, native Compton-y N_ell; no extra beam on noise",
+    "inference": "saved signed 40-bin D_ell, asinh, standardization, MOPED and nine-parameter SBI; original prior"
+  },
+  "verified_bundle": {
+    "path": "/lustre/work/kristero10/battaglia12_nine_fisher_comparison_models_20260913/moped",
+    "experiment_id": "35fbe0a27078c4b34d8aac9aee2b95fb4e2e4c977dc720ac516dd91176c302d6",
+    "files": {
+      "density_estimator.pkl": "223494532fd812a5b8eeeaab202dc3cc243151da8ed6f0b6c41e8011205fab5e",
+      "observation_contract.npz": "c3856aa39ee1bcb45a9ae91874be91f30ff6f7e001d688bc96f6fa99144f08d6",
+      "training_complete.json": "e55934b5024cf16a8913884ff869095d09ea925cab5f50d227dd9d878626468d",
+      "transform.npz": "2075d4e4e89b6beb385a70ea501ad2970b85fb406015afccdbf0093fe06ee304"
+    },
+    "checksum_verification": "passed",
+    "param_names": [
+      "P0",
+      "xc",
+      "beta",
+      "alpha_m_P0",
+      "alpha_m_xc",
+      "alpha_m_beta",
+      "alpha_z_P0",
+      "alpha_z_xc",
+      "alpha_z_beta"
+    ],
+    "prior_low": [
+      1.8325239419937134,
+      0.15001100301742554,
+      3.4806270599365234,
+      0.000311999989207834,
+      -0.09971799701452255,
+      -0.0199350006878376,
+      -1.3634569644927979,
+      0.14739300310611725,
+      0.08380799740552902
+    ],
+    "prior_high": [
+      34.34122085571289,
+      0.8445029854774475,
+      5.216610908508301,
+      0.29225099086761475,
+      0.09979499876499176,
+      0.09976699948310852,
+      -0.2288389950990677,
+      1.3144739866256714,
+      0.7458840012550354
+    ],
+    "bin_ell_min": [
+      80.0,
+      280.0,
+      480.0,
+      680.0,
+      880.0,
+      1080.0,
+      1280.0,
+      1480.0,
+      1680.0,
+      1880.0,
+      2080.0,
+      2280.0,
+      2480.0,
+      2680.0,
+      2880.0,
+      3080.0,
+      3280.0,
+      3480.0,
+      3680.0,
+      3880.0,
+      4080.0,
+      4280.0,
+      4480.0,
+      4680.0,
+      4880.0,
+      5080.0,
+      5280.0,
+      5480.0,
+      5680.0,
+      5880.0,
+      6080.0,
+      6280.0,
+      6480.0,
+      6680.0,
+      6880.0,
+      7080.0,
+      7280.0,
+      7480.0,
+      7680.0,
+      7880.0
+    ],
+    "bin_ell_max": [
+      279.0,
+      479.0,
+      679.0,
+      879.0,
+      1079.0,
+      1279.0,
+      1479.0,
+      1679.0,
+      1879.0,
+      2079.0,
+      2279.0,
+      2479.0,
+      2679.0,
+      2879.0,
+      3079.0,
+      3279.0,
+      3479.0,
+      3679.0,
+      3879.0,
+      4079.0,
+      4279.0,
+      4479.0,
+      4679.0,
+      4879.0,
+      5079.0,
+      5279.0,
+      5479.0,
+      5679.0,
+      5879.0,
+      6079.0,
+      6279.0,
+      6479.0,
+      6679.0,
+      6879.0,
+      7079.0,
+      7279.0,
+      7479.0,
+      7679.0,
+      7879.0,
+      7979.0
+    ],
+    "metadata": {
+      "bin_weighting": "2ell_plus_1",
+      "ell_max": 7979.0,
+      "ell_min": 80.0,
+      "ell_selection": "center",
+      "n_ell_unbinned": 7900,
+      "n_rows": 524288,
+      "n_selected_bins": 40,
+      "obs_index": 524287,
+      "obs_source": "dataset-row",
+      "product": "masked_baseline_noise_cross_deproj0",
+      "sobol_global_row_validation": {},
+      "source_cl_path": "/lustre/work/kristero10/adrian_dataset/sbi_masked_baseline_noise_cross_deproj0_cl.npy",
+      "source_metadata_csv_path": "/lustre/work/kristero10/adrian_dataset/sbi_masked_baseline_noise_cross_deproj0_metadata.csv",
+      "source_metadata_path": "/lustre/work/kristero10/adrian_dataset/sbi_masked_baseline_noise_cross_deproj0.npz",
+      "source_sobol_csv_path": "",
+      "source_sobol_global_row_path": "",
+      "statistic": "weighted mean of linear D_ell; x equals binned D_ell",
+      "test_last_n": 500,
+      "theta_source": "metadata_npz_theta"
+    },
+    "training": {
+      "best_validation_performance": [
+        24.2518
+      ],
+      "converged_by_early_stopping": false,
+      "epochs_trained": 201,
+      "experiment_id": "35fbe0a27078c4b34d8aac9aee2b95fb4e2e4c977dc720ac516dd91176c302d6",
+      "method": "moped",
+      "n_fit": 461737,
+      "n_train": 513042,
+      "python": "3.8.10 (default, Jun  4 2021, 15:09:15) \n[GCC 7.5.0]",
+      "returned_weights_differed_from_best": true,
+      "sbi": "0.22.0",
+      "torch": "2.4.1+cu121",
+      "training_seconds": 4604.381679812446,
+      "weights_selection": "best_validation_snapshot",
+      "x_dim": 9
+    }
+  },
+  "halfdome_reference": {
+    "path": "/lustre/work/kristero10/so9_fisher_moped524k_20260913/fixed_noise_observation",
+    "files": {
+      "simulation_complete.json": "a7f3e4edd61facea2553a4c0632d122fe515d0fe2ba89537b49871d2d02ccef9",
+      "observation.npz": "e647663037656f02464ef75763e08250c4a7d3dc3c32ed079e7749686d601c10",
+      "posterior_samples.npy": "632d74deb409fd636f5de47e17ca7bdb6b83509021bbcc8eb51a127b9168e998"
+    },
+    "simulation_request": {
+      "catalogue": {
+        "path": "/home/cbllover/HalfDome/lightcone_100.hdf5",
+        "size": 15425622199
+      },
+      "command": [
+        "/home/kn18001/.julia/juliaup/julia-1.12.2+0.x64.linux.gnu/bin/julia",
+        "--project=/home/kn18001/.julia/environments/v1.12",
+        "--threads=16",
+        "--startup-file=no",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_halfdome_fullsky_so_noise.jl",
+        "catalog_source=halfdome",
+        "simulation_name=halfdome_lightcone_100",
+        "batching_mode=full",
+        "halfdome_path=/home/cbllover/HalfDome/lightcone_100.hdf5",
+        "apply_mass_cut=true",
+        "mass_min=1000000000000.0",
+        "cosmo_h=0.68",
+        "cosmo_omegab=0.049",
+        "cosmo_omegac=0.261",
+        "sobol_row=0",
+        "sobol_csv_path=",
+        "cleanup_nonpositive_profile_values=true",
+        "output_dir=/home/cbllover/HalfDome/SBI_analysis/outputs/moped_local_profiles/0669be4fb61ca0d5/fixed_noise_diagnostic/raw",
+        "cache_dir=/home/cbllover/HalfDome/SBI_analysis/outputs/moped_local_profiles/0669be4fb61ca0d5/fixed_noise_diagnostic/cache",
+        "baseline_noise_path=/home/cbllover/HalfDome/other_sims/SO/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt",
+        "goal_noise_path=/home/cbllover/HalfDome/other_sims/SO/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt",
+        "nside=4096",
+        "cl_lmax=7979",
+        "so_noise_lmax=7979",
+        "cl_niter=0",
+        "so_noise_deprojections=0",
+        "so_noise_is_dl=false",
+        "apply_gaussian_beam=true",
+        "gaussian_beam_fwhm_arcmin=2.0",
+        "mask_fsky=0.4",
+        "mask_apodization_arcmin=60.0",
+        "seed=12345",
+        "mask_seed=12345",
+        "noise_seed=12345",
+        "model_exists=false",
+        "reuse_existing_cache=false",
+        "cache_wait_seconds=0",
+        "interpolator_pad=256",
+        "interpolator_logM_max=15.7",
+        "save_cl=true",
+        "save_no_noise_cl=true",
+        "save_baseline_noise_cross_cl=true",
+        "save_goal_noise_cross_cl=false",
+        "save_unmasked_no_noise_cl=false",
+        "save_healpix_map=false",
+        "save_bin_maps=false",
+        "save_mass_map=false",
+        "save_noise_maps=false",
+        "save_noisy_maps=false",
+        "save_mask_map=false",
+        "save_signal_map=false",
+        "save_masked_signal_map=false",
+        "skip_existing_outputs=false",
+        "skip_existing_any_run_instance=false",
+        "enforce_battaglia_guardrails=true",
+        "skip_invalid_battaglia_rows=false",
+        "run_instance_tag=",
+        "print_runtime_environment=true",
+        "battaglia_alpha_amp=1.0",
+        "battaglia_alpha_alpha_m=0.0",
+        "battaglia_alpha_alpha_z=0.0",
+        "battaglia_gamma_amp=-0.3",
+        "battaglia_gamma_alpha_m=0.0",
+        "battaglia_gamma_alpha_z=0.0",
+        "battaglia_P0_amp=18.1",
+        "battaglia_x_c_amp=0.497",
+        "battaglia_beta_amp=4.35",
+        "battaglia_P0_alpha_m=0.154",
+        "battaglia_x_c_alpha_m=-0.00865",
+        "battaglia_beta_alpha_m=0.0393",
+        "battaglia_P0_alpha_z=-0.758",
+        "battaglia_x_c_alpha_z=0.731",
+        "battaglia_beta_alpha_z=0.415"
+      ],
+      "library": {
+        "julia_version": "1.12.2",
+        "parameter_constructor_check": true,
+        "xgpaint_source": "/home/kn18001/.julia/dev/XGPaint/src/XGPaint.jl"
+      },
+      "noise_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+      "sources": {
+        "/home/cbllover/HalfDome/tSZ_visuals/HalfDome_tSZ.jl": "211d17a59fcae9f53f7ba225ca2ff9167946d34b2d94f0c5795843089ace8411",
+        "/home/cbllover/HalfDome/tSZ_visuals/HalfDome_tSZ_legacy_monolith.jl": "4b64e9f92241c22ada733b2f4c6941a06aef64575a5655fa29e0c84bbc52674c",
+        "/home/cbllover/HalfDome/tSZ_visuals/binning.jl": "39d9fd05378bad60553231263b83dedf9b72d552cec04680e5b9aa016783394a",
+        "/home/cbllover/HalfDome/tSZ_visuals/build_interpolator_cache.jl": "55e4c5b40e19b022899a58b9656ef33913011197ee903cbecac1b55623012e5e",
+        "/home/cbllover/HalfDome/tSZ_visuals/catalog_halfdome.jl": "bae2d0e20e50e68e33396298b3dadd9f2d8106983818d81b503fb2ca0ad9d334",
+        "/home/cbllover/HalfDome/tSZ_visuals/catalog_websky.jl": "0a2db62935f40c679cc676c37a0c0ba1936874b359338e36462b1b8a97f19e24",
+        "/home/cbllover/HalfDome/tSZ_visuals/config.jl": "a2e15531003b4360472d5173d538ddd9f9ec62a4072846308570922e30f8b3e8",
+        "/home/cbllover/HalfDome/tSZ_visuals/cosmology_helpers.jl": "6c3adc30d45cbd6ce43d309068093181f599cde7dc479b631edbc964d303c8d9",
+        "/home/cbllover/HalfDome/tSZ_visuals/generate_battaglia_5pct_variations.jl": "572b3d8a0b0c3ec4921a11749d736ebc1586af098f8f531c66e08e9f3a71b63d",
+        "/home/cbllover/HalfDome/tSZ_visuals/generate_cosmology_0p05pct_variations.jl": "71249a16b17424d0dc76fca8071039f90f5284ae638f0bc860c668a9af19302b",
+        "/home/cbllover/HalfDome/tSZ_visuals/instrumentation.jl": "7294e60ba35ea21c50063dc0f8caaf05cde1eb90f07d4a956f769c39dcaa250c",
+        "/home/cbllover/HalfDome/tSZ_visuals/model.jl": "1b2ce8c6cafdd78b10e72b0d7466fa08e01bdd45bd63baa63f3cce569fc0f7dc",
+        "/home/cbllover/HalfDome/tSZ_visuals/output.jl": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+        "/home/cbllover/HalfDome/tSZ_visuals/paint_battaglia_redshift_slice.jl": "c415fd70bca319a2582dfb06c5d9b9981cd7b4f995a954ff107dedea8514bb0c",
+        "/home/cbllover/HalfDome/tSZ_visuals/painting.jl": "09d6abe4fff6c7bcbf2facdfebd4f072ed4c0d52ba895302d0aa86b409a9df9c",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_by_mass.jl": "52becc6d59948e6fc42b93975ff4d6c53e903b66ec9f8959b0f91685525d89fc",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_by_redshift.jl": "5299f3562cc384c3f1dcae7cfaa1cbcf3ba403ce6c3eda6220d58da2f16a93da",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_full_map.jl": "7c63e1426f8f4ea33a0b0746b021d4b8b515932f50b57c9b944cdce055f6a1c8",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_halfdome_fullsky_so_noise.jl": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_initial_batches.jl": "695fb52406eefd669c28c59f85e252cfd8ed695c0dffafcf84754073a7ab79a1",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_single_profile.jl": "2d67b40b2551526af072f1db99a274b6b5a51863b58dee13bf81b3b6677c7533",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_sobol_full_maps.jl": "536bdd0f74475723ce5d61ec20fcc2829ebbdf748c5d3a27834e27f611f05e1d",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_tSZ_visuals.jl": "a610742bc184f19d19c10b43b92a11856d7034f79ebf205db43af0cdc34216b9",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_unphysical_vs_fiducial_full_map_default_grid.jl": "c466826ee33e1dbe8a3e5b8170a933a89a2a5d358e1eb629429d3ccdaefd8a21",
+        "/home/cbllover/HalfDome/tSZ_visuals/run_xgpaint_binned40_edge_profiles.jl": "4c439a01867e0433552d548a3e1eab3d79a3e5bd3dd745a0c4eecc058dca27b0",
+        "/home/kn18001/.julia/dev/XGPaint/src/XGPaint.jl": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+        "/home/kn18001/.julia/dev/XGPaint/src/cib.jl": "24fb58fddf510e638ca0a3eec0768fa52c7e7806b05c44e8015ea5d9e4f726cc",
+        "/home/kn18001/.julia/dev/XGPaint/src/co_broadband.jl": "46d89704a3c1cb78ab668dcb160ef8345375b9be9c57a77362dfd690cdaeb1d5",
+        "/home/kn18001/.julia/dev/XGPaint/src/healpixworkspace.jl": "e1a30d8cee9f2e8f5973c3ce50f89b7d2b3c13b16162f6fb34be8ca221bf16ef",
+        "/home/kn18001/.julia/dev/XGPaint/src/lrg.jl": "3c3033ae273530e0015dd1f21e8846cddba28707e5050e68af8e8169284dd81a",
+        "/home/kn18001/.julia/dev/XGPaint/src/model.jl": "ef9e50de2508febf9e9b48f43e17a9acd2cf17f507723c6521bf1145bd25a856",
+        "/home/kn18001/.julia/dev/XGPaint/src/profiles.jl": "0c6dd605c3ad4d2a85c07a474b234f7b6178d8b0139bbd14e706b262126179d3",
+        "/home/kn18001/.julia/dev/XGPaint/src/profiles_frb.jl": "c0344c11e905eed071da9b62532a0d3652df04b0dd187960974cc0e348343e8e",
+        "/home/kn18001/.julia/dev/XGPaint/src/profiles_rksz.jl": "fd907722031b58a3570f8917c38ad7c2b349767ace47027e59a00c77ec5fcfa0",
+        "/home/kn18001/.julia/dev/XGPaint/src/profiles_rsz.jl": "7ac16ac45599eaaabaf309ac0c42dcfe7e3ee5cda9bfa8a0efe256a2449002d5",
+        "/home/kn18001/.julia/dev/XGPaint/src/profiles_szp.jl": "dd3a8f14369873881f962292eb67a8b5ba09b4cd98ca0529bf427afb6ed44c3e",
+        "/home/kn18001/.julia/dev/XGPaint/src/profiles_tau.jl": "54de594bfc092e064b171eede6eca5db3788598bfdeda4f38fdf5591a933053b",
+        "/home/kn18001/.julia/dev/XGPaint/src/profiles_y.jl": "98d034e7ebacf8f37c252f1448dd77d71ee26412b7a9694e20106bcb82c4891c",
+        "/home/kn18001/.julia/dev/XGPaint/src/radio.jl": "52b403d456155d2d3c2f264e6baa27382f32f0c866af3fcb2908ab810efe17dc",
+        "/home/kn18001/.julia/dev/XGPaint/src/util.jl": "564e240b435f8e8c04a25b0af6ca0a7c25b6bf9b2c221bbdca5c2c6eef648e9e",
+        "/home/kn18001/.julia/environments/v1.12/Manifest.toml": "de7c0a3217e138ad1eaacc91c7e490322c990a7f1c7a6b8958be452a46f8126d",
+        "/home/kn18001/.julia/environments/v1.12/Project.toml": "ab50761b36d71ec4d8a50281fb7f65e361d066a3e40b98b265aa73b493741457"
+      },
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ]
+    }
+  },
+  "filesystem": {
+    "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/preflight",
+    "free_bytes": 120326155288576,
+    "note": "Filesystem free space is not a user-quota check"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "job_id": "597698.idark",
+  "command": [
+    "qsub",
+    "-N",
+    "flcosmo_check",
+    "-v",
+    "RUN_ROOT=/lustre/work/kristero10/flamingo_cosmology_refit_20260915,TASK=background",
+    "-o",
+    "/lustre/work/kristero10/flamingo_cosmology_refit_20260915/logs",
+    "/lustre/work/kristero10/flamingo_cosmology_refit_20260915/code/run_analysis.pbs"
+  ]
+}

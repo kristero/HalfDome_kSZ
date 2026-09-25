@@ -1,0 +1,23 @@
+{
+  "sha256": {
+    "analysis.pbs": "201e5da6aac60c42d69a79d25fbe2960c469b0951e2f10e03458830631f32069",
+    "analyze.py": "b65b1b7181e1cbd666f646763b15057be81d0f57fbb8048a57b086a52a8aae11",
+    "benchmark.jl": "8731925142bc7436b314a1a57f303200f985dfeeecd25ee0db91d23c59b5b287",
+    "external_dependencies.json": "c9733a62e98339a4a85fd5ad2f0a293926a947ffefc5354d7cb5b6934d606d56",
+    "fullsky_test.jl": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+    "gate.jl": "2f99bbe4095b2a150c1a391e465f32d2f4ae8b8cf653183c76f635062812b90a",
+    "gate.pbs": "0fecbee419b81c2c202a9918ab2b0743e5b000ad0c70764ae753bffd8a38148c",
+    "inputs/pixel_windows.json": "a4fde166de0c225f2a32245b16aafe13a3dfb06dba80cc5868964e7cdb13bc9f",
+    "inputs/pixwin4096.txt": "552b523a628ca6a4507892dac27336b052358b2242d8aa7a9b955877a3c191ed",
+    "inputs/pixwin8192.txt": "a61df2e2694efad6c978064cd6cda36a173be2f23da73d940102e12fa56bab58",
+    "pixel_windows.py": "0bef8e932f4c27f1ccf4ab9b345379c7b96ba22d76ba7e4e6f4645d0c44c0226",
+    "plan.json": "25f2e64f41e88d960c3817c5b4f261b3288dcae62e33bba15b37fee98474c3b8",
+    "prepare.py": "49f23183300b79f99c26eb1a1447812d1d40ff3a35bdf065dd0f4d9ba37a28eb",
+    "reference.pbs": "c27c2a067fe5c28f91e8d7dfba67035559e4e6dc0534c82f6822088f43696a0c",
+    "run.py": "04254647b9a389dab5acbbbeec49cc2555d8c28000a7e5556f2f60d2e60a129d",
+    "spherical_truncation_profiles.jl": "d76ddb2bcbb90e1335ef1f80593b9a9a4a1f2892277bd30d91eb05850e8bd487",
+    "submit.py": "e4022806125f8141ec4cc1688b612b85a7b48a6202364f87c0ed0eaa731e0907",
+    "worker.pbs": "5307a1016c9d387f5de921efdd139a9fce5ab96e34c3b59367c2374db9afc1a7"
+  },
+  "scope": "Numerical controls only; 256 dataset held"
+}

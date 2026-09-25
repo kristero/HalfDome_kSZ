@@ -1,0 +1,13 @@
+label = "shallow_nonconvergent"
+beta_raw = 0.5573500387748962
+stable_same_cylinder = 33.31053141480879
+x = 0.1
+cutoff_cylinder_1e4_1e5_1e6 = [22.173030098099176, 33.31053141480879, 48.7788005238254]
+initial19_error = 4.054473444808342
+cylinder_to_sphere = 11.048485619502292
+initial19_value = 26.360358321781877
+xc = 0.497
+stock_value = 33.310531414808814
+sphere4 = 3.014940921497018
+stock_relative_error = 6.399262085421571e-16
+stock_seconds_after_compile = 8.99e-5

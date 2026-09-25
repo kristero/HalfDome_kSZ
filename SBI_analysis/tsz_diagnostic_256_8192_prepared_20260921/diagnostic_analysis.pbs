@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_diagnostic_256_8192_prepared_20260921
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=26 MKL_NUM_THREADS=26 MPLBACKEND=Agg
+/home/anaconda3/bin/python3 diagnostic.py --count 256 --summarize-only
+/home/anaconda3/bin/python3 diagnostic_analysis.py --run-root /lustre/work/kristero10/tsz_diagnostic_256_8192_prepared_20260921/diagnostic_256 --train --threads 26 --seeds 20260920 20260921

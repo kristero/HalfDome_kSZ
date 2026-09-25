@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -N sphere_resolution
+#PBS -q mini2
+#PBS -l select=1:ncpus=4:mem=128gb
+#PBS -l walltime=10:00:00
+#PBS -j oe
+set -euo pipefail
+export PREFLIGHT_THREADS=4 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=4
+cd /lustre/work/kristero10/tsz_spherical_preflight_20260920
+/home/anaconda3/bin/python3 run_fullsky.py --cases Battaglia12 FL_L1_m9 --nsides 4096 8192 16384 --factor 1

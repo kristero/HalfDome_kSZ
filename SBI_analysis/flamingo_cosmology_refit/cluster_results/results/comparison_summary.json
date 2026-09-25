@@ -1,0 +1,140 @@
+{
+  "parameter_order": [
+    "P0",
+    "xc",
+    "beta",
+    "alpha_m_P0",
+    "alpha_m_xc",
+    "alpha_m_beta",
+    "alpha_z_P0",
+    "alpha_z_xc",
+    "alpha_z_beta"
+  ],
+  "variants": [
+    {
+      "variant": "L1_m9",
+      "selected": "L1_m9_iter1",
+      "previous_rms_fractional": 0.02310241347102159,
+      "previous_max_abs_fractional": 0.07575155398450151,
+      "old_theta_with_cosmology_rms_fractional": 0.04949814008679999,
+      "corrected_rms_fractional": 0.011724679844956199,
+      "corrected_max_abs_fractional": 0.04265329655551675,
+      "corrected_response_min": 0.9467399149678344,
+      "corrected_response_max": 0.9532740867004087,
+      "P0_ratio": 1.4043416030275178,
+      "amplitude_only_P0": 20.329740906738444,
+      "amplitude_only_P0_ratio": 1.0234492173628842,
+      "amplitude_only_rms_fractional": 0.021338276365977397,
+      "selected_optimizer_success": false,
+      "selected_optimizer_message": "The maximum number of function evaluations is exceeded.",
+      "support": {
+        "inside_current_joint_prior": true,
+        "metrics": {
+          "beta_min": 7.2858942588655164,
+          "beta_max": 32.87321397462779,
+          "size_min": 0.5074466039187719,
+          "size_max": 5.284080358056351,
+          "Y200_min": 0.021843503182157588,
+          "Y200_max": 11.373630777277652,
+          "tail": 1.854854650275629e-21
+        }
+      }
+    },
+    {
+      "variant": "fgas-8sigma",
+      "selected": "fgas-8sigma_iter1",
+      "previous_rms_fractional": 0.018985819152006696,
+      "previous_max_abs_fractional": 0.058840168637773305,
+      "old_theta_with_cosmology_rms_fractional": 0.060927331870456354,
+      "corrected_rms_fractional": 0.006031930659451146,
+      "corrected_max_abs_fractional": 0.0164277605291534,
+      "corrected_response_min": 0.9440374135891683,
+      "corrected_response_max": 0.9534273075632287,
+      "P0_ratio": 1.1608587209319117,
+      "amplitude_only_P0": 16.19329168091121,
+      "amplitude_only_P0_ratio": 1.0308279318129334,
+      "amplitude_only_rms_fractional": 0.017374417266046535,
+      "selected_optimizer_success": true,
+      "selected_optimizer_message": "`xtol` termination condition is satisfied.",
+      "support": {
+        "inside_current_joint_prior": true,
+        "metrics": {
+          "beta_min": 5.562159151500909,
+          "beta_max": 49.99901251209195,
+          "size_min": 0.5724746116845668,
+          "size_max": 6.5527420357284285,
+          "Y200_min": 0.019912306519453808,
+          "Y200_max": 8.312749725872889,
+          "tail": 8.301500805805376e-16
+        }
+      }
+    },
+    {
+      "variant": "Mstar-1sigma",
+      "selected": "Mstar-1sigma_iter1",
+      "previous_rms_fractional": 0.01753236577158283,
+      "previous_max_abs_fractional": 0.06592699479482866,
+      "old_theta_with_cosmology_rms_fractional": 0.05244129396251538,
+      "corrected_rms_fractional": 0.007650376848175467,
+      "corrected_max_abs_fractional": 0.02539129712653998,
+      "corrected_response_min": 0.9517656485967062,
+      "corrected_response_max": 0.958872070888933,
+      "P0_ratio": 0.9872939680140626,
+      "amplitude_only_P0": 35.09442408026349,
+      "amplitude_only_P0_ratio": 1.026158109192953,
+      "amplitude_only_rms_fractional": 0.016666760432003776,
+      "selected_optimizer_success": false,
+      "selected_optimizer_message": "The maximum number of function evaluations is exceeded.",
+      "support": {
+        "inside_current_joint_prior": true,
+        "metrics": {
+          "beta_min": 7.0790480246568235,
+          "beta_max": 49.99999132405534,
+          "size_min": 0.4962501127029916,
+          "size_max": 5.986126801948007,
+          "Y200_min": 0.011186566780692514,
+          "Y200_max": 17.515114922240805,
+          "tail": 2.900396635961596e-19
+        }
+      }
+    }
+  ],
+  "corrected_parameters": {
+    "L1_m9": [
+      27.895767029523494,
+      1.3742797203838153,
+      8.096506971978265,
+      0.24068706895722208,
+      -0.3708722120914735,
+      -0.027131779826878644,
+      -3.2950451155410274,
+      1.3212811497156247,
+      0.7123048539608454
+    ],
+    "fgas-8sigma": [
+      18.23594732761984,
+      1.4671672867423466,
+      7.375469738110147,
+      0.27382836676318884,
+      -0.29275997165682033,
+      0.06147581487544934,
+      -3.481706690343786,
+      1.5604732323948403,
+      0.9338324085124106
+    ],
+    "Mstar-1sigma": [
+      33.76527739241058,
+      1.3726902054783838,
+      8.376227180858422,
+      0.13203213879456643,
+      -0.3834874836107727,
+      -0.04321071424547937,
+      -3.870613895010689,
+      1.6021986139875475,
+      0.8860745932601031
+    ]
+  },
+  "fits_are_posterior_estimates": false,
+  "noise_used_for_fitting": false,
+  "original_8192_production_modified": false
+}

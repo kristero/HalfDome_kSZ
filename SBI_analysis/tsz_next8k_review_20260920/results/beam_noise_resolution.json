@@ -1,0 +1,98 @@
+{
+  "beam_fwhm_arcmin": 2.0,
+  "beam_power": {
+    "1000": 0.9407305326248776,
+    "2000": 0.7832744780565827,
+    "3000": 0.5772264296967123,
+    "4000": 0.3764973610614163,
+    "5000": 0.21735075899264023,
+    "6000": 0.1110564743075789,
+    "7000": 0.05022386128310019,
+    "7979": 0.020518965023606856
+  },
+  "covariance_scope": "64 independent split-noise realizations, fixed B12 sky, original beam/mask; excludes cosmic variance and model discrepancy",
+  "cases": {
+    "Battaglia12": {
+      "cuts": [
+        {
+          "ell_max": 1079,
+          "error4096": 0.270779362583174,
+          "error8192": 0.007710525951531943,
+          "amplitude_information_fraction": 0.15216803502273674
+        },
+        {
+          "ell_max": 2079,
+          "error4096": 0.877254981347191,
+          "error8192": 0.0201212891292158,
+          "amplitude_information_fraction": 0.24400532807157285
+        },
+        {
+          "ell_max": 4079,
+          "error4096": 7.283293136477577,
+          "error8192": 0.2724883186220167,
+          "amplitude_information_fraction": 0.8797442004023467
+        },
+        {
+          "ell_max": 6079,
+          "error4096": 9.730443541203291,
+          "error8192": 0.3810451615911701,
+          "amplitude_information_fraction": 0.9995461391128418
+        },
+        {
+          "ell_max": 7979,
+          "error4096": 9.789435319733357,
+          "error8192": 0.3831346781530631,
+          "amplitude_information_fraction": 1.0
+        }
+      ],
+      "last_bin_fractional_error": 0.18288694740484793,
+      "last_bin_error_over_sigma": 0.05265847908562341,
+      "maximum_error_over_sigma": 3.24358052570794,
+      "max_error_bin_ell": 4180.2974282296655,
+      "signal_to_noise_power_at_ell4000": 0.15753561778693737,
+      "signal_to_noise_power_last_bin": 0.000400790761179691,
+      "amplitude_information_scope": "Only ln(P0), other parameters fixed, existing fixed B12 covariance; not nine-parameter information retention"
+    },
+    "FL_L1_m9": {
+      "cuts": [
+        {
+          "ell_max": 1079,
+          "error4096": 0.03324328536472013,
+          "error8192": 0.004631367775375208,
+          "amplitude_information_fraction": 0.14109439040006672
+        },
+        {
+          "ell_max": 2079,
+          "error4096": 0.1453137520924256,
+          "error8192": 0.005451612974340182,
+          "amplitude_information_fraction": 0.2351435394891641
+        },
+        {
+          "ell_max": 4079,
+          "error4096": 1.3671061289426019,
+          "error8192": 0.018973725392615257,
+          "amplitude_information_fraction": 0.8884243173999643
+        },
+        {
+          "ell_max": 6079,
+          "error4096": 1.8659167390378641,
+          "error8192": 0.02586959721926846,
+          "amplitude_information_fraction": 0.9996863401668833
+        },
+        {
+          "ell_max": 7979,
+          "error4096": 1.8819832360149735,
+          "error8192": 0.02599675820439103,
+          "amplitude_information_fraction": 1.0
+        }
+      ],
+      "last_bin_fractional_error": 0.048403023745531605,
+      "last_bin_error_over_sigma": 0.013579872283503273,
+      "maximum_error_over_sigma": 0.6107516427186348,
+      "max_error_bin_ell": 4180.2974282296655,
+      "signal_to_noise_power_at_ell4000": 0.21004031649758412,
+      "signal_to_noise_power_last_bin": 0.0003888661380679116,
+      "amplitude_information_scope": "Only ln(P0), other parameters fixed, existing fixed B12 covariance; not nine-parameter information retention"
+    }
+  }
+}

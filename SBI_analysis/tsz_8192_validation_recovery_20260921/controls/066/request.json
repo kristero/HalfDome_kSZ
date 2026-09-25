@@ -1,0 +1,34 @@
+{
+  "task": {
+    "id": 66,
+    "label": "FL_L1_m9_d6_1.0_-1",
+    "theta": [
+      27.895767029523494,
+      1.3742797203838153,
+      8.096506971978265,
+      0.24068706895722208,
+      -0.3708722120914735,
+      -0.027131779826878644,
+      -3.3275451155410276,
+      1.3212811497156247,
+      0.7123048539608454
+    ],
+    "nside": 8192,
+    "grid_factor": 1,
+    "noise_draws": 0,
+    "lean_maps": false,
+    "threads": 26,
+    "anchor": "FL_L1_m9",
+    "derivative_index": 6,
+    "step": 0.0325,
+    "step_fraction": 1.0,
+    "sign": -1,
+    "identity_sha256": "df72f24040a6eb8f17842ed5cbbb9ea86063c8cad981d120996e1939ea71db10"
+  },
+  "source_sha256": {
+    "control.jl": "62de98e5f604f42f80149a10761f6d25c43ddf757324da460cc9219f5e07e690",
+    "fullsky_test.jl": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+    "spherical_truncation_profiles.jl": "d76ddb2bcbb90e1335ef1f80593b9a9a4a1f2892277bd30d91eb05850e8bd487",
+    "worker.py": "d4b727e91f23e4523b64789c776ac5ddfe405d3b6d3c5c14e9575903fd315304"
+  }
+}

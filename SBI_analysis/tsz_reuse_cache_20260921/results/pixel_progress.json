@@ -1,0 +1,141 @@
+{
+  "rows": [
+    {
+      "label": "Battaglia12",
+      "mode": "original_4096_centres",
+      "relative_Dell_l2": 0.016723482718020793,
+      "moped": {
+        "Battaglia12_rcond0.001": 9.205516392555475,
+        "Battaglia12_rcond1e-06": 9.291007179460587,
+        "FL_L1_m9_rcond0.001": 9.51203088135997,
+        "FL_L1_m9_rcond1e-06": 9.587715237399319
+      }
+    },
+    {
+      "label": "Battaglia12",
+      "mode": "four_child_mean",
+      "relative_Dell_l2": 0.03577991259652437,
+      "moped": {
+        "Battaglia12_rcond0.001": 21.40905465495862,
+        "Battaglia12_rcond1e-06": 21.63804701140788,
+        "FL_L1_m9_rcond0.001": 22.2419273191384,
+        "FL_L1_m9_rcond1e-06": 22.348332080222615
+      }
+    },
+    {
+      "label": "Battaglia12",
+      "mode": "four_child_mean_divide_parent_window",
+      "relative_Dell_l2": 0.013461752070859213,
+      "moped": {
+        "Battaglia12_rcond0.001": 7.846726574726035,
+        "Battaglia12_rcond1e-06": 7.922603722356082,
+        "FL_L1_m9_rcond0.001": 8.136753812473607,
+        "FL_L1_m9_rcond1e-06": 8.184184906264038
+      }
+    },
+    {
+      "label": "FL_L1_m9",
+      "mode": "original_4096_centres",
+      "relative_Dell_l2": 0.002737966667732107,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.6321564759769718,
+        "Battaglia12_rcond1e-06": 1.6707269771640558,
+        "FL_L1_m9_rcond0.001": 1.5770203055974095,
+        "FL_L1_m9_rcond1e-06": 1.6107589821169006
+      }
+    },
+    {
+      "label": "FL_L1_m9",
+      "mode": "four_child_mean",
+      "relative_Dell_l2": 0.034896476356557425,
+      "moped": {
+        "Battaglia12_rcond0.001": 26.67808371869819,
+        "Battaglia12_rcond1e-06": 27.220902995053628,
+        "FL_L1_m9_rcond0.001": 25.271578601800904,
+        "FL_L1_m9_rcond1e-06": 26.350305597725477
+      }
+    },
+    {
+      "label": "FL_L1_m9",
+      "mode": "four_child_mean_divide_parent_window",
+      "relative_Dell_l2": 0.0123399035929221,
+      "moped": {
+        "Battaglia12_rcond0.001": 9.3168680303222,
+        "Battaglia12_rcond1e-06": 9.505769336741427,
+        "FL_L1_m9_rcond0.001": 8.83867027558835,
+        "FL_L1_m9_rcond1e-06": 9.190261406216491
+      }
+    },
+    {
+      "label": "compact",
+      "mode": "original_4096_centres",
+      "relative_Dell_l2": 2.660034073682398,
+      "moped": {
+        "Battaglia12_rcond0.001": 5.144249253375061e-06,
+        "Battaglia12_rcond1e-06": 5.413171020333114e-06,
+        "FL_L1_m9_rcond0.001": 5.12025332245593e-06,
+        "FL_L1_m9_rcond1e-06": 5.164789384242163e-06
+      }
+    },
+    {
+      "label": "compact",
+      "mode": "four_child_mean",
+      "relative_Dell_l2": 0.006016900993738912,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.8671427592367257e-09,
+        "Battaglia12_rcond1e-06": 3.146516800580386e-09,
+        "FL_L1_m9_rcond0.001": 3.096623096818423e-09,
+        "FL_L1_m9_rcond1e-06": 3.18123839312276e-09
+      }
+    },
+    {
+      "label": "compact",
+      "mode": "four_child_mean_divide_parent_window",
+      "relative_Dell_l2": 0.14190198175052154,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.7558994586397468e-07,
+        "Battaglia12_rcond1e-06": 1.972854580973232e-07,
+        "FL_L1_m9_rcond0.001": 1.8822290047335109e-07,
+        "FL_L1_m9_rcond1e-06": 1.932655335372818e-07
+      }
+    },
+    {
+      "label": "extended_shallow",
+      "mode": "original_4096_centres",
+      "relative_Dell_l2": 0.00020299960039639077,
+      "moped": {
+        "Battaglia12_rcond0.001": 31.851558058351905,
+        "Battaglia12_rcond1e-06": 35.52684174365754,
+        "FL_L1_m9_rcond0.001": 33.11402675101806,
+        "FL_L1_m9_rcond1e-06": 42.86699879605709
+      }
+    },
+    {
+      "label": "extended_shallow",
+      "mode": "four_child_mean",
+      "relative_Dell_l2": 0.007857033734648524,
+      "moped": {
+        "Battaglia12_rcond0.001": 2000.9348792523167,
+        "Battaglia12_rcond1e-06": 2107.739259726293,
+        "FL_L1_m9_rcond0.001": 1977.4750408737946,
+        "FL_L1_m9_rcond1e-06": 2104.4754415275283
+      }
+    },
+    {
+      "label": "extended_shallow",
+      "mode": "four_child_mean_divide_parent_window",
+      "relative_Dell_l2": 0.002689186776479378,
+      "moped": {
+        "Battaglia12_rcond0.001": 692.95528128107,
+        "Battaglia12_rcond1e-06": 729.6496297838612,
+        "FL_L1_m9_rcond0.001": 685.1383723191235,
+        "FL_L1_m9_rcond1e-06": 731.6533095749181
+      }
+    }
+  ],
+  "ell_max": 7979,
+  "reference": "Same NSIDE8192 centre-sampled sky",
+  "quadrature_samples_per_parent": 4,
+  "interpretation": "Accuracy experiment; finite child quadrature and isotropic window removal are both approximate. Not evidence that exact 4096 pixel integration fails or succeeds.",
+  "finite_quadrature_note": "Dividing by the parent pixel window is the infinite-quadrature convention. With finitely many centre samples the response still differs. For a regular one-dimensional grid, the discrete averaging response equals parent sinc window divided by child sinc window; HEALPix windows are isotropic approximations. The pending 16384 child test checks convergence."
+}

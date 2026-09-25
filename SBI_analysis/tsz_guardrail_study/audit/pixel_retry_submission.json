@@ -1,0 +1,1 @@
+{"stdout": "597905.idark\n", "stderr": "", "reason": "Prevent projection-table extrapolation in negligible inner radial integral; explicitly bound omitted central flux."}

@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "full_maps_verified": [
+    "extreme_beta_high",
+    "extreme_beta_low",
+    "extreme_mass_redshift_amplitude",
+    "extreme_wide_steep",
+    "extreme_xc_high",
+    "fit_L1_m9_iter0",
+    "fit_L1_m9_iter2",
+    "fit_L1_m9_iter4",
+    "fit_L1_m9_secant0",
+    "fit_Mstar-1sigma_iter0",
+    "fit_Mstar-1sigma_iter1",
+    "fit_Mstar-1sigma_iter2",
+    "fit_Mstar-1sigma_iter3",
+    "fit_Mstar-1sigma_iter4",
+    "fit_fgas-8sigma_iter0",
+    "fit_fgas-8sigma_iter1",
+    "fit_fgas-8sigma_iter3"
+  ],
+  "operator": "Original archived Julia source/runtime, exact mask and noise pixel hashes, 40-bin clean statistic",
+  "parameter_receipts": "All nine parsed Julia parameters equal recorded requested values exactly",
+  "completed_plots": 9
+}

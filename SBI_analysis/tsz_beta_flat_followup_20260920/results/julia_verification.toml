@@ -1,0 +1,6 @@
+max_supported_production_difference = 6.661338147750939e-16
+julia_version = "1.12.2"
+passed = true
+max_python_julia_relative_difference = 1.7763568394002505e-15
+production_assertions = 4
+probes = 48

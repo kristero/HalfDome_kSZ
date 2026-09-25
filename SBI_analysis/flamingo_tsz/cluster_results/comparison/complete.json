@@ -1,0 +1,50 @@
+{
+  "files": {
+    "comparison/comparison_summary.json": "84c59f9bd9c08cab9f40e75c5a55196a0e6e405c31c9f89790df492768317178",
+    "comparison/halfdome_reference_check.json": "b7232e9e4b9de76e7360b256e8ff08ba9d1b965fe13ba130d3c46b6eee6fac0a",
+    "comparison/moped_and_feedback_diagnostics.png": "b7214deb39263f6fc86389483b4abf8d3873cb020621f5002cd6fd137f435b10",
+    "comparison/posterior_marginals.png": "745e6d6e7ef1fe8a75e66f27a90768ea859264f998bfa9f5e1f4a318bece21dc",
+    "comparison/posterior_summary.csv": "907eda50d12661bcf17c2e4c99a7a15daed0070f911e4c366077159bea20d8ae",
+    "comparison/spectra_binned.csv": "c246c6ce4eaa6df7594e51d8c34cd3e917b69ed830ecffd4c32f08ef48e4bbbb",
+    "comparison/spectra_comparison.png": "79bc84166a2ab892900960cf385f031bfc1292735eb1b383c9d3d434ff6e7779",
+    "results/HalfDome/complete.toml": "6c14ca1ac18e71ada67714de3fe2fefabaa27394be625364ad0e1863cb7b7f1e",
+    "results/HalfDome/diagnostics/sampling_preflight.json": "1cbf5d3f4b083cdf5928840eda2b367c937dc95cdd0af2129c0d0b0687f2a7ae",
+    "results/HalfDome/halfdome_catalogue_support.toml": "e247684154aab025a58f8c149951e1676bbb944c4da2c2eae964a93175a2e2e2",
+    "results/HalfDome/inference_result.json": "4e9108ac484070d1e8d05877a5fe28d5f523bf880e6501d2856b6793c7b9d36f",
+    "results/HalfDome/masked_clean_cl.npy": "f00e5264a2a564cc7d28289e1b15b4a9809396d62025da79a2abd36f94e88cb8",
+    "results/HalfDome/masked_noisy_cross_cl.npy": "5a18d7abf7dc512c1e5372df86b1bcb0a993ee043c56718c00391eeb152000d9",
+    "results/HalfDome/observation.npz": "d92941f1d4fabd4df58ef8a98d35af7d0834b80b2d3bb534ed2b1ebf76ba1b2d",
+    "results/HalfDome/posterior_samples.npy": "cb3a3624bbcf629423be74407c7b5a0583afa291fb44fbb31979fb3ea01550c1",
+    "results/HalfDome/unmasked_clean_cl.npy": "1e9f286b45b57b854fcee24ba034f726ff9a2a1a6996104c6c747693716bae58",
+    "results/L1_m9/complete.toml": "2ca6edd7a0a8e33735cbde12dbdf52b3cd9b47b6a5a3d29dbd1501325039468a",
+    "results/L1_m9/diagnostics/sampling_preflight.json": "52880a9a527f486de0a36ed9b7d8da16b347939aa0331fc78e53d414b107322f",
+    "results/L1_m9/inference_result.json": "440ffaeec141c2fe6d3eed1c83c9ea3b49580bddc08adaeaca2b7cb49c803b57",
+    "results/L1_m9/masked_clean_cl.npy": "7b1b8e5fc08d8671fdfa992e0eb547dde137e0f6aa10d65922ab1380de4f48f4",
+    "results/L1_m9/masked_noisy_cross_cl.npy": "fe852a3d5a9a85382b2bdd6ba15b5a9517f835e2342ae6f7e2100e06cfc75569",
+    "results/L1_m9/observation.npz": "517a0bc0f661aa232635e13966ab525930fd1bc39f8b3a41c124426c17c754b5",
+    "results/L1_m9/unmasked_clean_cl.npy": "bb9358ada4346fbf0f91bf8eebd8c11d3e93a59d067e903fa0d759eec8c433ae",
+    "results/Mstar-1sigma/complete.toml": "cd43b699cde010185fdf0d143ab91c126bf9196aa2b53181972920b3fd67c485",
+    "results/Mstar-1sigma/diagnostics/sampling_preflight.json": "098c0935b4ce88d12235f4d8f143be7bad3dbe6732fa53b62cf540732f8bf1ea",
+    "results/Mstar-1sigma/inference_result.json": "f89d784b4e9c5cfc968b462b4eda338140418f15ab0f3d59aa93bbe83d3ee44f",
+    "results/Mstar-1sigma/masked_clean_cl.npy": "cd262ce1e08add3e444c9103f2533ba717ce9fee5465e02b4c0bdac1b45e1b27",
+    "results/Mstar-1sigma/masked_noisy_cross_cl.npy": "89366e63f2d6b72f124dae2c1971dba99275b880797d1413ec0edb91a848bcbc",
+    "results/Mstar-1sigma/observation.npz": "14b1dcab1153d0ee764f5e3bbe770cdbd5aac32580edb3ba6c7e0ec73dcb8817",
+    "results/Mstar-1sigma/unmasked_clean_cl.npy": "83ebb8d42732af04eff4569d470574a44254548e4ddd8c91b1e6cbda41ac7224",
+    "results/fgas-8sigma/complete.toml": "c777ec340f32a882bf8c470243fee64de25bae049078807e2a9b3680693085f1",
+    "results/fgas-8sigma/diagnostics/sampling_preflight.json": "e6ac8055999c8510badf3fbf091ae03125d3d9af513caa01f79db6c782c860e4",
+    "results/fgas-8sigma/inference_result.json": "3b4be426be028890e383befa797d1e2caa043f39c38c6a97f3b48f1f53f618a3",
+    "results/fgas-8sigma/masked_clean_cl.npy": "6c17f6abc88dfcca5277702ed332a820a8fca77af3f7fa810da43e2f39898436",
+    "results/fgas-8sigma/masked_noisy_cross_cl.npy": "3677bffc90a868d5b3fd2cbcf48afe431d2430cb3c2d24eabaabd1ddfcc344a0",
+    "results/fgas-8sigma/observation.npz": "39515142143e1ecf1d6cbc4087935fa2291a4d9bf3244a77d2679a769176e033",
+    "results/fgas-8sigma/unmasked_clean_cl.npy": "4dfcaf4fa3edf599ceb4c8cff9887afb078727603f1dd735c7176a8d35c3fd31"
+  },
+  "posterior_available": [
+    "HalfDome"
+  ],
+  "posterior_unavailable": [
+    "L1_m9",
+    "fgas-8sigma",
+    "Mstar-1sigma"
+  ],
+  "status": "comparison_completed"
+}

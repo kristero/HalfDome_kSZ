@@ -1,0 +1,6 @@
+split_seeds = [62860095, 62860096]
+draw = 47
+noise1_sha256 = "4dd50335e4bdd3ff302cfab2799bfce6ee978c1b396a28ed333f659164a8cf4e"
+noise2_sha256 = "50435b02f6ba7e160c7886fd0b69515d314938508e9abe9ceaf92049e7afb7e7"
+seconds = 32.73614192008972
+map_alm_parity = 0.0

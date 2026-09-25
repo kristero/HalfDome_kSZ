@@ -1,0 +1,24 @@
+{
+  "groups": {
+    "production": {
+      "count": 8192,
+      "lower_bound_above_5p2e6": 2029,
+      "lower_bound_above_15e6": 527,
+      "range": [
+        1.2686451573150455e-08,
+        8.506262336577199e-05
+      ]
+    },
+    "analytic_candidate": {
+      "count": 8192,
+      "lower_bound_above_5p2e6": 3769,
+      "lower_bound_above_15e6": 2639,
+      "range": [
+        4.3961344068120415e-13,
+        0.008968106463305595
+      ]
+    }
+  },
+  "used_as_prior": false,
+  "interpretation": "Approximate conservative halo contribution, not total cosmic mean y. Exceeding the independent data limit warrants rejection only in a chosen data-informed prior or likelihood; not silently applied here."
+}

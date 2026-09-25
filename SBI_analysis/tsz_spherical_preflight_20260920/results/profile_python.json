@@ -1,0 +1,43 @@
+{
+  "columns": 10180,
+  "direct_reference_checks": 214,
+  "maximum_direct_relative_error": 5.681249879656723e-14,
+  "finite": true,
+  "nonnegative": true,
+  "underflowed_positive_columns": 6,
+  "integrated_y_identities": [
+    {
+      "xc": 0.5,
+      "beta_raw": 4.35,
+      "projected_over_volume": 0.9999999999999555
+    },
+    {
+      "xc": 1.13,
+      "beta_raw": 0.644,
+      "projected_over_volume": 0.9999999999999896
+    },
+    {
+      "xc": 0.025,
+      "beta_raw": 16.0,
+      "projected_over_volume": 1.0000000000000022
+    },
+    {
+      "xc": 4.0,
+      "beta_raw": 2.8,
+      "projected_over_volume": 0.9999999999999956
+    },
+    {
+      "xc": 70000.0,
+      "beta_raw": 0.05,
+      "projected_over_volume": 0.9999999999999979
+    },
+    {
+      "xc": 0.001,
+      "beta_raw": 100.0,
+      "projected_over_volume": 1.0000000000000049
+    }
+  ],
+  "uniform_sphere_ratio": 0.9999999999999977,
+  "seconds": 6.280803245000243,
+  "scope": "Projection tests, not full-map interpolation or rendering certification"
+}

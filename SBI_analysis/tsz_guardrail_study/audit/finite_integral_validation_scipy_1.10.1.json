@@ -1,0 +1,188 @@
+{
+  "scipy_version": "1.10.1",
+  "mpmath_digits": 70,
+  "cases": [
+    {
+      "xc": 0.0001,
+      "beta": 2.7001,
+      "quadrature_relative_error": 3.552713678800507e-15,
+      "scipy_special_relative_error": 4.389461638077972e-06
+    },
+    {
+      "xc": 0.0001,
+      "beta": 4.35,
+      "quadrature_relative_error": 0.0,
+      "scipy_special_relative_error": 0.0
+    },
+    {
+      "xc": 0.0001,
+      "beta": 50.0,
+      "quadrature_relative_error": 0.0,
+      "scipy_special_relative_error": 7.105427357600977e-15
+    },
+    {
+      "xc": 0.0001,
+      "beta": 500.0,
+      "quadrature_relative_error": 7.105427357600977e-15,
+      "scipy_special_relative_error": 2.1316282072802778e-14
+    },
+    {
+      "xc": 0.0001,
+      "beta": 2500.0,
+      "quadrature_relative_error": 7.105427357600977e-15,
+      "scipy_special_relative_error": 1.7621459846834959e-12
+    },
+    {
+      "xc": 0.025,
+      "beta": 2.7001,
+      "quadrature_relative_error": 0.0,
+      "scipy_special_relative_error": 1.776356839400252e-15
+    },
+    {
+      "xc": 0.025,
+      "beta": 4.35,
+      "quadrature_relative_error": 0.0,
+      "scipy_special_relative_error": 0.0
+    },
+    {
+      "xc": 0.025,
+      "beta": 50.0,
+      "quadrature_relative_error": 3.5527136788004946e-15,
+      "scipy_special_relative_error": 1.4210854715201903e-14
+    },
+    {
+      "xc": 0.025,
+      "beta": 500.0,
+      "quadrature_relative_error": 3.5527136788004946e-15,
+      "scipy_special_relative_error": 2.1316282072802778e-14
+    },
+    {
+      "xc": 0.025,
+      "beta": 2500.0,
+      "quadrature_relative_error": 3.5527136788004946e-15,
+      "scipy_special_relative_error": 1.7621459846834959e-12
+    },
+    {
+      "xc": 0.497,
+      "beta": 2.7001,
+      "quadrature_relative_error": 4.440892098500625e-16,
+      "scipy_special_relative_error": 0.0
+    },
+    {
+      "xc": 0.497,
+      "beta": 4.35,
+      "quadrature_relative_error": 0.0,
+      "scipy_special_relative_error": 8.881784197001256e-16
+    },
+    {
+      "xc": 0.497,
+      "beta": 50.0,
+      "quadrature_relative_error": 0.0,
+      "scipy_special_relative_error": 1.0658141036401446e-14
+    },
+    {
+      "xc": 0.497,
+      "beta": 500.0,
+      "quadrature_relative_error": 0.0,
+      "scipy_special_relative_error": 1.7763568394002347e-14
+    },
+    {
+      "xc": 0.497,
+      "beta": 2500.0,
+      "quadrature_relative_error": 3.5527136788004946e-15,
+      "scipy_special_relative_error": 1.7621459846834959e-12
+    },
+    {
+      "xc": 4.0,
+      "beta": 2.7001,
+      "quadrature_relative_error": 8.881784197001248e-16,
+      "scipy_special_relative_error": 4.440892098500627e-16
+    },
+    {
+      "xc": 4.0,
+      "beta": 4.35,
+      "quadrature_relative_error": 1.110223024625156e-15,
+      "scipy_special_relative_error": 6.661338147750937e-16
+    },
+    {
+      "xc": 4.0,
+      "beta": 50.0,
+      "quadrature_relative_error": 8.881784197001248e-16,
+      "scipy_special_relative_error": 1.1546319456101562e-14
+    },
+    {
+      "xc": 4.0,
+      "beta": 500.0,
+      "quadrature_relative_error": 1.7763568394002489e-15,
+      "scipy_special_relative_error": 1.9539925233402563e-14
+    },
+    {
+      "xc": 4.0,
+      "beta": 2500.0,
+      "quadrature_relative_error": 3.5527136788004946e-15,
+      "scipy_special_relative_error": 1.7621459846834959e-12
+    },
+    {
+      "xc": 100.0,
+      "beta": 2.7001,
+      "quadrature_relative_error": 1.221245327087673e-15,
+      "scipy_special_relative_error": 3.330669073875469e-16
+    },
+    {
+      "xc": 100.0,
+      "beta": 4.35,
+      "quadrature_relative_error": 8.881784197001256e-16,
+      "scipy_special_relative_error": 1.110223024625156e-15
+    },
+    {
+      "xc": 100.0,
+      "beta": 50.0,
+      "quadrature_relative_error": 4.128641872824802e-16,
+      "scipy_special_relative_error": 1.5855372570428005e-15
+    },
+    {
+      "xc": 100.0,
+      "beta": 500.0,
+      "quadrature_relative_error": 1.3322676295501869e-15,
+      "scipy_special_relative_error": 1.7763568394002347e-14
+    },
+    {
+      "xc": 100.0,
+      "beta": 2500.0,
+      "quadrature_relative_error": 1.7763568394002489e-15,
+      "scipy_special_relative_error": 1.7612578062637974e-12
+    },
+    {
+      "xc": 10000.0,
+      "beta": 2.7001,
+      "quadrature_relative_error": 2.2204460492503107e-15,
+      "scipy_special_relative_error": 4.6629367034256464e-15
+    },
+    {
+      "xc": 10000.0,
+      "beta": 4.35,
+      "quadrature_relative_error": 1.554312234475218e-15,
+      "scipy_special_relative_error": 3.1086244689504336e-15
+    },
+    {
+      "xc": 10000.0,
+      "beta": 50.0,
+      "quadrature_relative_error": 1.554312234475218e-15,
+      "scipy_special_relative_error": 1.110223024625156e-15
+    },
+    {
+      "xc": 10000.0,
+      "beta": 500.0,
+      "quadrature_relative_error": 1.110223024625156e-15,
+      "scipy_special_relative_error": 6.661338147750937e-16
+    },
+    {
+      "xc": 10000.0,
+      "beta": 2500.0,
+      "quadrature_relative_error": 2.664535259100372e-15,
+      "scipy_special_relative_error": 4.440892098500625e-16
+    }
+  ],
+  "scipy_special_exceeds_1e_minus_9_relative_tolerance": true,
+  "interpretation": "A special-function accuracy warning is recorded separately from the independent quadrature identity check."
+}

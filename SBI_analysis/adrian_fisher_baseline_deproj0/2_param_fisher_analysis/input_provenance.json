@@ -1,0 +1,42 @@
+{
+  "bin_weighting": "2ell_plus_1",
+  "derivatives": {
+    "large": {
+      "path": "/lustre/work/kristero10/adrian_fisher_baseline_deproj0/analysis/derivatives_large_step.npy",
+      "sha256": "bf740cfd7d4f00feb6d3a6a15c67cfecd80dc629b901d1211b0d29e4c4f388b4"
+    },
+    "richardson": {
+      "path": "/lustre/work/kristero10/adrian_fisher_baseline_deproj0/analysis/derivatives_richardson.npy",
+      "sha256": "ed26c81ac46703cc341616a5d7572a51ae7862c9bfc72d77a721771849127493"
+    },
+    "small": {
+      "path": "/lustre/work/kristero10/adrian_fisher_baseline_deproj0/analysis/derivatives_small_step.npy",
+      "sha256": "980fa3c1500127af2e3a5b9f64aa8a8b4f5e6050a547a8fe96deef0bc12a4b3f"
+    }
+  },
+  "ell_binned_max_difference": 0.00024350095463887556,
+  "ell_max": 7979,
+  "ell_min": 80,
+  "fiducial_binning_relative_max_difference": 1.5610810921677492e-16,
+  "fiducial_clean_cl": "/lustre/work/kristero10/adrian_fisher_baseline_deproj0/variations/row001_fiducial/halfdome_fullsky_masked_no_noise_cl_m200c_nside4096_sobol_fisher_variations_row0001_cosmo_fid_gaussbeam_2p0arcmin_so_fsky0p4_apo60p0arcmin_seed12345_deproj0_lmax7979.npy",
+  "fiducial_clean_cl_sha256": "a77d0a5f2d34bb41a641e6bc7155f5b866fd1bac81603b818c035ef82c60d0bc",
+  "n_bins": 40,
+  "n_ell": 7900,
+  "noise": {
+    "baseline": {
+      "one_based_value_column": 2,
+      "path": "/misc/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt",
+      "sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+      "zero_based_value_column": 1
+    },
+    "goal": {
+      "one_based_value_column": 2,
+      "path": "/misc/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt",
+      "sha256": "5564becc9520374159655f46f26a8b19c025195ebc7ec4791f93300ec2522681",
+      "zero_based_value_column": 1
+    }
+  },
+  "prepared_dataset": "/misc/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz",
+  "prepared_dataset_sha256": "de83d86e14225108862c94c26514808b903e6e7a6318d472852f3c5242721365",
+  "statistic": "linear masked pseudo-D_ell"
+}

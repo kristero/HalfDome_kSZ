@@ -1,0 +1,97 @@
+{
+  "created_utc": "2026-09-15T15:30:58.787594+00:00",
+  "design_rows": 8192,
+  "parameter_order": [
+    "P0",
+    "beta"
+  ],
+  "fixed_parameters": {
+    "xc": 0.497,
+    "alpha_m_P0": 0.154,
+    "alpha_m_xc": -0.00865,
+    "alpha_m_beta": 0.0393,
+    "alpha_z_P0": -0.758,
+    "alpha_z_xc": 0.731,
+    "alpha_z_beta": 0.415
+  },
+  "prior_area": 443.71102668487987,
+  "joint_density": 0.0022537190645708074,
+  "log_density": -6.095173509743589,
+  "normalizing_mass": 0.5697368087890086,
+  "beta_limits": [
+    3.354114539215185,
+    10.874999999999996
+  ],
+  "P0_lower_at_beta_upper": 1.1163055756591627,
+  "beta_upper_at_P0_one": 10.505895938124878,
+  "area_integration_error": 4.519280113800331e-10,
+  "independent_area": 443.71102668489834,
+  "independent_area_error": 4.9261819810564135e-12,
+  "all_former_corners_rejected": true,
+  "marginals": "Computed from permitted cross-section widths; approximately flat with a small low-P0/high-beta exclusion",
+  "rejection_cuts_applied": true,
+  "sobol_prefix_check": "passed",
+  "fixed_coordinates_check": "passed",
+  "old_guard_diagnostic": {
+    "applied_to_prior": true,
+    "design_passing": 8192,
+    "design_failing": 0,
+    "equal_area_grid_size": [
+      256,
+      256
+    ],
+    "grid_fraction_passing": 0.5703125,
+    "beta_min_from_slope": 3.354114539215185,
+    "beta_max_from_size": 10.874999999999996,
+    "denser_33x33_passing": 8192
+  },
+  "flamingo_markers": "P0 and beta projections of saved cosmology-corrected nine-parameter clean-spectrum fits; not fits in this fixed-seven-parameter model",
+  "reference_points": [
+    {
+      "label": "Battaglia12",
+      "parameters": [
+        18.1,
+        4.35
+      ]
+    },
+    {
+      "label": "FLAMINGO fiducial",
+      "parameters": [
+        27.895767029523494,
+        8.096506971978265
+      ]
+    },
+    {
+      "label": "FLAMINGO $f_{\\rm gas}-8\\sigma$",
+      "parameters": [
+        18.23594732761984,
+        7.375469738110147
+      ]
+    },
+    {
+      "label": "FLAMINGO $M_\\star-1\\sigma$",
+      "parameters": [
+        33.76527739241058,
+        8.376227180858422
+      ]
+    }
+  ],
+  "old_prior_comparison": "Projected support bounds from the verified nine-parameter 40-bin SBI bundle; no old histogram or density is inferred",
+  "full_map_validation_performed": false,
+  "cluster_jobs_submitted": false,
+  "source_input_sha256": {
+    "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\flamingo_linear_prior\\cluster_results\\inputs\\old_metadata.json": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf",
+    "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\flamingo_linear_prior\\cluster_results\\inputs\\old_comparison.json": "84c59f9bd9c08cab9f40e75c5a55196a0e6e405c31c9f89790df492768317178",
+    "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\flamingo_linear_prior\\cluster_results\\inputs\\flamingo_fits.json": "e87150fc059baf458564b8ca75a790e2986b4702f683733f44eb73cbf0f454d6",
+    "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\flamingo_linear_prior\\cluster_results\\code\\prior.py": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0",
+    "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\flamingo_linear_prior\\cluster_results\\code\\prior.json": "b4868a66630009e51bcadeed544f13cb3af49e13dab3b83f3c440933260574a9"
+  },
+  "source_code_sha256": {
+    "prior.json": "49e67836c66ce2c590afe3a5f1688225e0ce05846dbd8bdb69bc653075c4b485",
+    "flat_prior.py": "d0b5e3195d0da8771a2d1953cd8377dc424473d0ab321464b2e1f661c45f7951",
+    "make_plots.py": "2399bcab6e435bacc88e0c80a7020830689377dbe5b331949f451c1549fc16c7",
+    "guardrails.py": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0",
+    "guardrails.json": "b4868a66630009e51bcadeed544f13cb3af49e13dab3b83f3c440933260574a9",
+    "torch_prior.py": "72494468986eff19919f34d4717613edcc17969b1d858724093007c51f0cf6f7"
+  }
+}

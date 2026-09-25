@@ -1,0 +1,32 @@
+Active replacement sources (new files in flamingo_linear_prior):
+audit.py -- added or adapted for broad linear sampling/reuse
+check_noise_seeds.py -- added or adapted for broad linear sampling/reuse
+collect.py -- added or adapted for broad linear sampling/reuse
+design.py -- added or adapted for broad linear sampling/reuse
+independent_noise.jl -- copied unchanged from prior campaign
+noise_seeds.py -- copied unchanged from prior campaign
+paint_row.jl -- copied unchanged from prior campaign
+plot_prior.py -- added or adapted for broad linear sampling/reuse
+prepare.py -- added or adapted for broad linear sampling/reuse
+prior.json -- added or adapted for broad linear sampling/reuse
+prior.py -- copied unchanged from prior campaign
+README.md -- added or adapted for broad linear sampling/reuse
+restart.py -- added or adapted for broad linear sampling/reuse
+run_collect.pbs -- copied unchanged from prior campaign
+run_config.json -- added or adapted for broad linear sampling/reuse
+run_worker.pbs -- copied unchanged from prior campaign
+sbi_prior.py -- copied unchanged from prior campaign
+stable_los.jl -- copied unchanged from prior campaign
+validate.py -- copied unchanged from prior campaign
+worker.py -- added or adapted for broad linear sampling/reuse
+
+Generated plot outputs:
+cluster_results/plots/prior_all_parameters.png and .pdf
+cluster_results/plots/joint_prior_all_parameters.png and .pdf
+cluster_results/plots/joint_prior.png and .pdf
+cluster_results/plots/prior_and_fits.csv
+cluster_results/plots/plot_provenance.json
+
+Unused narrower-box draft retained under attempts/narrower_draft_not_used; never submitted to the cluster.
+
+Additional reporting helper: tools/export_run.py (read-only run snapshot and review archive).

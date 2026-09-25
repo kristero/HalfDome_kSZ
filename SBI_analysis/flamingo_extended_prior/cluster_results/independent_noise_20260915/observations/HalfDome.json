@@ -1,0 +1,35 @@
+{
+  "source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/results/HalfDome",
+  "source_sha256": {
+    "unmasked_clean_cl": "1e9f286b45b57b854fcee24ba034f726ff9a2a1a6996104c6c747693716bae58",
+    "masked_clean_cl": "f00e5264a2a564cc7d28289e1b15b4a9809396d62025da79a2abd36f94e88cb8",
+    "masked_noisy_cross_cl": "5a18d7abf7dc512c1e5372df86b1bcb0a993ee043c56718c00391eeb152000d9"
+  },
+  "operator": {
+    "noise1_pixel_sha256": "5d0d6bd4db70f0aec88320520c3efff1f779b315a0db5204634a7b615b8661dc",
+    "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+    "nside": 4096,
+    "cache_file_sha256": "e3a8b88ca3d66794b0194fab204014102df38788a82dbb3d87936b7a95e43b62",
+    "signal_beamed_pixel_sha256": "5d5e2d9448caa41c57a42519faa595a0a2d02fcfed3a90bae87f00c79f22f512",
+    "status": "map_processing_completed",
+    "signal_mean": 1.0415991251430933e-06,
+    "noise2_pixel_sha256": "dc6b755b997bb12d22c3386c60bed33aef5d2bb8b6d28802c300b610a3b55844",
+    "ell_max": 7979,
+    "signal_max": 0.0002793889727883773,
+    "source": "halfdome",
+    "signal_min": 8.350360869347952e-09,
+    "beam_fwhm_arcmin": 2.0,
+    "runtime": {
+      "xgpaint_source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl",
+      "julia_version": "1.12.2",
+      "xgpaint_sha256": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+      "threads": 26,
+      "adapter_sha256": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+      "hdf5_version": "0.17.2",
+      "healpix_version": "4.2.4",
+      "operator_sha256": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+      "beam_source_sha256": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a"
+    }
+  },
+  "inference_status": "observation only; new-prior training and coverage validation required"
+}

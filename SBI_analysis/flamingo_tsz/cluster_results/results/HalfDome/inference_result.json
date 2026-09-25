@@ -1,0 +1,226 @@
+{
+  "acceptance": 0.99443359375,
+  "conditional_on_fixed_noise": true,
+  "context": [
+    0.14629985392093658,
+    -0.35324957966804504,
+    -0.1402793973684311,
+    0.21234171092510223,
+    -0.5444698929786682,
+    -0.5146021842956543,
+    0.4583679139614105,
+    0.617368757724762,
+    -0.16901442408561707
+  ],
+  "map": {
+    "beam_fwhm_arcmin": 2.0,
+    "cache_file_sha256": "e3a8b88ca3d66794b0194fab204014102df38788a82dbb3d87936b7a95e43b62",
+    "ell_max": 7979,
+    "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+    "noise1_pixel_sha256": "5d0d6bd4db70f0aec88320520c3efff1f779b315a0db5204634a7b615b8661dc",
+    "noise2_pixel_sha256": "dc6b755b997bb12d22c3386c60bed33aef5d2bb8b6d28802c300b610a3b55844",
+    "nside": 4096,
+    "runtime": {
+      "adapter_sha256": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+      "beam_source_sha256": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+      "hdf5_version": "0.17.2",
+      "healpix_version": "4.2.4",
+      "julia_version": "1.12.2",
+      "operator_sha256": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+      "threads": 26,
+      "xgpaint_sha256": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+      "xgpaint_source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl"
+    },
+    "signal_beamed_pixel_sha256": "5d5e2d9448caa41c57a42519faa595a0a2d02fcfed3a90bae87f00c79f22f512",
+    "signal_max": 0.0002793889727883773,
+    "signal_mean": 1.0415991251430933e-06,
+    "signal_min": 8.350360869347952e-09,
+    "source": "halfdome",
+    "status": "map_processing_completed"
+  },
+  "max_absolute_moped_coordinate": 0.617368757724762,
+  "mean": [
+    18.560617446899414,
+    0.4885867238044739,
+    4.3106279373168945,
+    0.14771515130996704,
+    -0.002662630518898368,
+    0.04263856261968613,
+    -0.7830790877342224,
+    0.7434831261634827,
+    0.41699346899986267
+  ],
+  "median": [
+    18.503507614135742,
+    0.4870114326477051,
+    4.302386283874512,
+    0.1474631279706955,
+    -0.0022028088569641113,
+    0.04294847697019577,
+    -0.7814680337905884,
+    0.7428473234176636,
+    0.41724997758865356
+  ],
+  "physics_interpretation": "Effective HalfDome/Battaglia inference, not FLAMINGO input-parameter recovery",
+  "proposals": 10240,
+  "q16": [
+    17.519971542358398,
+    0.44648597717285154,
+    4.086299114227295,
+    0.12723635673522948,
+    -0.03561895564198494,
+    0.021550634056329728,
+    -0.8463226819038391,
+    0.6577894735336304,
+    0.36459235191345213
+  ],
+  "q84": [
+    19.611943817138673,
+    0.531087019443512,
+    4.535838832855225,
+    0.16826995611190795,
+    0.03006558045744896,
+    0.06367826282978058,
+    -0.718998556137085,
+    0.8310882902145386,
+    0.46968465924263003
+  ],
+  "sample_count": 10000,
+  "sampling_preflight": {
+    "acceptance": 0.99435,
+    "accepted_count": 19887,
+    "context": [
+      0.14629985392093658,
+      -0.35324957966804504,
+      -0.1402793973684311,
+      0.21234171092510223,
+      -0.5444698929786682,
+      -0.5146021842956543,
+      0.4583679139614105,
+      0.617368757724762,
+      -0.16901442408561707
+    ],
+    "interpretation": "Reference bounds are a heuristic, not a hard likelihood support test.",
+    "outside_reference_range": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "per_parameter": [
+      {
+        "above": 0.0,
+        "below": 0.0,
+        "param": "P0",
+        "prior_fraction_median": 0.5134380459785461,
+        "prior_fraction_q05": 0.46356172412633895,
+        "prior_fraction_q95": 0.5706600189208985
+      },
+      {
+        "above": 0.0,
+        "below": 0.0,
+        "param": "xc",
+        "prior_fraction_median": 0.48416323959827423,
+        "prior_fraction_q05": 0.39290585517883303,
+        "prior_fraction_q95": 0.5940902411937714
+      },
+      {
+        "above": 0.0002,
+        "below": 0.0,
+        "param": "beta",
+        "prior_fraction_median": 0.47136835753917694,
+        "prior_fraction_q05": 0.2767847031354904,
+        "prior_fraction_q95": 0.7040387064218521
+      },
+      {
+        "above": 0.0,
+        "below": 0.0,
+        "param": "alpha_m_P0",
+        "prior_fraction_median": 0.5053583085536957,
+        "prior_fraction_q05": 0.3903298959136009,
+        "prior_fraction_q95": 0.6223664730787277
+      },
+      {
+        "above": 0.0004,
+        "below": 0.00275,
+        "param": "alpha_m_xc",
+        "prior_fraction_median": 0.4880580008029938,
+        "prior_fraction_q05": 0.20923627987504007,
+        "prior_fraction_q95": 0.7548278629779815
+      },
+      {
+        "above": 0.00235,
+        "below": 0.00325,
+        "param": "alpha_m_beta",
+        "prior_fraction_median": 0.5251865088939667,
+        "prior_fraction_q05": 0.224525997787714,
+        "prior_fraction_q95": 0.8086679756641387
+      },
+      {
+        "above": 0.0,
+        "below": 0.0,
+        "param": "alpha_z_P0",
+        "prior_fraction_median": 0.5129188597202301,
+        "prior_fraction_q05": 0.41532617807388306,
+        "prior_fraction_q95": 0.6027816951274871
+      },
+      {
+        "above": 0.0,
+        "below": 0.0,
+        "param": "alpha_z_xc",
+        "prior_fraction_median": 0.5107543766498566,
+        "prior_fraction_q05": 0.3879486009478569,
+        "prior_fraction_q95": 0.633642852306366
+      },
+      {
+        "above": 0.0,
+        "below": 0.0,
+        "param": "alpha_z_beta",
+        "prior_fraction_median": 0.5033837258815765,
+        "prior_fraction_q05": 0.37248003035783767,
+        "prior_fraction_q95": 0.6325888425111771
+      }
+    ],
+    "raw_count": 20000,
+    "reference_count": 512,
+    "reference_max": [
+      0.9614934325218201,
+      4.1031951904296875,
+      3.839855432510376,
+      2.5874998569488525,
+      3.696063280105591,
+      7.540235996246338,
+      3.0079269409179688,
+      7.060149192810059,
+      5.602825164794922
+    ],
+    "reference_min": [
+      -4.084718227386475,
+      -3.858185291290283,
+      -3.2827677726745605,
+      -4.732479095458984,
+      -5.9348649978637695,
+      -2.0812227725982666,
+      -5.017172336578369,
+      -3.4427874088287354,
+      -3.893524408340454
+    ]
+  },
+  "status": "posterior_sampled",
+  "std": [
+    1.0582274198532104,
+    0.04207569733262062,
+    0.22202716767787933,
+    0.0203109048306942,
+    0.03263314440846443,
+    0.02095808833837509,
+    0.06426095217466354,
+    0.08589202165603638,
+    0.051542479544878006
+  ]
+}

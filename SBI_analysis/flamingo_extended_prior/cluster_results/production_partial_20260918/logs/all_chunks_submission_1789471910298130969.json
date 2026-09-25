@@ -1,0 +1,1219 @@
+{
+  "jobs": [
+    {
+      "chunk": 0,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d0",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=0,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597627.idark"
+    },
+    {
+      "chunk": 1,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d1",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=1,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597628.idark"
+    },
+    {
+      "chunk": 2,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d2",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=2,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597629.idark"
+    },
+    {
+      "chunk": 3,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d3",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=3,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597630.idark"
+    },
+    {
+      "chunk": 4,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d4",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=4,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597627.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597631.idark"
+    },
+    {
+      "chunk": 5,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d5",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=5,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597628.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597632.idark"
+    },
+    {
+      "chunk": 6,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d6",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=6,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597629.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597633.idark"
+    },
+    {
+      "chunk": 7,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d7",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=7,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597630.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597634.idark"
+    },
+    {
+      "chunk": 8,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d8",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=8,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597631.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597635.idark"
+    },
+    {
+      "chunk": 9,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d9",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=9,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597632.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597636.idark"
+    },
+    {
+      "chunk": 10,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d10",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=10,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597633.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597637.idark"
+    },
+    {
+      "chunk": 11,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d11",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=11,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597634.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597638.idark"
+    },
+    {
+      "chunk": 12,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d12",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=12,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597635.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597639.idark"
+    },
+    {
+      "chunk": 13,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d13",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=13,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597636.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597640.idark"
+    },
+    {
+      "chunk": 14,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d14",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=14,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597637.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597641.idark"
+    },
+    {
+      "chunk": 15,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d15",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=15,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597638.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597642.idark"
+    },
+    {
+      "chunk": 16,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d16",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=16,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597639.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597643.idark"
+    },
+    {
+      "chunk": 17,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d17",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=17,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597640.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597644.idark"
+    },
+    {
+      "chunk": 18,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d18",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=18,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597641.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597645.idark"
+    },
+    {
+      "chunk": 19,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d19",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=19,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597642.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597646.idark"
+    },
+    {
+      "chunk": 20,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d20",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=20,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597643.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597647.idark"
+    },
+    {
+      "chunk": 21,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d21",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=21,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597644.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597648.idark"
+    },
+    {
+      "chunk": 22,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d22",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=22,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597645.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597649.idark"
+    },
+    {
+      "chunk": 23,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d23",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=23,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597646.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597650.idark"
+    },
+    {
+      "chunk": 24,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d24",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=24,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597647.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597651.idark"
+    },
+    {
+      "chunk": 25,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d25",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=25,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597648.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597652.idark"
+    },
+    {
+      "chunk": 26,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d26",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=26,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597649.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597653.idark"
+    },
+    {
+      "chunk": 27,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d27",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=27,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597650.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597654.idark"
+    },
+    {
+      "chunk": 28,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d28",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=28,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597651.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597655.idark"
+    },
+    {
+      "chunk": 29,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d29",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=29,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597652.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597656.idark"
+    },
+    {
+      "chunk": 30,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d30",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=30,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597653.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597657.idark"
+    },
+    {
+      "chunk": 31,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d31",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=31,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597654.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597658.idark"
+    },
+    {
+      "chunk": 32,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d32",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=32,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597655.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597659.idark"
+    },
+    {
+      "chunk": 33,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d33",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=33,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597656.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597660.idark"
+    },
+    {
+      "chunk": 34,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d34",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=34,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597657.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597661.idark"
+    },
+    {
+      "chunk": 35,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d35",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=35,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597658.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597662.idark"
+    },
+    {
+      "chunk": 36,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d36",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=36,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597659.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597663.idark"
+    },
+    {
+      "chunk": 37,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d37",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=37,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597660.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597664.idark"
+    },
+    {
+      "chunk": 38,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d38",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=38,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597661.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597665.idark"
+    },
+    {
+      "chunk": 39,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d39",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=39,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597662.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597666.idark"
+    },
+    {
+      "chunk": 40,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d40",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=40,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597663.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597667.idark"
+    },
+    {
+      "chunk": 41,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d41",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=41,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597664.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597668.idark"
+    },
+    {
+      "chunk": 42,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d42",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=42,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597665.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597669.idark"
+    },
+    {
+      "chunk": 43,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d43",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=43,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597666.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597670.idark"
+    },
+    {
+      "chunk": 44,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d44",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=44,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597667.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597671.idark"
+    },
+    {
+      "chunk": 45,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d45",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=45,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597668.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597672.idark"
+    },
+    {
+      "chunk": 46,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d46",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=46,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597669.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597673.idark"
+    },
+    {
+      "chunk": 47,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d47",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=47,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597670.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597674.idark"
+    },
+    {
+      "chunk": 48,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d48",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=48,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597671.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597675.idark"
+    },
+    {
+      "chunk": 49,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d49",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=49,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597672.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597676.idark"
+    },
+    {
+      "chunk": 50,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d50",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=50,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597673.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597677.idark"
+    },
+    {
+      "chunk": 51,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d51",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=51,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597674.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597678.idark"
+    },
+    {
+      "chunk": 52,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d52",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=52,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597675.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597679.idark"
+    },
+    {
+      "chunk": 53,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d53",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=53,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597676.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597680.idark"
+    },
+    {
+      "chunk": 54,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d54",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=54,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597677.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597681.idark"
+    },
+    {
+      "chunk": 55,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d55",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=55,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597678.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597682.idark"
+    },
+    {
+      "chunk": 56,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d56",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=56,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597679.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597683.idark"
+    },
+    {
+      "chunk": 57,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d57",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=57,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597680.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597684.idark"
+    },
+    {
+      "chunk": 58,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d58",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=58,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597681.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597685.idark"
+    },
+    {
+      "chunk": 59,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d59",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=59,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597682.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597686.idark"
+    },
+    {
+      "chunk": 60,
+      "lane": 0,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d60",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=60,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597683.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597687.idark"
+    },
+    {
+      "chunk": 61,
+      "lane": 1,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d61",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=61,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597684.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597688.idark"
+    },
+    {
+      "chunk": 62,
+      "lane": 2,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d62",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=62,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597685.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597689.idark"
+    },
+    {
+      "chunk": 63,
+      "lane": 3,
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "xp441060d63",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915,CHUNK=63,PREFLIGHT=0",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/logs",
+        "-W",
+        "depend=afterok:597686.idark",
+        "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code/run_worker.pbs"
+      ],
+      "job_id": "597690.idark"
+    }
+  ],
+  "terminal_job_ids": [
+    "597687.idark",
+    "597688.idark",
+    "597689.idark",
+    "597690.idark"
+  ],
+  "concurrency": 4
+}

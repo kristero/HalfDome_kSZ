@@ -1,0 +1,8 @@
+{
+  "count": 524288,
+  "last_proposal_index": 30825234,
+  "prefix_8192_exact": true,
+  "seconds": 112.03788375854492,
+  "theta_bytes": 37748736,
+  "scope": "full design generation on local Python; no 524k map execution"
+}

@@ -1,0 +1,6 @@
+{
+  "passed": true,
+  "scope": "Production PBS branch reaches Python and enforces missing preflight gate; no map launched",
+  "exit_code": 1,
+  "wrapper_sha256": "c26c964968591b6bb7df583acc488cfae958b81b0739730eef961142d93fa4b9"
+}

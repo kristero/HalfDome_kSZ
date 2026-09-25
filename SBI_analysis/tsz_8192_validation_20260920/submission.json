@@ -1,0 +1,13 @@
+{
+  "utc": "2026-09-20T16:26:24.238611+00:00",
+  "root": "/lustre/work/kristero10/tsz_8192_validation_20260920",
+  "gate": "598452.idark",
+  "workers": [
+    "598453.idark",
+    "598454.idark",
+    "598455.idark",
+    "598456.idark"
+  ],
+  "analysis": "598457.idark",
+  "diagnostic_256_submitted": false
+}

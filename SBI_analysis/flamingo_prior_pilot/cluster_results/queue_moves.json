@@ -1,0 +1,26 @@
+[
+  {
+    "job": "597371.idark",
+    "queue": "mini2",
+    "reason": "mini GroupA saturated; GroupB has 28 free CPUs",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "job": "597374.idark",
+    "queue": "mini2",
+    "reason": "mini GroupA saturated; GroupB has 28 free CPUs",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  {
+    "job": "597377.idark",
+    "queue": "mini2",
+    "reason": "mini GroupA saturated; GroupB has 28 free CPUs",
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+]

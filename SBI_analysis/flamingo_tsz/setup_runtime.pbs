@@ -1,0 +1,37 @@
+#!/bin/bash
+#PBS -N FLAM_runtime
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${CAMPAIGN:?Set CAMPAIGN}"
+mkdir -p "${CAMPAIGN}/runtime"
+exec > "${CAMPAIGN}/logs/runtime_setup.log" 2>&1
+trap 'status=$?; printf "%s\n" "$status" > "${CAMPAIGN}/logs/runtime_setup.exit_code"' EXIT
+cd "${CAMPAIGN}/runtime"
+JULIA_ARCHIVE=julia-1.12.2-linux-x86_64.tar.gz
+if [[ ! -x julia-1.12.2/bin/julia ]]; then
+  curl --fail --retry 3 --connect-timeout 30 -L -o julia-1.12.2.sha256 \
+    https://julialang-s3.julialang.org/bin/checksums/julia-1.12.2.sha256
+  curl --fail --retry 3 --connect-timeout 30 -L -C - -o "${JULIA_ARCHIVE}" \
+    "https://julialang-s3.julialang.org/bin/linux/x64/1.12/${JULIA_ARCHIVE}"
+  awk '$2 == "julia-1.12.2-linux-x86_64.tar.gz" {print}' julia-1.12.2.sha256 > selected_checksum.txt
+  test -s selected_checksum.txt
+  sha256sum -c selected_checksum.txt
+  tar -xzf "${JULIA_ARCHIVE}"
+fi
+export JULIA_DEPOT_PATH="${CAMPAIGN}/runtime/depot:/home/kristero10/.julia"
+# Julia's 7z helper needs the bundled C++ runtime on this older cluster OS.
+export LD_LIBRARY_PATH="${CAMPAIGN}/runtime/julia-1.12.2/lib/julia:${LD_LIBRARY_PATH:-}"
+export JULIA_PKG_PRECOMPILE_AUTO=0 JULIA_NUM_PRECOMPILE_TASKS=8
+export OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+"${CAMPAIGN}/runtime/julia-1.12.2/bin/julia" --startup-file=no --threads=26 \
+  --project="${CAMPAIGN}/runtime/julia_env" -e 'using Pkg; Pkg.instantiate()'
+export HALFDOME_SOURCE_DIR="${CAMPAIGN}/code/halfdome"
+export FLAMINGO_MODE=probe
+export FLAMINGO_OUTPUT="${CAMPAIGN}/preflight/cluster_julia112_probe.toml"
+"${CAMPAIGN}/runtime/julia-1.12.2/bin/julia" --startup-file=no --threads=26 \
+  --project="${CAMPAIGN}/runtime/julia_env" "${CAMPAIGN}/code/process_maps.jl"
+date -u +%Y-%m-%dT%H:%M:%SZ > "${CAMPAIGN}/runtime/setup_complete.txt"

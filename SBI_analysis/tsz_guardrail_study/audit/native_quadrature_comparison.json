@@ -1,0 +1,115 @@
+{
+  "cases": [
+    {
+      "case": "amP0_low_2",
+      "source": "maps\\amP0_low_2\\historical1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 45,
+      "nominal_native_convergence": 45,
+      "native_positive_peak_missed": 0,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 3.219646771412954e-15,
+      "max_native_evaluations": 931.0
+    },
+    {
+      "case": "amxc_low_2",
+      "source": "maps\\amxc_low_2\\historical1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 45,
+      "nominal_native_convergence": 45,
+      "native_positive_peak_missed": 0,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 5.10702591327572e-15,
+      "max_native_evaluations": 969.0
+    },
+    {
+      "case": "azbeta_high_2",
+      "source": "maps\\azbeta_high_2\\historical1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 42,
+      "nominal_native_convergence": 34,
+      "native_positive_peak_missed": 8,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 1.3322676295501878e-14,
+      "max_native_evaluations": 969.0
+    },
+    {
+      "case": "azP0_low_2",
+      "source": "maps\\azP0_low_2\\historical1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 45,
+      "nominal_native_convergence": 45,
+      "native_positive_peak_missed": 0,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 3.219646771412954e-15,
+      "max_native_evaluations": 931.0
+    },
+    {
+      "case": "azxc_high_2",
+      "source": "maps\\azxc_high_2\\historical1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 45,
+      "nominal_native_convergence": 45,
+      "native_positive_peak_missed": 0,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 4.440892098500626e-15,
+      "max_native_evaluations": 931.0
+    },
+    {
+      "case": "Battaglia12",
+      "source": "maps\\Battaglia12\\logz1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 45,
+      "nominal_native_convergence": 45,
+      "native_positive_peak_missed": 0,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 3.219646771412954e-15,
+      "max_native_evaluations": 931.0
+    },
+    {
+      "case": "beta_steep",
+      "source": "maps\\beta_steep\\historical1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 36,
+      "nominal_native_convergence": 12,
+      "native_positive_peak_missed": 24,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 7.216449660063518e-15,
+      "max_native_evaluations": 969.0
+    },
+    {
+      "case": "combined_tails",
+      "source": "maps\\combined_tails\\historical1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 44,
+      "nominal_native_convergence": 40,
+      "native_positive_peak_missed": 4,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 2.0317081350640365e-14,
+      "max_native_evaluations": 969.0
+    },
+    {
+      "case": "FL_L1_m9",
+      "source": "maps\\FL_L1_m9\\logz1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 45,
+      "nominal_native_convergence": 45,
+      "native_positive_peak_missed": 0,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 5.10702591327572e-15,
+      "max_native_evaluations": 931.0
+    },
+    {
+      "case": "xc_low_1",
+      "source": "maps\\xc_low_1\\historical1\\columns.csv",
+      "probes": 45,
+      "positive_stable_columns": 45,
+      "nominal_native_convergence": 45,
+      "native_positive_peak_missed": 0,
+      "nominal_native_disagrees_over_1e_minus_7": 0,
+      "max_relative_disagreement_nominal": 5.10702591327572e-15,
+      "max_native_evaluations": 969.0
+    }
+  ],
+  "interpretation": "One set per unique case, excluding repeated grid refinements. The bounded native route is diagnostic, not ground truth; normalized integration was separately checked with QUADPACK."
+}

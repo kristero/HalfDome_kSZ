@@ -1,0 +1,9 @@
+#!/bin/bash
+#PBS -q mini2
+#PBS -l select=1:ncpus=2:mem=8gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_reuse_cache_20260921/followup
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=2 MKL_NUM_THREADS=1
+/home/anaconda3/bin/python3 baseline_cache.py

@@ -1,0 +1,12 @@
+label = "shallow"
+beta_raw = 0.8833402822722705
+stable_same_cylinder = 5.207872622216001
+x = 0.1
+initial19_error = 0.6402831564230094
+cylinder_to_sphere = 2.4269720033306847
+initial19_value = 1.6580448823825717
+xc = 0.497
+stock_value = 5.207872622216003
+sphere4 = 2.145831354901875
+stock_relative_error = 5.116360272971864e-16
+stock_seconds_after_compile = 7.102e-5

@@ -1,0 +1,413 @@
+{
+  "completed": 0,
+  "requested": 80,
+  "statuses": [
+    {
+      "returncode": null,
+      "task_id": 0,
+      "label": "Battaglia12"
+    },
+    {
+      "returncode": null,
+      "task_id": 1,
+      "label": "FL_L1_m9"
+    },
+    {
+      "returncode": null,
+      "task_id": 2,
+      "label": "compact"
+    },
+    {
+      "returncode": null,
+      "task_id": 3,
+      "label": "compact"
+    },
+    {
+      "returncode": null,
+      "task_id": 4,
+      "label": "extended_shallow"
+    },
+    {
+      "returncode": null,
+      "task_id": 5,
+      "label": "extended_shallow"
+    },
+    {
+      "returncode": null,
+      "task_id": 6,
+      "label": "combined_tails"
+    },
+    {
+      "returncode": null,
+      "task_id": 7,
+      "label": "combined_tails"
+    },
+    {
+      "returncode": null,
+      "task_id": 8,
+      "label": "high_amplitude_tails"
+    },
+    {
+      "returncode": null,
+      "task_id": 9,
+      "label": "high_amplitude_tails"
+    },
+    {
+      "returncode": null,
+      "task_id": 10,
+      "label": "Battaglia12"
+    },
+    {
+      "returncode": null,
+      "task_id": 11,
+      "label": "FL_L1_m9"
+    },
+    {
+      "returncode": null,
+      "task_id": 12,
+      "label": "compact"
+    },
+    {
+      "returncode": null,
+      "task_id": 13,
+      "label": "extended_shallow"
+    },
+    {
+      "returncode": null,
+      "task_id": 14,
+      "label": "Battaglia12_d1_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 15,
+      "label": "Battaglia12_d1_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 16,
+      "label": "Battaglia12_d1_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 17,
+      "label": "Battaglia12_d1_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 18,
+      "label": "Battaglia12_d2_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 19,
+      "label": "Battaglia12_d2_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 20,
+      "label": "Battaglia12_d2_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 21,
+      "label": "Battaglia12_d2_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 22,
+      "label": "Battaglia12_d3_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 23,
+      "label": "Battaglia12_d3_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 24,
+      "label": "Battaglia12_d3_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 25,
+      "label": "Battaglia12_d3_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 26,
+      "label": "Battaglia12_d4_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 27,
+      "label": "Battaglia12_d4_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 28,
+      "label": "Battaglia12_d4_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 29,
+      "label": "Battaglia12_d4_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 30,
+      "label": "Battaglia12_d5_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 31,
+      "label": "Battaglia12_d5_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 32,
+      "label": "Battaglia12_d5_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 33,
+      "label": "Battaglia12_d5_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 34,
+      "label": "Battaglia12_d6_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 35,
+      "label": "Battaglia12_d6_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 36,
+      "label": "Battaglia12_d6_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 37,
+      "label": "Battaglia12_d6_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 38,
+      "label": "Battaglia12_d7_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 39,
+      "label": "Battaglia12_d7_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 40,
+      "label": "Battaglia12_d7_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 41,
+      "label": "Battaglia12_d7_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 42,
+      "label": "Battaglia12_d8_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 43,
+      "label": "Battaglia12_d8_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 44,
+      "label": "Battaglia12_d8_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 45,
+      "label": "Battaglia12_d8_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 46,
+      "label": "FL_L1_m9_d1_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 47,
+      "label": "FL_L1_m9_d1_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 48,
+      "label": "FL_L1_m9_d1_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 49,
+      "label": "FL_L1_m9_d1_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 50,
+      "label": "FL_L1_m9_d2_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 51,
+      "label": "FL_L1_m9_d2_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 52,
+      "label": "FL_L1_m9_d2_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 53,
+      "label": "FL_L1_m9_d2_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 54,
+      "label": "FL_L1_m9_d3_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 55,
+      "label": "FL_L1_m9_d3_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 56,
+      "label": "FL_L1_m9_d3_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 57,
+      "label": "FL_L1_m9_d3_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 58,
+      "label": "FL_L1_m9_d4_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 59,
+      "label": "FL_L1_m9_d4_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 60,
+      "label": "FL_L1_m9_d4_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 61,
+      "label": "FL_L1_m9_d4_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 62,
+      "label": "FL_L1_m9_d5_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 63,
+      "label": "FL_L1_m9_d5_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 64,
+      "label": "FL_L1_m9_d5_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 65,
+      "label": "FL_L1_m9_d5_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 66,
+      "label": "FL_L1_m9_d6_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 67,
+      "label": "FL_L1_m9_d6_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 68,
+      "label": "FL_L1_m9_d6_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 69,
+      "label": "FL_L1_m9_d6_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 70,
+      "label": "FL_L1_m9_d7_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 71,
+      "label": "FL_L1_m9_d7_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 72,
+      "label": "FL_L1_m9_d7_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 73,
+      "label": "FL_L1_m9_d7_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 74,
+      "label": "FL_L1_m9_d8_1.0_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 75,
+      "label": "FL_L1_m9_d8_1.0_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 76,
+      "label": "FL_L1_m9_d8_0.5_-1"
+    },
+    {
+      "returncode": null,
+      "task_id": 77,
+      "label": "FL_L1_m9_d8_0.5_1"
+    },
+    {
+      "returncode": null,
+      "task_id": 78,
+      "label": "Battaglia12_fast26"
+    },
+    {
+      "returncode": null,
+      "task_id": 79,
+      "label": "Battaglia12_fast13"
+    }
+  ],
+  "production_certified": false,
+  "diagnostic_256_submitted": false,
+  "anchors": [],
+  "rendering": [],
+  "benchmarks": [],
+  "cache_refinement": [],
+  "interpretation": "8192 is a candidate, 4096 is tested, 16384 is reference only; no automatic launch"
+}

@@ -1,0 +1,81 @@
+{
+  "scope": "P0-only positive control for compression/SBI; deliberately not a new sky run.\n\nThe exact P0^2 scaling of a saved B12 spectrum gives a known likelihood. A\nfixed, saved noise covariance is used only for this software control; it is\nnot a candidate-dependent physical SO covariance or nine-parameter validation.\n",
+  "truth": [
+    5.0,
+    18.1,
+    40.0,
+    55.0
+  ],
+  "exact_posterior_means": [
+    4.998673309207822,
+    18.09997206879273,
+    39.9999974121306,
+    54.99999900451627
+  ],
+  "controls": [
+    {
+      "shuffled": false,
+      "predictions": [
+        {
+          "mean": 4.707170486450195,
+          "q16": 4.246075458526612,
+          "q84": 5.189755535125732
+        },
+        {
+          "mean": 18.116374969482422,
+          "q16": 17.97635154724121,
+          "q84": 18.26326042175293
+        },
+        {
+          "mean": 39.991241455078125,
+          "q16": 39.85933364868164,
+          "q84": 40.12162658691406
+        },
+        {
+          "mean": 54.96833801269531,
+          "q16": 54.79469940185547,
+          "q84": 55.14158432006836
+        }
+      ],
+      "normalized_mean_error": 0.0024898823709233785,
+      "epochs": [
+        163
+      ],
+      "validation_log_probs": []
+    },
+    {
+      "shuffled": true,
+      "predictions": [
+        {
+          "mean": 30.741050720214844,
+          "q16": 15.602022132873534,
+          "q84": 45.732640228271485
+        },
+        {
+          "mean": 30.528100967407227,
+          "q16": 15.419468688964844,
+          "q84": 46.21103973388672
+        },
+        {
+          "mean": 30.229915618896484,
+          "q16": 14.819066314697265,
+          "q84": 46.27648086547852
+        },
+        {
+          "mean": 31.080841064453125,
+          "q16": 15.809456367492675,
+          "q84": 46.32194091796875
+        }
+      ],
+      "normalized_mean_error": 0.326541710158292,
+      "epochs": [
+        90
+      ],
+      "validation_log_probs": []
+    }
+  ],
+  "seconds": 11.32052223699975,
+  "noiseless_recovery_max_error": 0.0,
+  "moped_variance": 1.0000000000000002,
+  "n_train_total": 1024
+}

@@ -1,0 +1,47 @@
+{
+  "theta": [
+    19.863946898236897,
+    1.378849450857866,
+    7.273537628593472,
+    0.004031541178634246,
+    -0.3708453659453409,
+    -0.01000634064400005,
+    -3.2031983230820584,
+    1.2715097462230687,
+    0.7122775044426832
+  ],
+  "rms_fractional": 0.01784062963002098,
+  "max_fractional": 0.09126676543411216,
+  "rms_log": 0.017393568547228535,
+  "elapsed_seconds": 33.208357501775026,
+  "nfev": 41,
+  "success": true,
+  "message": "`gtol` termination condition is satisfied.",
+  "searches": [
+    {
+      "theta": [
+        19.863946898236897,
+        1.378849450857866,
+        7.273537628593472,
+        0.004031541178634246,
+        -0.3708453659453409,
+        -0.01000634064400005,
+        -3.2031983230820584,
+        1.2715097462230687,
+        0.7122775044426832
+      ],
+      "rms_fractional": 0.01784062963002098,
+      "max_fractional": 0.09126676543411216,
+      "rms_log": 0.017393568547228535,
+      "elapsed_seconds": 33.208357501775026,
+      "nfev": 41,
+      "success": true,
+      "message": "`gtol` termination condition is satisfied."
+    }
+  ],
+  "fit_type": "regularized catalogue-forward proposal; requires full-map validation",
+  "regularization_coefficient": 0.005,
+  "minimum_grid_beta_for_proposal": 1.3,
+  "maximum_grid_beta_for_proposal": 64.0,
+  "local_unit_cube_trust_radius": 0.12
+}

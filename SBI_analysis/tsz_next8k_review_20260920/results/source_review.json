@@ -1,0 +1,29 @@
+{
+  "halfdome_commit": "10947ce33efadbe8431af54d5fb9b92fe6649fc5",
+  "spherical_fix_commit": "3522b71",
+  "public_xgpaint_cluster_commit": "5dd0b57cae243598cef9608de77f6807689db712",
+  "user_confirmed_halfdome_wrapper": true,
+  "cluster_ssh": "Two attempts timed out; this review uses fetched Git and preserved cluster artifacts",
+  "sources": {
+    "profiles_y.jl": {
+      "url": "https://raw.githubusercontent.com/kristero/XGPaint.jl/5dd0b57cae243598cef9608de77f6807689db712/src/profiles_y.jl",
+      "sha256": "98d034e7ebacf8f37c252f1448dd77d71ee26412b7a9694e20106bcb82c4891c"
+    },
+    "profiles.jl": {
+      "url": "https://raw.githubusercontent.com/kristero/XGPaint.jl/5dd0b57cae243598cef9608de77f6807689db712/src/profiles.jl",
+      "sha256": "9801dbac85fd078d890fa953349db3b555db510b7d70697317a4566f19ccd4a1"
+    },
+    "truncation_comparison/spherical_truncation_profiles.jl": {
+      "sha256": "94df8165f3a6fa26480534e1ed56c23dfdfd552b7408706ad7cce792941e018a"
+    },
+    "SBI_analysis/flamingo_linear_prior/stable_los.jl": {
+      "sha256": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca"
+    },
+    "SBI_analysis/tsz_guardrail_study/map_experiment.jl": {
+      "sha256": "c104b195e1aa549189afe19f9308f70cb2b0badcbcf2ac6452e96d4cb7cae7b0"
+    },
+    "SBI_analysis/tsz_beta_flat_followup_20260920/continuous_flat.py": {
+      "sha256": "7a185e66ccad5dbb1a83054ab780652d25f7fa22844e227b90978705830a5144"
+    }
+  }
+}

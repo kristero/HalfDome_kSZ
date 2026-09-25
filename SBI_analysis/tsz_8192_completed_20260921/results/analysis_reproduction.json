@@ -1,0 +1,12 @@
+[
+  {
+    "anchor": "Battaglia12",
+    "max_relative_difference": 2.2037037808928005e-12,
+    "passed": true
+  },
+  {
+    "anchor": "FL_L1_m9",
+    "max_relative_difference": 9.782384564339786e-13,
+    "passed": true
+  }
+]

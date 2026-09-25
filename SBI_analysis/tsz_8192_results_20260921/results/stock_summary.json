@@ -1,0 +1,135 @@
+{
+  "stock_shallow_nonconvergent": {
+    "label": "shallow_nonconvergent",
+    "beta_raw": 0.5573500387748962,
+    "stable_same_cylinder": 33.31053141480879,
+    "x": 0.1,
+    "cutoff_cylinder_1e4_1e5_1e6": [
+      22.173030098099176,
+      33.31053141480879,
+      48.7788005238254
+    ],
+    "initial19_error": 4.054473444808342,
+    "cylinder_to_sphere": 11.048485619502292,
+    "initial19_value": 26.360358321781877,
+    "xc": 0.497,
+    "stock_value": 33.310531414808814,
+    "sphere4": 3.014940921497018,
+    "stock_relative_error": 6.399262085421571e-16,
+    "stock_seconds_after_compile": 8.99e-05
+  },
+  "stock_steep_cache": {
+    "label": "steep_cache",
+    "beta_raw": 576.0,
+    "stable_same_cylinder": 0.0027781534655579184,
+    "x": 1e-06,
+    "initial19_error": 0.0,
+    "cylinder_to_sphere": 1.0,
+    "initial19_value": 0.0,
+    "xc": 0.09263360649031291,
+    "stock_value": 0.0,
+    "sphere4": 0.0027781534655579184,
+    "stock_relative_error": 1.0,
+    "stock_seconds_after_compile": 2.3932e-05
+  },
+  "stock_parse": {
+    "parse_errors": [
+      ":($(Expr(:error, Base.Meta.ParseError(\"ParseError:\\n# Error @ none:86:10\\n        \\\" N_logM=length(logMs, N_logM,\\n        \\\" threads=\\\", Threads.nthreads()\\n#        \u2514 \u2500\u2500 Expected `)` or `,`\", Base.JuliaSyntax.ParseError(Base.JuliaSyntax.SourceFile(\"\\n\\n# Import ChunkSplitters for better threading\\nusing ChunkSplitters: chunks\\n\\n# RECTANGULAR WORKSPACES\\n\\n\\nstruct CarClenshawCurtisProfileWorkspace{T,A<:AbstractArray{T,2}} <: AbstractProfileWorkspace{T}\\n    sin_\u03b1::A\\n    cos_\u03b1::A\\n    sin_\u03b4::A\\n    cos_\u03b4::A\\nend\\n\\nfunction profileworkspace(shape, wcs::CarClenshawCurtis)\\n    \u03b1_map, \u03b4_map = posmap(shape, wcs)\\n    return CarClenshawCurtisProfileWorkspace(\\n        sin.(\u03b1_map), cos.(\u03b1_map), sin.(\u03b4_map), cos.(\u03b4_map))\\nend\\n\\n\\nstruct GnomonicProfileWorkspace{T,A<:AbstractArray{T,2}} <: AbstractProfileWorkspace{T}\\n    sin_\u03b1::A\\n    cos_\u03b1::A\\n    sin_\u03b4::A\\n    cos_\u03b4::A\\nend\\n\\nfunction profileworkspace(shape, wcs::Gnomonic)\\n    \u03b1_map, \u03b4_map = posmap(shape, wcs)\\n    return GnomonicProfileWorkspace(\\n        sin.(\u03b1_map), cos.(\u03b1_map), sin.(\u03b4_map), cos.(\u03b4_map))\\nend\\n\\nBase.show(io::IO, w::AbstractProfileWorkspace) = print(io, \\\"\\$(typeof(w))\\\")\\n\\n@inline function interpolator_stage_start(label::AbstractString; verbose::Bool=true)\\n    if verbose\\n        println(\\\"[interpolator] START \\\", label)\\n        flush(stdout)\\n    end\\n    return time_ns()\\nend\\n\\n@inline function interpolator_stage_end(label::AbstractString, t0_ns; verbose::Bool=true, extra::AbstractString=\\\"\\\")\\n    if verbose\\n        elapsed_s = (time_ns() - t0_ns) / 1.0e9\\n        suffix = isempty(extra) ? \\\"\\\" : \\\" \\\" * extra\\n        println(\\\"[interpolator] END   \\\", label, \\\" wall=\\\", round(elapsed_s; digits=3), \\\" s\\\", suffix)\\n        flush(stdout)\\n    end\\n    return nothi"
+    ],
+    "relative_floor": 0.0,
+    "minimum_positive": 1e-320,
+    "log_floor": "-inf"
+  },
+  "stock_compact_pivot": {
+    "label": "compact_pivot",
+    "beta_raw": 16.0,
+    "stable_same_cylinder": 0.009680643565430842,
+    "x": 1e-08,
+    "initial19_error": 3.260112937810608e-63,
+    "cylinder_to_sphere": 1.0,
+    "initial19_value": 3.260112937814632e-63,
+    "xc": 0.025,
+    "stock_value": 0.009680643565430835,
+    "sphere4": 0.009680643565430842,
+    "stock_relative_error": 7.167802281953359e-16,
+    "stock_seconds_after_compile": 0.000102741
+  },
+  "stock_shallow": {
+    "label": "shallow",
+    "beta_raw": 0.8833402822722705,
+    "stable_same_cylinder": 5.207872622216001,
+    "x": 0.1,
+    "initial19_error": 0.6402831564230094,
+    "cylinder_to_sphere": 2.4269720033306847,
+    "initial19_value": 1.6580448823825717,
+    "xc": 0.497,
+    "stock_value": 5.207872622216003,
+    "sphere4": 2.145831354901875,
+    "stock_relative_error": 5.116360272971864e-16,
+    "stock_seconds_after_compile": 7.102e-05
+  },
+  "stock_steep_occupied": {
+    "label": "steep_occupied",
+    "beta_raw": 256.0,
+    "stable_same_cylinder": 0.003662821996555391,
+    "x": 1e-06,
+    "initial19_error": 0.0,
+    "cylinder_to_sphere": 1.0000000000000009,
+    "initial19_value": 0.0,
+    "xc": 0.06887250231915688,
+    "stock_value": 0.0,
+    "sphere4": 0.0036628219965553874,
+    "stock_relative_error": 1.0,
+    "stock_seconds_after_compile": 0.00010438
+  },
+  "stock_tail_underflow": {
+    "label": "tail_underflow",
+    "beta_raw": 80.0,
+    "stable_same_cylinder": 2.625426670986802e-209,
+    "x": 10.0,
+    "initial19_error": 7.065e-321,
+    "cylinder_to_sphere": 2.625426670986802e+91,
+    "initial19_value": 7.065e-321,
+    "xc": 0.025,
+    "stock_value": 2.625426670986768e-209,
+    "sphere4": 0.0,
+    "stock_relative_error": 1.2965637851481134e-14,
+    "stock_seconds_after_compile": 8.1648e-05
+  },
+  "stock_cache": {
+    "interpolation_probes": 343,
+    "nonfinite_interpolation_probes": 343,
+    "floor": 0.0,
+    "scope": "Exact original cleanup on synthetic subnormal cache, not a full-grid failure frequency",
+    "replaced": 1,
+    "nonfinite_log_cells": 1
+  },
+  "stock_stress_slow": {
+    "label": "stress_slow",
+    "beta_raw": 40.0,
+    "stable_same_cylinder": 0.004980410130849768,
+    "x": 1e-08,
+    "initial19_error": 7.278658210583088e-160,
+    "cylinder_to_sphere": 1.0000000000000728,
+    "initial19_value": 7.278658210583088e-160,
+    "xc": 0.025,
+    "stock_value": 0.004980410130849402,
+    "sphere4": 0.004980410130849405,
+    "stock_relative_error": 7.349327541598549e-14,
+    "stock_seconds_after_compile": 0.000103315
+  },
+  "stock_B12": {
+    "label": "B12",
+    "beta_raw": 4.35,
+    "stable_same_cylinder": 0.49513422374968075,
+    "x": 0.01,
+    "initial19_error": 2.9060927739686943e-10,
+    "cylinder_to_sphere": 1.000182323471812,
+    "initial19_value": 2.9101561633564326e-10,
+    "xc": 0.497,
+    "stock_value": 0.49513422374968064,
+    "sphere4": 0.4950439656151703,
+    "stock_relative_error": 2.242266786200663e-16,
+    "stock_seconds_after_compile": 7.9481e-05
+  }
+}

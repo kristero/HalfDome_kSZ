@@ -1,0 +1,43 @@
+{
+  "complete": true,
+  "covariance": "/home/cbllover/HalfDome/SBI_analysis/adrian_fisher_baseline_deproj0/2_param_fisher_analysis/baseline/conditional_noise/covariance_binned_dell.npy",
+  "covariance_scope": "conditional_noise",
+  "fisher_eigenvalue_threshold": 0.30552341373151076,
+  "fisher_rank": 6,
+  "fisher_root": "/home/cbllover/HalfDome/SBI_analysis/adrian_fisher_baseline_deproj0",
+  "importance_ess": 113679.44014123746,
+  "observation": "/home/cbllover/HalfDome/SBI_analysis/adrian_fisher_baseline_deproj0/matched_baseline0_deproj_comparison/npe_conditioning_contract_N523788.npz",
+  "outputs": {
+    "bundle": "/home/cbllover/HalfDome/SBI_analysis/adrian_fisher_baseline_deproj0/2_param_fisher_analysis/matched_conditional_fisher/matched_fisher_baseline_conditional_noise_hard_uniform.npz",
+    "samples": "/home/cbllover/HalfDome/SBI_analysis/adrian_fisher_baseline_deproj0/2_param_fisher_analysis/matched_conditional_fisher/matched_fisher_baseline_conditional_noise_hard_uniform_samples.npy"
+  },
+  "physics_choice": "baseline conditional_noise: the mask and signal realization are fixed while independent SO noise seeds vary",
+  "posterior_mean": [
+    22.064543451744328,
+    0.45079450642908125,
+    4.399109720361819,
+    0.16272799504099822,
+    0.003801836961659432,
+    0.041162012534563926,
+    -0.8192803816205694,
+    0.7445245028505042,
+    0.43338001961237255
+  ],
+  "posterior_samples": 200000,
+  "posterior_std": [
+    5.045742240713907,
+    0.11732583199614714,
+    0.4890641871368896,
+    0.07504542159100253,
+    0.052185226474516316,
+    0.03319666481387777,
+    0.3113553306425736,
+    0.2893368425702745,
+    0.17566335877190614
+  ],
+  "prior": "hard bounded uniform, identical to SBI",
+  "proposal_draws": 1000000,
+  "proposal_inside_prior": 794050,
+  "proposal_inside_prior_fraction": 0.79405,
+  "sensitivity_dir": "/home/cbllover/HalfDome/SBI_analysis/adrian_fisher_baseline_deproj0/2_param_fisher_analysis"
+}

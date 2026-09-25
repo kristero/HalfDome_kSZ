@@ -1,0 +1,12 @@
+label = "B12"
+beta_raw = 4.35
+stable_same_cylinder = 0.49513422374968075
+x = 0.01
+initial19_error = 2.9060927739686943e-10
+cylinder_to_sphere = 1.000182323471812
+initial19_value = 2.9101561633564326e-10
+xc = 0.497
+stock_value = 0.49513422374968064
+sphere4 = 0.4950439656151703
+stock_relative_error = 2.242266786200663e-16
+stock_seconds_after_compile = 7.9481e-5

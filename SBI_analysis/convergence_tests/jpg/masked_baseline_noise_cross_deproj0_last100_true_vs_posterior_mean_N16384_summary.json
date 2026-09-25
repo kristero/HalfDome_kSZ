@@ -1,0 +1,63 @@
+{
+  "case": "masked_baseline_noise_cross_deproj0",
+  "finite_points_total": 900,
+  "n_train": 16384,
+  "output_path": "/home/kristero10/HalfDome_kSZ/SBI_analysis/outputs/cluster_outputs/SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_metadata_verified_asinh/diagnostics_last100/jpg/masked_baseline_noise_cross_deproj0_last100_true_vs_posterior_mean_N16384.jpg",
+  "params": {
+    "P0": {
+      "finite_points": 100,
+      "nonfinite_points": 0,
+      "param_index": 0,
+      "rows": 100
+    },
+    "alpha_m_P0": {
+      "finite_points": 100,
+      "nonfinite_points": 0,
+      "param_index": 3,
+      "rows": 100
+    },
+    "alpha_m_beta": {
+      "finite_points": 100,
+      "nonfinite_points": 0,
+      "param_index": 5,
+      "rows": 100
+    },
+    "alpha_m_xc": {
+      "finite_points": 100,
+      "nonfinite_points": 0,
+      "param_index": 4,
+      "rows": 100
+    },
+    "alpha_z_P0": {
+      "finite_points": 100,
+      "nonfinite_points": 0,
+      "param_index": 6,
+      "rows": 100
+    },
+    "alpha_z_beta": {
+      "finite_points": 100,
+      "nonfinite_points": 0,
+      "param_index": 8,
+      "rows": 100
+    },
+    "alpha_z_xc": {
+      "finite_points": 100,
+      "nonfinite_points": 0,
+      "param_index": 7,
+      "rows": 100
+    },
+    "beta": {
+      "finite_points": 100,
+      "nonfinite_points": 0,
+      "param_index": 2,
+      "rows": 100
+    },
+    "xc": {
+      "finite_points": 100,
+      "nonfinite_points": 0,
+      "param_index": 1,
+      "rows": 100
+    }
+  },
+  "rows": 900
+}

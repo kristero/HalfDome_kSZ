@@ -1,0 +1,23 @@
+	Command being timed: "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/julia-1.12.2/bin/julia --startup-file=no --threads=26 --project=/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/julia_env /lustre/work/kristero10/tsz_8192_validation_recovery_20260921/control.jl catalog_source=halfdome simulation_name=halfdome_lightcone_100 batching_mode=full halfdome_path=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5 apply_mass_cut=true mass_min=1000000000000.0 cosmo_h=0.68 cosmo_omegab=0.049 cosmo_omegac=0.261 sobol_row=0 sobol_csv_path= cleanup_nonpositive_profile_values=true output_dir=/lustre/work/kristero10/tsz_8192_validation_recovery_20260921/controls/037/raw cache_dir=/lustre/work/kristero10/tsz_8192_validation_recovery_20260921/controls/037/cache baseline_noise_path=/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt goal_noise_path=/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/other_sims/SO/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt nside=8192 cl_lmax=7979 so_noise_lmax=7979 cl_niter=0 so_noise_deprojections=0 so_noise_is_dl=false apply_gaussian_beam=true gaussian_beam_fwhm_arcmin=2.0 mask_fsky=0.4 mask_apodization_arcmin=60.0 seed=12345 mask_seed=12345 noise_seed=12345 model_exists=false reuse_existing_cache=false cache_wait_seconds=0 interpolator_pad=256 interpolator_logM_max=15.7 save_cl=true save_no_noise_cl=true save_baseline_noise_cross_cl=true save_goal_noise_cross_cl=false save_unmasked_no_noise_cl=false save_healpix_map=false save_bin_maps=false save_mass_map=false save_noise_maps=false save_noisy_maps=false save_mask_map=false save_signal_map=false save_masked_signal_map=false skip_existing_outputs=false skip_existing_any_run_instance=false enforce_battaglia_guardrails=false skip_invalid_battaglia_rows=false run_instance_tag= print_runtime_environment=true battaglia_alpha_amp=1.0 battaglia_alpha_alpha_m=0.0 battaglia_alpha_alpha_z=0.0 battaglia_gamma_amp=-0.3 battaglia_gamma_alpha_m=0.0 battaglia_gamma_alpha_z=0.0 battaglia_P0_amp=18.100000000000001 battaglia_x_c_amp=0.497 battaglia_beta_amp=4.3499999999999996 battaglia_P0_alpha_m=0.154 battaglia_x_c_alpha_m=-0.0086499999999999997 battaglia_beta_alpha_m=0.039300000000000002 battaglia_P0_alpha_z=-0.74175000000000002 battaglia_x_c_alpha_z=0.73099999999999998 battaglia_beta_alpha_z=0.41499999999999998"
+	User time (seconds): 8389.13
+	System time (seconds): 1034.46
+	Percent of CPU this job got: 932%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 16:51.04
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 22022696
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 338989434
+	Voluntary context switches: 607887
+	Involuntary context switches: 21309
+	Swaps: 0
+	File system inputs: 3642856
+	File system outputs: 320
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

@@ -1,0 +1,1962 @@
+{
+  "cases": {
+    "Battaglia12": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.0176600669362696e-06,
+        "cylinder_flat_sky": 1.0340127226027719e-06,
+        "cylinder_spherical_lower": 1.033981185726011e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 1.019075901166798e-06,
+        "cylinder_flat_sky": 1.0354489969437198e-06,
+        "cylinder_spherical_lower": 1.0354174241306808e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.019075901166798e-06,
+        "cylinder_flat_sky": 1.0354489969437198e-06,
+        "cylinder_spherical_lower": 1.0354174241306808e-06
+      },
+      "histogram_relative_change": 0.0013871029333045737,
+      "radial_relative_change": 0.0
+    },
+    "FL_L1_m9": {
+      "theta": [
+        27.895767029523494,
+        1.3742797203838153,
+        8.096506971978265,
+        0.24068706895722208,
+        -0.3708722120914735,
+        -0.027131779826878644,
+        -3.2950451155410274,
+        1.3212811497156247,
+        0.7123048539608454
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.4543136097764667e-06,
+        "cylinder_flat_sky": 2.510619985429555e-06,
+        "cylinder_spherical_lower": 2.5105338613170993e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 2.4564159185195906e-06,
+        "cylinder_flat_sky": 2.512744901826903e-06,
+        "cylinder_spherical_lower": 2.512658708325232e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.4564159185195906e-06,
+        "cylinder_flat_sky": 2.512744901826903e-06,
+        "cylinder_spherical_lower": 2.512658708325232e-06
+      },
+      "histogram_relative_change": 0.0008456554407106909,
+      "radial_relative_change": 0.0
+    },
+    "FL_fgas-8sigma": {
+      "theta": [
+        18.23594732761984,
+        1.4671672867423466,
+        7.375469738110147,
+        0.27382836676318884,
+        -0.29275997165682033,
+        0.06147581487544934,
+        -3.481706690343786,
+        1.5604732323948403,
+        0.9338324085124106
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.35645764406582e-06,
+        "cylinder_flat_sky": 2.459148324221836e-06,
+        "cylinder_spherical_lower": 2.4590523196935877e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 2.35861650385191e-06,
+        "cylinder_flat_sky": 2.4613568922078413e-06,
+        "cylinder_spherical_lower": 2.461260811888887e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.35861650385191e-06,
+        "cylinder_flat_sky": 2.4613568922078413e-06,
+        "cylinder_spherical_lower": 2.4612608118888864e-06
+      },
+      "histogram_relative_change": 0.0008972969312158741,
+      "radial_relative_change": 0.0
+    },
+    "FL_Mstar-1sigma": {
+      "theta": [
+        33.76527739241058,
+        1.3726902054783838,
+        8.376227180858422,
+        0.13203213879456643,
+        -0.3834874836107727,
+        -0.04321071424547937,
+        -3.870613895010689,
+        1.6021986139875475,
+        0.8860745932601031
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.6260104478944835e-06,
+        "cylinder_flat_sky": 2.6822717675316287e-06,
+        "cylinder_spherical_lower": 2.6821726392943684e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 2.6282054377073553e-06,
+        "cylinder_flat_sky": 2.6844890050176303e-06,
+        "cylinder_spherical_lower": 2.6843898011300283e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.6282054377073553e-06,
+        "cylinder_flat_sky": 2.68448900501763e-06,
+        "cylinder_spherical_lower": 2.6843898011300283e-06
+      },
+      "histogram_relative_change": 0.000825943962466158,
+      "radial_relative_change": 2.220446049250313e-16
+    },
+    "xc_low_0": {
+      "theta": [
+        18.1,
+        0.1,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 8.682568898109746e-09,
+        "cylinder_flat_sky": 8.688842804564732e-09,
+        "cylinder_spherical_lower": 8.68857079641399e-09
+      },
+      "fine": {
+        "inner_sphere_lower": 8.694603151913164e-09,
+        "cylinder_flat_sky": 8.700886593042612e-09,
+        "cylinder_spherical_lower": 8.70061427761083e-09
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 8.694603151913164e-09,
+        "cylinder_flat_sky": 8.700886593042612e-09,
+        "cylinder_spherical_lower": 8.70061427761083e-09
+      },
+      "histogram_relative_change": 0.0013842024429453481,
+      "radial_relative_change": 0.0
+    },
+    "xc_low_1": {
+      "theta": [
+        18.1,
+        0.05,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.0870120160210514e-09,
+        "cylinder_flat_sky": 1.0872449318333382e-09,
+        "cylinder_spherical_lower": 1.0872108067632796e-09
+      },
+      "fine": {
+        "inner_sphere_lower": 1.0885189164568507e-09,
+        "cylinder_flat_sky": 1.0887522036380312e-09,
+        "cylinder_spherical_lower": 1.088718040055057e-09
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.0885189164568507e-09,
+        "cylinder_flat_sky": 1.0887522036380312e-09,
+        "cylinder_spherical_lower": 1.088718040055057e-09
+      },
+      "histogram_relative_change": 0.0013844029887208897,
+      "radial_relative_change": 0.0
+    },
+    "xc_low_2": {
+      "theta": [
+        18.1,
+        0.025,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.3593267210452955e-10,
+        "cylinder_flat_sky": 1.3594384986920218e-10,
+        "cylinder_spherical_lower": 1.3593957886780645e-10
+      },
+      "fine": {
+        "inner_sphere_lower": 1.3612112919024023e-10,
+        "cylinder_flat_sky": 1.3613232399645268e-10,
+        "cylinder_spherical_lower": 1.3612804817682654e-10
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.3612112919024023e-10,
+        "cylinder_flat_sky": 1.3613232399645268e-10,
+        "cylinder_spherical_lower": 1.3612804817682654e-10
+      },
+      "histogram_relative_change": 0.0013844921009018574,
+      "radial_relative_change": 0.0
+    },
+    "amP0_low_0": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        -0.2,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.2921609327319591e-06,
+        "cylinder_flat_sky": 1.3143601891789283e-06,
+        "cylinder_spherical_lower": 1.314331327039759e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 1.2935014403848307e-06,
+        "cylinder_flat_sky": 1.3157218271718999e-06,
+        "cylinder_spherical_lower": 1.3156929362854236e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.2935014403848307e-06,
+        "cylinder_flat_sky": 1.3157218271718997e-06,
+        "cylinder_spherical_lower": 1.3156929362854232e-06
+      },
+      "histogram_relative_change": 0.001034898080164992,
+      "radial_relative_change": 2.220446049250313e-16
+    },
+    "amP0_low_1": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        -0.4,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.6002141562749908e-06,
+        "cylinder_flat_sky": 1.6285225035498836e-06,
+        "cylinder_spherical_lower": 1.6284920550700884e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 1.601607724931081e-06,
+        "cylinder_flat_sky": 1.6299392046840335e-06,
+        "cylinder_spherical_lower": 1.6299087287342678e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.601607724931081e-06,
+        "cylinder_flat_sky": 1.6299392046840335e-06,
+        "cylinder_spherical_lower": 1.6299087287342676e-06
+      },
+      "histogram_relative_change": 0.0008691742183258855,
+      "radial_relative_change": 0.0
+    },
+    "amP0_low_2": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        -0.6,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.076224841010037e-06,
+        "cylinder_flat_sky": 2.1138219027315066e-06,
+        "cylinder_spherical_lower": 2.1137875375161827e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 2.077743973291338e-06,
+        "cylinder_flat_sky": 2.1153677225132987e-06,
+        "cylinder_spherical_lower": 2.1153333293729935e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.077743973291338e-06,
+        "cylinder_flat_sky": 2.1153677225132983e-06,
+        "cylinder_spherical_lower": 2.115333329372993e-06
+      },
+      "histogram_relative_change": 0.000730757005195759,
+      "radial_relative_change": 2.220446049250313e-16
+    },
+    "amxc_low_0": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.6,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 8.344138093111238e-06,
+        "cylinder_flat_sky": 9.550388810284426e-06,
+        "cylinder_spherical_lower": 9.55029146219438e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 8.347299398879552e-06,
+        "cylinder_flat_sky": 9.554076513489943e-06,
+        "cylinder_spherical_lower": 9.55397911024486e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 8.347299398879552e-06,
+        "cylinder_flat_sky": 9.554076513489936e-06,
+        "cylinder_spherical_lower": 9.553979110244851e-06
+      },
+      "histogram_relative_change": 0.00038598217214436126,
+      "radial_relative_change": 6.661338147750939e-16
+    },
+    "amxc_low_1": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.8,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.927307575184028e-05,
+        "cylinder_flat_sky": 2.4552993664263184e-05,
+        "cylinder_spherical_lower": 2.455277215693054e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 1.9278318321894533e-05,
+        "cylinder_flat_sky": 2.456064804335526e-05,
+        "cylinder_spherical_lower": 2.456042642436766e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.9278318321894533e-05,
+        "cylinder_flat_sky": 2.456064804335522e-05,
+        "cylinder_spherical_lower": 2.456042642436762e-05
+      },
+      "histogram_relative_change": 0.00031165216318906896,
+      "radial_relative_change": 1.5543122344752192e-15
+    },
+    "amxc_low_2": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -1.0,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 3.981089977546178e-05,
+        "cylinder_flat_sky": 5.8500315741274305e-05,
+        "cylinder_spherical_lower": 5.8499815997727955e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 3.9818594254113864e-05,
+        "cylinder_flat_sky": 5.851596081677272e-05,
+        "cylinder_spherical_lower": 5.851546083802746e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 3.9818594254113864e-05,
+        "cylinder_flat_sky": 5.8515960816772564e-05,
+        "cylinder_spherical_lower": 5.8515460838027296e-05
+      },
+      "histogram_relative_change": 0.0002673642418219435,
+      "radial_relative_change": 2.6645352591003757e-15
+    },
+    "azP0_low_0": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -4.5,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.479598079423507e-07,
+        "cylinder_flat_sky": 2.5300107523632144e-07,
+        "cylinder_spherical_lower": 2.529727611556381e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 2.4842623712106135e-07,
+        "cylinder_flat_sky": 2.534769445403577e-07,
+        "cylinder_spherical_lower": 2.5344860094147954e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.4842623712106135e-07,
+        "cylinder_flat_sky": 2.534769445403577e-07,
+        "cylinder_spherical_lower": 2.5344860094147954e-07
+      },
+      "histogram_relative_change": 0.0018773672094681837,
+      "radial_relative_change": 0.0
+    },
+    "azP0_low_1": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -5.25,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.0687840222052332e-07,
+        "cylinder_flat_sky": 2.1120739747749315e-07,
+        "cylinder_spherical_lower": 2.111795902624573e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 2.0728699662816377e-07,
+        "cylinder_flat_sky": 2.116244474195807e-07,
+        "cylinder_spherical_lower": 2.11596611661943e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.0728699662816377e-07,
+        "cylinder_flat_sky": 2.1162444741958068e-07,
+        "cylinder_spherical_lower": 2.1159661166194294e-07
+      },
+      "histogram_relative_change": 0.0019707077663888573,
+      "radial_relative_change": 2.220446049250313e-16
+    },
+    "azP0_low_2": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -6.0,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.7627299110784013e-07,
+        "cylinder_flat_sky": 1.800529963905106e-07,
+        "cylinder_spherical_lower": 1.8002566695250886e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 1.766348913359396e-07,
+        "cylinder_flat_sky": 1.8042252416541465e-07,
+        "cylinder_spherical_lower": 1.8039516709221168e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.766348913359396e-07,
+        "cylinder_flat_sky": 1.8042252416541462e-07,
+        "cylinder_spherical_lower": 1.8039516709221165e-07
+      },
+      "histogram_relative_change": 0.0020481244047180214,
+      "radial_relative_change": 2.220446049250313e-16
+    },
+    "azxc_high_0": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        2.0,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.2299151280210359e-05,
+        "cylinder_flat_sky": 1.3965162186295992e-05,
+        "cylinder_spherical_lower": 1.3965123687681712e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 1.2330176579286861e-05,
+        "cylinder_flat_sky": 1.4004012958610298e-05,
+        "cylinder_spherical_lower": 1.400397440855947e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.2330176579286861e-05,
+        "cylinder_flat_sky": 1.4004012958610286e-05,
+        "cylinder_spherical_lower": 1.4003974408559456e-05
+      },
+      "histogram_relative_change": 0.0027742599517095456,
+      "radial_relative_change": 8.881784197001252e-16
+    },
+    "azxc_high_1": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        2.5,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 3.235327589936522e-05,
+        "cylinder_flat_sky": 4.226660802361812e-05,
+        "cylinder_spherical_lower": 4.226656260533163e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 3.2442894744499505e-05,
+        "cylinder_flat_sky": 4.2410198445145274e-05,
+        "cylinder_spherical_lower": 4.241015295675287e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 3.2442894744499505e-05,
+        "cylinder_flat_sky": 4.241019844514519e-05,
+        "cylinder_spherical_lower": 4.2410152956752796e-05
+      },
+      "histogram_relative_change": 0.003385752172624157,
+      "radial_relative_change": 1.9984014443252818e-15
+    },
+    "azxc_high_2": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        3.0,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 7.191042741284498e-05,
+        "cylinder_flat_sky": 0.00011353943549622361,
+        "cylinder_spherical_lower": 0.00011353937644558853
+      },
+      "fine": {
+        "inner_sphere_lower": 7.210376499241547e-05,
+        "cylinder_flat_sky": 0.00011396117881177608,
+        "cylinder_spherical_lower": 0.00011396111965017384
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 7.210376499241547e-05,
+        "cylinder_flat_sky": 0.0001139611788117757,
+        "cylinder_spherical_lower": 0.00011396111965017348
+      },
+      "histogram_relative_change": 0.0037007630137686487,
+      "radial_relative_change": 3.3306690738754696e-15
+    },
+    "azbeta_high_0": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        1.5
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.2354521142534745e-07,
+        "cylinder_flat_sky": 2.2517528894229e-07,
+        "cylinder_spherical_lower": 2.251476194409985e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 2.2396877151702462e-07,
+        "cylinder_flat_sky": 2.2560245113250534e-07,
+        "cylinder_spherical_lower": 2.2557475331126201e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.2396877151702462e-07,
+        "cylinder_flat_sky": 2.256024511325053e-07,
+        "cylinder_spherical_lower": 2.2557475331126201e-07
+      },
+      "histogram_relative_change": 0.001893428852705159,
+      "radial_relative_change": 2.220446049250313e-16
+    },
+    "azbeta_high_1": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        1.75
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.8056219253264744e-07,
+        "cylinder_flat_sky": 1.818799798530442e-07,
+        "cylinder_spherical_lower": 1.81852982653583e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 1.8092178559169944e-07,
+        "cylinder_flat_sky": 1.8224246320119506e-07,
+        "cylinder_spherical_lower": 1.8221543893933277e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.8092178559169944e-07,
+        "cylinder_flat_sky": 1.8224246320119506e-07,
+        "cylinder_spherical_lower": 1.8221543893933277e-07
+      },
+      "histogram_relative_change": 0.0019890169490888177,
+      "radial_relative_change": 0.0
+    },
+    "azbeta_high_2": {
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        2.0
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.5004862414222552e-07,
+        "cylinder_flat_sky": 1.5115109957481645e-07,
+        "cylinder_spherical_lower": 1.5112472648985118e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 1.5035907825861665e-07,
+        "cylinder_flat_sky": 1.514639391498443e-07,
+        "cylinder_spherical_lower": 1.5143754014618355e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.5035907825861665e-07,
+        "cylinder_flat_sky": 1.514639391498443e-07,
+        "cylinder_spherical_lower": 1.5143754014618355e-07
+      },
+      "histogram_relative_change": 0.002065439317000539,
+      "radial_relative_change": 0.0
+    },
+    "combined_tails": {
+      "theta": [
+        18.1,
+        0.05,
+        4.35,
+        -0.4,
+        -0.8,
+        0.0393,
+        -5.25,
+        2.5,
+        1.75
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.606374493883704e-08,
+        "cylinder_flat_sky": 1.6156027395065836e-08,
+        "cylinder_spherical_lower": 1.615468841562638e-08
+      },
+      "fine": {
+        "inner_sphere_lower": 1.6088899223382345e-08,
+        "cylinder_flat_sky": 1.6181555344222248e-08,
+        "cylinder_spherical_lower": 1.618021577495195e-08
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.6088899223382345e-08,
+        "cylinder_flat_sky": 1.6181555344222245e-08,
+        "cylinder_spherical_lower": 1.618021577495195e-08
+      },
+      "histogram_relative_change": 0.0015775955162137256,
+      "radial_relative_change": 2.220446049250313e-16
+    },
+    "P0_tiny": {
+      "theta": [
+        0.01,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 5.622431309040164e-10,
+        "cylinder_flat_sky": 5.712777472943491e-10,
+        "cylinder_spherical_lower": 5.712603236055309e-10
+      },
+      "fine": {
+        "inner_sphere_lower": 5.63025359760662e-10,
+        "cylinder_flat_sky": 5.720712690296795e-10,
+        "cylinder_spherical_lower": 5.720538254865642e-10
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 5.63025359760662e-10,
+        "cylinder_flat_sky": 5.720712690296794e-10,
+        "cylinder_spherical_lower": 5.720538254865642e-10
+      },
+      "histogram_relative_change": 0.0013871029333045737,
+      "radial_relative_change": 2.220446049250313e-16
+    },
+    "P0_huge": {
+      "theta": [
+        6000.0,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 0.0003373458785424097,
+        "cylinder_flat_sky": 0.0003427666483766093,
+        "cylinder_spherical_lower": 0.0003427561941633184
+      },
+      "fine": {
+        "inner_sphere_lower": 0.00033781521585639693,
+        "cylinder_flat_sky": 0.00034324276141780755,
+        "cylinder_spherical_lower": 0.0003432322952919383
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 0.00033781521585639693,
+        "cylinder_flat_sky": 0.00034324276141780755,
+        "cylinder_spherical_lower": 0.0003432322952919383
+      },
+      "histogram_relative_change": 0.0013871029333047957,
+      "radial_relative_change": 0.0
+    },
+    "beta_near_energy": {
+      "theta": [
+        18.1,
+        0.497,
+        2.7001,
+        0.154,
+        -0.00865,
+        0.0,
+        -0.758,
+        0.731,
+        0.0
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.4467066571504544e-05,
+        "cylinder_flat_sky": 1.9009033130403498e-05,
+        "cylinder_spherical_lower": 1.900867897952824e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 1.4490260803582161e-05,
+        "cylinder_flat_sky": 1.9039961624102607e-05,
+        "cylinder_spherical_lower": 1.9039607035100133e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.4490260803582161e-05,
+        "cylinder_flat_sky": 1.9039961624102567e-05,
+        "cylinder_spherical_lower": 1.9039607035100096e-05
+      },
+      "histogram_relative_change": 0.0016243989515145607,
+      "radial_relative_change": 2.220446049250313e-15
+    },
+    "beta_steep": {
+      "theta": [
+        18.1,
+        0.497,
+        128.0,
+        0.154,
+        -0.00865,
+        0.0,
+        -0.758,
+        0.731,
+        0.0
+      ],
+      "coarse": {
+        "inner_sphere_lower": 6.97542704656068e-11,
+        "cylinder_flat_sky": 6.975521150792246e-11,
+        "cylinder_spherical_lower": 6.97542704656068e-11
+      },
+      "fine": {
+        "inner_sphere_lower": 6.9880179868516e-11,
+        "cylinder_flat_sky": 6.988112209412587e-11,
+        "cylinder_spherical_lower": 6.9880179868516e-11
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 6.9880179868516e-11,
+        "cylinder_flat_sky": 6.988112209412587e-11,
+        "cylinder_spherical_lower": 6.9880179868516e-11
+      },
+      "histogram_relative_change": 0.0018017825477075755,
+      "radial_relative_change": 0.0
+    },
+    "joint_beta_max": {
+      "theta": [
+        15.361145910806954,
+        2.9036614970536903,
+        15.997341207787393,
+        -0.10641240980476135,
+        0.3758199311792849,
+        0.38163784798234707,
+        -3.5617905789986253,
+        2.6963765756227076,
+        1.9936249060556293
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.0332827838461464e-06,
+        "cylinder_flat_sky": 1.0339344967166004e-06,
+        "cylinder_spherical_lower": 1.0338879119924633e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 1.0347486474503104e-06,
+        "cylinder_flat_sky": 1.0354015952459744e-06,
+        "cylinder_spherical_lower": 1.0353549606033413e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.0347486474503104e-06,
+        "cylinder_flat_sky": 1.0354015952459744e-06,
+        "cylinder_spherical_lower": 1.0353549606033413e-06
+      },
+      "histogram_relative_change": 0.0014169367094952756,
+      "radial_relative_change": 0.0
+    },
+    "joint_size_min": {
+      "theta": [
+        5.156203415244818,
+        0.03953442838974297,
+        15.858488038182259,
+        0.33065228238701827,
+        -0.906396109983325,
+        0.28441937062889344,
+        -3.576756347436458,
+        -1.0322308572940528,
+        1.9103440344333649
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.0387729500511704e-11,
+        "cylinder_flat_sky": 1.0390965218463473e-11,
+        "cylinder_spherical_lower": 1.0387771698255748e-11
+      },
+      "fine": {
+        "inner_sphere_lower": 1.0415243817644156e-11,
+        "cylinder_flat_sky": 1.0418481528141053e-11,
+        "cylinder_spherical_lower": 1.041528665688769e-11
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.0415243817644156e-11,
+        "cylinder_flat_sky": 1.0418481528141053e-11,
+        "cylinder_spherical_lower": 1.041528665688769e-11
+      },
+      "histogram_relative_change": 0.0026411055779343995,
+      "radial_relative_change": 0.0
+    },
+    "joint_size_max": {
+      "theta": [
+        35.568248816765845,
+        3.6242492051329465,
+        9.993468184024096,
+        0.7601502575911582,
+        -0.9776215124875307,
+        0.0892194559797645,
+        -3.1082251463085413,
+        2.9891171087510884,
+        -0.3814676911570132
+      ],
+      "coarse": {
+        "inner_sphere_lower": 0.00021910829568640196,
+        "cylinder_flat_sky": 0.0010130505467323301,
+        "cylinder_spherical_lower": 0.0010130469857800055
+      },
+      "fine": {
+        "inner_sphere_lower": 0.00021931704332983903,
+        "cylinder_flat_sky": 0.0010139045949236981,
+        "cylinder_spherical_lower": 0.0010139010316409188
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 0.00021931704332983903,
+        "cylinder_flat_sky": 0.0010139045949236895,
+        "cylinder_spherical_lower": 0.0010139010316409104
+      },
+      "histogram_relative_change": 0.0008423358525400104,
+      "radial_relative_change": 8.659739592076221e-15
+    },
+    "joint_Y200_min": {
+      "theta": [
+        36.595496009103954,
+        0.08015995221212507,
+        14.039110667258502,
+        -0.24638748876750466,
+        -0.9353453002870082,
+        0.03736199010163549,
+        -5.813868148252368,
+        -1.4949411232955754,
+        1.9738263455219567
+      ],
+      "coarse": {
+        "inner_sphere_lower": 4.991966149598343e-10,
+        "cylinder_flat_sky": 4.993947169436168e-10,
+        "cylinder_spherical_lower": 4.991966399345286e-10
+      },
+      "fine": {
+        "inner_sphere_lower": 5.004316679126091e-10,
+        "cylinder_flat_sky": 5.006298500115935e-10,
+        "cylinder_spherical_lower": 5.004316931516291e-10
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 5.004316679126091e-10,
+        "cylinder_flat_sky": 5.006298500115935e-10,
+        "cylinder_spherical_lower": 5.004316931516291e-10
+      },
+      "histogram_relative_change": 0.002467158256640345,
+      "radial_relative_change": 0.0
+    },
+    "joint_Y200_max": {
+      "theta": [
+        52.378325811587274,
+        0.7232731042662636,
+        4.831306764110923,
+        1.45153719317168,
+        0.31589984651654945,
+        0.05005613658577207,
+        0.45189512986689806,
+        2.948520014528185,
+        1.0132326842285693
+      ],
+      "coarse": {
+        "inner_sphere_lower": 0.0005639280653968266,
+        "cylinder_flat_sky": 0.0006353407145525192,
+        "cylinder_spherical_lower": 0.0006353224755954087
+      },
+      "fine": {
+        "inner_sphere_lower": 0.0005670179904513751,
+        "cylinder_flat_sky": 0.0006390723981824374,
+        "cylinder_spherical_lower": 0.0006390541369453492
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 0.0005670179904513751,
+        "cylinder_flat_sky": 0.000639072398182437,
+        "cylinder_spherical_lower": 0.0006390541369453487
+      },
+      "histogram_relative_change": 0.005839218906231736,
+      "radial_relative_change": 6.661338147750939e-16
+    },
+    "joint_tail": {
+      "theta": [
+        48.78675870131701,
+        3.585461583524011,
+        9.147418083623052,
+        1.0102658819407226,
+        -0.9990637041628361,
+        0.2640470320358873,
+        0.37374725798144937,
+        2.9669178309850395,
+        1.9527928023599088
+      ],
+      "coarse": {
+        "inner_sphere_lower": 0.0012536594909400695,
+        "cylinder_flat_sky": 0.0038604181238060414,
+        "cylinder_spherical_lower": 0.003860412135719891
+      },
+      "fine": {
+        "inner_sphere_lower": 0.001255789057103741,
+        "cylinder_flat_sky": 0.003866977799497302,
+        "cylinder_spherical_lower": 0.003866971807395859
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 0.001255789057103741,
+        "cylinder_flat_sky": 0.003866977799496701,
+        "cylinder_spherical_lower": 0.0038669718073952577
+      },
+      "histogram_relative_change": 0.0016963313550735215,
+      "radial_relative_change": 1.5543122344752192e-13
+    },
+    "joint_random_0": {
+      "theta": [
+        46.03793065529317,
+        0.3668686882359907,
+        11.881869018822908,
+        1.0900464096106588,
+        -0.6953144263476134,
+        0.24412417747080334,
+        -3.2843133909627795,
+        1.334751999936998,
+        1.7922159638255835
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.951412917184712e-08,
+        "cylinder_flat_sky": 2.965941252644847e-08,
+        "cylinder_spherical_lower": 2.9656504124183718e-08
+      },
+      "fine": {
+        "inner_sphere_lower": 2.9550710345286646e-08,
+        "cylinder_flat_sky": 2.9696670649549004e-08,
+        "cylinder_spherical_lower": 2.9693760796858743e-08
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.9550710345286646e-08,
+        "cylinder_flat_sky": 2.9696670649549004e-08,
+        "cylinder_spherical_lower": 2.9693760796858743e-08
+      },
+      "histogram_relative_change": 0.0012546229016786592,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_1": {
+      "theta": [
+        30.51659952569753,
+        1.6173752722563222,
+        14.408877082914113,
+        0.718151064310223,
+        -0.5284815846011043,
+        0.13020872939378025,
+        -2.2308223261497915,
+        -0.9200918348506093,
+        1.37067951541394
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.6168234757492961e-07,
+        "cylinder_flat_sky": 1.6317689041642038e-07,
+        "cylinder_spherical_lower": 1.6314058663814152e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 1.6196723851658512e-07,
+        "cylinder_flat_sky": 1.6346533668315263e-07,
+        "cylinder_spherical_lower": 1.6342901228452193e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.6196723851658512e-07,
+        "cylinder_flat_sky": 1.6346533668315263e-07,
+        "cylinder_spherical_lower": 1.6342901228452193e-07
+      },
+      "histogram_relative_change": 0.0017645714534044732,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_2": {
+      "theta": [
+        32.65391746349633,
+        0.29314793052617466,
+        11.397477011755107,
+        1.2098835350945594,
+        -0.060319798253476664,
+        -0.10311800185590982,
+        -1.6722882827743888,
+        -0.9187289457768202,
+        -0.2231104876846075
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.3894720301510584e-08,
+        "cylinder_flat_sky": 1.3897426905202298e-08,
+        "cylinder_spherical_lower": 1.3894724417712782e-08
+      },
+      "fine": {
+        "inner_sphere_lower": 1.3931041823552002e-08,
+        "cylinder_flat_sky": 1.3933750607866442e-08,
+        "cylinder_spherical_lower": 1.393104594893805e-08
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.3931041823552002e-08,
+        "cylinder_flat_sky": 1.3933750607866442e-08,
+        "cylinder_spherical_lower": 1.393104594893805e-08
+      },
+      "histogram_relative_change": 0.00260688623518468,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_3": {
+      "theta": [
+        16.637873267754912,
+        0.2496089010965079,
+        4.325032524764538,
+        0.6701870589517057,
+        -0.6590317983180285,
+        0.016807266883552108,
+        0.1453990936279297,
+        -0.11145488452166319,
+        1.1186372353695333
+      ],
+      "coarse": {
+        "inner_sphere_lower": 7.533010407777275e-08,
+        "cylinder_flat_sky": 7.681980581117693e-08,
+        "cylinder_spherical_lower": 7.681286137138932e-08
+      },
+      "fine": {
+        "inner_sphere_lower": 7.541929080621836e-08,
+        "cylinder_flat_sky": 7.691181852053339e-08,
+        "cylinder_spherical_lower": 7.690486996859087e-08
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 7.541929080621836e-08,
+        "cylinder_flat_sky": 7.691181852053337e-08,
+        "cylinder_spherical_lower": 7.690486996859087e-08
+      },
+      "histogram_relative_change": 0.0011963403170850428,
+      "radial_relative_change": 2.220446049250313e-16
+    },
+    "joint_random_4": {
+      "theta": [
+        47.31103550828993,
+        3.9798637312836944,
+        4.678325903415679,
+        1.1521696351468562,
+        -0.5882644766941667,
+        0.04984968584030869,
+        -2.4101617760024965,
+        0.895421891938895,
+        0.4322122181765735
+      ],
+      "coarse": {
+        "inner_sphere_lower": 0.00016514273327781717,
+        "cylinder_flat_sky": 0.0002454950670517863,
+        "cylinder_spherical_lower": 0.00024548416510438006
+      },
+      "fine": {
+        "inner_sphere_lower": 0.00016539227348060827,
+        "cylinder_flat_sky": 0.000245825932851376,
+        "cylinder_spherical_lower": 0.00024581501956661035
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 0.00016539227348060827,
+        "cylinder_flat_sky": 0.00024582593285137533,
+        "cylinder_spherical_lower": 0.00024581501956660965
+      },
+      "histogram_relative_change": 0.0013459352955615955,
+      "radial_relative_change": 2.6645352591003757e-15
+    },
+    "joint_random_5": {
+      "theta": [
+        16.168965610675514,
+        1.8607268325518815,
+        13.850951572507618,
+        0.7775138391181827,
+        -0.4826660424470902,
+        -0.09621570240706205,
+        -4.457332124002278,
+        -0.3426505518145859,
+        1.5020666252821684
+      ],
+      "coarse": {
+        "inner_sphere_lower": 5.9444003321953594e-08,
+        "cylinder_flat_sky": 5.947332899574429e-08,
+        "cylinder_spherical_lower": 5.9457724445704826e-08
+      },
+      "fine": {
+        "inner_sphere_lower": 5.957110276074514e-08,
+        "cylinder_flat_sky": 5.960046762923979e-08,
+        "cylinder_spherical_lower": 5.958485005318099e-08
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 5.957110276074514e-08,
+        "cylinder_flat_sky": 5.960046762923979e-08,
+        "cylinder_spherical_lower": 5.958485005318099e-08
+      },
+      "histogram_relative_change": 0.0021331818113642376,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_6": {
+      "theta": [
+        1.4096674695611,
+        3.744770012702793,
+        5.240341545641423,
+        0.15973671684041624,
+        -0.7048430599272251,
+        0.1310635030269623,
+        -4.8015504642389715,
+        0.8569479966536164,
+        1.4684927514754236
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.6490226597527214e-06,
+        "cylinder_flat_sky": 4.774596949721241e-06,
+        "cylinder_spherical_lower": 4.774009586210234e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 2.652734103984861e-06,
+        "cylinder_flat_sky": 4.781201529839238e-06,
+        "cylinder_spherical_lower": 4.78061383513788e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.652734103984861e-06,
+        "cylinder_flat_sky": 4.781201529839217e-06,
+        "cylinder_spherical_lower": 4.78061383513786e-06
+      },
+      "histogram_relative_change": 0.001381364093681836,
+      "radial_relative_change": 4.218847493575595e-15
+    },
+    "joint_random_7": {
+      "theta": [
+        32.2572306971997,
+        3.385175006929785,
+        10.513586172461508,
+        0.39429302886128437,
+        -0.21688735242933044,
+        0.012477936781942867,
+        -5.31163867469877,
+        0.05885631451383233,
+        -0.26297900080680847
+      ],
+      "coarse": {
+        "inner_sphere_lower": 4.4315338047041496e-06,
+        "cylinder_flat_sky": 4.573447212757065e-06,
+        "cylinder_spherical_lower": 4.572960743668247e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 4.439326392083212e-06,
+        "cylinder_flat_sky": 4.5813994157117296e-06,
+        "cylinder_spherical_lower": 4.580912477356561e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 4.439326392083212e-06,
+        "cylinder_flat_sky": 4.5813994157117296e-06,
+        "cylinder_spherical_lower": 4.58091247735656e-06
+      },
+      "histogram_relative_change": 0.0017357584949683202,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_8": {
+      "theta": [
+        37.437455305829644,
+        2.2157539575127885,
+        15.31149270273745,
+        0.6526117527857423,
+        -0.478656891733408,
+        0.2749330025166274,
+        -1.6914563793689013,
+        -0.5980372885242105,
+        1.4294619583524764
+      ],
+      "coarse": {
+        "inner_sphere_lower": 8.567678166616798e-07,
+        "cylinder_flat_sky": 8.95288440979271e-07,
+        "cylinder_spherical_lower": 8.951337820292088e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 8.581132883937149e-07,
+        "cylinder_flat_sky": 8.967158993399328e-07,
+        "cylinder_spherical_lower": 8.965611600040225e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 8.581132883937149e-07,
+        "cylinder_flat_sky": 8.967158993399328e-07,
+        "cylinder_spherical_lower": 8.965611600040223e-07
+      },
+      "histogram_relative_change": 0.0015918735930885441,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_9": {
+      "theta": [
+        21.61171092558652,
+        0.16148725380189716,
+        14.762337935343385,
+        1.0862473921850326,
+        -0.389493776857853,
+        0.24182245600968605,
+        -1.9163968772627413,
+        2.7005558805540204,
+        1.4993271306157112
+      ],
+      "coarse": {
+        "inner_sphere_lower": 5.353827566359325e-09,
+        "cylinder_flat_sky": 5.353903325483947e-09,
+        "cylinder_spherical_lower": 5.353885300596671e-09
+      },
+      "fine": {
+        "inner_sphere_lower": 5.3618705660789224e-09,
+        "cylinder_flat_sky": 5.36194797270625e-09,
+        "cylinder_spherical_lower": 5.36192993263083e-09
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 5.3618705660789224e-09,
+        "cylinder_flat_sky": 5.36194797270625e-09,
+        "cylinder_spherical_lower": 5.36192993263083e-09
+      },
+      "histogram_relative_change": 0.0015003217605342734,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_10": {
+      "theta": [
+        47.324866532348096,
+        2.3316249477444217,
+        14.205706422030925,
+        -0.5378091886639594,
+        -0.38760458193719394,
+        0.3441056391224266,
+        -2.0679153464734554,
+        -0.40024371910840273,
+        0.9174575638025999
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.8926746441823453e-05,
+        "cylinder_flat_sky": 2.0891222291422486e-05,
+        "cylinder_spherical_lower": 2.0888900600733702e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 1.8954925508055873e-05,
+        "cylinder_flat_sky": 2.0925043797691114e-05,
+        "cylinder_spherical_lower": 2.092272109753015e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.8954925508055873e-05,
+        "cylinder_flat_sky": 2.09250437976911e-05,
+        "cylinder_spherical_lower": 2.092272109753014e-05
+      },
+      "histogram_relative_change": 0.001616317107653864,
+      "radial_relative_change": 6.661338147750939e-16
+    },
+    "joint_random_11": {
+      "theta": [
+        57.12227672897279,
+        0.933039147942327,
+        11.559422114491461,
+        0.9334653058089316,
+        -0.8766391210258007,
+        0.005758841149508975,
+        -4.541353298351169,
+        0.3729306645691395,
+        -0.24196987226605415
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.0719532036579555e-06,
+        "cylinder_flat_sky": 1.1657196839053696e-06,
+        "cylinder_spherical_lower": 1.165667023123986e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 1.0727421646601974e-06,
+        "cylinder_flat_sky": 1.1665572766968252e-06,
+        "cylinder_spherical_lower": 1.166504587630694e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.0727421646601974e-06,
+        "cylinder_flat_sky": 1.1665572766968246e-06,
+        "cylinder_spherical_lower": 1.1665045876306933e-06
+      },
+      "histogram_relative_change": 0.0007180040004779453,
+      "radial_relative_change": 4.440892098500626e-16
+    },
+    "joint_random_12": {
+      "theta": [
+        22.12058855034411,
+        3.790773886675015,
+        10.158567628264427,
+        -0.42470549577847116,
+        -0.10528433993458752,
+        -0.08539475481957197,
+        -1.9433637741021812,
+        1.894113496877253,
+        -0.1685621328651905
+      ],
+      "coarse": {
+        "inner_sphere_lower": 0.0002098511975222433,
+        "cylinder_flat_sky": 0.000348856122722565,
+        "cylinder_spherical_lower": 0.0003488554159188477
+      },
+      "fine": {
+        "inner_sphere_lower": 0.00021000727364235328,
+        "cylinder_flat_sky": 0.00034925210572904567,
+        "cylinder_spherical_lower": 0.0003492513981488658
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 0.00021000727364235328,
+        "cylinder_flat_sky": 0.0003492521057290445,
+        "cylinder_spherical_lower": 0.0003492513981488645
+      },
+      "histogram_relative_change": 0.00113380277451125,
+      "radial_relative_change": 3.3306690738754696e-15
+    },
+    "joint_random_13": {
+      "theta": [
+        11.36989384982735,
+        0.31380551960319286,
+        9.801437965407967,
+        1.0327219988219443,
+        0.04722222108393903,
+        -0.021269707009196254,
+        -5.764928626362234,
+        1.1277258396148682,
+        1.8198182182386518
+      ],
+      "coarse": {
+        "inner_sphere_lower": 3.968844156225234e-09,
+        "cylinder_flat_sky": 3.970020835337636e-09,
+        "cylinder_spherical_lower": 3.9688445072505324e-09
+      },
+      "fine": {
+        "inner_sphere_lower": 3.978047932759917e-09,
+        "cylinder_flat_sky": 3.97922549718782e-09,
+        "cylinder_spherical_lower": 3.978048284027216e-09
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 3.978047932759917e-09,
+        "cylinder_flat_sky": 3.97922549718782e-09,
+        "cylinder_spherical_lower": 3.978048284027216e-09
+      },
+      "histogram_relative_change": 0.002313179249753383,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_14": {
+      "theta": [
+        25.49488866981119,
+        2.0427697953302415,
+        15.960389236733317,
+        -0.49906708840280767,
+        -0.09596318174153573,
+        0.3464011060073972,
+        -0.15201495541259646,
+        -1.051480886992067,
+        0.9387933979742229
+      ],
+      "coarse": {
+        "inner_sphere_lower": 9.53858846433382e-07,
+        "cylinder_flat_sky": 9.630129719347261e-07,
+        "cylinder_spherical_lower": 9.628859025161722e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 9.553096095914804e-07,
+        "cylinder_flat_sky": 9.644928135510645e-07,
+        "cylinder_spherical_lower": 9.643656825395245e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 9.553096095914804e-07,
+        "cylinder_flat_sky": 9.644928135510645e-07,
+        "cylinder_spherical_lower": 9.643656825395245e-07
+      },
+      "histogram_relative_change": 0.001534321039562636,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_15": {
+      "theta": [
+        2.384511877782643,
+        0.43187109304126353,
+        6.459427556023002,
+        0.7343841595575215,
+        -0.22881212104111914,
+        0.005386526510119449,
+        -4.400393500458449,
+        2.0498539223335683,
+        1.2597923171706498
+      ],
+      "coarse": {
+        "inner_sphere_lower": 6.4895520988073876e-09,
+        "cylinder_flat_sky": 6.491360117948395e-09,
+        "cylinder_spherical_lower": 6.490861011569046e-09
+      },
+      "fine": {
+        "inner_sphere_lower": 6.500541572097929e-09,
+        "cylinder_flat_sky": 6.502352363137736e-09,
+        "cylinder_spherical_lower": 6.501852711984638e-09
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 6.500541572097929e-09,
+        "cylinder_flat_sky": 6.502352363137736e-09,
+        "cylinder_spherical_lower": 6.501852711984638e-09
+      },
+      "histogram_relative_change": 0.0016905028481164486,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_16": {
+      "theta": [
+        49.88121316116303,
+        3.8849623723188413,
+        7.245036464557051,
+        0.6102235749363899,
+        -0.7547484403476119,
+        -0.13190496768802404,
+        -4.4640859281644225,
+        0.7865056651644409,
+        1.3661890900693834
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.6908439740287705e-05,
+        "cylinder_flat_sky": 3.288909988651491e-05,
+        "cylinder_spherical_lower": 3.288478963698045e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 2.695108854253882e-05,
+        "cylinder_flat_sky": 3.294041654715075e-05,
+        "cylinder_spherical_lower": 3.293610327471883e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.695108854253882e-05,
+        "cylinder_flat_sky": 3.294041654715071e-05,
+        "cylinder_spherical_lower": 3.293610327471879e-05
+      },
+      "histogram_relative_change": 0.0015578631363797335,
+      "radial_relative_change": 1.3322676295501878e-15
+    },
+    "joint_random_17": {
+      "theta": [
+        13.239763396792114,
+        3.0366861154092475,
+        13.597084793075918,
+        0.056876386608928464,
+        -0.8777048867195845,
+        0.34181909281760464,
+        -4.293482938315719,
+        0.4026061180047691,
+        1.4250731053762138
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.3489174453958074e-05,
+        "cylinder_flat_sky": 2.1922106469200848e-05,
+        "cylinder_spherical_lower": 2.1919472022781353e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 1.350459985170748e-05,
+        "cylinder_flat_sky": 2.1951285928420864e-05,
+        "cylinder_spherical_lower": 2.1948650359574392e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.350459985170748e-05,
+        "cylinder_flat_sky": 2.195128592842079e-05,
+        "cylinder_spherical_lower": 2.194865035957432e-05
+      },
+      "histogram_relative_change": 0.0013292824536608183,
+      "radial_relative_change": 3.3306690738754696e-15
+    },
+    "joint_random_18": {
+      "theta": [
+        57.30073392484337,
+        2.6277433346956967,
+        13.061896020919082,
+        1.2182104784063994,
+        -0.7994510134682059,
+        0.2588826531544328,
+        -1.333188058808446,
+        1.0042926091700792,
+        0.23524207808077335
+      ],
+      "coarse": {
+        "inner_sphere_lower": 5.540434245329411e-05,
+        "cylinder_flat_sky": 8.91508409702635e-05,
+        "cylinder_spherical_lower": 8.91501002731284e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 5.544456961019291e-05,
+        "cylinder_flat_sky": 8.920106134794115e-05,
+        "cylinder_spherical_lower": 8.92003202002695e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 5.544456961019291e-05,
+        "cylinder_flat_sky": 8.920106134794082e-05,
+        "cylinder_spherical_lower": 8.92003202002692e-05
+      },
+      "histogram_relative_change": 0.0005630020194650198,
+      "radial_relative_change": 3.552713678800501e-15
+    },
+    "joint_random_19": {
+      "theta": [
+        34.062808574177325,
+        3.2175924212904645,
+        5.961612531170249,
+        0.6684384003281595,
+        0.29994724690914154,
+        0.01008758004754784,
+        -3.0195307647809386,
+        0.0827047317288816,
+        1.7275614435784519
+      ],
+      "coarse": {
+        "inner_sphere_lower": 7.102328378693148e-05,
+        "cylinder_flat_sky": 8.539705287410895e-05,
+        "cylinder_spherical_lower": 8.537262920832147e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 7.119883965643027e-05,
+        "cylinder_flat_sky": 8.560186361876137e-05,
+        "cylinder_spherical_lower": 8.557742178886944e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 7.119883965643027e-05,
+        "cylinder_flat_sky": 8.560186361876126e-05,
+        "cylinder_spherical_lower": 8.557742178886933e-05
+      },
+      "histogram_relative_change": 0.0023925967963087658,
+      "radial_relative_change": 1.3322676295501878e-15
+    },
+    "joint_random_20": {
+      "theta": [
+        9.41358049865812,
+        3.94111121580936,
+        12.163649090379476,
+        0.17461554380133748,
+        -0.19389801174402244,
+        -0.0929756872355938,
+        -3.886358877643943,
+        0.3345110001973808,
+        1.7519523371011019
+      ],
+      "coarse": {
+        "inner_sphere_lower": 6.187289135526238e-07,
+        "cylinder_flat_sky": 6.208878424905767e-07,
+        "cylinder_spherical_lower": 6.20752102424543e-07
+      },
+      "fine": {
+        "inner_sphere_lower": 6.200748990366462e-07,
+        "cylinder_flat_sky": 6.222383776934174e-07,
+        "cylinder_spherical_lower": 6.221025092587387e-07
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 6.200748990366462e-07,
+        "cylinder_flat_sky": 6.222383776934174e-07,
+        "cylinder_spherical_lower": 6.221025092587387e-07
+      },
+      "histogram_relative_change": 0.002170446650762714,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_21": {
+      "theta": [
+        39.831713922321796,
+        0.39221609113737943,
+        8.165053621679544,
+        0.1859793693758548,
+        -0.5723071584478021,
+        0.19842220414429906,
+        -0.24379276065155864,
+        0.688064135145396,
+        0.7838923442177474
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.7275407587157943e-06,
+        "cylinder_flat_sky": 1.7478859050612916e-06,
+        "cylinder_spherical_lower": 1.7478608472220338e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 1.7283617367916941e-06,
+        "cylinder_flat_sky": 1.7487758489263952e-06,
+        "cylinder_spherical_lower": 1.7487507789591831e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.7283617367916941e-06,
+        "cylinder_flat_sky": 1.7487758489263952e-06,
+        "cylinder_spherical_lower": 1.7487507789591831e-06
+      },
+      "histogram_relative_change": 0.000508895331354231,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_22": {
+      "theta": [
+        3.3730896674096584,
+        2.740732230851427,
+        14.414012404531238,
+        1.085780115891248,
+        0.21088288314640513,
+        -0.03149997293949125,
+        -5.747612960636616,
+        2.011908237822354,
+        0.4022194938734174
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.2447007411841648e-06,
+        "cylinder_flat_sky": 2.310264796310878e-06,
+        "cylinder_spherical_lower": 2.3099087136890527e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 2.2512138220859676e-06,
+        "cylinder_flat_sky": 2.3170428280072476e-06,
+        "cylinder_spherical_lower": 2.3166864806550185e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.2512138220859676e-06,
+        "cylinder_flat_sky": 2.3170428280072476e-06,
+        "cylinder_spherical_lower": 2.316686480655018e-06
+      },
+      "histogram_relative_change": 0.002925294092297359,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_23": {
+      "theta": [
+        25.107886933721602,
+        3.7865860095014794,
+        15.227487963810564,
+        0.35961702112108473,
+        -0.6320616409182549,
+        0.32192134428769353,
+        -3.001931149046868,
+        -0.4268976766616106,
+        1.9679327430203557
+      ],
+      "coarse": {
+        "inner_sphere_lower": 5.644314130341152e-06,
+        "cylinder_flat_sky": 7.15717038455224e-06,
+        "cylinder_spherical_lower": 7.155782465437023e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 5.65297641142996e-06,
+        "cylinder_flat_sky": 7.168584161047583e-06,
+        "cylinder_spherical_lower": 7.167195603861237e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 5.65297641142996e-06,
+        "cylinder_flat_sky": 7.168584161047571e-06,
+        "cylinder_spherical_lower": 7.167195603861225e-06
+      },
+      "histogram_relative_change": 0.001592193972883904,
+      "radial_relative_change": 1.5543122344752192e-15
+    },
+    "joint_random_24": {
+      "theta": [
+        55.662293179892,
+        3.1717782233608887,
+        10.06881111226976,
+        0.7613794500008225,
+        -0.7352817924693227,
+        -0.005814332515001269,
+        -4.343969099689275,
+        2.64910986693576,
+        1.5059557585045695
+      ],
+      "coarse": {
+        "inner_sphere_lower": 3.535268235502455e-05,
+        "cylinder_flat_sky": 4.900104894571936e-05,
+        "cylinder_spherical_lower": 4.899958115251467e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 3.538469502066836e-05,
+        "cylinder_flat_sky": 4.903734678861096e-05,
+        "cylinder_spherical_lower": 4.9035878013810746e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 3.538469502066836e-05,
+        "cylinder_flat_sky": 4.9037346788610854e-05,
+        "cylinder_spherical_lower": 4.903587801381064e-05
+      },
+      "histogram_relative_change": 0.000740208132547715,
+      "radial_relative_change": 2.220446049250313e-15
+    },
+    "joint_random_25": {
+      "theta": [
+        23.300433075986803,
+        3.7753080221591517,
+        13.655020320042969,
+        0.6331963866949083,
+        0.10301701053977008,
+        -0.09186238273978233,
+        -5.084083834197372,
+        -1.384865218307823,
+        0.6928857560269535
+      ],
+      "coarse": {
+        "inner_sphere_lower": 3.3654405163424216e-06,
+        "cylinder_flat_sky": 3.4197045054288343e-06,
+        "cylinder_spherical_lower": 3.4184758392474845e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 3.372704997667006e-06,
+        "cylinder_flat_sky": 3.4270346264705357e-06,
+        "cylinder_spherical_lower": 3.42580507657931e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 3.372704997667006e-06,
+        "cylinder_flat_sky": 3.4270346264705357e-06,
+        "cylinder_spherical_lower": 3.42580507657931e-06
+      },
+      "histogram_relative_change": 0.0021389107028809695,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_26": {
+      "theta": [
+        30.01687058340758,
+        1.230751856137067,
+        9.434723929315805,
+        -0.0014434933662413885,
+        -0.8264605732634663,
+        -0.03785520456731317,
+        -4.407406804151833,
+        1.4768536146730185,
+        0.10485641239210963
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.4857877149241341e-05,
+        "cylinder_flat_sky": 2.0336956999209397e-05,
+        "cylinder_spherical_lower": 2.0336586221956327e-05
+      },
+      "fine": {
+        "inner_sphere_lower": 1.4863945817981875e-05,
+        "cylinder_flat_sky": 2.0343777784910393e-05,
+        "cylinder_spherical_lower": 2.0343406827992686e-05
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.4863945817981875e-05,
+        "cylinder_flat_sky": 2.034377778491035e-05,
+        "cylinder_spherical_lower": 2.034340682799264e-05
+      },
+      "histogram_relative_change": 0.0003352762585723257,
+      "radial_relative_change": 2.220446049250313e-15
+    },
+    "joint_random_27": {
+      "theta": [
+        11.88420275785029,
+        0.7084158127196134,
+        15.685990354046226,
+        -0.07473342362791291,
+        -0.6317247595638037,
+        0.09283494018018251,
+        -2.5867409794591367,
+        -0.7638559760525823,
+        1.476192828733474
+      ],
+      "coarse": {
+        "inner_sphere_lower": 2.2879104587850268e-08,
+        "cylinder_flat_sky": 2.289694459133226e-08,
+        "cylinder_spherical_lower": 2.2891976576037868e-08
+      },
+      "fine": {
+        "inner_sphere_lower": 2.292142033178538e-08,
+        "cylinder_flat_sky": 2.2939344068727133e-08,
+        "cylinder_spherical_lower": 2.293437386213345e-08
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 2.292142033178538e-08,
+        "cylinder_flat_sky": 2.2939344068727133e-08,
+        "cylinder_spherical_lower": 2.293437386213345e-08
+      },
+      "histogram_relative_change": 0.0018483299813560894,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_28": {
+      "theta": [
+        54.44581809826195,
+        1.9243631448596716,
+        9.970112814381718,
+        -0.40492688706144686,
+        -0.46958323586732154,
+        -0.16270502749830484,
+        -5.074455485679209,
+        0.16564507596194744,
+        1.7622747486457229
+      ],
+      "coarse": {
+        "inner_sphere_lower": 1.4745024648065182e-06,
+        "cylinder_flat_sky": 1.4795310138681932e-06,
+        "cylinder_spherical_lower": 1.4791671527004984e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 1.4771622049058153e-06,
+        "cylinder_flat_sky": 1.4822002881647369e-06,
+        "cylinder_spherical_lower": 1.4818362246937463e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 1.4771622049058153e-06,
+        "cylinder_flat_sky": 1.4822002881647369e-06,
+        "cylinder_spherical_lower": 1.4818362246937463e-06
+      },
+      "histogram_relative_change": 0.0018008863699848776,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_29": {
+      "theta": [
+        36.557413671165705,
+        2.3311151665402576,
+        13.897117551788686,
+        0.1537402798421681,
+        -0.8569178152829409,
+        0.13411188330501322,
+        -1.8066955828107893,
+        2.5557685615494847,
+        0.34058835403993726
+      ],
+      "coarse": {
+        "inner_sphere_lower": 0.0003609249080964452,
+        "cylinder_flat_sky": 0.0010697836047937356,
+        "cylinder_spherical_lower": 0.001069781879223762
+      },
+      "fine": {
+        "inner_sphere_lower": 0.0003610922024320991,
+        "cylinder_flat_sky": 0.0010704959933493796,
+        "cylinder_spherical_lower": 0.001070494266926041
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 0.0003610922024320991,
+        "cylinder_flat_sky": 0.0010704959933493725,
+        "cylinder_spherical_lower": 0.0010704942669260333
+      },
+      "histogram_relative_change": 0.0006654752190224933,
+      "radial_relative_change": 6.661338147750939e-15
+    },
+    "joint_random_30": {
+      "theta": [
+        2.6670486135408282,
+        1.511643361649476,
+        10.841782235354184,
+        0.053747056704014584,
+        0.1366755459457636,
+        0.04776135254651312,
+        -0.3420706517063081,
+        -0.3619855362921953,
+        0.3465038472786546
+      ],
+      "coarse": {
+        "inner_sphere_lower": 5.670105463723166e-08,
+        "cylinder_flat_sky": 5.6711752616684646e-08,
+        "cylinder_spherical_lower": 5.670665251348624e-08
+      },
+      "fine": {
+        "inner_sphere_lower": 5.681283628990335e-08,
+        "cylinder_flat_sky": 5.6823553419707134e-08,
+        "cylinder_spherical_lower": 5.681844753033859e-08
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 5.681283628990335e-08,
+        "cylinder_flat_sky": 5.6823553419707134e-08,
+        "cylinder_spherical_lower": 5.681844753033859e-08
+      },
+      "histogram_relative_change": 0.0019675081246101067,
+      "radial_relative_change": 0.0
+    },
+    "joint_random_31": {
+      "theta": [
+        7.627133932895958,
+        0.8219543236773461,
+        13.893196995928882,
+        -0.5185772158205509,
+        -0.7274978362023831,
+        0.14107153061777356,
+        -3.8245839327573776,
+        1.0932408710941672,
+        -0.4175948090851307
+      ],
+      "coarse": {
+        "inner_sphere_lower": 5.044377895933449e-06,
+        "cylinder_flat_sky": 6.911708603070276e-06,
+        "cylinder_spherical_lower": 6.911661000827171e-06
+      },
+      "fine": {
+        "inner_sphere_lower": 5.045411472307356e-06,
+        "cylinder_flat_sky": 6.913717764946903e-06,
+        "cylinder_spherical_lower": 6.913670140083219e-06
+      },
+      "refined_radial": {
+        "inner_sphere_lower": 5.045411472307356e-06,
+        "cylinder_flat_sky": 6.913717764946888e-06,
+        "cylinder_spherical_lower": 6.913670140083203e-06
+      },
+      "histogram_relative_change": 0.0002906051338685822,
+      "radial_relative_change": 2.220446049250313e-15
+    }
+  },
+  "limits": {
+    "Fixsen1996_95percent": 1.5e-05,
+    "Sabyr2025_pixel_95percent": 8.3e-06,
+    "Fabbian2025_95percent": 5.2e-06
+  },
+  "used_as_prior": false,
+  "interpretation": "Independent observational diagnostic; histogram quadrature is approximate. Inner sphere with spherical-area lower factor is a conservative catalogue contribution, subject to catalogue discretization error. Cylinder adds infinite LOS pressure and assumes locally constant angular diameter distance.",
+  "caveats": "This is not the total cosmic y: excluded halos, diffuse gas and pressure beyond the painting radius add positive contributions. Data confidence limits are not mathematical singularities."
+}

@@ -1,0 +1,250 @@
+{
+  "conditional_on_fixed_noise": true,
+  "context": [
+    -0.0005630968371406198,
+    -0.21547910571098328,
+    1.332637071609497,
+    -2.915353536605835,
+    -5.993658542633057,
+    3.755617141723633,
+    2.5032894611358643,
+    2.0942819118499756,
+    -4.001369953155518
+  ],
+  "error": "Sampling stopped at preflight: 0/20000 raw draws lie inside the prior, but the training control accepts 55.37%. Largest absolute standardized MOPED coordinate: 5.99. Check the simulator/noise-realization contract before sampling again. More proposals, clipping, or an MCMC fallback do not repair a distribution mismatch. Report: /lustre/work/kristero10/flamingo_tsz_comparison_20260914/results/Mstar-1sigma/diagnostics/sampling_preflight.json.",
+  "map": {
+    "beam_fwhm_arcmin": 2.0,
+    "cache_file_sha256": "e3a8b88ca3d66794b0194fab204014102df38788a82dbb3d87936b7a95e43b62",
+    "ell_max": 7979,
+    "input_sha256": "33a0c0e6ff2c9dae54802746cc89e881dbe423f9f514e6d09d89f9f00c0e8c8b",
+    "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+    "noise1_pixel_sha256": "5d0d6bd4db70f0aec88320520c3efff1f779b315a0db5204634a7b615b8661dc",
+    "noise2_pixel_sha256": "dc6b755b997bb12d22c3386c60bed33aef5d2bb8b6d28802c300b610a3b55844",
+    "nside": 4096,
+    "runtime": {
+      "adapter_sha256": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+      "beam_source_sha256": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+      "hdf5_version": "0.17.2",
+      "healpix_version": "4.2.4",
+      "julia_version": "1.12.2",
+      "operator_sha256": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+      "threads": 26,
+      "xgpaint_sha256": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+      "xgpaint_source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl"
+    },
+    "signal_beamed_pixel_sha256": "c3d9b6620e097d55ade644c6fb8449105594d0ccd22796b67eba2b49a00660df",
+    "signal_max": 0.00020419735830055276,
+    "signal_mean": 1.5856831302301635e-06,
+    "signal_min": 2.624192011584706e-07,
+    "source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/inputs/Mstar-1sigma.hdf5",
+    "status": "map_processing_completed"
+  },
+  "max_absolute_moped_coordinate": 5.993658542633057,
+  "physics_interpretation": "Effective HalfDome/Battaglia inference, not FLAMINGO input-parameter recovery",
+  "sampling_preflight": {
+    "acceptance": 0.0,
+    "accepted_count": 0,
+    "context": [
+      -0.0005630968371406198,
+      -0.21547910571098328,
+      1.332637071609497,
+      -2.915353536605835,
+      -5.993658542633057,
+      3.755617141723633,
+      2.5032894611358643,
+      2.0942819118499756,
+      -4.001369953155518
+    ],
+    "interpretation": "Reference bounds are a heuristic, not a hard likelihood support test.",
+    "outside_reference_range": [
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true
+    ],
+    "per_parameter": [
+      {
+        "above": 0.0,
+        "below": 0.0,
+        "param": "P0",
+        "prior_fraction_median": 0.3699202686548233,
+        "prior_fraction_q05": 0.3403178408741951,
+        "prior_fraction_q95": 0.40050597935914994
+      },
+      {
+        "above": 1.0,
+        "below": 0.0,
+        "param": "xc",
+        "prior_fraction_median": 2.5629974603652954,
+        "prior_fraction_q05": 2.405139911174774,
+        "prior_fraction_q95": 2.7284260749816895
+      },
+      {
+        "above": 1.0,
+        "below": 0.0,
+        "param": "beta",
+        "prior_fraction_median": 2.493705630302429,
+        "prior_fraction_q05": 2.2820779919624328,
+        "prior_fraction_q95": 2.7309113144874573
+      },
+      {
+        "above": 0.0,
+        "below": 0.0,
+        "param": "alpha_m_P0",
+        "prior_fraction_median": 0.33258260786533356,
+        "prior_fraction_q05": 0.2572633907198906,
+        "prior_fraction_q95": 0.4098299890756607
+      },
+      {
+        "above": 0.0,
+        "below": 0.85035,
+        "param": "alpha_m_xc",
+        "prior_fraction_median": -0.0852891057729721,
+        "prior_fraction_q05": -0.22190122678875923,
+        "prior_fraction_q95": 0.051342609152197814
+      },
+      {
+        "above": 1.0,
+        "below": 0.0,
+        "param": "alpha_m_beta",
+        "prior_fraction_median": 2.0898176431655884,
+        "prior_fraction_q05": 1.9059639692306518,
+        "prior_fraction_q95": 2.2627003669738768
+      },
+      {
+        "above": 0.0,
+        "below": 1.0,
+        "param": "alpha_z_P0",
+        "prior_fraction_median": -1.0701833367347717,
+        "prior_fraction_q05": -1.1942611336708069,
+        "prior_fraction_q95": -0.944696718454361
+      },
+      {
+        "above": 0.0,
+        "below": 0.0,
+        "param": "alpha_z_xc",
+        "prior_fraction_median": 0.7449518144130707,
+        "prior_fraction_q05": 0.6774641752243042,
+        "prior_fraction_q95": 0.8107539594173431
+      },
+      {
+        "above": 1.0,
+        "below": 0.0,
+        "param": "alpha_z_beta",
+        "prior_fraction_median": 1.3508923649787903,
+        "prior_fraction_q05": 1.2419783353805542,
+        "prior_fraction_q95": 1.459079670906067
+      }
+    ],
+    "raw_count": 20000,
+    "reference_count": 512,
+    "reference_max": [
+      0.9614934325218201,
+      4.1031951904296875,
+      3.839855432510376,
+      2.5874998569488525,
+      3.696063280105591,
+      7.540235996246338,
+      3.0079269409179688,
+      7.060149192810059,
+      5.602825164794922
+    ],
+    "reference_min": [
+      -4.084718227386475,
+      -3.858185291290283,
+      -3.2827677726745605,
+      -4.732479095458984,
+      -5.9348649978637695,
+      -2.0812227725982666,
+      -5.017172336578369,
+      -3.4427874088287354,
+      -3.893524408340454
+    ],
+    "training_control": {
+      "acceptance": 0.5537109375,
+      "accepted_count": 2268,
+      "per_parameter": [
+        {
+          "above": 0.0,
+          "below": 0.0,
+          "param": "P0",
+          "prior_fraction_median": 0.07084866985678673,
+          "prior_fraction_q05": 0.05296514742076397,
+          "prior_fraction_q95": 0.09173768386244774
+        },
+        {
+          "above": 0.17236328125,
+          "below": 0.0,
+          "param": "xc",
+          "prior_fraction_median": 0.8733000457286835,
+          "prior_fraction_q05": 0.6842454522848129,
+          "prior_fraction_q95": 1.1049284040927887
+        },
+        {
+          "above": 0.0,
+          "below": 0.021484375,
+          "param": "beta",
+          "prior_fraction_median": 0.2738770395517349,
+          "prior_fraction_q05": 0.049465928226709366,
+          "prior_fraction_q95": 0.5116282254457474
+        },
+        {
+          "above": 0.0,
+          "below": 0.0,
+          "param": "alpha_m_P0",
+          "prior_fraction_median": 0.3916095197200775,
+          "prior_fraction_q05": 0.2579672262072563,
+          "prior_fraction_q95": 0.5227994024753571
+        },
+        {
+          "above": 0.000244140625,
+          "below": 0.093017578125,
+          "param": "alpha_m_xc",
+          "prior_fraction_median": 0.25467993319034576,
+          "prior_fraction_q05": -0.06675267964601517,
+          "prior_fraction_q95": 0.5797560065984726
+        },
+        {
+          "above": 0.207763671875,
+          "below": 0.001220703125,
+          "param": "alpha_m_beta",
+          "prior_fraction_median": 0.7968018651008606,
+          "prior_fraction_q05": 0.3832900747656822,
+          "prior_fraction_q95": 1.204603761434555
+        },
+        {
+          "above": 0.0,
+          "below": 0.000732421875,
+          "param": "alpha_z_P0",
+          "prior_fraction_median": 0.3839515745639801,
+          "prior_fraction_q05": 0.19368718564510345,
+          "prior_fraction_q95": 0.5713835507631302
+        },
+        {
+          "above": 0.0,
+          "below": 0.01904296875,
+          "param": "alpha_z_xc",
+          "prior_fraction_median": 0.26961278915405273,
+          "prior_fraction_q05": 0.0551306139677763,
+          "prior_fraction_q95": 0.480295792222023
+        },
+        {
+          "above": 0.080810546875,
+          "below": 0.0,
+          "param": "alpha_z_beta",
+          "prior_fraction_median": 0.8071853220462799,
+          "prior_fraction_q05": 0.5750140398740768,
+          "prior_fraction_q95": 1.0415416955947876
+        }
+      ],
+      "raw_count": 4096
+    },
+    "zero_count_95pct_upper_bound": 0.00014977539622296285
+  },
+  "status": "posterior_unavailable"
+}

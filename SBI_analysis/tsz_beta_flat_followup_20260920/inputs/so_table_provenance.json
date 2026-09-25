@@ -1,0 +1,7 @@
+{
+  "url": "https://raw.githubusercontent.com/simonsobs/so_noise_models/master/LAT_comp_sep_noise/v3.1.0/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt",
+  "local_table": "other_sims\\SO\\SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt",
+  "local_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+  "official_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+  "data_identical": true
+}

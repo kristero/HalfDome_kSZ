@@ -1,0 +1,68 @@
+{
+  "rows": [
+    {
+      "requested_ell_max": 1000,
+      "last_complete_bin_ell_max": 879,
+      "bins": 4,
+      "conditional_binned_noise_distance": 0.1940454103652321,
+      "max_fractional_difference": 0.0015659818277765263
+    },
+    {
+      "requested_ell_max": 1500,
+      "last_complete_bin_ell_max": 1479,
+      "bins": 7,
+      "conditional_binned_noise_distance": 0.406431278499095,
+      "max_fractional_difference": 0.004355727355194058
+    },
+    {
+      "requested_ell_max": 2000,
+      "last_complete_bin_ell_max": 1879,
+      "bins": 9,
+      "conditional_binned_noise_distance": 0.6694136922289062,
+      "max_fractional_difference": 0.006049935232865243
+    },
+    {
+      "requested_ell_max": 3000,
+      "last_complete_bin_ell_max": 2879,
+      "bins": 14,
+      "conditional_binned_noise_distance": 2.4894071180510724,
+      "max_fractional_difference": 0.0126989529654075
+    },
+    {
+      "requested_ell_max": 4000,
+      "last_complete_bin_ell_max": 3879,
+      "bins": 19,
+      "conditional_binned_noise_distance": 6.436200259050153,
+      "max_fractional_difference": 0.023687436964500833
+    },
+    {
+      "requested_ell_max": 5000,
+      "last_complete_bin_ell_max": 4879,
+      "bins": 24,
+      "conditional_binned_noise_distance": 8.864671274191915,
+      "max_fractional_difference": 0.04148260926992137
+    },
+    {
+      "requested_ell_max": 6000,
+      "last_complete_bin_ell_max": 5879,
+      "bins": 29,
+      "conditional_binned_noise_distance": 9.324844250541526,
+      "max_fractional_difference": 0.06852915409404647
+    },
+    {
+      "requested_ell_max": 7979,
+      "last_complete_bin_ell_max": 7979,
+      "bins": 40,
+      "conditional_binned_noise_distance": 9.40992611238076,
+      "max_fractional_difference": 0.17500522359735604
+    }
+  ],
+  "beam_power": {
+    "1000": 0.9407305326248776,
+    "2000": 0.7832744780565827,
+    "4000": 0.3764973610614163,
+    "6000": 0.1110564743075789,
+    "7979": 0.020518965023606856
+  },
+  "scope": "Completed spherical B12 controls. Saved 64-draw conditional 40-bin SO covariance; excludes cosmic variance. Not unbinned MOPED, posterior bias, or validation of all prior combinations."
+}

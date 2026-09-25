@@ -1,0 +1,37 @@
+#!/bin/bash
+#PBS -N B12F8kCompare
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=32gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${RUN_ROOT:?}"
+: "${CPUS:=26}"
+export OPENBLAS_NUM_THREADS="${CPUS}" MKL_NUM_THREADS="${CPUS}" OMP_NUM_THREADS="${CPUS}"
+export HDF5_USE_FILE_LOCKING=FALSE PYTHONUNBUFFERED=1 MPLBACKEND=Agg
+unset PYTHONNOUSERSITE
+cd "${RUN_ROOT}"
+sha256sum --check analysis_sources.sha256
+if [[ -f "${RUN_ROOT}/comparison/complete.json" ]]; then
+  /home/anaconda3/bin/python3 - <<'PY'
+import hashlib
+import json
+from pathlib import Path
+root = Path('comparison')
+for name, expected in json.loads((root / 'complete.json').read_text())['artifacts'].items():
+    assert hashlib.sha256((root / name).read_bytes()).hexdigest() == expected, name
+print('Completed result verified; no files changed.')
+PY
+  exit 0
+fi
+for stage in combine fisher infer plot; do
+  if [[ "${stage}" == combine && -f "${RUN_ROOT}/comparison/calibration_complete.json" ]]; then
+    continue
+  fi
+  if [[ "${stage}" == plot && -f "${RUN_ROOT}/comparison/complete.json" ]]; then
+    continue
+  fi
+  /home/anaconda3/bin/python3 "${RUN_ROOT}/analysis_code/analyze.py" "${stage}" \
+    --root "${RUN_ROOT}" --common "${RUN_ROOT}/analysis_code/common" --threads "${CPUS}"
+done

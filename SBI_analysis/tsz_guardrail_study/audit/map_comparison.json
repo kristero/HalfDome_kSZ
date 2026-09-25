@@ -1,0 +1,510 @@
+{
+  "cases": [
+    {
+      "case": "amP0_low_2",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 313.72461472451687,
+          "peak_rss_gib": 10.248672485351562
+        },
+        "logz1": {
+          "seconds": 331.8623802661896,
+          "peak_rss_gib": 10.221611022949219
+        },
+        "logz2": {
+          "seconds": 557.549760453403,
+          "peak_rss_gib": 12.10772705078125
+        }
+      },
+      "historical_to_logz1_sigma": 0.046061576923618223,
+      "historical_to_logz1_max_relative": 0.0020500700789780613,
+      "historical_to_logz2_sigma": 0.04606185419171627,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        0.04600097343619457,
+        0.05200889794920313,
+        0.06006888840484831
+      ],
+      "logz1_to_logz2_sigma": 4.9235844055889495e-06,
+      "historical_max_relative": 0.0020500504666252084,
+      "logz1_max_relative": 1.9572228504571854e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": true,
+        "0.1": true,
+        "0.3": true
+      }
+    },
+    {
+      "case": "amxc_low_2",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 315.3368007950485,
+          "peak_rss_gib": 10.240367889404297
+        },
+        "logz1": {
+          "seconds": 319.1537703424692,
+          "peak_rss_gib": 10.131217956542969
+        },
+        "logz2": {
+          "seconds": 538.0452002100646,
+          "peak_rss_gib": 11.346378326416016
+        }
+      },
+      "historical_to_logz1_sigma": 2.113085923706333,
+      "historical_to_logz1_max_relative": 0.00032477964351129707,
+      "historical_to_logz2_sigma": 2.113120118310538,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        2.0688579283007558,
+        2.374372283329221,
+        2.7929203195355137
+      ],
+      "logz1_to_logz2_sigma": 0.0016489667072064709,
+      "historical_max_relative": 0.00032477878028958074,
+      "logz1_max_relative": 2.6796549201790754e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": false,
+        "0.1": false,
+        "0.3": false
+      }
+    },
+    {
+      "case": "azbeta_high_2",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 309.71388928964734,
+          "peak_rss_gib": 10.247989654541016
+        },
+        "logz1": {
+          "seconds": 309.9161584340036,
+          "peak_rss_gib": 10.114547729492188
+        },
+        "logz2": {
+          "seconds": 552.1496061682701,
+          "peak_rss_gib": 12.220714569091797
+        }
+      },
+      "historical_to_logz1_sigma": 0.009920003410714556,
+      "historical_to_logz1_max_relative": 0.00039303502570664506,
+      "historical_to_logz2_sigma": 0.009920413337402163,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        0.010087356802286066,
+        0.011303020518410388,
+        0.012802365428177769
+      ],
+      "logz1_to_logz2_sigma": 1.0941361088153149e-06,
+      "historical_max_relative": 0.0003930499031405965,
+      "logz1_max_relative": 3.6518670087914984e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": true,
+        "0.1": true,
+        "0.3": true
+      }
+    },
+    {
+      "case": "azP0_low_2",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 314.7816645987332,
+          "peak_rss_gib": 10.23868179321289
+        },
+        "logz1": {
+          "seconds": 318.0945151299238,
+          "peak_rss_gib": 10.246238708496094
+        },
+        "logz2": {
+          "seconds": 546.5571198500693,
+          "peak_rss_gib": 11.334491729736328
+        }
+      },
+      "historical_to_logz1_sigma": 0.010912602511051852,
+      "historical_to_logz1_max_relative": 0.000441860956358342,
+      "historical_to_logz2_sigma": 0.010913170649534759,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        0.011053404866267118,
+        0.012389778113028074,
+        0.014084868527279203
+      ],
+      "logz1_to_logz2_sigma": 6.336898616534202e-07,
+      "historical_max_relative": 0.0004418796312101181,
+      "logz1_max_relative": 2.7137089686490867e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": true,
+        "0.1": true,
+        "0.3": true
+      }
+    },
+    {
+      "case": "azxc_high_2",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 308.45963196083903,
+          "peak_rss_gib": 10.233840942382812
+        },
+        "logz1": {
+          "seconds": 311.5233695432544,
+          "peak_rss_gib": 10.242767333984375
+        },
+        "logz2": {
+          "seconds": 550.0490733347833,
+          "peak_rss_gib": 11.460002899169922
+        }
+      },
+      "historical_to_logz1_sigma": 0.6644849508391228,
+      "historical_to_logz1_max_relative": 7.683568226557469e-06,
+      "historical_to_logz2_sigma": 0.6657498778975357,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        0.6447356221541662,
+        0.7432756806099323,
+        0.8767563556310656
+      ],
+      "logz1_to_logz2_sigma": 0.025139505612907457,
+      "historical_max_relative": 7.688789888327108e-06,
+      "logz1_max_relative": 1.2810126071016725e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": false,
+        "0.1": false,
+        "0.3": false
+      }
+    },
+    {
+      "case": "Battaglia12",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2",
+        "pixel16384_2",
+        "pixel8192_2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 330.2822353467345,
+          "peak_rss_gib": 10.263816833496094
+        },
+        "logz1": {
+          "seconds": 320.06500294432044,
+          "peak_rss_gib": 10.138374328613281
+        },
+        "logz2": {
+          "seconds": 551.4168815612793,
+          "peak_rss_gib": 12.095108032226562
+        },
+        "pixel16384_2": {
+          "seconds": 3346.8266660161316,
+          "peak_rss_gib": 55.5235481262207
+        },
+        "pixel8192_2": {
+          "seconds": 1118.6971567496657,
+          "peak_rss_gib": 19.18914031982422
+        }
+      },
+      "historical_to_logz1_sigma": 0.008909053190987197,
+      "historical_to_logz1_max_relative": 0.0001406682922066027,
+      "historical_to_logz2_sigma": 0.008911427936835106,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        0.00895886379353116,
+        0.010104482474736755,
+        0.011503904058362904
+      ],
+      "logz1_to_logz2_sigma": 4.972743875888882e-06,
+      "historical_max_relative": 0.0001406893316568958,
+      "logz1_max_relative": 2.1042410258687028e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": true,
+        "0.1": true,
+        "0.3": true
+      },
+      "pixel16384_2_from_4096_sigma": 9.789435319733357,
+      "pixel16384_2_covariance_bootstrap_interval": [
+        9.775447865439737,
+        10.686692767673248,
+        11.966506507464894
+      ],
+      "pixel16384_2_from_4096_max_relative": 0.182886947404848,
+      "pixel16384_2_max_relative_ell": 7929.6050756620425,
+      "pixel16384_2_amplitude_only_fit": {
+        "power_amplitude": 0.983801694259333,
+        "P0_ratio": 0.9918677806337561,
+        "signed_power_amplitude_shift_sigma": -8.116091562039164,
+        "residual_sigma": 5.4737648502509995,
+        "interpretation": "Treat finer sampling as synthetic data and fit only P0 with the coarse template; not a nine-parameter posterior bias or proof of a continuum reference."
+      },
+      "pixel8192_2_from_4096_sigma": 9.409863900415404,
+      "pixel8192_2_covariance_bootstrap_interval": [
+        9.402249533571966,
+        10.274811096964878,
+        11.51206279153535
+      ],
+      "pixel8192_2_from_4096_max_relative": 0.17502464101180615,
+      "pixel8192_2_max_relative_ell": 7929.6050756620425,
+      "pixel8192_2_amplitude_only_fit": {
+        "power_amplitude": 0.9844017087595593,
+        "P0_ratio": 0.9921702015075636,
+        "signed_power_amplitude_shift_sigma": -7.815456872192392,
+        "residual_sigma": 5.240627109730617,
+        "interpretation": "Treat finer sampling as synthetic data and fit only P0 with the coarse template; not a nine-parameter posterior bias or proof of a continuum reference."
+      },
+      "pixel16384_2_from_8192_sigma": 0.3831346781530631,
+      "pixel16384_2_from_8192_max_relative": 0.006691184268503125
+    },
+    {
+      "case": "beta_steep",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 312.53134513646364,
+          "peak_rss_gib": 10.087020874023438
+        },
+        "logz1": {
+          "seconds": 315.4296501725912,
+          "peak_rss_gib": 10.136947631835938
+        },
+        "logz2": {
+          "seconds": 586.3502751365304,
+          "peak_rss_gib": 12.265033721923828
+        }
+      },
+      "historical_to_logz1_sigma": 1.9680041957025444e-08,
+      "historical_to_logz1_max_relative": 1.729358137803061e-05,
+      "historical_to_logz2_sigma": 1.9812886589872957e-08,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        1.9897034031965538e-08,
+        2.169834757166443e-08,
+        2.4390486974251143e-08
+      ],
+      "logz1_to_logz2_sigma": 1.3326462516485566e-10,
+      "historical_max_relative": 1.7370448548659212e-05,
+      "logz1_max_relative": 7.702069004800194e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": true,
+        "0.1": true,
+        "0.3": true
+      }
+    },
+    {
+      "case": "combined_tails",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2",
+        "pixel8192_2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 319.53455040976405,
+          "peak_rss_gib": 10.265777587890625
+        },
+        "logz1": {
+          "seconds": 318.0012262798846,
+          "peak_rss_gib": 10.242076873779297
+        },
+        "logz2": {
+          "seconds": 550.3690305501223,
+          "peak_rss_gib": 12.240394592285156
+        },
+        "pixel8192_2": {
+          "seconds": 1105.1452221795917,
+          "peak_rss_gib": 19.318607330322266
+        }
+      },
+      "historical_to_logz1_sigma": 0.0025940039096540328,
+      "historical_to_logz1_max_relative": 0.1577283260671669,
+      "historical_to_logz2_sigma": 0.002594003795325428,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        0.002507874199297728,
+        0.002886990825111073,
+        0.003447667006444187
+      ],
+      "logz1_to_logz2_sigma": 1.66748909570465e-09,
+      "historical_max_relative": 0.157728307247476,
+      "logz1_max_relative": 1.665610604995038e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": true,
+        "0.1": true,
+        "0.3": true
+      },
+      "pixel8192_2_from_4096_sigma": 0.014623893202646385,
+      "pixel8192_2_covariance_bootstrap_interval": [
+        0.014580489659422192,
+        0.01597924970823291,
+        0.017842671453007868
+      ],
+      "pixel8192_2_from_4096_max_relative": 0.471489979792016,
+      "pixel8192_2_max_relative_ell": 7929.6050756620425,
+      "pixel8192_2_amplitude_only_fit": {
+        "power_amplitude": 0.9184748330588989,
+        "P0_ratio": 0.9583709266556968,
+        "signed_power_amplitude_shift_sigma": -0.013161798507366863,
+        "residual_sigma": 0.006373798902842939,
+        "interpretation": "Treat finer sampling as synthetic data and fit only P0 with the coarse template; not a nine-parameter posterior bias or proof of a continuum reference."
+      }
+    },
+    {
+      "case": "FL_L1_m9",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2",
+        "pixel16384_2",
+        "pixel8192_2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 337.9823526442051,
+          "peak_rss_gib": 10.265819549560547
+        },
+        "logz1": {
+          "seconds": 319.44724902138114,
+          "peak_rss_gib": 10.11691665649414
+        },
+        "logz2": {
+          "seconds": 558.0400602519512,
+          "peak_rss_gib": 12.116535186767578
+        },
+        "pixel16384_2": {
+          "seconds": 3350.003977507353,
+          "peak_rss_gib": 55.85129165649414
+        },
+        "pixel8192_2": {
+          "seconds": 1126.311002973467,
+          "peak_rss_gib": 19.277610778808594
+        }
+      },
+      "historical_to_logz1_sigma": 0.0973760321855641,
+      "historical_to_logz1_max_relative": 0.0011436424807306222,
+      "historical_to_logz2_sigma": 0.09737650500797691,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        0.09624768907478234,
+        0.10878870881531623,
+        0.12444955064948789
+      ],
+      "logz1_to_logz2_sigma": 1.6131139430458494e-05,
+      "historical_max_relative": 0.001143647585439167,
+      "logz1_max_relative": 4.011313259333349e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": false,
+        "0.1": true,
+        "0.3": true
+      },
+      "pixel16384_2_from_4096_sigma": 1.8819832360149735,
+      "pixel16384_2_covariance_bootstrap_interval": [
+        1.8788760641911004,
+        2.0507371947663504,
+        2.297979388041964
+      ],
+      "pixel16384_2_from_4096_max_relative": 0.048403023745531515,
+      "pixel16384_2_max_relative_ell": 7929.6050756620425,
+      "pixel16384_2_amplitude_only_fit": {
+        "power_amplitude": 0.9977560496881557,
+        "P0_ratio": 0.9988773947227736,
+        "signed_power_amplitude_shift_sigma": -1.5076007566041274,
+        "residual_sigma": 1.1264993827461718,
+        "interpretation": "Treat finer sampling as synthetic data and fit only P0 with the coarse template; not a nine-parameter posterior bias or proof of a continuum reference."
+      },
+      "pixel8192_2_from_4096_sigma": 1.8595381698009386,
+      "pixel8192_2_covariance_bootstrap_interval": [
+        1.8568239648369949,
+        2.0256908802943245,
+        2.273050349455531
+      ],
+      "pixel8192_2_from_4096_max_relative": 0.047852446118559655,
+      "pixel8192_2_max_relative_ell": 7929.6050756620425,
+      "pixel8192_2_amplitude_only_fit": {
+        "power_amplitude": 0.9977796205902695,
+        "P0_ratio": 0.9988891933494273,
+        "signed_power_amplitude_shift_sigma": -1.491764617241754,
+        "residual_sigma": 1.1101894125288023,
+        "interpretation": "Treat finer sampling as synthetic data and fit only P0 with the coarse template; not a nine-parameter posterior bias or proof of a continuum reference."
+      },
+      "pixel16384_2_from_8192_sigma": 0.02599675820439103,
+      "pixel16384_2_from_8192_max_relative": 0.0005254343099654335
+    },
+    {
+      "case": "xc_low_1",
+      "completed": [
+        "historical1",
+        "logz1",
+        "logz2",
+        "pixel8192_2"
+      ],
+      "timing": {
+        "historical1": {
+          "seconds": 329.08522856608033,
+          "peak_rss_gib": 10.129573822021484
+        },
+        "logz1": {
+          "seconds": 322.6916555315256,
+          "peak_rss_gib": 10.22970962524414
+        },
+        "logz2": {
+          "seconds": 565.0342478975654,
+          "peak_rss_gib": 11.342048645019531
+        },
+        "pixel8192_2": {
+          "seconds": 1087.448320981115,
+          "peak_rss_gib": 19.166873931884766
+        }
+      },
+      "historical_to_logz1_sigma": 1.5047628454711606e-05,
+      "historical_to_logz1_max_relative": 0.046217422878202186,
+      "historical_to_logz2_sigma": 1.504762775462396e-05,
+      "historical_to_logz2_covariance_bootstrap_interval": [
+        1.5825432509341538e-05,
+        1.759306488351013e-05,
+        1.9347311459803477e-05
+      ],
+      "logz1_to_logz2_sigma": 2.440977339528212e-10,
+      "historical_max_relative": 0.04621740536240537,
+      "logz1_max_relative": 1.7359318649212696e-08,
+      "historical_interpolation_budget_pass": {
+        "0.05": true,
+        "0.1": true,
+        "0.3": true
+      },
+      "pixel8192_2_from_4096_sigma": 0.009186705482964635,
+      "pixel8192_2_covariance_bootstrap_interval": [
+        0.009157751293596165,
+        0.010037096798000305,
+        0.01121613423631334
+      ],
+      "pixel8192_2_from_4096_max_relative": 1.3656771160704442,
+      "pixel8192_2_max_relative_ell": 7929.6050756620425,
+      "pixel8192_2_amplitude_only_fit": {
+        "power_amplitude": 0.6140676658285857,
+        "P0_ratio": 0.7836246970512005,
+        "signed_power_amplitude_shift_sigma": -0.009102260639956682,
+        "residual_sigma": 0.001242742480575826,
+        "interpretation": "Treat finer sampling as synthetic data and fit only P0 with the coarse template; not a nine-parameter posterior bias or proof of a continuum reference."
+      }
+    }
+  ],
+  "covariance": "64-realization conditional B12 SO-noise reference, not each candidate posterior uncertainty",
+  "interpretation": "Paired interpolation and pixel-sampling tests. Same continuous pressure and analysis operator. Two sampling levels do not establish a continuum limit; full-observable LOS convergence remains untested."
+}

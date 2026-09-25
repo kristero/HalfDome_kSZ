@@ -1,0 +1,4 @@
+lmax = 63
+full_row_validated = false
+nside = 32
+relative_error = 2.9881130476689365e-16

@@ -1,0 +1,37 @@
+[
+  {
+    "case": "B12",
+    "xc": 0.497,
+    "beta": 4.35,
+    "Y8_over_Y4": 1.0672929964923692,
+    "interpretation": "Same 3D amplitude; added outer gas, not renormalized to fixed Y"
+  },
+  {
+    "case": "Small core",
+    "xc": 0.025,
+    "beta": 4.35,
+    "Y8_over_Y4": 1.0006363784565726,
+    "interpretation": "Same 3D amplitude; added outer gas, not renormalized to fixed Y"
+  },
+  {
+    "case": "Steep beta",
+    "xc": 0.497,
+    "beta": 16.0,
+    "Y8_over_Y4": 1.0000000000097788,
+    "interpretation": "Same 3D amplitude; added outer gas, not renormalized to fixed Y"
+  },
+  {
+    "case": "Shallow beta",
+    "xc": 1.13,
+    "beta": 0.644,
+    "Y8_over_Y4": 4.640451195993058,
+    "interpretation": "Same 3D amplitude; added outer gas, not renormalized to fixed Y"
+  },
+  {
+    "case": "Extended core",
+    "xc": 4.0,
+    "beta": 2.8,
+    "Y8_over_Y4": 2.7259249137052417,
+    "interpretation": "Same 3D amplitude; added outer gas, not renormalized to fixed Y"
+  }
+]

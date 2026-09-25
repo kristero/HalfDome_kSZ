@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "numerical_metric_crosschecks": 212,
+  "input_hashes_checked": 83,
+  "pdf_pages": 8,
+  "visual_review": "All eight pages rendered and inspected; equations rechecked after newline formatting",
+  "pdf_sha256": "e818770e3591d673c0f2c78af084c893ed3a14c1cf6fef614f420a707b35b520",
+  "production_submitted": false
+}

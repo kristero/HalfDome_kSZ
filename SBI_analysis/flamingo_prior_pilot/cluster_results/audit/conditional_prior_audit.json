@@ -1,0 +1,45 @@
+{
+  "groups": {
+    "sobol": {
+      "count": 65536,
+      "accepted": 42348,
+      "fraction": 0.64617919921875,
+      "retained_min_Y200_ratio": 8.95572988266759e-19,
+      "retained_max_Y200_ratio": 450814.79374374106
+    },
+    "corners": {
+      "count": 512,
+      "accepted": 128,
+      "fraction": 0.25,
+      "retained_min_Y200_ratio": 1.8000527034284133e-22,
+      "retained_max_Y200_ratio": 815887.7794837591
+    },
+    "examples": {
+      "count": 163,
+      "accepted": 102,
+      "fraction": 0.6257668711656442,
+      "retained_min_Y200_ratio": 7.455574087113667e-09,
+      "retained_max_Y200_ratio": 8133.075001136702
+    }
+  },
+  "proposed_condition": "min_grid_beta >= 2.8 and conservative central LOS tail <= 1 percent",
+  "purpose": "Conservative outer-energy/LOS condition, not observational calibration or pixel-resolution guarantee",
+  "finite_pressure_validation": {
+    "cases": 45,
+    "maximum_relative_error": 1.1436839932654763e-05,
+    "relative_tolerance": 5e-05,
+    "status": "passed"
+  },
+  "candidate_accepted": {
+    "Battaglia12": true,
+    "fit_L1_m9": true,
+    "fit_fgas-8sigma": true,
+    "fit_Mstar-1sigma": true,
+    "xc_high": true,
+    "beta_low": false,
+    "beta_high": true,
+    "wide_steep": true,
+    "compact_steep_evolving": true,
+    "mass_redshift_amplitude": true
+  }
+}

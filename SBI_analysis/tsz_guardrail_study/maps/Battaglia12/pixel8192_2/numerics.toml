@@ -1,0 +1,9 @@
+cache_nonpositive_replaced = 0
+refinement = "2"
+nside = 8192
+beam_lmax = 12287
+mask_pixel_sha256 = "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689"
+grid = "pixel"
+seconds = 1086.9473400115967
+cache_floor = 0.0
+output_nside = 4096

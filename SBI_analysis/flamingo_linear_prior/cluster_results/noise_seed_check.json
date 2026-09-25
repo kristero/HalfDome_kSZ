@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "algorithm": "sha256-halfdome-so-v1-first64be-shift1",
+  "maximum_production_rows": 524288,
+  "preflight_rows": 6,
+  "unique_split_seeds": 1049914,
+  "reused_design_points": 663,
+  "fresh_noise_row_offset": 1048576,
+  "prefix_stable": true,
+  "observation_seed_overlap": false,
+  "first_three_rows": [
+    [
+      2316640806283745059,
+      3177268260723233719
+    ],
+    [
+      6347587312561498949,
+      7034827093279949432
+    ],
+    [
+      484586897710458911,
+      6935631894966280157
+    ]
+  ],
+  "seed_code_sha256": "f76ef01bb5926e7e8bec7921b6eb60ab4036b312e2d4d590e77f5b03a51bcb92",
+  "design_sha256": "5bfc8a552b2da6934a378aaab170d433ded88cfbcfc2e4226ca3a7b8f08fe9db"
+}

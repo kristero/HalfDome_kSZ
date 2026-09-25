@@ -1,0 +1,86 @@
+{
+  "fits": {
+    "L1_m9": {
+      "ell_ge_80": {
+        "bins": 40,
+        "rms_fractional": 0.02310241347102159,
+        "max_fractional": 0.07575155398450151,
+        "rms_log": 0.02324752034271393
+      },
+      "ell_ge_500": {
+        "bins": 38,
+        "rms_fractional": 0.018742602613633787,
+        "max_fractional": 0.06024028161705608,
+        "rms_log": 0.019133770973149822
+      },
+      "ell_ge_1000": {
+        "bins": 35,
+        "rms_fractional": 0.0128495225046735,
+        "max_fractional": 0.04358521881016808,
+        "rms_log": 0.013014376717203634
+      },
+      "ell_ge_2000": {
+        "bins": 30,
+        "rms_fractional": 0.006650560584853685,
+        "max_fractional": 0.014479333708766973,
+        "rms_log": 0.006633893591028537
+      },
+      "worst_bin_ell": 198.01805555555555
+    },
+    "fgas-8sigma": {
+      "ell_ge_80": {
+        "bins": 40,
+        "rms_fractional": 0.018985819152006696,
+        "max_fractional": 0.058840168637773305,
+        "rms_log": 0.019416733650905425
+      },
+      "ell_ge_500": {
+        "bins": 38,
+        "rms_fractional": 0.014412305991618942,
+        "max_fractional": 0.05601788702678845,
+        "rms_log": 0.014654953536799627
+      },
+      "ell_ge_1000": {
+        "bins": 35,
+        "rms_fractional": 0.008765818745664858,
+        "max_fractional": 0.029046726628703223,
+        "rms_log": 0.008788201174498522
+      },
+      "ell_ge_2000": {
+        "bins": 30,
+        "rms_fractional": 0.006896369000130335,
+        "max_fractional": 0.020386264205152882,
+        "rms_log": 0.006855130945588884
+      },
+      "worst_bin_ell": 388.2717105263158
+    },
+    "Mstar-1sigma": {
+      "ell_ge_80": {
+        "bins": 40,
+        "rms_fractional": 0.01753236577158283,
+        "max_fractional": 0.06592699479482866,
+        "rms_log": 0.017973934899023727
+      },
+      "ell_ge_500": {
+        "bins": 38,
+        "rms_fractional": 0.010853130281999185,
+        "max_fractional": 0.04841408159829963,
+        "rms_log": 0.010980680159441038
+      },
+      "ell_ge_1000": {
+        "bins": 35,
+        "rms_fractional": 0.00709858544989572,
+        "max_fractional": 0.020185438252443122,
+        "rms_log": 0.0070611653176918
+      },
+      "ell_ge_2000": {
+        "bins": 30,
+        "rms_fractional": 0.00734003836758534,
+        "max_fractional": 0.020185438252443122,
+        "rms_log": 0.007296179309701293
+      },
+      "worst_bin_ell": 198.01805555555555
+    }
+  },
+  "scope": "Post-fit diagnostics with the same best parameters; no bins were removed from fitting"
+}

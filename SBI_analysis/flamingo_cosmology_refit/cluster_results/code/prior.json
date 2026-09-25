@@ -1,0 +1,20 @@
+{
+  "version": "flamingo_extended_v1",
+  "parameter_order": ["P0", "xc", "beta", "alpha_m_P0", "alpha_m_xc", "alpha_m_beta", "alpha_z_P0", "alpha_z_xc", "alpha_z_beta"],
+  "lower": [1.0, 0.1, 2.8, -0.2, -0.6, -0.2, -4.5, -1.5, -0.5],
+  "upper": [60.0, 4.0, 16.0, 1.5, 0.4, 0.4, 0.5, 2.0, 1.5],
+  "log_uniform_indices": [0, 1],
+  "interpolation_domain": {"log10_mass": [12.0, 15.7], "redshift": [0.001, 5.0]},
+  "catalogue_enclosing_domain": {"log10_mass": [12.8167, 15.5781], "redshift": [0.0021, 3.8555]},
+  "beta_range_on_interpolation_domain": [2.8, 50.0],
+  "size_ratio_to_battaglia12": [0.4, 8.0],
+  "size_definition": "(xc/beta)/(xc_B12/beta_B12), exact corner extrema on catalogue enclosing domain",
+  "Y200_ratio_to_battaglia12": [0.003, 30.0],
+  "Y200_grid_size": 9,
+  "Y200_definition": "finite spherical integral to R200; checked on a 9 by 9 grid uniform in log M and log(1+z), not a continuum guarantee",
+  "maximum_central_column_tail": 0.01,
+  "los_endpoint_R200": 100000.0,
+  "seed": 20260915,
+  "distribution": "exploratory product density conditioned on every joint restriction",
+  "interpretation": "Engineering and effective-model prior; not an observational confidence region or independent FLAMINGO prior"
+}

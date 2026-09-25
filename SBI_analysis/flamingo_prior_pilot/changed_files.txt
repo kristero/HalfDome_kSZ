@@ -1,0 +1,37 @@
+﻿Created for the FLAMINGO prior pilot. No pre-existing pipeline files were edited.
+
+Source, configuration, and documentation files:
+SBI_analysis/flamingo_prior_pilot/collect_pilot.py
+SBI_analysis/flamingo_prior_pilot/conditional_prior.py
+SBI_analysis/flamingo_prior_pilot/diagnose_quadrature.jl
+SBI_analysis/flamingo_prior_pilot/diagnose_ranges.py
+SBI_analysis/flamingo_prior_pilot/fetch_results.py
+SBI_analysis/flamingo_prior_pilot/forward_proposals.py
+SBI_analysis/flamingo_prior_pilot/paint_candidate.jl
+SBI_analysis/flamingo_prior_pilot/plot_pilot.py
+SBI_analysis/flamingo_prior_pilot/prepare_guarded_proposals.py
+SBI_analysis/flamingo_prior_pilot/prepare_pilot.py
+SBI_analysis/flamingo_prior_pilot/prior.json
+SBI_analysis/flamingo_prior_pilot/prior_model.py
+SBI_analysis/flamingo_prior_pilot/README.md
+SBI_analysis/flamingo_prior_pilot/refine_fiducial.py
+SBI_analysis/flamingo_prior_pilot/requirements_diagnostics.txt
+SBI_analysis/flamingo_prior_pilot/run_diagnostics.pbs
+SBI_analysis/flamingo_prior_pilot/run_early_checks.pbs
+SBI_analysis/flamingo_prior_pilot/run_guarded_proposals.pbs
+SBI_analysis/flamingo_prior_pilot/run_map.py
+SBI_analysis/flamingo_prior_pilot/run_pilot.pbs
+SBI_analysis/flamingo_prior_pilot/run_pilot.py
+SBI_analysis/flamingo_prior_pilot/run_prepare.pbs
+SBI_analysis/flamingo_prior_pilot/run_refine_fiducial.pbs
+SBI_analysis/flamingo_prior_pilot/run_split_pilot.pbs
+SBI_analysis/flamingo_prior_pilot/secant_proposal.py
+SBI_analysis/flamingo_prior_pilot/seed_related_feedback.py
+SBI_analysis/flamingo_prior_pilot/summarize_report.py
+SBI_analysis/flamingo_prior_pilot/verify_pilot.py
+SBI_analysis/flamingo_prior_pilot/changed_files.txt
+
+Generated outputs are under SBI_analysis/flamingo_prior_pilot/cluster_results/.
+artifact_manifest.json lists the individual code, audit, spectra, proposal and plot files.
+RUN_REPORT.md, parameters.csv, fit_spectra.csv, resource_usage.json, job_history.json,
+verification.json and local_verification.json summarize the measured results and provenance.

@@ -1,0 +1,5 @@
+{
+  "job": "598448.idark",
+  "dependency": "afterany:598439.idark",
+  "pbs": "analyze_resolution.pbs"
+}

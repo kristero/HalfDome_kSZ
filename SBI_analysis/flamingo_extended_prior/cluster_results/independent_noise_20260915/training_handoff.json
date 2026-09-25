@@ -1,0 +1,18 @@
+{
+  "prior_class": "sbi_prior.ExtendedPrior",
+  "prior_pickle": "joint_sbi_prior.pkl",
+  "pythonpath": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/code",
+  "density": "conditional log-uniform P0/xc, uniform remaining parameters; joint support",
+  "normalization_Z": 0.01695871353149414,
+  "normalization_SE": 4.169414439196526e-05,
+  "theta": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/dataset/theta.npy",
+  "x_clean": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/dataset/masked_clean_dl40.npy",
+  "x_noisy": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/dataset/masked_noisy_cross_dl40.npy",
+  "observations": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/observations",
+  "compression": "40 linear D_ell bins available; MOPED must be checked on new prior",
+  "model_status": "new SBI training required; no trained posterior produced by dataset generation",
+  "training_noise": "independent SO noise per row and split; master seed 12345, row/split SHA256 derivation",
+  "noise_seed_array": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/dataset/noise_split_seeds.npy",
+  "observation_noise": "fixed original realization: split seeds 22446 and 22447",
+  "sky_variance": "Catalogue and mask fixed; no independent cosmological sky realizations"
+}

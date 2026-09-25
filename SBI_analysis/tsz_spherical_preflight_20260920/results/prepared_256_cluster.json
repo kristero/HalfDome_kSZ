@@ -1,0 +1,16 @@
+{
+  "cluster_root": "/lustre/work/kristero10/tsz_spherical_diagnostic_256_prepared_20260920",
+  "count": 256,
+  "sha256": {
+    "manifest.json": "4820509fbd72bb64ec9fca66470330640930918da3b5b22522b386b72b64ced7",
+    "theta_design.npy": "14ae8a583b32afb3e87cb953667591e9ef47b99ebe27036e2334cb52ec78241f",
+    "noise_seeds.npy": "08df14a842bd87e39a33f3fe5b93b5e055f035fb103dc85b226cd9a88d474543",
+    "heldout_design.npy": "ebfdca57b255cadebdb217485b21a806b2a821000d427fde463cfda64f39df07",
+    "observations/manifest.json": "ec39e71212acc616607e6b89cf3c82b403aad8bdfe139cb351e1f5dd4ab9a6d7",
+    "observations/Mstar-1sigma.npz": "787731c1cd2d03f6b4e2374e777c3c3d0faf78a75af9f558e7a7233e5dbd62fe",
+    "observations/L1_m9.npz": "c18176d85eb2a0e4a6447b7604f47f7117b420f353de114ad05968dac13c4dac",
+    "observations/fgas-8sigma.npz": "ca502e3fe24e87f70df8881702483851c9e394a989fdbc73b6688361952705bb"
+  },
+  "submitted": false,
+  "generated_rows": 0
+}

@@ -1,0 +1,40 @@
+lean_maps = "0"
+beam_arcmin = 2.0
+noise_table_sha256 = "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64"
+output_nside = 4096
+threads = 26
+noise_beam_applied = false
+split_Nell_multiplier = 1.0
+raw_nside = 8192
+mask_sha256 = "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689"
+current_signal_and_noise_seconds = 1128.8434870243073
+production_certified = false
+
+[[noise_draws]]
+split_seeds = [62800001, 62800002]
+draw = 0
+noise1_sha256 = "651ff80728bdec9eec5c4d5bb034b784079e520c50b5611d365a01c423d66eb9"
+noise2_sha256 = "e6e6e5e78bb2fd3531f5574a8dff3a15f76a2f34d7f4969eb9bfb182cec032c1"
+seconds = 51.24430012702942
+map_alm_parity = 6.01862233770722e-16
+[[noise_draws]]
+split_seeds = [62800003, 62800004]
+draw = 1
+noise1_sha256 = "9b2067c116573f1ef17cfe67db5759a8dd5de8a639ff5681b15e8e6200dcf589"
+noise2_sha256 = "f09f98967f8f15a8e1444da27d1c46aa4db4f25568deda8a03a13970f5a186d8"
+seconds = 40.83728098869324
+map_alm_parity = 0.0
+
+[phases]
+raw8192_output_alm2map = 7.722400188446045
+mask = 17.550227880477905
+raw8192_allocation = 7.582906007766724
+masked_signal_map2alm = 2.8885858058929443
+raw8192_map2alm = 13.674522876739502
+raw8192_beam = 0.15799498558044434
+raw8192_catalogue_and_painting = 980.7524831295013
+raw8192_cache = 15.744534969329834
+
+[cache]
+underflow_count = 0
+seconds = 13.016967058181763

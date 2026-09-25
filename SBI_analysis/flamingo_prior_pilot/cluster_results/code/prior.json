@@ -1,0 +1,16 @@
+{
+  "status": "user_authorized_pilot_not_production_prior",
+  "parameter_order": ["P0", "xc", "beta", "alpha_m_P0", "alpha_m_xc", "alpha_m_beta", "alpha_z_P0", "alpha_z_xc", "alpha_z_beta"],
+  "lower": [1.0, 0.1, 2.8, -0.2, -0.6, -0.2, -4.5, -1.5, -0.5],
+  "upper": [60.0, 4.0, 16.0, 1.5, 0.4, 0.4, 0.5, 2.0, 1.5],
+  "distributions": ["log_uniform", "log_uniform", "uniform", "uniform", "uniform", "uniform", "uniform", "uniform", "uniform"],
+  "fixed_alpha": 1.0,
+  "fixed_gamma": -0.3,
+  "fit_statistic": "clean masked beamed 40-bin linear D_ell, equal-weight log residuals",
+  "fit_ell_min": 80,
+  "fit_ell_max": 7979,
+  "retain_historical_HalfDome_redshift_support": true,
+  "noise_comparison": "same cached mask and SO noise arrays as approved FLAMINGO comparison",
+  "interpolator_domain": {"log10_mass_Msun": [12.0, 15.7], "redshift": [0.001, 5.0]},
+  "notes": ["Parameter fits are representative effective fits, not SBI posteriors.", "No existing emulator is extrapolated beyond its training domain.", "Divergent untruncated profiles are diagnosed but not sent through full maps."]
+}

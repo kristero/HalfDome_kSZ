@@ -1,0 +1,14 @@
+{
+  "download_approved": true,
+  "user_message": "Yes, I approve for the cluster",
+  "recorded_utc": "2026-09-14T10:10:05.718215+00:00",
+  "variants": [
+    "L1_m9",
+    "fgas-8sigma",
+    "Mstar-1sigma"
+  ],
+  "download_bytes": 4556709696,
+  "disk_budget_GiB": 20,
+  "ram_allocation_GB": 64,
+  "manifest_sha256": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf"
+}

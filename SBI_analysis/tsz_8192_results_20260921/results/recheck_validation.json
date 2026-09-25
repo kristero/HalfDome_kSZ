@@ -1,0 +1,42 @@
+{
+  "utc": "2026-09-21T06:31:52.654688+00:00",
+  "tolerance": 1e-10,
+  "records": [
+    {
+      "task_id": 80,
+      "repeats": 0,
+      "label": "Battaglia12_recheck",
+      "status": "passed",
+      "relative_dl_norm": 6.669509413110526e-16
+    },
+    {
+      "task_id": 81,
+      "repeats": 1,
+      "label": "FL_L1_m9_recheck",
+      "status": "passed",
+      "relative_dl_norm": 7.697311648448407e-16
+    },
+    {
+      "task_id": 82,
+      "repeats": 2,
+      "label": "compact_recheck",
+      "status": "passed",
+      "relative_dl_norm": 4.562584823553452e-16
+    },
+    {
+      "task_id": 83,
+      "repeats": 4,
+      "label": "extended_shallow_recheck",
+      "status": "passed",
+      "relative_dl_norm": 7.712713497306066e-16
+    },
+    {
+      "task_id": 84,
+      "status": "pending"
+    },
+    {
+      "task_id": 85,
+      "status": "pending"
+    }
+  ]
+}

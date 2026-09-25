@@ -1,0 +1,11 @@
+mask_sha256 = "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689"
+painting_and_beam_seconds = 8827.473065853119
+threads = 4
+model = "sphere4; point sampling; log-z chord-mean cache; fixed 2 arcmin beam"
+seconds = 8850.495105028152
+raw_nside = 16384
+output_nside = 4096
+
+[cache]
+underflow_count = 0
+seconds = 31.670583963394165

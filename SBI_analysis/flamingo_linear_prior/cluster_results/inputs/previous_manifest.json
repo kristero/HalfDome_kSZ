@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "prior": {
+    "version": "flamingo_extended_v1",
+    "parameter_order": [
+      "P0",
+      "xc",
+      "beta",
+      "alpha_m_P0",
+      "alpha_m_xc",
+      "alpha_m_beta",
+      "alpha_z_P0",
+      "alpha_z_xc",
+      "alpha_z_beta"
+    ],
+    "lower": [
+      1.0,
+      0.1,
+      2.8,
+      -0.2,
+      -0.6,
+      -0.2,
+      -4.5,
+      -1.5,
+      -0.5
+    ],
+    "upper": [
+      60.0,
+      4.0,
+      16.0,
+      1.5,
+      0.4,
+      0.4,
+      0.5,
+      2.0,
+      1.5
+    ],
+    "log_uniform_indices": [
+      0,
+      1
+    ],
+    "interpolation_domain": {
+      "log10_mass": [
+        12.0,
+        15.7
+      ],
+      "redshift": [
+        0.001,
+        5.0
+      ]
+    },
+    "catalogue_enclosing_domain": {
+      "log10_mass": [
+        12.8167,
+        15.5781
+      ],
+      "redshift": [
+        0.0021,
+        3.8555
+      ]
+    },
+    "beta_range_on_interpolation_domain": [
+      2.8,
+      50.0
+    ],
+    "size_ratio_to_battaglia12": [
+      0.4,
+      8.0
+    ],
+    "size_definition": "(xc/beta)/(xc_B12/beta_B12), exact corner extrema on catalogue enclosing domain",
+    "Y200_ratio_to_battaglia12": [
+      0.003,
+      30.0
+    ],
+    "Y200_grid_size": 9,
+    "Y200_definition": "finite spherical integral to R200; checked on a 9 by 9 grid uniform in log M and log(1+z), not a continuum guarantee",
+    "maximum_central_column_tail": 0.01,
+    "los_endpoint_R200": 100000.0,
+    "seed": 20260915,
+    "distribution": "exploratory product density conditioned on every joint restriction",
+    "interpretation": "Engineering and effective-model prior; not an observational confidence region or independent FLAMINGO prior"
+  },
+  "accepted_count": 8192,
+  "last_proposal_index": 486088,
+  "accepted_fraction_prefix": 0.016852880851037567,
+  "parameter_order": [
+    "P0",
+    "xc",
+    "beta",
+    "alpha_m_P0",
+    "alpha_m_xc",
+    "alpha_m_beta",
+    "alpha_z_P0",
+    "alpha_z_xc",
+    "alpha_z_beta"
+  ],
+  "metrics": {
+    "beta_min": [
+      2.800023968150483,
+      15.62983057369922
+    ],
+    "beta_max": [
+      3.11618641795027,
+      49.990648987800576
+    ],
+    "size_min": [
+      0.4000395879416044,
+      5.829165044015217
+    ],
+    "size_max": [
+      0.419974735847427,
+      7.997391633422956
+    ],
+    "Y200_min": [
+      0.003002850171235692,
+      14.761883308229287
+    ],
+    "Y200_max": [
+      0.007726306013441467,
+      29.979504502403632
+    ],
+    "tail": [
+      1.4228467550153393e-65,
+      9.85153956960327e-08
+    ]
+  },
+  "design_sha256": {
+    "proposal_index.npy": "a013677495b5099bc67b50dc7cc4d343c33e43e17c7be0b4d30b2985feb0bd60",
+    "noise_split_seeds.npy": "d1e90802565202bdac66d1c80643b627397db2ba45fb58472090569609998c41",
+    "theta.npy": "a3afa9b7e332afca0375b8b3b2879f9a264ea8eea5c9209dec1c51d692be9175",
+    "parameters.csv": "0b624c8c9bd2ca9b0185d2784af62f35d0ab99d5d221848e426366bd3e192885",
+    "validation_split.npy": "13a64bc0a2cb5334abb41e5a13050160469840087f1ab5e8d25139164fe7455f"
+  },
+  "code_sha256": {
+    "submit.py": "73c9e9f9216617bd297e9a21ce65e33267d2854eedeb3b49a01691fe7813fa86",
+    "audit.py": "1c21b5a9ce1ee8335133770c612d9b897f05a668b7d1080091e0fefa226b153d",
+    "independent_noise.jl": "daca9ecc61eb7f08f10554e82950f8d95e5ae0d2e1cd6ec09c2e434848e2d0a9",
+    "run_worker.pbs": "c26c964968591b6bb7df583acc488cfae958b81b0739730eef961142d93fa4b9",
+    "prior.json": "300ee6769cf5e5e5d0f3c670a5a1e80a5748dabda8ffe034dbb70f4dec2344f0",
+    "prepare.py": "082033f38e5dec8918342e423bc7be1f6e8c9f501549f6d5aa6e6ab950443a70",
+    "collect.py": "4453bc71ebfe0b017ea94410f81a3207969bb1445641b4ffa1227794d399707c",
+    "prior.py": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0",
+    "validate.py": "8fbab32eefd3bacf8125ba0c9097106d96460bf0751dafddac599fe4920a40bf",
+    "README.md": "b30e656c9113b65e7dda2370bacd2e7cefcffc8631cd75df96405557d8bf986d",
+    "check_workflow.py": "3e8866a8f45d52c0e8f9df7e2f01c1a7208605c5d2f98681b0034326ba246f40",
+    "stable_los.jl": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+    "plot_preflight.py": "9bb43ce90b180ce9edb95d93fdb06bc1a67a8f878e364e56e675283269a43dbd",
+    "run_collect.pbs": "5072b6f1f7d1af601895041779bff56e4599d2af384946f6b7ae9faf871ea450",
+    "check_noise_seeds.py": "447224082e87138c4b29a695efdbe79c81f87631578cefcb284722dc0f487496",
+    "sbi_prior.py": "908f3ad1f2cb8b2f4f17ee4e1ff871dc660c8c6a6ca6df8dff001e49ddfa138d",
+    "run_config.json": "b6b54b0687d403d5f6e518dd40c10af11dae7b378d08253b70da75530b9b816e",
+    "noise_seeds.py": "f76ef01bb5926e7e8bec7921b6eb60ab4036b312e2d4d590e77f5b03a51bcb92",
+    "worker.py": "448d91d1f95b0fde566cfbad594bc30815b9307c5ec8198ac8a1dedc709f5353",
+    "paint_row.jl": "a390825874831907aa492852ac93a6142e6595735bb31a27123dfc32f86f5cec"
+  },
+  "run_config_sha256": "b6b54b0687d403d5f6e518dd40c10af11dae7b378d08253b70da75530b9b816e",
+  "preflight_cases_sha256": "5e73d52d2f7e361348daf6c5f532b1e6bb6f02e5ca911c99d1aeefccfdda8dea",
+  "dependency_sha256": {
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/process_maps.jl": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_tSZ_visuals.jl": "a610742bc184f19d19c10b43b92a11856d7034f79ebf205db43af0cdc34216b9",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/HalfDome_tSZ.jl": "211d17a59fcae9f53f7ba225ca2ff9167946d34b2d94f0c5795843089ace8411",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_halfdome_fullsky_so_noise.jl": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_unphysical_vs_fiducial_full_map_default_grid.jl": "c466826ee33e1dbe8a3e5b8170a933a89a2a5d358e1eb629429d3ccdaefd8a21",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/painting.jl": "09d6abe4fff6c7bcbf2facdfebd4f072ed4c0d52ba895302d0aa86b409a9df9c",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/build_interpolator_cache.jl": "55e4c5b40e19b022899a58b9656ef33913011197ee903cbecac1b55623012e5e",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/instrumentation.jl": "7294e60ba35ea21c50063dc0f8caaf05cde1eb90f07d4a956f769c39dcaa250c",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_single_profile.jl": "2d67b40b2551526af072f1db99a274b6b5a51863b58dee13bf81b3b6677c7533",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/config.jl": "a2e15531003b4360472d5173d538ddd9f9ec62a4072846308570922e30f8b3e8",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_sobol_full_maps.jl": "536bdd0f74475723ce5d61ec20fcc2829ebbdf748c5d3a27834e27f611f05e1d",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_full_map.jl": "7c63e1426f8f4ea33a0b0746b021d4b8b515932f50b57c9b944cdce055f6a1c8",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/catalog_halfdome.jl": "bae2d0e20e50e68e33396298b3dadd9f2d8106983818d81b503fb2ca0ad9d334",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_xgpaint_binned40_edge_profiles.jl": "4c439a01867e0433552d548a3e1eab3d79a3e5bd3dd745a0c4eecc058dca27b0",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/generate_cosmology_0p05pct_variations.jl": "71249a16b17424d0dc76fca8071039f90f5284ae638f0bc860c668a9af19302b",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/catalog_websky.jl": "0a2db62935f40c679cc676c37a0c0ba1936874b359338e36462b1b8a97f19e24",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/paint_battaglia_redshift_slice.jl": "c415fd70bca319a2582dfb06c5d9b9981cd7b4f995a954ff107dedea8514bb0c",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/generate_battaglia_5pct_variations.jl": "572b3d8a0b0c3ec4921a11749d736ebc1586af098f8f531c66e08e9f3a71b63d",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_by_redshift.jl": "5299f3562cc384c3f1dcae7cfaa1cbcf3ba403ce6c3eda6220d58da2f16a93da",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/output.jl": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/cosmology_helpers.jl": "6c3adc30d45cbd6ce43d309068093181f599cde7dc479b631edbc964d303c8d9",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/binning.jl": "39d9fd05378bad60553231263b83dedf9b72d552cec04680e5b9aa016783394a",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_initial_batches.jl": "695fb52406eefd669c28c59f85e252cfd8ed695c0dffafcf84754073a7ab79a1",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/HalfDome_tSZ_legacy_monolith.jl": "4b64e9f92241c22ada733b2f4c6941a06aef64575a5655fa29e0c84bbc52674c",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_by_mass.jl": "52becc6d59948e6fc42b93975ff4d6c53e903b66ec9f8959b0f91685525d89fc",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/model.jl": "1b2ce8c6cafdd78b10e72b0d7466fa08e01bdd45bd63baa63f3cce569fc0f7dc",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_szp.jl": "dd3a8f14369873881f962292eb67a8b5ba09b4cd98ca0529bf427afb6ed44c3e",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_frb.jl": "c0344c11e905eed071da9b62532a0d3652df04b0dd187960974cc0e348343e8e",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/co_broadband.jl": "46d89704a3c1cb78ab668dcb160ef8345375b9be9c57a77362dfd690cdaeb1d5",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/cib.jl": "24fb58fddf510e638ca0a3eec0768fa52c7e7806b05c44e8015ea5d9e4f726cc",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles.jl": "0c6dd605c3ad4d2a85c07a474b234f7b6178d8b0139bbd14e706b262126179d3",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/healpixworkspace.jl": "e1a30d8cee9f2e8f5973c3ce50f89b7d2b3c13b16162f6fb34be8ca221bf16ef",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_rksz.jl": "fd907722031b58a3570f8917c38ad7c2b349767ace47027e59a00c77ec5fcfa0",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_y.jl": "98d034e7ebacf8f37c252f1448dd77d71ee26412b7a9694e20106bcb82c4891c",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/radio.jl": "52b403d456155d2d3c2f264e6baa27382f32f0c866af3fcb2908ab810efe17dc",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_rsz.jl": "7ac16ac45599eaaabaf309ac0c42dcfe7e3ee5cda9bfa8a0efe256a2449002d5",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/lrg.jl": "3c3033ae273530e0015dd1f21e8846cddba28707e5050e68af8e8169284dd81a",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_tau.jl": "54de594bfc092e064b171eede6eca5db3788598bfdeda4f38fdf5591a933053b",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/util.jl": "564e240b435f8e8c04a25b0af6ca0a7c25b6bf9b2c221bbdca5c2c6eef648e9e",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/model.jl": "ef9e50de2508febf9e9b48f43e17a9acd2cf17f507723c6521bf1145bd25a856",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/cache/complete.toml": "edfa3b179caaaf29dc49c688700b8da4194faf46fcf04d84507405c0c719e28a",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/preflight/metadata_manifest.json": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf"
+  },
+  "preflight_revision": "scaled LOS plus strictly positive cache floor; prior and map definition unchanged",
+  "post_preflight_bookkeeping": "Hashed training split and PBS dependency-chain scheduling; identical forward code and parameter design",
+  "noise_revision": "User selected independent SO noise per row; fixed-noise preflight archived in attempts/fixed_noise_before_row_independence"
+}

@@ -1,0 +1,25 @@
+{
+  "theta": [
+    18.23594732761984,
+    1.4671672867423466,
+    7.375469738110147,
+    0.27382836676318884,
+    -0.29275997165682033,
+    0.06147581487544934,
+    -3.481706690343786,
+    1.5604732323948403,
+    0.9338324085124106
+  ],
+  "success": true,
+  "message": "`xtol` termination condition is satisfied.",
+  "nfev": 14,
+  "seconds": 16.15759864449501,
+  "regularizer_residual_coefficient": 0.005,
+  "anchor": "Battaglia12",
+  "local_unit_cube_radius": 0.08,
+  "proposal_metrics": {
+    "rms_fractional": 0.006039477589557074,
+    "max_fractional": 0.016644009379565228,
+    "rms_log": 0.006033611900188164
+  }
+}

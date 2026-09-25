@@ -1,0 +1,14 @@
+{
+  "L1_m9": {
+    "rms_noise_change_over_peak_target": 0.003369812253267885,
+    "clean_peak_Dl": 4.2498393209635144e-13
+  },
+  "fgas-8sigma": {
+    "rms_noise_change_over_peak_target": 0.003794560530642942,
+    "clean_peak_Dl": 3.3713798583326253e-13
+  },
+  "Mstar-1sigma": {
+    "rms_noise_change_over_peak_target": 0.003374243961473095,
+    "clean_peak_Dl": 4.3597958433414325e-13
+  }
+}

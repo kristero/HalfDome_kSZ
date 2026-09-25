@@ -1,0 +1,13 @@
+{
+  "utc": "2026-09-21T13:17:57.609577+00:00",
+  "gate": "598553.idark",
+  "workers": [
+    "598554.idark",
+    "598555.idark",
+    "598556.idark",
+    "598557.idark"
+  ],
+  "reference": "598558.idark",
+  "analysis": "598559.idark",
+  "diagnostic_256_submitted": false
+}

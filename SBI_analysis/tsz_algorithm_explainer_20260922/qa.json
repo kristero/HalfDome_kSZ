@@ -1,0 +1,10 @@
+{
+  "pdf_pages": 7,
+  "source_hashes_checked": 6,
+  "figures": 7,
+  "visual_review": "All pages inspected; final output-resolution qualification and source table rechecked",
+  "boundary_analytic_checks": "passed",
+  "actual_healpix_child_assignment": "passed",
+  "cluster_tests_newly_run": false,
+  "pdf_sha256": "dbc9b5472e32a4b9260adf678bb7b7d2d2bfe7d545e88a7e65ff16c1eca69628"
+}

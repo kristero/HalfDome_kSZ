@@ -1,0 +1,13 @@
+{
+  "cases": 30,
+  "max_relative_error": 1.7435606124544814e-07,
+  "beta_range": [
+    1.3,
+    2048
+  ],
+  "q_range": [
+    1e-08,
+    10000.0
+  ],
+  "method": "Independent adaptive quadrature in log-scaled LOS coordinates"
+}

@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -N tsz8192_gate
+#PBS -q mini2
+#PBS -l select=1:ncpus=2:mem=8gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_8192_validation_20260920
+export FLAMINGO_CAMPAIGN=/lustre/work/kristero10/flamingo_tsz_comparison_20260914
+export HALFDOME_SOURCE_DIR=$FLAMINGO_CAMPAIGN/code/halfdome
+export JULIA_DEPOT_PATH=$FLAMINGO_CAMPAIGN/runtime/depot:/home/kristero10/.julia
+export LD_LIBRARY_PATH=$FLAMINGO_CAMPAIGN/runtime/julia-1.12.2/lib/julia:${LD_LIBRARY_PATH:-}
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=2 MKL_NUM_THREADS=1
+mkdir -p results plots
+julia_executable=$FLAMINGO_CAMPAIGN/runtime/julia-1.12.2/bin/julia
+julia_project=$FLAMINGO_CAMPAIGN/runtime/julia_env
+"$julia_executable" --startup-file=no --threads=2 --project="$julia_project" test_quadrature.jl
+"$julia_executable" --startup-file=no --threads=2 --project="$julia_project" test_noise_algebra.jl
+export CONTROL_LOAD_ONLY=1 VALIDATION_LEAN_MAPS=0 PREFLIGHT_OUTPUT=$PWD/results/load_standard
+"$julia_executable" --startup-file=no --threads=2 --project="$julia_project" test_load.jl
+export VALIDATION_LEAN_MAPS=1 PREFLIGHT_OUTPUT=$PWD/results/load_lean
+"$julia_executable" --startup-file=no --threads=2 --project="$julia_project" test_load.jl
+/home/anaconda3/bin/python3 test_workflow.py
+/home/anaconda3/bin/python3 test_analysis.py
+/home/anaconda3/bin/python3 verify_gate.py

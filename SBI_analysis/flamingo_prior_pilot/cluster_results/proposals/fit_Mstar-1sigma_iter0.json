@@ -1,0 +1,24 @@
+{
+  "theta": [
+    19.950305789195056,
+    1.378849450857866,
+    7.273537628593472,
+    0.004031541178634246,
+    -0.3708453659453409,
+    -0.01000634064400005,
+    -3.2031983230820584,
+    1.2715097462230687,
+    0.7122775044426832
+  ],
+  "rms_fractional": 0.03549552580781479,
+  "max_fractional": 0.08128722876861916,
+  "rms_log": 0.03602912439246037,
+  "fit_type": "Exact P0 rescaling of validated L1_m9 map; requires Mstar full-map confirmation",
+  "source_full_map": "fit_L1_m9_iter2",
+  "amplitude_scale": 1.004347519221662,
+  "nfev": 0,
+  "elapsed_seconds": 0.0,
+  "success": true,
+  "message": "Analytic minimum for amplitude at fixed source shape; not a nine-parameter optimum",
+  "regularization_coefficient": 0.0
+}

@@ -1,0 +1,25 @@
+{
+  "groups": {
+    "sobol": {
+      "count": 65536,
+      "los_divergent": 32,
+      "infinite_thermal_energy_divergent": 10268,
+      "conservative_beta_condition_failed": 11163
+    },
+    "corners": {
+      "count": 512,
+      "los_divergent": 64,
+      "infinite_thermal_energy_divergent": 320,
+      "conservative_beta_condition_failed": 320
+    },
+    "examples": {
+      "count": 163,
+      "los_divergent": 0,
+      "infinite_thermal_energy_divergent": 60,
+      "conservative_beta_condition_failed": 60
+    }
+  },
+  "hull_vertices": 876,
+  "method": "Convex hull of all selected log(M/1e14), log(1+z); exact extrema for power laws",
+  "distinction": "Actual catalogue support is narrower than the interpolation grid that must also remain numerically valid"
+}

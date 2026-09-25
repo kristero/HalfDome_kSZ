@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/home/anaconda3/bin/python3",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/compare_inference.py",
+    "--campaign",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914",
+    "--helpers",
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/inference_helpers",
+    "--bundle",
+    "/lustre/work/kristero10/battaglia12_nine_fisher_comparison_models_20260913/moped",
+    "--reference",
+    "/lustre/work/kristero10/so9_fisher_moped524k_20260913/fixed_noise_observation"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 11.363322630524635,
+  "finished_utc": "2026-09-14T11:32:16.808072+00:00",
+  "job_id": "597329.idark",
+  "peak_rss_kbytes": 420036
+}

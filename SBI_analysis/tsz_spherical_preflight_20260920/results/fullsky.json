@@ -1,0 +1,106 @@
+{
+  "measurements": [
+    {
+      "case": "Battaglia12",
+      "nside": 4096,
+      "seconds": 958.3069524019957,
+      "rss_gib": 9.430732727050781,
+      "whitened_discrepancy": 9.789454279227767,
+      "max_bin_error_over_sigma": 3.243409296356258
+    },
+    {
+      "case": "Battaglia12",
+      "nside": 8192,
+      "seconds": 2558.456199608743,
+      "rss_gib": 19.90544891357422,
+      "whitened_discrepancy": 0.38309467552971793,
+      "max_bin_error_over_sigma": 0.1483268957647568
+    },
+    {
+      "case": "Battaglia12",
+      "nside": 16384,
+      "seconds": 8887.376212392002,
+      "rss_gib": 58.53806686401367,
+      "whitened_discrepancy": 0.0,
+      "max_bin_error_over_sigma": 0.0
+    },
+    {
+      "case": "FL_L1_m9",
+      "nside": 4096,
+      "seconds": 915.3363266289234,
+      "rss_gib": 9.754589080810547,
+      "whitened_discrepancy": 1.8801039366230052,
+      "max_bin_error_over_sigma": 0.6087169576556147
+    },
+    {
+      "case": "FL_L1_m9",
+      "nside": 8192,
+      "seconds": 2572.347781445831,
+      "rss_gib": 20.018993377685547,
+      "whitened_discrepancy": 0.0257704278064022,
+      "max_bin_error_over_sigma": 0.011539098676893227
+    },
+    {
+      "case": "FL_L1_m9",
+      "nside": 16384,
+      "seconds": 8277.020107153803,
+      "rss_gib": 58.75681686401367,
+      "whitened_discrepancy": 0.0,
+      "max_bin_error_over_sigma": 0.0
+    }
+  ],
+  "pairwise": [
+    {
+      "case": "Battaglia12",
+      "nside": 4096,
+      "reference_nside": 8192,
+      "whitened_discrepancy": 9.40992611238076,
+      "max_fractional_bandpower_error": 0.17500522359735604,
+      "scope": "40-bin conditional-noise spectrum check, not an unbinned MOPED posterior bias"
+    },
+    {
+      "case": "Battaglia12",
+      "nside": 4096,
+      "reference_nside": 16384,
+      "whitened_discrepancy": 9.789454279227767,
+      "max_fractional_bandpower_error": 0.18286642864412603,
+      "scope": "40-bin conditional-noise spectrum check, not an unbinned MOPED posterior bias"
+    },
+    {
+      "case": "Battaglia12",
+      "nside": 8192,
+      "reference_nside": 16384,
+      "whitened_discrepancy": 0.38309467552971793,
+      "max_fractional_bandpower_error": 0.006690357531094543,
+      "scope": "40-bin conditional-noise spectrum check, not an unbinned MOPED posterior bias"
+    },
+    {
+      "case": "FL_L1_m9",
+      "nside": 4096,
+      "reference_nside": 8192,
+      "whitened_discrepancy": 1.8580878450079767,
+      "max_fractional_bandpower_error": 0.04761958044376236,
+      "scope": "40-bin conditional-noise spectrum check, not an unbinned MOPED posterior bias"
+    },
+    {
+      "case": "FL_L1_m9",
+      "nside": 4096,
+      "reference_nside": 16384,
+      "whitened_discrepancy": 1.8801039366230052,
+      "max_fractional_bandpower_error": 0.04816091407001343,
+      "scope": "40-bin conditional-noise spectrum check, not an unbinned MOPED posterior bias"
+    },
+    {
+      "case": "FL_L1_m9",
+      "nside": 8192,
+      "reference_nside": 16384,
+      "whitened_discrepancy": 0.0257704278064022,
+      "max_fractional_bandpower_error": 0.0005167272895202753,
+      "scope": "40-bin conditional-noise spectrum check, not an unbinned MOPED posterior bias"
+    }
+  ],
+  "scope": "Spherical point painter; matched coarse log-z cache and same 2 arcmin beam/mask",
+  "covariance": "Saved 64-draw conditional B12 split-noise covariance, excludes cosmic variance; approximate at FL fit",
+  "production_certified": false,
+  "remaining": "Cache refinement, flat-prior joint extremes, full-sky pre-beam/pixel integration, actual noisy-row timing, nine-parameter inference checks"
+}

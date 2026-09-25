@@ -1,0 +1,329 @@
+{
+  "results": [
+    {
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.8756620663852605e-07,
+      "maximum_absolute_Dell": 2.7398261132323774e-19,
+      "moped": [
+        {
+          "anchor_and_rank": "Battaglia12_rcond0.001",
+          "distance": 2.4387394954815474e-05,
+          "rank": 5,
+          "covariance": {
+            "covariance_rank": 5,
+            "covariance_eigenvalues": [
+              1.9026487079847694,
+              1.9832877090105399,
+              2.4563653965385743,
+              2.757714132904731,
+              3.485516176422325
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "Battaglia12_rcond1e-06",
+          "distance": 2.633547806175414e-05,
+          "rank": 9,
+          "covariance": {
+            "covariance_rank": 9,
+            "covariance_eigenvalues": [
+              1.0216227524707564,
+              1.3356795523391767,
+              1.676994858573962,
+              1.9966020239954654,
+              2.3941718859142807,
+              2.718773801350365,
+              3.3142280984185146,
+              3.6084238870672274,
+              3.9814920336881885
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "FL_L1_m9_rcond0.001",
+          "distance": 2.678619341557684e-05,
+          "rank": 5,
+          "covariance": {
+            "covariance_rank": 5,
+            "covariance_eigenvalues": [
+              1.6104216275694103,
+              1.8020108346419925,
+              2.5608810519500342,
+              2.7253408912611543,
+              2.8816124842422264
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "FL_L1_m9_rcond1e-06",
+          "distance": 2.9651210123074903e-05,
+          "rank": 9,
+          "covariance": {
+            "covariance_rank": 9,
+            "covariance_eigenvalues": [
+              0.8709397055705375,
+              1.3541333181643869,
+              1.4106744172805956,
+              1.8288923159687374,
+              1.9623744058523735,
+              2.2135945810954865,
+              2.7749503275613807,
+              2.9660550373991135,
+              3.6429239689537636
+            ],
+            "covariance_samples": 64
+          }
+        }
+      ],
+      "max_tested_moped_distance": 2.9651210123074903e-05
+    },
+    {
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 3.4067477768051194e-07,
+      "maximum_absolute_Dell": 3.344602373080298e-19,
+      "moped": [
+        {
+          "anchor_and_rank": "Battaglia12_rcond0.001",
+          "distance": 0.00019758249221937774,
+          "rank": 5,
+          "covariance": {
+            "covariance_rank": 5,
+            "covariance_eigenvalues": [
+              1.5995191070281,
+              2.299295045798976,
+              2.545274533282798,
+              3.612942297787116,
+              3.8114747901053643
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "Battaglia12_rcond1e-06",
+          "distance": 0.00020278940230110246,
+          "rank": 9,
+          "covariance": {
+            "covariance_rank": 9,
+            "covariance_eigenvalues": [
+              0.8847047758819933,
+              1.3434625103873512,
+              1.499783112761066,
+              2.0548376108651025,
+              2.169296588546418,
+              2.5882563388448916,
+              3.3591112355473816,
+              3.895290977283147,
+              4.415852692817801
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "FL_L1_m9_rcond0.001",
+          "distance": 0.0001975434796038161,
+          "rank": 5,
+          "covariance": {
+            "covariance_rank": 5,
+            "covariance_eigenvalues": [
+              1.2502576990610312,
+              1.446270452770898,
+              2.3709814184255573,
+              3.346671864619771,
+              3.6663996711702516
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "FL_L1_m9_rcond1e-06",
+          "distance": 0.00020084731212771482,
+          "rank": 9,
+          "covariance": {
+            "covariance_rank": 9,
+            "covariance_eigenvalues": [
+              1.1078072204470766,
+              1.1796640454409308,
+              1.411817324200383,
+              1.4723031440495455,
+              1.671022246558932,
+              2.2489588879988176,
+              2.632526643799087,
+              3.635405141177359,
+              4.076514844115881
+            ],
+            "covariance_samples": 64
+          }
+        }
+      ],
+      "max_tested_moped_distance": 0.00020278940230110246
+    },
+    {
+      "label": "compact",
+      "relative_Dell_l2": 4.6174539288483715e-08,
+      "maximum_absolute_Dell": 4.318738597293953e-29,
+      "moped": [
+        {
+          "anchor_and_rank": "Battaglia12_rcond0.001",
+          "distance": 8.933888741111817e-14,
+          "rank": 5,
+          "covariance": {
+            "covariance_rank": 5,
+            "covariance_eigenvalues": [
+              1.048053534018906,
+              1.2479552656264672,
+              1.517464719711836,
+              2.3525194997892642,
+              2.6909227660095656
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "Battaglia12_rcond1e-06",
+          "distance": 9.401466621747754e-14,
+          "rank": 9,
+          "covariance": {
+            "covariance_rank": 9,
+            "covariance_eigenvalues": [
+              0.8118033153511717,
+              0.9538343529605925,
+              1.116751850264974,
+              1.1630768450728826,
+              1.3305460490327823,
+              1.6953452830819236,
+              1.7790578869204048,
+              2.602495903743625,
+              2.9094711672063287
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "FL_L1_m9_rcond0.001",
+          "distance": 8.890843122759525e-14,
+          "rank": 5,
+          "covariance": {
+            "covariance_rank": 5,
+            "covariance_eigenvalues": [
+              0.6685469172391505,
+              0.8769032146314275,
+              1.4140408757788927,
+              2.057003645969608,
+              2.3115221858226698
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "FL_L1_m9_rcond1e-06",
+          "distance": 8.967381937092857e-14,
+          "rank": 9,
+          "covariance": {
+            "covariance_rank": 9,
+            "covariance_eigenvalues": [
+              0.5392298460403406,
+              0.6453957289936092,
+              0.8559671289252169,
+              1.0503117279676053,
+              1.2153328070678722,
+              1.4487418721297673,
+              1.6866855719948468,
+              2.243371911543744,
+              2.3599422326241575
+            ],
+            "covariance_samples": 64
+          }
+        }
+      ],
+      "max_tested_moped_distance": 9.401466621747754e-14
+    },
+    {
+      "label": "extended_shallow",
+      "relative_Dell_l2": 5.442862563056665e-06,
+      "maximum_absolute_Dell": 1.0175378933689492e-13,
+      "moped": [
+        {
+          "anchor_and_rank": "Battaglia12_rcond0.001",
+          "distance": 0.40460461650894947,
+          "rank": 5,
+          "covariance": {
+            "covariance_rank": 5,
+            "covariance_eigenvalues": [
+              1806.73120192836,
+              7380.9452369690935,
+              21629.171173536648,
+              41938.60124342668,
+              68781.17675416273
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "Battaglia12_rcond1e-06",
+          "distance": 0.45604648471986964,
+          "rank": 9,
+          "covariance": {
+            "covariance_rank": 9,
+            "covariance_eigenvalues": [
+              1352.9484883386435,
+              2528.524852594766,
+              8292.566784791168,
+              10622.64417586492,
+              11646.924125942613,
+              32014.266857818173,
+              35592.439182573304,
+              47390.92453045574,
+              86460.02911289278
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "FL_L1_m9_rcond0.001",
+          "distance": 0.4046025232432574,
+          "rank": 5,
+          "covariance": {
+            "covariance_rank": 5,
+            "covariance_eigenvalues": [
+              1549.683521298394,
+              4276.865489843024,
+              24042.14179886164,
+              38615.167746355844,
+              70524.50624889228
+            ],
+            "covariance_samples": 64
+          }
+        },
+        {
+          "anchor_and_rank": "FL_L1_m9_rcond1e-06",
+          "distance": 0.4236644908418119,
+          "rank": 9,
+          "covariance": {
+            "covariance_rank": 9,
+            "covariance_eigenvalues": [
+              701.9339253784115,
+              2568.0188178860276,
+              8901.465997147536,
+              9419.088664069835,
+              12862.088129769498,
+              14008.922531400622,
+              46126.06281113387,
+              60665.96477171817,
+              78209.0997389011
+            ],
+            "covariance_samples": 64
+          }
+        }
+      ],
+      "max_tested_moped_distance": 0.45604648471986964
+    }
+  ],
+  "ell_min": 80,
+  "ell_max": 7979,
+  "noise_scope": "Each case has its own 64 held-out split-noise draws; fixed sky, no cosmic variance",
+  "compression_scope": "Local linear unbinned MOPED at B12 and FL, relative singular cutoffs 1e-3 and 1e-6",
+  "note": "Cache error only at fixed raw NSIDE8192. No posterior bias interpretation."
+}

@@ -1,0 +1,12 @@
+label = "steep_cache"
+beta_raw = 576.0
+stable_same_cylinder = 0.0027781534655579184
+x = 1.0e-6
+initial19_error = 0.0
+cylinder_to_sphere = 1.0
+initial19_value = 0.0
+xc = 0.09263360649031291
+stock_value = 0.0
+sphere4 = 0.0027781534655579184
+stock_relative_error = 1.0
+stock_seconds_after_compile = 2.3932e-5

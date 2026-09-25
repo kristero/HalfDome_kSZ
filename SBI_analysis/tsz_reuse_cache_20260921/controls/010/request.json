@@ -1,0 +1,29 @@
+{
+  "id": 10,
+  "label": "single_profile_optimized",
+  "mode": "fused",
+  "nodes": [
+    512,
+    256,
+    128
+  ],
+  "cases": [
+    {
+      "label": "Battaglia12",
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "reference_id": 0
+    }
+  ],
+  "nside": 8192,
+  "threads": 26
+}

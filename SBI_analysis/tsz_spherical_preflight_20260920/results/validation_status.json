@@ -1,0 +1,21 @@
+{
+  "P01": "Experimental operator defined; production renderer not frozen",
+  "P02": "Passed scalar projection, direct integration, volume and uniform-sphere identities",
+  "P03": "Passed old-LOS disabling test; finite all-corner values, underflow tracked",
+  "P04": "Auxiliary padding mismatch corrected; matched compact case 0.04014% central-normalized error at both refinements; other joint extremes pending",
+  "P05": "Sparse actual-pixel pre-beam/subpixel tests completed; full-catalogue corrected painter pending",
+  "P06": "512 scalar corners passed; six full-map controls running; broad-prior extreme maps pending",
+  "P07": "New clean four-CPU 4096/8192 timings complete; complete noisy row and tail timing pending",
+  "D01": "Independent physical uniforms verified, including all beta parameters; no rejection",
+  "D02": "Seed uniqueness and analytic/Monte Carlo split-noise controls passed; new full-row parity pending",
+  "D03": "P0 scaling and sufficient-compression control passed; new dataset round-trip pending",
+  "D04": "7900-multipole MOPED algebra and within-bin shape test passed; physical rank and inference tests pending",
+  "D05": "Exact 8k/524k design prefix passed; diagnostic resume implemented but interruption test pending",
+  "I01": "P0 means respond to data, but learned intervals are 7-29 times too wide; P0-beta control pending",
+  "I02": "One-parameter shuffled comparison completed; nine-parameter comparison pending",
+  "I03": "Awaiting independent diagnostic dataset",
+  "I04": "Awaiting independent diagnostic dataset",
+  "I05": "Awaiting adequately sized diagnostic dataset",
+  "I06": "Historical FL fit used as rendering control, no new physical fit asserted",
+  "I07": "Not approved by evidence: production rendering and inference gates remain open"
+}

@@ -1,0 +1,24 @@
+noise1_pixel_sha256 = "5d0d6bd4db70f0aec88320520c3efff1f779b315a0db5204634a7b615b8661dc"
+mask_pixel_sha256 = "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689"
+nside = 4096
+cache_file_sha256 = "e3a8b88ca3d66794b0194fab204014102df38788a82dbb3d87936b7a95e43b62"
+signal_beamed_pixel_sha256 = "d570660b02dc9f9ac25f5a2feac7e6ea1096ced9df96d92f84d1ef2fb265b554"
+status = "map_processing_completed"
+signal_mean = 2.350639624742107e-6
+noise2_pixel_sha256 = "dc6b755b997bb12d22c3386c60bed33aef5d2bb8b6d28802c300b610a3b55844"
+ell_max = 7979
+signal_max = 0.00018400993151788435
+source = "halfdome"
+signal_min = 5.5768374707264895e-8
+beam_fwhm_arcmin = 2.0
+
+[runtime]
+xgpaint_source = "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl"
+julia_version = "1.12.2"
+xgpaint_sha256 = "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664"
+threads = 26
+adapter_sha256 = "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81"
+hdf5_version = "0.17.2"
+healpix_version = "4.2.4"
+operator_sha256 = "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb"
+beam_source_sha256 = "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a"

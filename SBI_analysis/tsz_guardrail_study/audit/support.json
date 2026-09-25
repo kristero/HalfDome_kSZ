@@ -1,0 +1,76 @@
+{
+  "proposals": 262144,
+  "old_acceptance": 0.021976470947265625,
+  "analytic_same_box_acceptance": 0.6630096435546875,
+  "analytic_extended_acceptance": 0.67376708984375,
+  "production_accepted_in_analytic": 5761,
+  "production_total": 5761,
+  "old_support_fraction_of_extended_box": 0.00583648681640625,
+  "isolated_halo_energy_failures_on_actual_catalogue": 39050,
+  "old_guard_failure_fraction_among_analytic": {
+    "beta_lower": 0.025047558655675334,
+    "beta_upper": 0.5885610109611378,
+    "size_lower": 0.7385745991484736,
+    "size_upper": 0.5045690279916659,
+    "Y_lower": 0.6453879427484374,
+    "Y_upper": 0.48908415617356643,
+    "LOS_tail": 0.001370142223027448
+  },
+  "tails": {
+    "P0": {
+      "accepted_min": 1.000440463423729,
+      "accepted_max": 59.99977130629122,
+      "below_old": 0,
+      "above_old": 0
+    },
+    "xc": {
+      "accepted_min": 0.02502744668163359,
+      "accepted_max": 3.9999996446073056,
+      "below_old": 3335,
+      "above_old": 0
+    },
+    "beta": {
+      "accepted_min": 2.804262203350663,
+      "accepted_max": 15.999994885921478,
+      "below_old": 0,
+      "above_old": 0
+    },
+    "alpha_m_P0": {
+      "accepted_min": -0.599998720921576,
+      "accepted_max": 1.4999955388717354,
+      "below_old": 33652,
+      "above_old": 0
+    },
+    "alpha_m_xc": {
+      "accepted_min": -0.9999970206990838,
+      "accepted_max": 0.3999976191669701,
+      "below_old": 50468,
+      "above_old": 0
+    },
+    "alpha_m_beta": {
+      "accepted_min": -0.1999977620318532,
+      "accepted_max": 0.38614184074103836,
+      "below_old": 0,
+      "above_old": 0
+    },
+    "alpha_z_P0": {
+      "accepted_min": -5.999979750718921,
+      "accepted_max": 0.4999823779799044,
+      "below_old": 40746,
+      "above_old": 0
+    },
+    "alpha_z_xc": {
+      "accepted_min": -1.499962352681905,
+      "accepted_max": 2.999996156897396,
+      "below_old": 0,
+      "above_old": 39268
+    },
+    "alpha_z_beta": {
+      "accepted_min": -0.4999494547955692,
+      "accepted_max": 1.9999951128847897,
+      "below_old": 0,
+      "above_old": 37605
+    }
+  },
+  "status": "Analytic candidate support only; numerical map fidelity not certified"
+}

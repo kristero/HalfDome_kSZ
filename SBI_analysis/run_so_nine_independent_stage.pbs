@@ -1,0 +1,44 @@
+#!/bin/bash
+#PBS -N SO9matched
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=128gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${PROJECT_DIR:?Set PROJECT_DIR}"
+: "${RUN_ROOT:?Set RUN_ROOT}"
+: "${STAGE:?Set STAGE}"
+: "${PYTHON:=python3}"
+: "${CPUS:=${PBS_NCPUS:-26}}"
+export OMP_NUM_THREADS="${CPUS}" OPENBLAS_NUM_THREADS="${CPUS}" MKL_NUM_THREADS="${CPUS}"
+export TORCH_NUM_THREADS="${CPUS}" TORCH_NUM_INTEROP_THREADS=1
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1 HDF5_USE_FILE_LOCKING=FALSE
+# This cluster installs Torch and SBI in the user's site-packages.
+unset PYTHONNOUSERSITE
+cd "${PROJECT_DIR}"
+case "${STAGE}" in
+  calibration)
+    "${PYTHON}" SBI_analysis/prepare_so_nine_fisher_calibration.py work \
+      --root "${CALIBRATION_ROOT:?}" --worker "${WORKER:?}" --workers "${WORKERS:-4}" \
+      --julia "${JULIA:-julia}" --threads "${CPUS}"
+    ;;
+  combine)
+    "${PYTHON}" SBI_analysis/prepare_so_nine_fisher_calibration.py combine --root "${CALIBRATION_ROOT:?}"
+    ;;
+  prepare)
+    "${PYTHON}" SBI_analysis/run_so_nine_independent_comparison.py prepare --root "${RUN_ROOT}" \
+      --dataset "${DATASET:?}" --generation-manifest "${GENERATION_MANIFEST:?}" \
+      --calibration "${CALIBRATION_ROOT:?}/calibration.npz" --sizes "${SIZES:-4096,8192,16384,max}"
+    ;;
+  train_evaluate)
+    for action in train evaluate; do
+      "${PYTHON}" SBI_analysis/run_so_nine_independent_comparison.py "${action}" --root "${RUN_ROOT}" \
+        --n-train "${N_TRAIN:?}" --method "${METHOD:?}"
+    done
+    ;;
+  summarize)
+    "${PYTHON}" SBI_analysis/run_so_nine_independent_comparison.py summarize --root "${RUN_ROOT}"
+    ;;
+  *) echo "Unknown STAGE: ${STAGE}" >&2; exit 2 ;;
+esac

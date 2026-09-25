@@ -1,0 +1,479 @@
+{
+  "utc": "2026-09-22T15:08:31.619170+00:00",
+  "full_sky_computation": false,
+  "source_sha256": {
+    "benchmark.jl": "8731925142bc7436b314a1a57f303200f985dfeeecd25ee0db91d23c59b5b287",
+    "spherical_truncation_profiles.jl": "d76ddb2bcbb90e1335ef1f80593b9a9a4a1f2892277bd30d91eb05850e8bd487",
+    "edge_extension/smooth_exterior.jl": "3fbea72cce31c64523d0f76eec165b4476c75b31bee567167f171d22ae2e7a4e",
+    "edge_extension/entrypoint.jl": "180904b5ed69310b9416174d936026a71618616270f5fcb6a3234bdaa1b5fa5a",
+    "edge_extension/controls/001/task.toml": "5562a5a49e2fd257452d795095022176be8e3f90c0d4b32fc9a71ee3b36eef49",
+    "work_balance/balanced_painter.jl": "f00a343e5238847bab38a66c607136ccf8fea65432ce3abac379a5ae8b991e7e"
+  },
+  "measured_smooth_half_errors": [
+    {
+      "group": "smooth_exterior",
+      "task": 1,
+      "variant": "smooth_exterior_1",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 2.92499784951177e-07,
+      "max_fractional_Dell": 6.018225187496089e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00011925832408073209,
+        "Battaglia12_rcond1e-06": 0.00012107604110415413,
+        "FL_L1_m9_rcond0.001": 0.00011157673289797625,
+        "FL_L1_m9_rcond1e-06": 0.00011397821970026326
+      },
+      "distance5": 0.00011925832408073209,
+      "distance9": 0.00012107604110415413
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 1,
+      "variant": "smooth_exterior_1",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 2.4535790709159767e-07,
+      "max_fractional_Dell": 9.011648523012177e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00020778645052114362,
+        "Battaglia12_rcond1e-06": 0.00021210430814096534,
+        "FL_L1_m9_rcond0.001": 0.00020415342801375779,
+        "FL_L1_m9_rcond1e-06": 0.00021224779650859892
+      },
+      "distance5": 0.00020778645052114362,
+      "distance9": 0.00021224779650859892
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 1,
+      "variant": "smooth_exterior_1",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 8.771937558560544e-07,
+      "max_fractional_Dell": 9.481195018688454e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.6973030694036082e-12,
+        "Battaglia12_rcond1e-06": 1.7859532523722346e-12,
+        "FL_L1_m9_rcond0.001": 1.6891057860059352e-12,
+        "FL_L1_m9_rcond1e-06": 1.7036568558021215e-12
+      },
+      "distance5": 1.6973030694036082e-12,
+      "distance9": 1.7859532523722346e-12
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 1,
+      "variant": "smooth_exterior_1",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 7.45960730257892e-08,
+      "max_fractional_Dell": 2.4113076627840863e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00692858354937872,
+        "Battaglia12_rcond1e-06": 0.007487850839121517,
+        "FL_L1_m9_rcond0.001": 0.006964371928742271,
+        "FL_L1_m9_rcond1e-06": 0.0070505895279737284
+      },
+      "distance5": 0.006964371928742271,
+      "distance9": 0.007487850839121517
+    }
+  ],
+  "boundary_checks": [
+    {
+      "shape": "Battaglia12 shape",
+      "xc": 0.497,
+      "beta_raw": 4.35,
+      "gamma": -0.3,
+      "alpha": 1,
+      "edge_derivative": -2.5652573271954576e-05,
+      "exterior_rule_relative_error": 2.6645352591003757e-15
+    },
+    {
+      "shape": "Bright / shallow shape",
+      "xc": 4.0,
+      "beta_raw": 2.8,
+      "gamma": -0.3,
+      "alpha": 1,
+      "edge_derivative": -0.04068306673947833,
+      "exterior_rule_relative_error": 8.881784197001252e-16
+    }
+  ],
+  "cache": {
+    "default_nodes": [
+      512,
+      256,
+      128
+    ],
+    "half_nodes": [
+      256,
+      128,
+      64
+    ],
+    "default_values": 16777216,
+    "half_values": 2097152,
+    "spacing_ratios": [
+      2.003921568627451,
+      2.0078740157480315,
+      2.015873015873016
+    ],
+    "default_values_MiB": 128,
+    "half_values_MiB": 16
+  },
+  "pixel_geometry": [
+    {
+      "nside": 4096,
+      "parent_nside": 4096,
+      "parent_nested_pixel": 94741914,
+      "children": 1,
+      "centres_arcmin": [
+        [
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "nside": 8192,
+      "parent_nside": 4096,
+      "parent_nested_pixel": 94741914,
+      "children": 4,
+      "centres_arcmin": [
+        [
+          1.9083328151973046e-13,
+          -0.279764549330126
+        ],
+        [
+          0.3295898447600402,
+          0.0
+        ],
+        [
+          -0.3295898447592769,
+          0.0
+        ],
+        [
+          1.9083328151973046e-13,
+          0.279764549330126
+        ]
+      ]
+    },
+    {
+      "nside": 16384,
+      "parent_nside": 4096,
+      "parent_nested_pixel": 94741914,
+      "children": 16,
+      "centres_arcmin": [
+        [
+          0.0,
+          -0.4196468257321959
+        ],
+        [
+          0.16479492200082385,
+          -0.27976454965156794
+        ],
+        [
+          -0.16479492200101473,
+          -0.279764549651568
+        ],
+        [
+          -1.9083328104579088e-13,
+          -0.1398822743176616
+        ],
+        [
+          0.329589844759997,
+          -0.13988227496054553
+        ],
+        [
+          0.4943847690331289,
+          0.0
+        ],
+        [
+          0.1647949220009102,
+          0.0
+        ],
+        [
+          0.329589844759997,
+          0.13988227496054553
+        ],
+        [
+          -0.32958984475904285,
+          -0.1398822749605455
+        ],
+        [
+          -0.1647949220009102,
+          0.0
+        ],
+        [
+          -0.4943847690333197,
+          0.0
+        ],
+        [
+          -0.32958984475904285,
+          0.1398822749605455
+        ],
+        [
+          -1.9083328104579088e-13,
+          0.1398822743176616
+        ],
+        [
+          0.16479492200082385,
+          0.27976454965156794
+        ],
+        [
+          -0.16479492200101473,
+          0.279764549651568
+        ],
+        [
+          0.0,
+          0.4196468257321959
+        ]
+      ]
+    }
+  ],
+  "measured_painting": {
+    "shared_static": {
+      "total_paint_seconds": 1612.0402355194092,
+      "last_chunk_seconds": 864.9329159259796
+    },
+    "shared_greedy": {
+      "total_paint_seconds": 878.5634202957153,
+      "last_chunk_seconds": 214.60443902015686
+    }
+  },
+  "scheduling_illustration": {
+    "costs": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      2,
+      2,
+      3,
+      3,
+      4,
+      6,
+      8,
+      12
+    ],
+    "static": [
+      [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          2,
+          1,
+          2
+        ],
+        [
+          3,
+          1,
+          3
+        ]
+      ],
+      [
+        [
+          0,
+          1,
+          4
+        ],
+        [
+          1,
+          1,
+          5
+        ],
+        [
+          2,
+          1,
+          6
+        ],
+        [
+          3,
+          1,
+          7
+        ]
+      ],
+      [
+        [
+          0,
+          2,
+          8
+        ],
+        [
+          2,
+          2,
+          9
+        ],
+        [
+          4,
+          3,
+          10
+        ],
+        [
+          7,
+          3,
+          11
+        ]
+      ],
+      [
+        [
+          0,
+          4,
+          12
+        ],
+        [
+          4,
+          6,
+          13
+        ],
+        [
+          10,
+          8,
+          14
+        ],
+        [
+          18,
+          12,
+          15
+        ]
+      ]
+    ],
+    "greedy": [
+      [
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          1,
+          1,
+          4
+        ],
+        [
+          2,
+          2,
+          8
+        ],
+        [
+          4,
+          4,
+          12
+        ]
+      ],
+      [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          5
+        ],
+        [
+          2,
+          2,
+          9
+        ],
+        [
+          4,
+          6,
+          13
+        ]
+      ],
+      [
+        [
+          0,
+          1,
+          2
+        ],
+        [
+          1,
+          1,
+          6
+        ],
+        [
+          2,
+          3,
+          10
+        ],
+        [
+          5,
+          8,
+          14
+        ]
+      ],
+      [
+        [
+          0,
+          1,
+          3
+        ],
+        [
+          1,
+          1,
+          7
+        ],
+        [
+          2,
+          3,
+          11
+        ],
+        [
+          5,
+          12,
+          15
+        ]
+      ]
+    ],
+    "units": "arbitrary; not measured cluster trace"
+  },
+  "output_map": {
+    "4096": {
+      "npix": 201326592,
+      "pixel_scale_arcmin": 0.8588716029543515,
+      "one_Float64_map_GiB": 1.5
+    },
+    "8192": {
+      "npix": 805306368,
+      "pixel_scale_arcmin": 0.42943580147717575,
+      "one_Float64_map_GiB": 6.0
+    }
+  },
+  "beam_power": {
+    "2000": 0.7832744780565827,
+    "4000": 0.3764973610614163,
+    "6000": 0.1110564743075789,
+    "7979": 0.020518965023606867,
+    "12287": 9.947494812355805e-05
+  }
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "nside": 4096,
+    "healpy": "1.18.1",
+    "sha256": "552b523a628ca6a4507892dac27336b052358b2242d8aa7a9b955877a3c191ed",
+    "source": "https://healpix.sourceforge.io/html/intro_Pixel_window_functions.htm"
+  },
+  {
+    "nside": 8192,
+    "healpy": "1.18.1",
+    "sha256": "a61df2e2694efad6c978064cd6cda36a173be2f23da73d940102e12fa56bab58",
+    "source": "https://healpix.sourceforge.io/html/intro_Pixel_window_functions.htm"
+  }
+]

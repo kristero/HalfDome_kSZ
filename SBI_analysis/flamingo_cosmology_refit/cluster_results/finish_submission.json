@@ -1,0 +1,12 @@
+{
+  "job_id": "597708.idark",
+  "depends_on": {
+    "Mstar-1sigma": "597705.idark"
+  },
+  "already_complete": [
+    "L1_m9",
+    "fgas-8sigma"
+  ],
+  "purpose": "multipole integration audit and isolated result export",
+  "previous_submission": "597706.idark disappeared without starting; server keeps no completed-job history"
+}

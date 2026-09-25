@@ -1,0 +1,29 @@
+{
+  "all_match_frozen_manifest": true,
+  "checked_files": 21,
+  "root": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915",
+  "checks": {
+    "code/submit.py": true,
+    "code/audit.py": true,
+    "code/independent_noise.jl": true,
+    "code/run_worker.pbs": true,
+    "code/prior.json": true,
+    "code/prepare.py": true,
+    "code/collect.py": true,
+    "code/prior.py": true,
+    "code/validate.py": true,
+    "code/README.md": true,
+    "code/check_workflow.py": true,
+    "code/stable_los.jl": true,
+    "code/plot_preflight.py": true,
+    "code/run_collect.pbs": true,
+    "code/check_noise_seeds.py": true,
+    "code/sbi_prior.py": true,
+    "code/run_config.json": true,
+    "code/noise_seeds.py": true,
+    "code/worker.py": true,
+    "code/paint_row.jl": true,
+    "run_config.json": true
+  },
+  "operation": "read-only SHA256 verification"
+}

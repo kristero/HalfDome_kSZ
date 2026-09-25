@@ -1,0 +1,45 @@
+{
+  "groups": {
+    "sobol": {
+      "count": 65536,
+      "los_divergent": 1285,
+      "infinite_thermal_energy_divergent": 22073,
+      "central_column_tail_gt_1pct": 4419,
+      "Y200_above_100x_fiducial_somewhere": 8503,
+      "Y200_below_0p01x_fiducial_somewhere": 57289,
+      "min_Y200_ratio": 8.95572988266759e-19,
+      "max_Y200_ratio": 450814.79374374106
+    },
+    "corners": {
+      "count": 512,
+      "los_divergent": 192,
+      "infinite_thermal_energy_divergent": 384,
+      "central_column_tail_gt_1pct": 232,
+      "Y200_above_100x_fiducial_somewhere": 218,
+      "Y200_below_0p01x_fiducial_somewhere": 449,
+      "min_Y200_ratio": 1.8000527034284133e-22,
+      "max_Y200_ratio": 818016.8150337641
+    },
+    "examples": {
+      "count": 163,
+      "los_divergent": 16,
+      "infinite_thermal_energy_divergent": 61,
+      "central_column_tail_gt_1pct": 18,
+      "Y200_above_100x_fiducial_somewhere": 20,
+      "Y200_below_0p01x_fiducial_somewhere": 82,
+      "min_Y200_ratio": 7.455574087113667e-09,
+      "max_Y200_ratio": 8133.075001136702
+    }
+  },
+  "interpolation_domain": {
+    "logmass": [
+      12,
+      15.7
+    ],
+    "redshift": [
+      0.001,
+      5
+    ]
+  },
+  "interpretation": "Y200 ratio thresholds flag large deviations; they are not observational exclusion limits"
+}

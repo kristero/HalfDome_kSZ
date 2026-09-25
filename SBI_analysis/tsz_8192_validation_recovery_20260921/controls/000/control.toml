@@ -1,0 +1,928 @@
+lean_maps = "0"
+beam_arcmin = 2.0
+noise_table_sha256 = "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64"
+output_nside = 4096
+threads = 26
+noise_beam_applied = false
+split_Nell_multiplier = 1.0
+raw_nside = 8192
+mask_sha256 = "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689"
+current_signal_and_noise_seconds = 3771.8231360912323
+production_certified = false
+
+[[noise_draws]]
+split_seeds = [62000001, 62000002]
+draw = 0
+noise1_sha256 = "9a9b90d51b382b6f705b25dd324acf25907d8948c515b99803db19fbf4cfd0df"
+noise2_sha256 = "544859c52f589f1f80b6c5d66aac269e129d247f090eea9e30e827e72efdf886"
+seconds = 40.8447949886322
+map_alm_parity = 2.005510739249433e-16
+[[noise_draws]]
+split_seeds = [62000003, 62000004]
+draw = 1
+noise1_sha256 = "2b599a5ca039a861441cfe387ac974374cc9c65ff2456a4fbb143c697e3648d3"
+noise2_sha256 = "5a40a21c2f335955633a3653604501ad413b818e4abdc7613525056e9ce9ed94"
+seconds = 33.98861289024353
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000005, 62000006]
+draw = 2
+noise1_sha256 = "8ccaf533cc31fa3ab82c4bebe74a82e4b18e9785f257d11ff6773979d34acf2f"
+noise2_sha256 = "c57e83ed1ab4b56857542c9482d6edd1ebd6f72cfc6289e108a11a59f281b1d0"
+seconds = 33.20373296737671
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000007, 62000008]
+draw = 3
+noise1_sha256 = "d4214a5f497de1d94d8191e7b0b4b3a59c77227023d19be286032e559c63410a"
+noise2_sha256 = "797694a302b01beb982bc6f6f3d6f526dbf8812dac351238a8241435b0f40257"
+seconds = 33.052911043167114
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000009, 62000010]
+draw = 4
+noise1_sha256 = "7e5bdcf95f310b7f20729451a4594bafd91b0a0d46b62ec095810753180ea538"
+noise2_sha256 = "889ec95aa265580e5ebb686567861357e653c169779ea922f1fa8773788e597b"
+seconds = 32.98317503929138
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000011, 62000012]
+draw = 5
+noise1_sha256 = "abdbb114970ef0e14ed90a0c48008fa5efe9f5e2780bfbee02c3c46bd3f96493"
+noise2_sha256 = "8a813b4dbb71beee71ea354ab3b0db820d82fb2ef50c60920f65da0bff6d6c0d"
+seconds = 33.052379846572876
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000013, 62000014]
+draw = 6
+noise1_sha256 = "74c7706d4e42c9aa5155428238faa2093687f8d8772fae436917529202a6f57a"
+noise2_sha256 = "c82cb64398e5e0aec800ccba06d52f5fee0bcbcffbe9e437bd7393e627cdde81"
+seconds = 33.06494998931885
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000015, 62000016]
+draw = 7
+noise1_sha256 = "20dcde454ec438b9dcb4820ea6f223cf4cdb5fcaef8448c3a59e95127e13f139"
+noise2_sha256 = "3a68884aa7762d033cb4f5b04e9bfd5a415098132a6213e3c14b85d17921f0c7"
+seconds = 33.05043292045593
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000017, 62000018]
+draw = 8
+noise1_sha256 = "0656510140cc23114a714ba50f4533c7388cef2af84e4017e44c10ba294271f3"
+noise2_sha256 = "a67d2b178c58707d50ca0663ea1c2ddba4eb6a12d927f3ec34f14ea728caa8c7"
+seconds = 34.931232929229736
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000019, 62000020]
+draw = 9
+noise1_sha256 = "0691ca2682ef1e4aa36ca82d3bd7804f2437c7e915dd44d27fc2e19361ff1249"
+noise2_sha256 = "abe66581b929f6455c480cd96e3b145df6a42dc70893078bf9a668b4923cd6d0"
+seconds = 34.1763870716095
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000021, 62000022]
+draw = 10
+noise1_sha256 = "7903d3b20d7b2f78426511608c9340817a9c393d955a4b7f5c9bcb4b3f9e5035"
+noise2_sha256 = "4d3033065c66637207c544b33498838edd62252287ca32e12269c45ffae50927"
+seconds = 33.83986496925354
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000023, 62000024]
+draw = 11
+noise1_sha256 = "13b10f02b05f284df87fc2152c5ee1337e9e8b17274fa5fc346679250d53bc8f"
+noise2_sha256 = "5de36a75109464fcc622c57951e65f2c4436faf7dbed7c7b95b7027bd6dfdb18"
+seconds = 33.826456785202026
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000025, 62000026]
+draw = 12
+noise1_sha256 = "fe3390dcbca3d467ae5ca4dc26fec7cc14a5627a629b9890b844658e625c4c77"
+noise2_sha256 = "9c2016969ad63f57f94799cded94fc173d231182f82a81c79073b7eb5446e72a"
+seconds = 34.17400097846985
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000027, 62000028]
+draw = 13
+noise1_sha256 = "94168f7843470194b3b1974b0c896fb7c6541b7f2ddcae560d90e95b4d6ff243"
+noise2_sha256 = "c302354caf2b50700a97b0a0db3b45be9e459af0ab25343ecdfcafcc5c1e423f"
+seconds = 34.30670189857483
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000029, 62000030]
+draw = 14
+noise1_sha256 = "e407acdab74ff6302651e0c36908782c6fa50a2b03c5522e2dfa912f1e629297"
+noise2_sha256 = "817a4dae1558450e2b99a8d1a492fe5278660ffe23572b9b4b237fbcdbe98cef"
+seconds = 33.99011015892029
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000031, 62000032]
+draw = 15
+noise1_sha256 = "ecf87417945240f929c0637c409675982664b1b356e53a85560f47cd2c780593"
+noise2_sha256 = "d43a9257822edd309a4b3b2351cbf223274cefc7489874686b514c4cc9286fa1"
+seconds = 33.85758399963379
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000033, 62000034]
+draw = 16
+noise1_sha256 = "839b828686c8b2786d0cdf7f1c488970dabf213d32a1ccc8f86fad8e768a46e0"
+noise2_sha256 = "8c5663e5fc0df929dd6e48f4e259f4e328a1777a306bdc18a407d12bb82ab720"
+seconds = 33.75770592689514
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000035, 62000036]
+draw = 17
+noise1_sha256 = "03505dd5694315f361c33bdadf474f96d23f962d40951858b87f65e7912d8372"
+noise2_sha256 = "32710fd7645605294b6092fd7d2531e1ef0c42e7187d9531270df841d60ec6a6"
+seconds = 34.019296169281006
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000037, 62000038]
+draw = 18
+noise1_sha256 = "348279b302eb7fb4f3954fd4ef59a948c6ef759301fb894549dcdf7edd8eea27"
+noise2_sha256 = "bad83d022bd795647d5d4567281230ad7e5f33ee838c8939ce1c78f8679d5fdc"
+seconds = 33.81714081764221
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000039, 62000040]
+draw = 19
+noise1_sha256 = "94f1e170d4216d93cf2529147d43bf202b16c600433eca8b4c602c86cf668514"
+noise2_sha256 = "247d784338b9de2dd608d19f3ce52fc95161a04d065f66d97a477407a76f087a"
+seconds = 33.73934006690979
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000041, 62000042]
+draw = 20
+noise1_sha256 = "be39a2a631f1bbca585dd8f50cd865d52bf0e679602013f6db93527074146348"
+noise2_sha256 = "71f0ca033f7edb3ea6e0e9c5d4991b5e7b9c62eaa76252bd24a7011251300855"
+seconds = 33.864553928375244
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000043, 62000044]
+draw = 21
+noise1_sha256 = "9d6404ed93d5c4db742c9e97e7dc692b2064c2ffc4ee8a8041e2e959e064fefa"
+noise2_sha256 = "58d31442a3d8bdfeaa010696f4336a5260e93a4bedd5bc07dcb45a84b091d8f8"
+seconds = 33.69978094100952
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000045, 62000046]
+draw = 22
+noise1_sha256 = "3d5ed7e1fc3ab248127200cbd1c9788b0818e80f2ab27c62bfff5769c2406af8"
+noise2_sha256 = "6d6231c43998feb20ee700a8b9a0d16ef99c9c7af360f26c28681316295e9ce2"
+seconds = 33.760140895843506
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000047, 62000048]
+draw = 23
+noise1_sha256 = "4ca94c74c0a8e6aa2f4d4adc13558141814d3b6e4d7fef16ce14713e2ae3461c"
+noise2_sha256 = "0adac1a84a6902c5619edbeef5535f74c3713c5f7ef469a9be8735e7e9acde58"
+seconds = 33.81134605407715
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000049, 62000050]
+draw = 24
+noise1_sha256 = "aa19570d5e895e478836721c148500cb7fe005d77c8686d97832d242bd591a2a"
+noise2_sha256 = "e6d8fe9c50bdd4f1ecd5b8ca60cff1cbdc8d3f2567c486bb6ad29c548806f4ae"
+seconds = 33.684489011764526
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000051, 62000052]
+draw = 25
+noise1_sha256 = "c6ba6432678159cf3a72331d7db6c6ba372e00a48c323cc58587795b9d0c1ecb"
+noise2_sha256 = "6336a18c9ad2dab55b12ade3dee00bfc2d8faee0fd82c7ea19b36ebe2f0cd3d4"
+seconds = 33.70550608634949
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000053, 62000054]
+draw = 26
+noise1_sha256 = "b4dc197917dc619b4220189309f294ad7c3bd5879e0153e9beaa63becb2881d4"
+noise2_sha256 = "7afb88484b0a1b61a4dd67d76530865ff427a64c33717569548dd00b62f58de7"
+seconds = 33.66107201576233
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000055, 62000056]
+draw = 27
+noise1_sha256 = "6c6ecdead2ca45feff74c62150ff53acf1742d9366adb7ea536ece3f8eaf460d"
+noise2_sha256 = "b47959132b93c197d572fd132b5f0e389481ff9024674919b0d1e451feeff6d5"
+seconds = 33.481544971466064
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000057, 62000058]
+draw = 28
+noise1_sha256 = "e029e900c04fe7f5fe3886f8d30541ac3c948da1b781e339364cac90d3da7f60"
+noise2_sha256 = "1a56a9f92a2c9c89d31a87e60cc0026f67a34e02af5991a9958d30be1758b381"
+seconds = 33.461475133895874
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000059, 62000060]
+draw = 29
+noise1_sha256 = "a9f28bf6b02a09ce70897b81d1a79bd3d9fda7d251711f67a0031afe91c6c7a9"
+noise2_sha256 = "df464f5cdcac4c95559953aa6f29ec44f32473c0fcf2c7988304bcd1b7dc7d19"
+seconds = 33.62318205833435
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000061, 62000062]
+draw = 30
+noise1_sha256 = "6f987a0441b70e0002ea96db74f6e3e13a52a4552d8767866ab2780120d669eb"
+noise2_sha256 = "22092a3712cf197490525b4b58955164c9106adcbd2d6170a330fc71007ec289"
+seconds = 33.44877290725708
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000063, 62000064]
+draw = 31
+noise1_sha256 = "2b70970648019a2121fb490b14aedc75c2c28589196861653971a1fc5266fa59"
+noise2_sha256 = "78eadcb8b716fa6eebafe55f9244c005d656fa593f4bda5cadfc3b6a48fc0cfe"
+seconds = 33.44059109687805
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000065, 62000066]
+draw = 32
+noise1_sha256 = "925d5ef346588364caaf825ea15990a1a99c8dd457ca433633eca40f57ab4223"
+noise2_sha256 = "3338de4fadaee2ee38544b72b33e7de72c84823d32803cb5281d6bfe6f0dafc4"
+seconds = 33.44627594947815
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000067, 62000068]
+draw = 33
+noise1_sha256 = "d6a8fd4d3a51dc55eec26cb9ffb71112eb04b9b61cef613881d9ed0fb188c632"
+noise2_sha256 = "7f68fe311f76480e5297a12308caf5ef928d799e83520498a123270693a3a6c9"
+seconds = 33.480929136276245
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000069, 62000070]
+draw = 34
+noise1_sha256 = "071a57ff3c9afbd19dbbd1d700a1365d802621483226e632f342b7f0c9e30734"
+noise2_sha256 = "3e30ad1ebef763029747d44a7a614bc162ac7de0053b8980616b3e87f6f2335f"
+seconds = 33.44964003562927
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000071, 62000072]
+draw = 35
+noise1_sha256 = "a377bfccffabf222bdbe9eda161cae5baaa6116c1c97e1016d4fbf9b08065a75"
+noise2_sha256 = "ca1e91b406bc8485fac89351ccab3e9977064c62f4f048da7f0ba8db4d85c39c"
+seconds = 33.47404909133911
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000073, 62000074]
+draw = 36
+noise1_sha256 = "c01a2bbdf0ad8d328b09bc3f13e930de5595a95b68d6cf5e56245ae99200c0b9"
+noise2_sha256 = "fe6c9bd1741765938081184dd64408fa2d0cda2ee363040f1848b7b507129999"
+seconds = 33.42686581611633
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000075, 62000076]
+draw = 37
+noise1_sha256 = "41519cb90f102fdf8fe8b2f974abb7cd06513ec3e817d1dc0e12ab6aa3bac13c"
+noise2_sha256 = "6f0f4650da7bcf5424289b551f30ab74f153de8f52839c7d38fdcac56de9dade"
+seconds = 33.51813006401062
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000077, 62000078]
+draw = 38
+noise1_sha256 = "88604f679b891ede35ccf6c68c978cac7ea04e0ec3001e8b7e171098cecd72f2"
+noise2_sha256 = "38b281fd6f32d68418e6cb99901f0369bc53ddf96b51af25cd471dc7e4e8af8d"
+seconds = 33.44475293159485
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000079, 62000080]
+draw = 39
+noise1_sha256 = "efff02fae3fae584e081c51699ff5734d4530dd9e7836d26a650dc5f094fe902"
+noise2_sha256 = "285b71a8c26385b334d07037209a7a32540633cccc2d661fc1abb100785a36a1"
+seconds = 33.188313007354736
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000081, 62000082]
+draw = 40
+noise1_sha256 = "410b27b33e7946fa7227ba9af0e338607537daba6cf8b6ffa438a50e30d1afef"
+noise2_sha256 = "cd372ab2fbb2a5072e666e82a4485042918b0dee68fb2e60dd8305c61d479233"
+seconds = 33.455487966537476
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000083, 62000084]
+draw = 41
+noise1_sha256 = "9fae674fb3f55123bd7ea0df7763d3449446a63ac9a4e07d85ecbc5f312b7cda"
+noise2_sha256 = "3c2dbcce4782647e27ea21ac6202bef7d19ca8d52ec04666e18d9bb051663dd0"
+seconds = 33.42551803588867
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000085, 62000086]
+draw = 42
+noise1_sha256 = "78d1960954f7be788b40d9954ae6d89144fb4fa29ecc10c4a4fbcc12f6b9a669"
+noise2_sha256 = "fd17b267ef0c0fa39f1ced9e1c09df640705c1237dc3a3088fb92b0915aa8014"
+seconds = 33.43288493156433
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000087, 62000088]
+draw = 43
+noise1_sha256 = "1d04e630b0eab4dd987ec8be253023a4dff8edcae421d5cc67713a98edbff04c"
+noise2_sha256 = "bc16a519474fd5f8dce7d72ba0461db2c140c03adc6615391d71d89c2a1abe3e"
+seconds = 33.78084111213684
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000089, 62000090]
+draw = 44
+noise1_sha256 = "fbabc168afeaa2a49144b234bd6a77d44f55ff14aa53bad031aa22a116665b58"
+noise2_sha256 = "306a51eefad3c5fc932fcf7db4ea63995b340dbbe34b0c26ef089504151f030b"
+seconds = 35.251556158065796
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000091, 62000092]
+draw = 45
+noise1_sha256 = "cbea8c5fa71d62649536bcc90f644e4cedd4f482b272a9d89001c7278b72631f"
+noise2_sha256 = "128c9dd05a2dbba4f228c9424628bf4837345e8e39eca52f0d25484d9dfd5670"
+seconds = 34.59628081321716
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000093, 62000094]
+draw = 46
+noise1_sha256 = "80192c81d426d21339db0e4df9a772fac728cfca1ed542c64ed9160c1b2b54b8"
+noise2_sha256 = "0d93b5fcc4d0df2503a614287474a66d27f6c9980ff85cbfa5defcce026d8317"
+seconds = 34.50629186630249
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000095, 62000096]
+draw = 47
+noise1_sha256 = "7e80dfb3c8a662b73cc80332b25f3208b1a6b0d826885cd492c50ad0eac44c4a"
+noise2_sha256 = "7f9395e97139454afa7bd7b0610394d104880bad7ef3a8d67f0651e41372e81f"
+seconds = 34.3775691986084
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000097, 62000098]
+draw = 48
+noise1_sha256 = "6dfe989967049193ac468a6661661c93884a56ed268d1ab18b73ac28571dbc96"
+noise2_sha256 = "07755123a30de64d5b310ba1bb5ca4c2e717fa4ac189f00afda5b7494046c738"
+seconds = 33.80469298362732
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000099, 62000100]
+draw = 49
+noise1_sha256 = "a0ab8d9456b4782d1fdf26c54edde954e82bd329464734b88cfef0c659403b24"
+noise2_sha256 = "a140f52302aa76a527c57a07b83f8b7c36475378066de6e80097883537191918"
+seconds = 34.31620693206787
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000101, 62000102]
+draw = 50
+noise1_sha256 = "0d86f218ce6aa57628e13436acbac833c89513e8d3656d621195093e4b501c7d"
+noise2_sha256 = "d6b3448137edc8193475e24bbe7d6a8d761e5c4377acf865a1c72e8a315994c2"
+seconds = 34.41024994850159
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000103, 62000104]
+draw = 51
+noise1_sha256 = "b93ce524adad8c60b8458eaf74277094fe0d630479d5074a903249169e6a52cd"
+noise2_sha256 = "731a4e17b37d60b6a3daeeed79f1b3be7c973166ee305e1dc31673ec623df5b6"
+seconds = 34.308640003204346
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000105, 62000106]
+draw = 52
+noise1_sha256 = "35f3a37f00541eafaaa4d504aad4082e10d7dcac7594c3e77ee5f4a373a5f529"
+noise2_sha256 = "5640136ac7481ab7081477cb6966b158dc8811fee85a5d8869a75a048eadd9e1"
+seconds = 34.51667904853821
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000107, 62000108]
+draw = 53
+noise1_sha256 = "cea0d32fe11db4929e1ea22d20e49b65ae32f30f655ab0a5ee331ead61f23481"
+noise2_sha256 = "3834dfb18aa5fc3e2a0b18c8080996b63fe0d2f572613fc0138efb9e9f38f286"
+seconds = 34.26440906524658
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000109, 62000110]
+draw = 54
+noise1_sha256 = "04fd463dbd153909a2823b64971bc6aca5e6ea803ac9da3ae9551f6dfa8061d5"
+noise2_sha256 = "266a191942f7d6565928a79dc8a596f1403cd1e70ceb75f1fbf9bfcb03cfcf87"
+seconds = 34.24055194854736
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000111, 62000112]
+draw = 55
+noise1_sha256 = "bb21bc505dbbcc5edae879925ad0f33da51cf7e000e00af6512a410622425198"
+noise2_sha256 = "b06d278994d7d3fa31da3c4e9cf648427f53e0483ac0c57063698ccffa8dc3d8"
+seconds = 34.24771189689636
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000113, 62000114]
+draw = 56
+noise1_sha256 = "f88147f29361a937be55e2bec940b22cbb6cd970ee918219f1b4e00818562a2d"
+noise2_sha256 = "0577e3d3e85940837a279066094279ba2657cdf6202be0c81bf5c800351922ad"
+seconds = 34.20013689994812
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000115, 62000116]
+draw = 57
+noise1_sha256 = "c9d53dad8b7b7f9e4800bed8f062e550e4542f6e5695d9ac597fe28f4b4819b9"
+noise2_sha256 = "a0c7cf1eed42597a76315581cf0a5c4367f53ec1a6ec87915b46038a487e07bc"
+seconds = 34.26839995384216
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000117, 62000118]
+draw = 58
+noise1_sha256 = "9d853e8699efbefa38ff8821753aacb7e36a577a27e994a47b903f26ef2d5b0d"
+noise2_sha256 = "a8765a23b592547a54041a264ea9351a64c2b2c782cff622d549f71cbe284b05"
+seconds = 34.2052788734436
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000119, 62000120]
+draw = 59
+noise1_sha256 = "776ac1a45dda6b15f2b9a8fdce6f188de2810d0843c08e8eb0080fa2406ec231"
+noise2_sha256 = "23c20f53c416d18599bba73870d55dcfb4c96df824e7a01f9dc00d968fc32635"
+seconds = 34.239803075790405
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000121, 62000122]
+draw = 60
+noise1_sha256 = "c8ae989fc3ea3bf24a0f7f9ec288bd6538d8525a2813ca49f95f85e6356b3de4"
+noise2_sha256 = "a6e20bcd944dab9dcbf7d381e8bba9ad34a5044b12029ce93df13a3af6ef68e4"
+seconds = 34.30064105987549
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000123, 62000124]
+draw = 61
+noise1_sha256 = "ab963bfa47daa45e2cad95c9b7a4c825e0649a1763cf0a564e8b0835322f578b"
+noise2_sha256 = "483831d2579bd5167c622fa48d954986837a26c74f1ee946d58ec27dff05bcdd"
+seconds = 34.17654895782471
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000125, 62000126]
+draw = 62
+noise1_sha256 = "7511208b0e24d5ea9c8897aed00ee558801edd41aa9cff6e300b30f2667578e6"
+noise2_sha256 = "401454e94b77930527fd62a76694c1f263d54cdd7573b63e9534682959ad6716"
+seconds = 34.19307494163513
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000127, 62000128]
+draw = 63
+noise1_sha256 = "ffa2e904a765d068d6a43a6053ca02a4b75ad3de43ab7be0197d11c43c86121b"
+noise2_sha256 = "2ec5ffb8b9e9ef8fe1165f44d17e324e97dc263fe5c7d5bdae167cba7cb3a7e7"
+seconds = 34.112837076187134
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000129, 62000130]
+draw = 64
+noise1_sha256 = "ab01a909d20d3db5f7507b000b2f30b7c7c902ea6f24e347f597868bd5e1ee79"
+noise2_sha256 = "23d72133b487e0e057d05b386bbac3b4e3cb69413d32eb5d867a9f2f743dca68"
+seconds = 34.23023819923401
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000131, 62000132]
+draw = 65
+noise1_sha256 = "78488bfbcb8310777a8356710ba9c8dafbf0932008ed36dceb787fe452743325"
+noise2_sha256 = "13bb69fb7879fb54d3778c1071af609be5c22805bae7267d6ad6b384dbf653ac"
+seconds = 34.224344968795776
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000133, 62000134]
+draw = 66
+noise1_sha256 = "8e69b80124a5ba32d2c5fadb11c5da82f71888d6690d3553d0b7958ad6f66f36"
+noise2_sha256 = "2ae078ab75f8fe6be3fa15d857d8080e57f2b8b86671d465f95ebd40607ad319"
+seconds = 34.049832820892334
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000135, 62000136]
+draw = 67
+noise1_sha256 = "f1716580a0460dc54c0b302c75eba340627cb489535516a9c30ec8512dfc9efc"
+noise2_sha256 = "6986f30c86c6d72150c860217e83c004610a7286883d54daa3823753a14456b7"
+seconds = 33.891769886016846
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000137, 62000138]
+draw = 68
+noise1_sha256 = "9fe3d81c3b2e29235280bcfcfb5176bc2ca87c80d5c861128e5cceca8c60ca4a"
+noise2_sha256 = "9aa80875aaa487ade14c388f617585ba6351de067f99ad8318fb53a5bb801ff6"
+seconds = 34.300482988357544
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000139, 62000140]
+draw = 69
+noise1_sha256 = "86d26c3a09553b664b5f3ea6120b88c64d1b8eeb2265cc4ebe513b2d7dc0f588"
+noise2_sha256 = "5840ffdd7857f32387da64e9773fe6a4fea1d09484c1e6d99ed5881a1153d325"
+seconds = 32.39393496513367
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000141, 62000142]
+draw = 70
+noise1_sha256 = "d336d1ee0db24f9ecfd6793bb7eb8f16257815f49b248c90a7b7843791f6124f"
+noise2_sha256 = "6d4ec97033fd916a9593ccea1c134d96ea13f4ffca1e5fd3781d7c8dc56001a3"
+seconds = 34.026087045669556
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000143, 62000144]
+draw = 71
+noise1_sha256 = "de2b86d4b76239d077940b71cb715b5471cc5a5a96ea21a5081d86e9ea71e8d8"
+noise2_sha256 = "552e849d2529fb43462422136bb52bd6d924811769ab2f42a671d00808cd0491"
+seconds = 33.97145986557007
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000145, 62000146]
+draw = 72
+noise1_sha256 = "366f0dcccd9fa44b7395cb6b4de8a1c6b091d06ee8600498b68d0ce46a84af14"
+noise2_sha256 = "c4e442594c1e5e719340eed01991ec748eb297b80583dd33133aedf56f8b3c88"
+seconds = 34.43824291229248
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000147, 62000148]
+draw = 73
+noise1_sha256 = "d45cf23e9589bc8df5652479edecba58f74fa5c6db1910d491c28c1f77b0c132"
+noise2_sha256 = "f33a2ee88aadbf0804801f359ad91d792fd322b93b6c6f29c799a276716c43e2"
+seconds = 34.15432810783386
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000149, 62000150]
+draw = 74
+noise1_sha256 = "65eeae59c5e864c1c8ecb3158a39da1327e4533073284f7fd854b85144180fca"
+noise2_sha256 = "b00aed4de86ed692e18bf6ad80696a419142b3c5059b16b84e39099c3837d564"
+seconds = 34.057111978530884
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000151, 62000152]
+draw = 75
+noise1_sha256 = "101d09bdbca09e9d1961da6bdff30c9636ba9b8011ed9799a71ca4956c96fb45"
+noise2_sha256 = "92fa33bb8d2fb6b8be102d7a84a98a94632bf4daeb793c510be377bc64c78f37"
+seconds = 34.00756001472473
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000153, 62000154]
+draw = 76
+noise1_sha256 = "5abaa901816dde9e2c46c7d708a6b7f13c5a11a99d2b02f66c19a1453b6fbea9"
+noise2_sha256 = "9d6704d37aa535a42679ffb8374cb124a7859ff803f08bd65392b3003900a5db"
+seconds = 34.039968967437744
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000155, 62000156]
+draw = 77
+noise1_sha256 = "c491d3de3e78198f7175767913c0e1ba315ee1e646ea77f0c186bc2c11235c15"
+noise2_sha256 = "2f466fd7a0eeea7d239ab9c82d0194931c5fd766abe9bd673ee1676a76212ae9"
+seconds = 33.96871614456177
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000157, 62000158]
+draw = 78
+noise1_sha256 = "2b38fa2bae28098b2a5a007753149768a905094ece866ffba9845479fc810611"
+noise2_sha256 = "e4e30081aee19d48524e6eef011d9fdb32ffd74aa0a3ecfbf9c486e8b6ca4b77"
+seconds = 33.99306797981262
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000159, 62000160]
+draw = 79
+noise1_sha256 = "91de215f9052f168d4a697579f990b7295e7ed1dde99b467932da47b590c138f"
+noise2_sha256 = "917e49be1cc890372eea7a127dcb411fdcf1502e18101d91a591b4917fc6bca8"
+seconds = 33.936168909072876
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000161, 62000162]
+draw = 80
+noise1_sha256 = "58da400ab8867b4d2fae88dfc3e09747d786ff5b7f64fc708167129f6198aa1c"
+noise2_sha256 = "ba7f496a33e420f5781d40c70d329da5c0e2bf025071137ab016dbc19485caca"
+seconds = 33.75625705718994
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000163, 62000164]
+draw = 81
+noise1_sha256 = "263bfb8ab78dd0c2fab5b37f0ae5b7b912c94b2bc8245b565f74a557ccfeb31a"
+noise2_sha256 = "f257b39479ef012d664fc1eaa8f0130a9d3db890ca2885f7d81ea0a8bbdcad0d"
+seconds = 33.66830015182495
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000165, 62000166]
+draw = 82
+noise1_sha256 = "36b70089e43a5087367f8f689f71a81e9c335ea67a3609ae8b88a94bbdc10a65"
+noise2_sha256 = "909255b0d49a2eacf15aa683b469c56dcba82d4226b0ee66e777946b56eefd4f"
+seconds = 33.71870303153992
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000167, 62000168]
+draw = 83
+noise1_sha256 = "87500a7b0b49a4552f56e96a636dda8199edd424095e0b5e8d0e70c7fe7cfc50"
+noise2_sha256 = "7f29233a4037f7d0bee1a620a5d5259e6bdb9d2b96201af4c9be9970e4e389bd"
+seconds = 33.69238018989563
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000169, 62000170]
+draw = 84
+noise1_sha256 = "8f2f3453847c136e4d04d81444644057a894c55d2911afdfc2d19936ca9b8ee6"
+noise2_sha256 = "7f65d59e424de43c60d2e4bbe24b748d84fc93a398725f70b6c7c2dcecf9ca94"
+seconds = 33.764240980148315
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000171, 62000172]
+draw = 85
+noise1_sha256 = "40418a64932feba6b0d97e26dc834881b7e4eee5fe5d665e65ac0f35870a16d6"
+noise2_sha256 = "048d19b5a42249294f99aae9beda7540e990e90d7582864823c4142a610fba7f"
+seconds = 33.69147300720215
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000173, 62000174]
+draw = 86
+noise1_sha256 = "b8acb30dc14cfad239fbac14a6d8e09159a1f801cc53731ee895297bc284c9d0"
+noise2_sha256 = "6a38e40f687836310af7e2f10eb50ab1d3eac5b3101a26d4eeb5e8c4556c970d"
+seconds = 33.7571702003479
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000175, 62000176]
+draw = 87
+noise1_sha256 = "dd491f736fa689404b2dd9add0cf0e7a52874fb2a7e401547abc5d325325fa84"
+noise2_sha256 = "1a0f5c31fabc6e04f31a7d81db44918aa17d78ae0466f8e34e803147781e1121"
+seconds = 33.668116092681885
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000177, 62000178]
+draw = 88
+noise1_sha256 = "914f8e0221c72b9f9e69a4f4ec2eb8e525d1a4c9848a30d9f38a109dc584ff3f"
+noise2_sha256 = "bd33eac17afaab68b48c3a35551e84d3886fb50a6a096687d1a750c5c2b2d8d2"
+seconds = 33.74317193031311
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000179, 62000180]
+draw = 89
+noise1_sha256 = "3b3574d0343878597511db986037fa7498cefa5a520108c2718702cabe29a5bc"
+noise2_sha256 = "e37f334f9a261d2f5edc5515eb2af01126ad6961ffe413089235e9b40a896185"
+seconds = 33.676756858825684
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000181, 62000182]
+draw = 90
+noise1_sha256 = "0a59701623590c210db3bcb9c1833313fb012c144c4b43d2f63579716b20eb9a"
+noise2_sha256 = "24adeb98153d8896e48f72184086a475e83a0d63b18c5b4c4c755a2c0e4e8f35"
+seconds = 32.36462998390198
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000183, 62000184]
+draw = 91
+noise1_sha256 = "1ae652aa3edcfe726448a0773328eb4408de694497f7aa265e5911cf5449ad3f"
+noise2_sha256 = "367fe51834838dfa152d9e7e04310eb5559ce58e347d50f39a97d404c345da17"
+seconds = 33.66094207763672
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000185, 62000186]
+draw = 92
+noise1_sha256 = "c10340306881f6be3f8579c0fd775a775c7553e73a7884dd69198173c29a524f"
+noise2_sha256 = "f7b3510d1c7f102e2cb2dc0b973424d472eb082988bf35e606b02f01b5c9f4d6"
+seconds = 34.478090047836304
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000187, 62000188]
+draw = 93
+noise1_sha256 = "60a7d736ae77cf5501b376a8610e1c4c68c265871ca9868eaf44f5f6f414b9b5"
+noise2_sha256 = "d714dac0ab456e52fec5a408d256621445f352e0b6921ab044a4cf7dbf92c489"
+seconds = 35.07815885543823
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000189, 62000190]
+draw = 94
+noise1_sha256 = "51a631047a4d6f3b28cf7c7aa0f6e979139255bc711c4853072aeecb260aa1b8"
+noise2_sha256 = "aec78c88517781937e87cab309a728fff1212f3a35f7893f3afc4220e6da7879"
+seconds = 35.197876930236816
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000191, 62000192]
+draw = 95
+noise1_sha256 = "e19c5eca586c99bdea362f0145369395af6a110f16393edd636386029234099f"
+noise2_sha256 = "1fa4360c339edddd8bb2f25ea904ec64ac21e9eee63a0106994d70000ac3e54a"
+seconds = 35.43147802352905
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000193, 62000194]
+draw = 96
+noise1_sha256 = "424f337275bcce8d1a44457c43eecc5aff7ae93775658ce426f653618661fb63"
+noise2_sha256 = "32563aad1d383d27a198fafe7f0a5ae13cdc7987d1356fdd8d047e449c3ebe0e"
+seconds = 34.888519048690796
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000195, 62000196]
+draw = 97
+noise1_sha256 = "f476b91626babe79810b42be40432b8b4b083bc3c8b1e9dac7b0c94dc1e0ac09"
+noise2_sha256 = "ac8fc06e2529bcbc3d881a0247ce57ac304b40ea724d4bc9a2ea11c624c4655f"
+seconds = 34.106009006500244
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000197, 62000198]
+draw = 98
+noise1_sha256 = "e9fc4f337d53636797cdcdef43420ddf93dd98b4aa71bb297303f13f0f8df4d9"
+noise2_sha256 = "906d832f35996d881d69cc7ab584eb9a4f7284c145584bf66426ff0f943c8af5"
+seconds = 34.34120988845825
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000199, 62000200]
+draw = 99
+noise1_sha256 = "9cf66492701d952e7cb1981242443bb7c1d42e02a7dc694c244e54a89c92d762"
+noise2_sha256 = "d302fa43365b664ac2d0771bab7e7e65f9a662db0c453aba0b7957d9721fadc1"
+seconds = 34.48867607116699
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000201, 62000202]
+draw = 100
+noise1_sha256 = "56a5e08de61753e4d005f179964aaca7f612cce315d973b921990b6d04f34257"
+noise2_sha256 = "cb4b1465fb9b8f2cb518b1579234f2bc542b468ec99fe9d9fdebe15eeff27984"
+seconds = 34.26850509643555
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000203, 62000204]
+draw = 101
+noise1_sha256 = "43e6db53fd9659c2927db749a3b84397c78419bf98891e43672cd17d9872741e"
+noise2_sha256 = "954055a236c169be0062de3002b1b11ee21c5373963ea217277642f27e6c15c3"
+seconds = 34.06898903846741
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000205, 62000206]
+draw = 102
+noise1_sha256 = "02f3411935ddd3830b6a0b125efb0c46ea5e576ec88177ab3db121924cefe2de"
+noise2_sha256 = "835057bade22992eae68218adbf7d44888a13cce767edfe919082c8a08e0291a"
+seconds = 34.41388916969299
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000207, 62000208]
+draw = 103
+noise1_sha256 = "ddcbb72be5d4fbc3f5907013554a4408a01ffa80462bf914d24db9993e6b718a"
+noise2_sha256 = "fc72364a596febfe24a54a79c67cab1c18b52681a6761e7463b93f066a221963"
+seconds = 34.01112985610962
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000209, 62000210]
+draw = 104
+noise1_sha256 = "305eb4e61a79387c4c05602859f5a315c43c9bb324ffe15779b7e53be10f7c29"
+noise2_sha256 = "9e91f021610f977a47d10f3f59a0d516b18c01d35479a335170beaa36b3201c0"
+seconds = 31.993452787399292
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000211, 62000212]
+draw = 105
+noise1_sha256 = "bea33d34a599935e41c5d1bb0a4f32228455b623c3bbbeef0c691ae4cb8e9745"
+noise2_sha256 = "e044825d3736d0f60d5040ac3c9858f82a3dc1cfea6536ab2442065cba3869f7"
+seconds = 33.68113899230957
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000213, 62000214]
+draw = 106
+noise1_sha256 = "82bd8f104d5961d546f187006f9aac26e93abd2376b7fbdf8795b3b8ad11b26a"
+noise2_sha256 = "0aab7b8398f6f2d207bbf91f34d22c417cfeb438061f81b212c76a19374a37d1"
+seconds = 33.682313203811646
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000215, 62000216]
+draw = 107
+noise1_sha256 = "e9a66dd5fe70f90807feaf3838d8ce582a09941f2c2670cfe0428e0cb4afe666"
+noise2_sha256 = "663bc2b16cddc6ec212112d891bd383e326a24b6cab47844908bb415f9086649"
+seconds = 33.573391914367676
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000217, 62000218]
+draw = 108
+noise1_sha256 = "7bc36be6020f44c045a0d22025fd8393aaf18c0d55e70d45e6879c2ef7ac62a6"
+noise2_sha256 = "64fab4001aecc35d0fc0d42697d71166f33486c913c67ab07c4480af9f609e7e"
+seconds = 33.56597399711609
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000219, 62000220]
+draw = 109
+noise1_sha256 = "b458b39d6a29b93bb52d94a18751ed441387fc7c2955f6a26a82a7997ff61d3a"
+noise2_sha256 = "3d354f3129f174dbe44b394011cfae0b364c2fb2c52b29f6e18f1fbc5a5abdce"
+seconds = 33.539243936538696
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000221, 62000222]
+draw = 110
+noise1_sha256 = "b8e53ed2cd6a7fb95f14de30838540e2c20596341802cf1c78f8bde7bb425c97"
+noise2_sha256 = "7f0644cd0c6bfc6a5ccc9304bee3ae8dc5c0143093e628c7ead1d3259b0268e4"
+seconds = 33.53288292884827
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000223, 62000224]
+draw = 111
+noise1_sha256 = "5b52c4bf8c91386e49264966ae7a690d5c19422b4f30761e144e67b1d9f9dd86"
+noise2_sha256 = "dce6e2e1f5ce2d52241838417c7bdd5ab49e9ab079045e038c0bbb43e611a2a4"
+seconds = 33.42997598648071
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000225, 62000226]
+draw = 112
+noise1_sha256 = "ec34f7c5634b3a942f0694ad0a829e1ca586c779deb74fcaa09683c06a0d2ae0"
+noise2_sha256 = "409769c80e34cd33c0ae258996cbeae183a0ce40a2eb40b6c5422c1c6d2e3054"
+seconds = 33.37778306007385
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000227, 62000228]
+draw = 113
+noise1_sha256 = "1eb0e46118efd6069c7999e0f910cae09808b77b3c96c562b5effc3b30b0bd14"
+noise2_sha256 = "36dd80a64a6cd4b485111328e71e1748bad93b1904f4e8931a28cb3346b2ba8c"
+seconds = 33.393014907836914
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000229, 62000230]
+draw = 114
+noise1_sha256 = "a234ba2038ecf90bbcd95eebcaa96dcad651711ed68732bc5cfe55a3ac0b97ef"
+noise2_sha256 = "f71247ab836d96c7150004027f40c4b8c32ed3735fe199a4c164b781c8677766"
+seconds = 33.42641592025757
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000231, 62000232]
+draw = 115
+noise1_sha256 = "6ebeec2e7685308cdb0dea073a980161c71ee31cd47cc716a2071097381378f5"
+noise2_sha256 = "400405f3b13d0aaab2690fa2817bfa980055c2c4f7de2c3951078e7a837a030a"
+seconds = 33.40998101234436
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000233, 62000234]
+draw = 116
+noise1_sha256 = "c9f7c96f9f085002ce0ffac5a4f50789ae2dc36a67a1fd901b8a042630531912"
+noise2_sha256 = "c9a0fafb281b4b995149f38c5a58ef2248d83bc5c48187b23d1db3d88a20ff69"
+seconds = 33.41149115562439
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000235, 62000236]
+draw = 117
+noise1_sha256 = "bfb50c1cbce0fbbfea2b90a849dd464e0884c4db71ffed1f20201ba56c21ca33"
+noise2_sha256 = "45e5847661367c55503384cdba4de9224bec6d0ec1580f5007c35f6faf7e091f"
+seconds = 33.39633107185364
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000237, 62000238]
+draw = 118
+noise1_sha256 = "5e7f8d4b591f14ac98f6e7bada2f6049a99f5700f800af614c77e8872e98d5f0"
+noise2_sha256 = "9d70d92b0c0caba1f60bdc3fae70ea428c3f121a1030a49b29f22c6f4f8c9faa"
+seconds = 33.577569007873535
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000239, 62000240]
+draw = 119
+noise1_sha256 = "1cc278b09ed52a78a093f07de3fcea58b9a4054dc3a1a51bc4ca9b716a9319b6"
+noise2_sha256 = "8a5c44835b085b5f957093c52ef6bd37808e01536b48f2a983e0968d6c69c84f"
+seconds = 33.60370111465454
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000241, 62000242]
+draw = 120
+noise1_sha256 = "a89bd480b11c8ea507774cb90576b0132d1646bdd9c413ade8c2136bf52e19a7"
+noise2_sha256 = "92bca079f26b29596b0f713a9bb31b6ac4e2ad427f78d6aa6dbe07a2a3c835c6"
+seconds = 33.724244832992554
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000243, 62000244]
+draw = 121
+noise1_sha256 = "c5195af081c93d9120e428ba60dd72dc28feb6d4dc61fb0e3214492b1bcf2838"
+noise2_sha256 = "b03cb86fd2e67b883e95292ad33e419265a538c74487ca58cd0e3b03f4de0419"
+seconds = 33.69429302215576
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000245, 62000246]
+draw = 122
+noise1_sha256 = "3b5e4e9ec424a74137d9fab4acb6206a5fd50f9d09ceede0dab18b6d44fab481"
+noise2_sha256 = "01e6f9e976f1f7a1e066babb091511b1180bed41363fcf75b9e2e6aff803a09a"
+seconds = 33.617149114608765
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000247, 62000248]
+draw = 123
+noise1_sha256 = "f12ed133df2f1cce192471c2870240f4c7282f8a2f4213ed080ecb8aee844f02"
+noise2_sha256 = "8d2640b60a411148d1b5ba6b174d02910c03e332dc84fa980c5663420e07f9cf"
+seconds = 33.611469984054565
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000249, 62000250]
+draw = 124
+noise1_sha256 = "ab40c0cfc8f15bebcd0397e88204be58dd700170f266f97fae5c40b3c6b48f07"
+noise2_sha256 = "c38e386cadb37a1b7082f93aa0bcea8e95162d5e25a56695f8aa764a110ec054"
+seconds = 33.55444884300232
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000251, 62000252]
+draw = 125
+noise1_sha256 = "a707046708347b94959decf0203885eff3f175d06b4ac300891deb80bcf8b21a"
+noise2_sha256 = "6b020b4d1cdd790b3e1129564f7a70873c06fe44d02973371834ce31e3876f29"
+seconds = 33.56224703788757
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000253, 62000254]
+draw = 126
+noise1_sha256 = "0c43da1306ebf6f712a3ab0a388eb85b3f1d09b1d0063afa21267b40330d6d4f"
+noise2_sha256 = "da331351e24195c61e51deec6bc3b5c7f9db20cba410ac4619a70bf490470437"
+seconds = 33.562896966934204
+map_alm_parity = 0.0
+[[noise_draws]]
+split_seeds = [62000255, 62000256]
+draw = 127
+noise1_sha256 = "b3196bdbec370a627a4f41a75ab5759f8fb8c38d0044425161023998761a9119"
+noise2_sha256 = "78fad48f844dd58a82c03536d896691e03c2f9e143ddf294aba6129d651accae"
+seconds = 33.491666078567505
+map_alm_parity = 0.0
+
+[phases]
+masked_signal_map2alm = 2.790510892868042
+raw8192_map2alm = 11.660499811172485
+raw8192_beam = 0.1290278434753418
+raw4096_beam = 0.1725599765777588
+raw4096_output_alm2map = 6.089406967163086
+raw4096_cache = 12.783851146697998
+raw8192_catalogue_and_painting = 998.0588939189911
+raw4096_catalogue_and_painting = 392.79747104644775
+raw8192_allocation = 4.061814069747925
+raw8192_cache = 11.086467027664185
+raw8192_output_alm2map = 6.131769895553589
+mask = 16.85473084449768
+raw4096_map2alm = 5.778424024581909
+raw4096_allocation = 1.0564160346984863
+
+[cache]
+underflow_count = 0
+seconds = 10.316783905029297

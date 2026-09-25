@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "SBI_analysis/run_so_nell_fisher_sensitivity.py",
+    "--prepared-dataset",
+    "/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz",
+    "--fisher-root",
+    "/lustre/work/kristero10/adrian_fisher_baseline_deproj0",
+    "--baseline-noise",
+    "/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt",
+    "--goal-noise",
+    "/home/kristero10/tSZ_data/SO_noise/SO_LAT_Nell_T_atmv1_goal_fsky0p4_ILC_tSZ.txt",
+    "--noise-cases",
+    "baseline",
+    "goal",
+    "--covariance-scopes",
+    "conditional_noise",
+    "gaussian_total",
+    "--deprojection",
+    "0",
+    "--mask-fsky-effective",
+    "0.4",
+    "--split-noise-factor",
+    "1.0",
+    "--output-dir",
+    "/lustre/work/kristero10/adrian_fisher_nell_sensitivity_deproj0"
+  ],
+  "output_dir": "/lustre/work/kristero10/adrian_fisher_nell_sensitivity_deproj0",
+  "started": true
+}

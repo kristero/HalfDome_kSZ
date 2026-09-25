@@ -1,0 +1,142 @@
+{
+  "created_utc": "2026-09-15T14:25:14.403380+00:00",
+  "parameter_order": [
+    "P0",
+    "xc",
+    "beta",
+    "alpha_m_P0",
+    "alpha_m_xc",
+    "alpha_m_beta",
+    "alpha_z_P0",
+    "alpha_z_xc",
+    "alpha_z_beta"
+  ],
+  "accepted_design_rows": 8192,
+  "old_prior_source": "verified 40-bin nine-parameter SBI bundle support",
+  "flamingo_points": "selected clean-spectrum fits including approximate abundance and geometry response",
+  "points_are_posterior_constraints": false,
+  "marginal_histograms": "probability mass in equal-width physical bins; all nine proposal coordinates linear-uniform before cuts",
+  "bins_per_parameter": 32,
+  "full_corner_pair_count": 36,
+  "production_inputs_unchanged": true,
+  "input_sha256": {
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/manifest.json": "994333174a0c5a1e636a5cc065d000464ea3b4ddee2bb0082ccb4cfdd70cc600",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/inputs/old_metadata.json": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/inputs/old_comparison.json": "84c59f9bd9c08cab9f40e75c5a55196a0e6e405c31c9f89790df492768317178",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/inputs/flamingo_fits.json": "e87150fc059baf458564b8ca75a790e2986b4702f683733f44eb73cbf0f454d6",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/audit.py": "28fc09274abf110111b550362c5380ffde79722699f89014de67b1c1aa77bd6c",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/restart.py": "63426b1a6042378fda9b2fae4427d93ce29786eb33096270a4cc96a0cb668af2",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/independent_noise.jl": "daca9ecc61eb7f08f10554e82950f8d95e5ae0d2e1cd6ec09c2e434848e2d0a9",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/run_worker.pbs": "c26c964968591b6bb7df583acc488cfae958b81b0739730eef961142d93fa4b9",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/prior.json": "b4868a66630009e51bcadeed544f13cb3af49e13dab3b83f3c440933260574a9",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/prepare.py": "e9200bd3fb7ee0b9662e5f9c39002f0d4c75bfbd47319df2b55d4ee84b0fb5f0",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/collect.py": "1537b60ecee7880d57a771da9e978a4615dd432cc855de334364f214034974e8",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/prior.py": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/validate.py": "8fbab32eefd3bacf8125ba0c9097106d96460bf0751dafddac599fe4920a40bf",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/README.md": "3830a36c35a390e150fef79ab76c51735704a31d1947abdd026130ebbaf1b92f",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/plot_prior.py": "09b6842d85460380c4a5bb3e72ecf1d2ab0bb5c68900c1240039d135bfc1664a",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/stable_los.jl": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/run_collect.pbs": "5072b6f1f7d1af601895041779bff56e4599d2af384946f6b7ae9faf871ea450",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/design.py": "1b5558bee9eb3c02c429d24017d4f098696a05237b69aee9050f703648152de6",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/check_noise_seeds.py": "5453e56defaff7c2d4ba0cf2340fc8d7fa77a64eb90c3d08d5339107be702011",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/sbi_prior.py": "908f3ad1f2cb8b2f4f17ee4e1ff871dc660c8c6a6ca6df8dff001e49ddfa138d",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/run_config.json": "9b78efca5d10c319360587bbc77cef416d1b4405ffeeca10930adf249670ec7d",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/noise_seeds.py": "f76ef01bb5926e7e8bec7921b6eb60ab4036b312e2d4d590e77f5b03a51bcb92",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/worker.py": "9ee65b7989849f23d8c7da31d85d253c16ae3d3c5155d2cce1339e1e15ce4d36",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/paint_row.jl": "a390825874831907aa492852ac93a6142e6595735bb31a27123dfc32f86f5cec",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/proposal_index.npy": "e11d9c0f342f9067ede38a622907f2ca64c960df24dbb771d75f58785bccfcc0",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/noise_split_seeds.npy": "5bfc8a552b2da6934a378aaab170d433ded88cfbcfc2e4226ca3a7b8f08fe9db",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/source_old_row.npy": "b933f9e787b4e98d82ac725f91e5feb15db043a790792dd930de6c517ef51b84",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/noise_seed_row_ids.npy": "7c912a04ad5c040023810a17c59331c33287337a54bc5edc5cdde3de953ec3ca",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/theta.npy": "ecac74ace38af76f06bb91f4e00c239302a30738c8338de2d317c7196c2d22b8",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/parameters.csv": "a2e8c0bc6ad8a1d69048d7f528552a5436733e7bb8e48aa0e3906de3fcc087bd",
+    "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/validation_split.npy": "97fe238a2ce81d3120d04d29ff29c78df5f20d00429a1766fcf68471e3c3bd75"
+  },
+  "plotter_sha256": "09b6842d85460380c4a5bb3e72ecf1d2ab0bb5c68900c1240039d135bfc1664a",
+  "fit_support": {
+    "L1_m9": {
+      "inside_current_joint_prior": true,
+      "joint_metrics": {
+        "beta_min": 7.2858942588655164,
+        "beta_max": 32.87321397462779,
+        "size_min": 0.5074466039187719,
+        "size_max": 5.284080358056351,
+        "Y200_min": 0.021843503182157588,
+        "Y200_max": 11.373630777277652,
+        "tail": 1.854854650275629e-21
+      },
+      "outside_old_prior_parameters": [
+        "xc",
+        "beta",
+        "alpha_m_xc",
+        "alpha_m_beta",
+        "alpha_z_P0",
+        "alpha_z_xc"
+      ]
+    },
+    "fgas-8sigma": {
+      "inside_current_joint_prior": true,
+      "joint_metrics": {
+        "beta_min": 5.562159151500909,
+        "beta_max": 49.99901251209195,
+        "size_min": 0.5724746116845668,
+        "size_max": 6.5527420357284285,
+        "Y200_min": 0.019912306519453808,
+        "Y200_max": 8.312749725872889,
+        "tail": 8.301500805805376e-16
+      },
+      "outside_old_prior_parameters": [
+        "xc",
+        "beta",
+        "alpha_m_xc",
+        "alpha_z_P0",
+        "alpha_z_xc",
+        "alpha_z_beta"
+      ]
+    },
+    "Mstar-1sigma": {
+      "inside_current_joint_prior": true,
+      "joint_metrics": {
+        "beta_min": 7.0790480246568235,
+        "beta_max": 49.99999132405534,
+        "size_min": 0.4962501127029916,
+        "size_max": 5.986126801948007,
+        "Y200_min": 0.011186566780692514,
+        "Y200_max": 17.515114922240805,
+        "tail": 2.900396635961596e-19
+      },
+      "outside_old_prior_parameters": [
+        "xc",
+        "beta",
+        "alpha_m_xc",
+        "alpha_m_beta",
+        "alpha_z_P0",
+        "alpha_z_xc",
+        "alpha_z_beta"
+      ]
+    }
+  },
+  "optimizer_status": {
+    "L1_m9": {
+      "success": false,
+      "message": "The maximum number of function evaluations is exceeded."
+    },
+    "fgas-8sigma": {
+      "success": true,
+      "message": "`xtol` termination condition is satisfied."
+    },
+    "Mstar-1sigma": {
+      "success": false,
+      "message": "The maximum number of function evaluations is exceeded."
+    }
+  },
+  "output_sha256": {
+    "joint_prior.pdf": "c87d826cc6c6e0e1149eaa1e39ba2d919b1982fe6cd5268c7e97a236eab884e3",
+    "joint_prior.png": "6e30e9dbf980c0d1012fa05fb803ec24067e71593e407e098964e8bdbad3ebd0",
+    "joint_prior_all_parameters.pdf": "70042d9df96c994672eb306c861ef96f9c16498be2e49537616cf809cd109642",
+    "joint_prior_all_parameters.png": "7ca0e965d3c1019b406993c74b1405308749ebdda918770eed13a4fd7b30377d",
+    "prior_all_parameters.pdf": "cd821197076dc68edb7f44468ab227b197a38e083e5588bd1703437345e7df41",
+    "prior_all_parameters.png": "3744fc4e78cd268309c47ffefad04bc18c8d37b8e9483e1152a599b59fdc06da",
+    "prior_and_fits.csv": "182f9a8b3d56db18aec8c22e931124c8017c47c5656240426852392d51e84021"
+  }
+}

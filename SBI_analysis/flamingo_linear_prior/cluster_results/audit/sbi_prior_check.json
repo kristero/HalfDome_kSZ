@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "samples": 1024,
+  "constant_log_density_on_support": -7.768650531768799,
+  "expected_log_density": -7.768650358847693,
+  "outside_rejected": true,
+  "normalizing_mass_Z": 0.021813392639160156,
+  "normalizing_mass_standard_error": 4.985107128926375e-05,
+  "prior_code_sha256": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0",
+  "sbi_code_sha256": "908f3ad1f2cb8b2f4f17ee4e1ff871dc660c8c6a6ca6df8dff001e49ddfa138d"
+}

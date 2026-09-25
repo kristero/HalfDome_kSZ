@@ -1,0 +1,17 @@
+{
+  "finalized_utc": "2026-09-20T12:06:56.731710+00:00",
+  "main_experiment": {
+    "host": "idark",
+    "pbs_job": "598374.idark",
+    "python_stage": "completed",
+    "first_julia_stage": "failed test-driver import; fixed"
+  },
+  "scalar_validation": {
+    "host": "idark",
+    "mode": "direct bounded single-thread validation",
+    "timeout_seconds": 90,
+    "note": "Queued follow-up 598434 was cancelled before direct validation; production jobs were not changed"
+  },
+  "checks": "passed",
+  "production_hashes_checked": 77
+}

@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -N tsz8192_report
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mem=32gb
+#PBS -l walltime=02:00:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_8192_validation_recovery_20260921
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=26 MKL_NUM_THREADS=1 MPLBACKEND=Agg
+/home/anaconda3/bin/python3 analyze.py

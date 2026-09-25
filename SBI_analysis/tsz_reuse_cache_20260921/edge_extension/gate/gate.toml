@@ -1,0 +1,4 @@
+passed = true
+edge_derivative_relative_errors = [4.816644637251066e-6, 2.0381656252732583e-6, 1.694426022158524e-5, 1.1404901862910322e-6]
+interior_bitwise_unchanged = true
+physical_support_unchanged = true

@@ -1,0 +1,18 @@
+{
+  "utc": "2026-09-20T15:30:44.821549+00:00",
+  "production_certified": false,
+  "experimental_diagnostic_implemented": true,
+  "experimental_diagnostic_submitted": false,
+  "prepared_diagnostic_count": 256,
+  "prepared_cluster_root": "/lustre/work/kristero10/tsz_spherical_diagnostic_256_prepared_20260920",
+  "resolution_job": "598439.idark",
+  "automatic_analysis_job": "598448.idark",
+  "deadline_utc": "2026-09-21T06:00:00+00:00",
+  "blockers": [
+    "full-catalogue corrected renderer validation",
+    "joint-extreme observable fidelity",
+    "actual noisy-row timing",
+    "nine-parameter inference calibration and information tests"
+  ],
+  "decision": "A small engineering diagnostic can expose failures; it cannot certify a new 8k production run"
+}

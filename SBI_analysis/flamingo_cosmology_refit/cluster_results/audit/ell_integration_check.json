@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "original_nodes": 3,
+  "refined_nodes": 9,
+  "maximum_relative_change": 1.4351940735624069e-05,
+  "per_candidate": {
+    "Battaglia12": 3.953404992262932e-06,
+    "L1_m9/previous": 1.4351940735624069e-05,
+    "L1_m9/amplitude_from_existing_map": 1.435194073517998e-05,
+    "L1_m9/L1_m9_iter0": 9.584315551425249e-06,
+    "L1_m9/L1_m9_iter1": 8.815298074393851e-06,
+    "fgas-8sigma/previous": 9.780277542725813e-06,
+    "fgas-8sigma/amplitude_from_existing_map": 9.780277543169902e-06,
+    "fgas-8sigma/fgas-8sigma_iter0": 9.942460624356997e-06,
+    "fgas-8sigma/fgas-8sigma_iter1": 9.911983745336528e-06,
+    "Mstar-1sigma/previous": 8.020617201509594e-06,
+    "Mstar-1sigma/amplitude_from_existing_map": 8.020617202175728e-06,
+    "Mstar-1sigma/Mstar-1sigma_iter0": 9.844834194083774e-06,
+    "Mstar-1sigma/Mstar-1sigma_iter1": 9.229273867150667e-06
+  },
+  "scope": "Numerical response sensitivity, not a cosmological modeling error"
+}

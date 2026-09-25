@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "identical": true,
+  "nside": 32,
+  "nonzero_pixels": 228,
+  "scope": "Real entrypoint small-map allocation parity"
+}

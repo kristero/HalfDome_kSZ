@@ -1,0 +1,1888 @@
+{
+  "utc": "2026-09-20T15:54:04.107546+00:00",
+  "jobs": [
+    {
+      "id": "598106.idark",
+      "state": "R",
+      "owner": "param",
+      "name": "th_p4lzf",
+      "queue": "mini_B",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {
+        "cpupercent": 3537,
+        "cput": "2507:39:28",
+        "mem": "74137472kb",
+        "ncpus": 32,
+        "vmem": "99418008kb",
+        "walltime": "71:46:54"
+      },
+      "estimated": {},
+      "comment": "Job run at Thu Sep 17 at 16:05 on (ansys15:ncpus=32:mem=104857600kb)"
+    },
+    {
+      "id": "453055.idark",
+      "state": "R",
+      "owner": "jonathan.gree",
+      "name": "run_notebook",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "pack",
+        "select": "1:ncpus=1"
+      },
+      "used": {
+        "cpupercent": 2,
+        "cput": "01:18:26",
+        "mem": "9136kb",
+        "ncpus": 1,
+        "vmem": "577200kb",
+        "walltime": "155:57:00"
+      },
+      "estimated": {
+        "exec_vnode": "(db02:ncpus=1)",
+        "start_time": "Fri Nov 28 18:50:03 2025"
+      },
+      "comment": "Job run at Mon Sep 14 at 03:56 on (ansys06:ncpus=1)"
+    },
+    {
+      "id": "583383.idark",
+      "state": "R",
+      "owner": "terasawa",
+      "name": "jupyter_tjpcov",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "999:00:00"
+      },
+      "used": {
+        "cpupercent": 32,
+        "cput": "00:34:29",
+        "mem": "216784kb",
+        "ncpus": 1,
+        "vmem": "1201720kb",
+        "walltime": "155:57:00"
+      },
+      "estimated": {},
+      "comment": "Job run at Mon Sep 14 at 03:56 on (ansys06:ncpus=1)"
+    },
+    {
+      "id": "586791.idark",
+      "state": "R",
+      "owner": "mtakada",
+      "name": "jupyter_lab_pfs",
+      "queue": "tiny",
+      "requested": {
+        "mem": "40gb",
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1:mem=40gb",
+        "walltime": "999:00:00"
+      },
+      "used": {
+        "cpupercent": 16,
+        "cput": "00:46:08",
+        "mem": "256808kb",
+        "ncpus": 1,
+        "vmem": "1203384kb",
+        "walltime": "155:57:00"
+      },
+      "estimated": {},
+      "comment": "Job run at Mon Sep 14 at 03:56 on (ansys06:ncpus=1:mem=41943040kb)"
+    },
+    {
+      "id": "589381.idark",
+      "state": "R",
+      "owner": "Kousuke0128",
+      "name": "cellcov.sh",
+      "queue": "tiny",
+      "requested": {
+        "mem": "73400320kb",
+        "ncpus": 1,
+        "nodect": 1,
+        "nodes": "1:ppn=1",
+        "place": "scatter",
+        "select": "1:ncpus=1:mem=73400320KB",
+        "walltime": "999:00:00"
+      },
+      "used": {
+        "cpupercent": 16,
+        "cput": "00:56:19",
+        "mem": "140724kb",
+        "ncpus": 1,
+        "vmem": "1177808kb",
+        "walltime": "895:27:42"
+      },
+      "estimated": {},
+      "comment": "Job run at Fri Aug 14 at 08:25 on (ansys19:ncpus=1:mem=73400320kb)"
+    },
+    {
+      "id": "590251.idark",
+      "state": "R",
+      "owner": "Terawaki8128",
+      "name": "WL_WFpolyspec.sh",
+      "queue": "mini",
+      "requested": {
+        "mem": "314572800kb",
+        "mpiprocs": 32,
+        "ncpus": 32,
+        "nodect": 1,
+        "nodes": "1:ppn=32",
+        "place": "scatter",
+        "select": "1:ncpus=32:mem=314572800KB:mpiprocs=32",
+        "walltime": "999:00:00"
+      },
+      "used": {
+        "cpupercent": 75,
+        "cput": "01:02:15",
+        "mem": "449800kb",
+        "ncpus": 32,
+        "vmem": "1272112kb",
+        "walltime": "804:42:25"
+      },
+      "estimated": {},
+      "comment": "Job run at Tue Aug 18 at 03:11 on (ansys40:ncpus=32:mem=314572800kb)"
+    },
+    {
+      "id": "590636.idark",
+      "state": "R",
+      "owner": "zxliu",
+      "name": "STDIN",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "ncpus": 51,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=51:mem=100gb",
+        "walltime": "900:00:00"
+      },
+      "used": {
+        "cpupercent": 4725,
+        "cput": "101:53:11",
+        "mem": "35721048kb",
+        "ncpus": 51,
+        "vmem": "119024024kb",
+        "walltime": "744:19:31"
+      },
+      "estimated": {},
+      "comment": "Job run at Thu Aug 20 at 15:33 on (ansys10:ncpus=51:mem=104857600kb)"
+    },
+    {
+      "id": "590988.idark",
+      "state": "Q",
+      "owner": "carlos.lopez",
+      "name": "thesan-Thesan-2-s080-gas-clumping.pylians-g2048",
+      "queue": "mini",
+      "requested": {
+        "mem": "512gb",
+        "ncpus": 4,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=4:mem=512gb",
+        "walltime": "24:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 4 A: 2 T: 2528)"
+    },
+    {
+      "id": "590993.idark",
+      "state": "Q",
+      "owner": "carlos.lopez",
+      "name": "thesan-Thesan-2-s080-gas-clumping.pylians-g2048",
+      "queue": "small",
+      "requested": {
+        "mem": "512gb",
+        "ncpus": 20,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=20:mem=512gb",
+        "walltime": "24:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 20 A: 2 T: 2528)"
+    },
+    {
+      "id": "594047.idark",
+      "state": "R",
+      "owner": "oooao2997Maki",
+      "name": "class.sh",
+      "queue": "tiny",
+      "requested": {
+        "mem": "10485760kb",
+        "ncpus": 1,
+        "nodect": 1,
+        "nodes": "1:ppn=1",
+        "place": "scatter",
+        "select": "1:ncpus=1:mem=10485760KB",
+        "walltime": "999:00:00"
+      },
+      "used": {
+        "cpupercent": 32,
+        "cput": "00:03:51",
+        "mem": "223316kb",
+        "ncpus": 1,
+        "vmem": "1095996kb",
+        "walltime": "155:58:04"
+      },
+      "estimated": {},
+      "comment": "Job run at Mon Sep 14 at 03:55 on (ansys07:ncpus=1:mem=10485760kb)"
+    },
+    {
+      "id": "595514.idark",
+      "state": "R",
+      "owner": "terasawa",
+      "name": "jupyter_hscfy",
+      "queue": "tiny",
+      "requested": {
+        "mem": "40gb",
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1:mem=40gb",
+        "walltime": "999:00:00"
+      },
+      "used": {
+        "cpupercent": 48,
+        "cput": "01:46:32",
+        "mem": "276296kb",
+        "ncpus": 1,
+        "vmem": "1231872kb",
+        "walltime": "364:01:18"
+      },
+      "estimated": {},
+      "comment": "Job run at Sat Sep 05 at 11:52 on (ansys01:ncpus=1:mem=41943040kb)"
+    },
+    {
+      "id": "596244.idark",
+      "state": "R",
+      "owner": "terasawa",
+      "name": "populate_Y3tomo_galaxies_ducc",
+      "queue": "mini2",
+      "requested": {
+        "ncpus": 4,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=4",
+        "walltime": "999:00:00"
+      },
+      "used": {
+        "cpupercent": 398,
+        "cput": "1148:02:37",
+        "mem": "101607332kb",
+        "ncpus": 4,
+        "vmem": "103074828kb",
+        "walltime": "291:18:35"
+      },
+      "estimated": {},
+      "comment": "Job run at Tue Sep 08 at 12:33 on (ansys2:ncpus=4)"
+    },
+    {
+      "id": "596876.idark",
+      "state": "R",
+      "owner": "khayashi",
+      "name": "jupyter.pbs",
+      "queue": "mini",
+      "requested": {
+        "mem": "75gb",
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mem=75gb",
+        "walltime": "199:00:00"
+      },
+      "used": {
+        "cpupercent": 18,
+        "cput": "00:07:34",
+        "mem": "223612kb",
+        "ncpus": 52,
+        "vmem": "1177208kb",
+        "walltime": "177:41:58"
+      },
+      "estimated": {},
+      "comment": "Job run at Sun Sep 13 at 06:10 on (ansys27:ncpus=52:mem=78643200kb)"
+    },
+    {
+      "id": "596964.idark",
+      "state": "R",
+      "owner": "ShintaroNKN",
+      "name": "nbody-mini.sh",
+      "queue": "mini",
+      "requested": {
+        "mem": "52428800kb",
+        "ncpus": 1,
+        "nodect": 1,
+        "nodes": "1:ppn=1",
+        "place": "scatter",
+        "select": "1:ncpus=1:mem=52428800KB",
+        "walltime": "728:00:00"
+      },
+      "used": {
+        "cpupercent": 85,
+        "cput": "04:06:53",
+        "mem": "353468kb",
+        "ncpus": 1,
+        "vmem": "1038544kb",
+        "walltime": "155:57:00"
+      },
+      "estimated": {},
+      "comment": "Job run at Mon Sep 14 at 03:56 on (ansys06:ncpus=1:mem=52428800kb)"
+    },
+    {
+      "id": "597235.idark",
+      "state": "R",
+      "owner": "joaoferri",
+      "name": "lab_lite",
+      "queue": "tiny",
+      "requested": {
+        "mem": "16gb",
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1:mem=16gb",
+        "walltime": "199:00:00"
+      },
+      "used": {
+        "cpupercent": 32,
+        "cput": "01:30:02",
+        "mem": "356900kb",
+        "ncpus": 1,
+        "vmem": "1732744kb",
+        "walltime": "155:24:37"
+      },
+      "estimated": {},
+      "comment": "Job run at Mon Sep 14 at 04:29 on (ansys08:ncpus=1:mem=16777216kb)"
+    },
+    {
+      "id": "597516.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "pbh_fast_mass",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 52,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=52:ompthreads=1:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job held by param on Thu Sep 17 15:45:25 2026"
+    },
+    {
+      "id": "597517.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "pbh_fast_nocut",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 52,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=52:ompthreads=1:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job held by param on Thu Sep 17 15:45:25 2026"
+    },
+    {
+      "id": "597891.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "pbh_log_nocut",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 52,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=52:ompthreads=1:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job held by param on Thu Sep 17 15:45:25 2026"
+    },
+    {
+      "id": "597896.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "pbh_log_nocut",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 52,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=52:ompthreads=1:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job held by param on Thu Sep 17 15:45:25 2026"
+    },
+    {
+      "id": "597952[].idark",
+      "state": "B",
+      "owner": "satoshi",
+      "name": "qed80",
+      "queue": "mini",
+      "requested": {
+        "mem": "225gb",
+        "ncpus": 16,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=16:ompthreads=16:mem=225gb",
+        "walltime": "20:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Thu Sep 17 at 15:46"
+    },
+    {
+      "id": "597954[].idark",
+      "state": "B",
+      "owner": "satoshi",
+      "name": "qed80_small",
+      "queue": "small",
+      "requested": {
+        "mem": "225gb",
+        "ncpus": 16,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=16:ompthreads=16:mem=225gb",
+        "walltime": "20:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Wed Sep 16 at 20:06"
+    },
+    {
+      "id": "597957[].idark",
+      "state": "B",
+      "owner": "satoshi",
+      "name": "qed96",
+      "queue": "mini2",
+      "requested": {
+        "mem": "495gb",
+        "ncpus": 24,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=24:ompthreads=24:mem=495gb",
+        "walltime": "15:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Wed Sep 16 at 20:55"
+    },
+    {
+      "id": "597977.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "PBHfibre_free",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 52,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=52:ompthreads=1:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job held by param on Thu Sep 17 15:45:25 2026"
+    },
+    {
+      "id": "597978.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "PBHfibre_mass",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 52,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=52:ompthreads=1:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job held by param on Thu Sep 17 15:45:25 2026"
+    },
+    {
+      "id": "597979.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "PBHpoly_free",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 52,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=52:ompthreads=1:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job held by param on Thu Sep 17 15:45:25 2026"
+    },
+    {
+      "id": "597980.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "PBHpoly_mass",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 52,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=52:ompthreads=1:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job held by param on Thu Sep 17 15:45:25 2026"
+    },
+    {
+      "id": "598096.idark",
+      "state": "R",
+      "owner": "demisra",
+      "name": "networkModel",
+      "queue": "small",
+      "requested": {
+        "mem": "1024gb",
+        "ncpus": 16,
+        "nodect": 4,
+        "place": "free",
+        "select": "4:ncpus=4:mem=256gb",
+        "walltime": "480:00:00"
+      },
+      "used": {
+        "cpupercent": 1884,
+        "cput": "1359:27:19",
+        "mem": "5173168kb",
+        "ncpus": 16,
+        "vmem": "29161884kb",
+        "walltime": "72:07:54"
+      },
+      "estimated": {},
+      "comment": "Job run at Thu Sep 17 at 15:45 on (ansys18:ncpus=4:mem=268435456kb)+(ansys25:ncpus=4:mem=268435456kb)+(ansys05:ncpus=4:mem=268435456kb)+(ansys33:ncpus=4:mem=268435456kb)"
+    },
+    {
+      "id": "598097[].idark",
+      "state": "Q",
+      "owner": "satoshi",
+      "name": "qed64",
+      "queue": "mini",
+      "requested": {
+        "mem": "92gb",
+        "ncpus": 16,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=16:ompthreads=16:mem=92gb",
+        "walltime": "20:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 16 A: 2 T: 2528)"
+    },
+    {
+      "id": "598098[].idark",
+      "state": "B",
+      "owner": "satoshi",
+      "name": "qed64_B",
+      "queue": "mini_B",
+      "requested": {
+        "mem": "92gb",
+        "ncpus": 16,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=16:ompthreads=16:mem=92gb",
+        "walltime": "20:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sat Sep 19 at 01:15"
+    },
+    {
+      "id": "598100.idark",
+      "state": "R",
+      "owner": "param",
+      "name": "th_p4ltrf",
+      "queue": "mini_B",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {
+        "cpupercent": 3791,
+        "cput": "2641:32:02",
+        "mem": "92175408kb",
+        "ncpus": 52,
+        "vmem": "120172064kb",
+        "walltime": "71:57:42"
+      },
+      "estimated": {},
+      "comment": "Job run at Thu Sep 17 at 15:56 on (ansys32:ncpus=52:mem=104857600kb)"
+    },
+    {
+      "id": "598105.idark",
+      "state": "R",
+      "owner": "param",
+      "name": "th_p4ldzf",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {
+        "cpupercent": 3491,
+        "cput": "2501:10:55",
+        "mem": "78726484kb",
+        "ncpus": 32,
+        "vmem": "102876840kb",
+        "walltime": "71:48:17"
+      },
+      "estimated": {},
+      "comment": "Job run at Thu Sep 17 at 16:05 on (ansys09:ncpus=32:mem=104857600kb)"
+    },
+    {
+      "id": "598110[].idark",
+      "state": "B",
+      "owner": "kateryna_vovk",
+      "name": "galight",
+      "queue": "tiny",
+      "requested": {
+        "mem": "4gb",
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1:mem=4gb",
+        "walltime": "80:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Fri Sep 18 at 01:28"
+    },
+    {
+      "id": "598134.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4ltrf",
+      "queue": "mini_B",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598135.idark",
+      "state": "Q",
+      "owner": "param",
+      "name": "th_p4lz20",
+      "queue": "mini_B",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 52 A: 1 T: 2528)"
+    },
+    {
+      "id": "598136.idark",
+      "state": "Q",
+      "owner": "param",
+      "name": "th_p4lz25",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 52 A: 1 T: 2528)"
+    },
+    {
+      "id": "598139.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4ldzf",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598140.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4lzf",
+      "queue": "mini_B",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598142.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4ltrf",
+      "queue": "mini_B",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598143.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4lz20",
+      "queue": "mini_B",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598144.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4lz25",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598147.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4ldzf",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598148.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4lzf",
+      "queue": "mini_B",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598241.idark",
+      "state": "R",
+      "owner": "kanmi.nose",
+      "name": "notebook",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "100:00:00"
+      },
+      "used": {
+        "cpupercent": 8,
+        "cput": "00:00:57",
+        "mem": "163872kb",
+        "ncpus": 1,
+        "vmem": "1163320kb",
+        "walltime": "24:56:32"
+      },
+      "estimated": {},
+      "comment": "Job run at Sat Sep 19 at 14:56 on (ansys25:ncpus=1)"
+    },
+    {
+      "id": "598266.idark",
+      "state": "R",
+      "owner": "xinpengwang",
+      "name": "osc_dw_ht128",
+      "queue": "mini2",
+      "requested": {
+        "mem": "128gb",
+        "ncpus": 52,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=52:mem=128gb",
+        "walltime": "120:00:00"
+      },
+      "used": {
+        "cpupercent": 5063,
+        "cput": "134:09:28",
+        "mem": "15082444kb",
+        "ncpus": 52,
+        "vmem": "31045992kb",
+        "walltime": "19:26:30"
+      },
+      "estimated": {},
+      "comment": "Job run at Sat Sep 19 at 20:26 on (ansys1:ncpus=52:mem=134217728kb)"
+    },
+    {
+      "id": "598330.idark",
+      "state": "R",
+      "owner": "rramesh",
+      "name": "post",
+      "queue": "mini",
+      "requested": {
+        "mpiprocs": 52,
+        "ncpus": 52,
+        "nodect": 1,
+        "nodes": "ansys39:ppn=52",
+        "place": "scatter",
+        "select": "1:ncpus=52:host=ansys39:mpiprocs=52",
+        "walltime": "99999:00:00"
+      },
+      "used": {
+        "cpupercent": 18,
+        "cput": "00:00:02",
+        "mem": "96776kb",
+        "ncpus": 52,
+        "vmem": "537044kb",
+        "walltime": "07:25:41"
+      },
+      "estimated": {},
+      "comment": "Job run at Sun Sep 20 at 08:27 on (ansys39:ncpus=52)"
+    },
+    {
+      "id": "598331.idark",
+      "state": "R",
+      "owner": "liuzhj26",
+      "name": "STDIN",
+      "queue": "small",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "nodes": "1:ppn=1",
+        "place": "scatter",
+        "select": "1:ncpus=1",
+        "walltime": "24:00:00"
+      },
+      "used": {
+        "cpupercent": 16,
+        "cput": "00:03:13",
+        "mem": "159588kb",
+        "ncpus": 1,
+        "vmem": "1326104kb",
+        "walltime": "07:08:16"
+      },
+      "estimated": {},
+      "comment": "Job run at Sun Sep 20 at 08:45 on (ansys06:ncpus=1)"
+    },
+    {
+      "id": "598365.idark",
+      "state": "Q",
+      "owner": "param",
+      "name": "th_p4lbase",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 32 A: 1 T: 2528)"
+    },
+    {
+      "id": "598366.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4lbase",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598368.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4lbase",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598369.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4lbase",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598370.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4lbase",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598371.idark",
+      "state": "H",
+      "owner": "param",
+      "name": "th_p4lbase",
+      "queue": "mini",
+      "requested": {
+        "mem": "100gb",
+        "mpiprocs": 8,
+        "ncpus": 32,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=32:mpiprocs=8:mem=100gb",
+        "walltime": "500:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598376[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d02NH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:12"
+    },
+    {
+      "id": "598377[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d02IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:12"
+    },
+    {
+      "id": "598378[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d025NH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:12"
+    },
+    {
+      "id": "598380[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d03NH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:12"
+    },
+    {
+      "id": "598382[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d04NH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:12"
+    },
+    {
+      "id": "598384[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d06NH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:12"
+    },
+    {
+      "id": "598386[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d085NH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:12"
+    },
+    {
+      "id": "598387[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d085IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:12"
+    },
+    {
+      "id": "598388[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d10IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:20"
+    },
+    {
+      "id": "598389[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d12IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 11:20"
+    },
+    {
+      "id": "598390[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d15IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 12:26"
+    },
+    {
+      "id": "598391[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d17IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 14:10"
+    },
+    {
+      "id": "598392[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d20IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 14:13"
+    },
+    {
+      "id": "598393[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d22IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 14:18"
+    },
+    {
+      "id": "598394[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d25IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 14:25"
+    },
+    {
+      "id": "598395[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d275IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 14:30"
+    },
+    {
+      "id": "598396[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d30IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 14:33"
+    },
+    {
+      "id": "598397[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d35IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 14:36"
+    },
+    {
+      "id": "598398[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d40IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 14:41"
+    },
+    {
+      "id": "598399[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d425IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 14:51"
+    },
+    {
+      "id": "598400[].idark",
+      "state": "B",
+      "owner": "ygeoris99IPMU",
+      "name": "d46IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Job Array Began at Sun Sep 20 at 15:49"
+    },
+    {
+      "id": "598401[].idark",
+      "state": "Q",
+      "owner": "ygeoris99IPMU",
+      "name": "d50IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: host_group "
+    },
+    {
+      "id": "598402[].idark",
+      "state": "Q",
+      "owner": "ygeoris99IPMU",
+      "name": "d70IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: host_group "
+    },
+    {
+      "id": "598403[].idark",
+      "state": "Q",
+      "owner": "ygeoris99IPMU",
+      "name": "d100IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: host_group "
+    },
+    {
+      "id": "598404[].idark",
+      "state": "Q",
+      "owner": "ygeoris99IPMU",
+      "name": "d150IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: host_group "
+    },
+    {
+      "id": "598405[].idark",
+      "state": "Q",
+      "owner": "ygeoris99IPMU",
+      "name": "d200IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: host_group "
+    },
+    {
+      "id": "598406[].idark",
+      "state": "Q",
+      "owner": "ygeoris99IPMU",
+      "name": "d250IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: host_group "
+    },
+    {
+      "id": "598407[].idark",
+      "state": "Q",
+      "owner": "ygeoris99IPMU",
+      "name": "d300IH",
+      "queue": "tiny",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1",
+        "walltime": "06:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: host_group "
+    },
+    {
+      "id": "598428.idark",
+      "state": "R",
+      "owner": "terasawa",
+      "name": "fid_v27_DQ2_spk_HaloIA_Largea1h",
+      "queue": "mini2",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "nodes": "1:ppn=1",
+        "place": "scatter",
+        "select": "1:ncpus=1",
+        "walltime": "100:00:00"
+      },
+      "used": {
+        "cpupercent": 98,
+        "cput": "04:28:58",
+        "mem": "901256kb",
+        "ncpus": 1,
+        "vmem": "4961984kb",
+        "walltime": "04:29:40"
+      },
+      "estimated": {},
+      "comment": "Job run at Sun Sep 20 at 11:22 on (ansys2:ncpus=1)"
+    },
+    {
+      "id": "598429.idark",
+      "state": "Q",
+      "owner": "terasawa",
+      "name": "fid_v27_DQ2_spk_HaloIA_Largea1h",
+      "queue": "mini2",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "nodes": "1:ppn=1",
+        "place": "scatter",
+        "select": "1:ncpus=1",
+        "walltime": "100:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: User has reached queue mini2 running job limit."
+    },
+    {
+      "id": "598430.idark",
+      "state": "Q",
+      "owner": "terasawa",
+      "name": "fid_v27_DQ2_spk_HaloIA_Largea1h",
+      "queue": "mini2",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "nodes": "1:ppn=1",
+        "place": "scatter",
+        "select": "1:ncpus=1",
+        "walltime": "100:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: User has reached queue mini2 running job limit."
+    },
+    {
+      "id": "598431.idark",
+      "state": "Q",
+      "owner": "terasawa",
+      "name": "fid_v27_DQ2_spk_HaloIA_Largea1h",
+      "queue": "mini2",
+      "requested": {
+        "ncpus": 1,
+        "nodect": 1,
+        "nodes": "1:ppn=1",
+        "place": "scatter",
+        "select": "1:ncpus=1",
+        "walltime": "100:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: User has reached queue mini2 running job limit."
+    },
+    {
+      "id": "598433.idark",
+      "state": "Q",
+      "owner": "terasawa",
+      "name": "fid_ana_sim",
+      "queue": "mini",
+      "requested": {
+        "mpiprocs": 10,
+        "ncpus": 10,
+        "nodect": 1,
+        "nodes": "1:ppn=10",
+        "place": "scatter",
+        "select": "1:ncpus=10:mpiprocs=10",
+        "walltime": "100:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 10 A: 1 T: 2528)"
+    },
+    {
+      "id": "598439.idark",
+      "state": "R",
+      "owner": "kristero10",
+      "name": "sphere_resolution",
+      "queue": "mini2",
+      "requested": {
+        "mem": "128gb",
+        "ncpus": 4,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=4:mem=128gb",
+        "walltime": "10:00:00"
+      },
+      "used": {
+        "cpupercent": 400,
+        "cput": "06:16:35",
+        "mem": "57752784kb",
+        "ncpus": 4,
+        "vmem": "64057252kb",
+        "walltime": "01:54:41"
+      },
+      "estimated": {},
+      "comment": "Job run at Sun Sep 20 at 13:58 on (ansys1:ncpus=4:mem=134217728kb)"
+    },
+    {
+      "id": "598440.idark",
+      "state": "R",
+      "owner": "kristero10",
+      "name": "B12F8k",
+      "queue": "mini2",
+      "requested": {
+        "mem": "32gb",
+        "mpiprocs": 1,
+        "ncpus": 2,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=2:mpiprocs=1:mem=32gb:host_group=GroupB",
+        "walltime": "23:59:00"
+      },
+      "used": {
+        "cpupercent": 242,
+        "cput": "03:49:08",
+        "mem": "10192820kb",
+        "ncpus": 2,
+        "vmem": "13878788kb",
+        "walltime": "01:52:18"
+      },
+      "estimated": {},
+      "comment": "Job run at Sun Sep 20 at 13:59 on (ansys2:ncpus=2:mem=33554432kb)"
+    },
+    {
+      "id": "598441.idark",
+      "state": "Q",
+      "owner": "kristero10",
+      "name": "B12F8k",
+      "queue": "mini",
+      "requested": {
+        "mem": "64gb",
+        "mpiprocs": 1,
+        "ncpus": 26,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=26:mpiprocs=1:mem=64gb",
+        "walltime": "23:59:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 26 A: 1 T: 2528)"
+    },
+    {
+      "id": "598442.idark",
+      "state": "Q",
+      "owner": "kristero10",
+      "name": "B12F8k",
+      "queue": "mini",
+      "requested": {
+        "mem": "64gb",
+        "mpiprocs": 1,
+        "ncpus": 26,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=26:mpiprocs=1:mem=64gb",
+        "walltime": "23:59:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 26 A: 1 T: 2528)"
+    },
+    {
+      "id": "598443.idark",
+      "state": "Q",
+      "owner": "kristero10",
+      "name": "B12F8k",
+      "queue": "mini",
+      "requested": {
+        "mem": "64gb",
+        "mpiprocs": 1,
+        "ncpus": 26,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=26:mpiprocs=1:mem=64gb",
+        "walltime": "23:59:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 26 A: 1 T: 2528)"
+    },
+    {
+      "id": "598444.idark",
+      "state": "Q",
+      "owner": "kristero10",
+      "name": "B12F8k",
+      "queue": "mini",
+      "requested": {
+        "mem": "64gb",
+        "mpiprocs": 1,
+        "ncpus": 26,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=26:mpiprocs=1:mem=64gb",
+        "walltime": "23:59:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 26 A: 1 T: 2528)"
+    },
+    {
+      "id": "598447.idark",
+      "state": "Q",
+      "owner": "rzangarelli",
+      "name": "test-LGal",
+      "queue": "mini2",
+      "requested": {
+        "mem": "370gb",
+        "ncpus": 48,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=48:mem=370gb",
+        "walltime": "02:00:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 48 A: 1 T: 2528)"
+    },
+    {
+      "id": "598448.idark",
+      "state": "H",
+      "owner": "kristero10",
+      "name": "sphere_analysis",
+      "queue": "mini2",
+      "requested": {
+        "mem": "4gb",
+        "ncpus": 1,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=1:mem=4gb",
+        "walltime": "00:20:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598449.idark",
+      "state": "H",
+      "owner": "kristero10",
+      "name": "B12F8kCompare",
+      "queue": "mini",
+      "requested": {
+        "mem": "32gb",
+        "mpiprocs": 1,
+        "ncpus": 26,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=26:mpiprocs=1:mem=32gb",
+        "walltime": "23:59:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": ""
+    },
+    {
+      "id": "598451.idark",
+      "state": "Q",
+      "owner": "liuzhj26",
+      "name": "oii_refit",
+      "queue": "mini",
+      "requested": {
+        "mem": "48gb",
+        "ncpus": 24,
+        "nodect": 1,
+        "place": "free",
+        "select": "1:ncpus=24:mem=48gb",
+        "walltime": "00:30:00"
+      },
+      "used": {},
+      "estimated": {},
+      "comment": "Not Running: Insufficient amount of resource: ncpus (R: 24 A: 1 T: 2528)"
+    }
+  ],
+  "nodes": "                                                        mem       ncpus   nmics   ngpus\nvnode           state           njobs   run   susp      f/t        f/t     f/t     f/t   jobs\n--------------- --------------- ------ ----- ------ ------------ ------- ------- ------- -------\nidark           state-unknown        0     0      0      0kb/0kb   48/48     0/0     0/0 --\nansys06         job-busy            27    27      0   50gb/376gb    0/52     0/0     0/0 596964,598098[34],453055,598098[34],598098[20],598110[1],598110[2],598098[20],598110[3],598110[4],598110[5],598110[6],598110[7],598110[8],598110[9],598110[10],598110[11],598110[12],598110[13],598098[20],586791,598098[20],583383,598098[20],598331,598376[0],598376[1]\nansys07         job-busy            40    40      0  138gb/376gb    0/52     0/0     0/0 598110[14],598110[15],598110[16],598110[17],598110[18],598110[19],598110[20],598110[21],598110[22],598110[23],598110[24],598110[25],598110[26],598110[27],598110[28],598110[29],598110[30],598110[31],598110[32],598110[33],598110[34],598098[21],598110[35],598110[36],598110[37],598110[38],594047,598110[39],598098[21],598110[40],598098[21],598110[41],598110[42],598098[21],598376[2],598110[43],598110[44],598110[45],598110[46],598110[47]\nansys08         job-busy            41    41      0   19gb/376gb    0/52     0/0     0/0 598110[48],598110[49],597952[24],598110[50],598110[51],597952[24],598110[52],597952[24],598110[53],598110[54],598110[55],598110[56],598110[57],598110[58],598110[59],598110[60],598110[61],598110[62],597952[24],598110[63],598110[64],598110[65],598110[66],597952[24],598110[67],598110[68],598376[3],598376[4],598376[5],598110[69],597235,598376[6],598110[70],598110[71],598110[72],598110[73],598110[74],598110[75],598110[76],598376[7],598376[8]\nansys09         job-busy             6     6      0  168gb/376gb    0/52     0/0     0/0 598098[24],598105,598110[77],598110[78],598110[79],598110[80]\nansys10         job-busy             2     2      0  272gb/376gb    0/52     0/0     0/0 590636,598110[81]\nansys11         job-busy            39    39      0   11gb/376gb    0/52     0/0     0/0 598110[82],598110[83],598110[84],598110[85],598110[86],597952[23],598110[87],598110[88],598110[89],598110[90],598110[91],598110[92],598110[93],598110[94],598110[95],598110[96],598110[97],598110[98],597952[23],598110[99],598110[100],598110[101],598110[102],598110[103],598110[104],598110[105],598110[106],598110[107],597952[23],598376[9],598110[108],598110[109],598110[110],598110[111],598110[112],598110[113],598110[114],598110[115],598110[116]\nansys12         job-busy            17    17      0  100gb/376gb    0/52     0/0     0/0 598098[27],598376[10],598376[11],598376[12],598098[35],598098[28],598098[35],598098[28],598098[35],598098[28],598098[35],598098[28],598098[35],598098[28],598376[13],598098[28],598098[35]\nansys13         job-busy            37    37      0   47gb/376gb    0/52     0/0     0/0 597954[25],598110[117],598110[118],598110[119],598110[120],598110[121],598110[122],598110[123],598110[124],598110[125],598110[126],598110[127],598110[128],598110[129],598110[130],598110[131],598110[132],598110[133],598110[134],598110[135],598110[136],598110[137],598110[138],598110[139],598110[140],598110[141],598110[142],598376[14],598376[15],598376[16],598376[17],598376[18],598376[19],598398[35],598398[75],598399[1],598398[69]\nansys14         job-busy            37    37      0  188gb/376gb    0/52     0/0     0/0 598098[32],598399[59],598398[37],598398[59],598398[28],598399[74],598399[77],598399[51],598399[78],598399[73],598398[45],598110[143],598110[144],598398[42],598399[37],598110[145],598110[146],598110[147],598110[148],598110[149],598110[150],598110[151],598110[152],598110[153],598110[154],598110[155],598110[156],598110[157],598110[158],598110[159],598110[160],598110[161],598110[162],598110[163],598110[164],598110[165],598110[166]\nansys15         job-busy             6     6      0  168gb/376gb    0/52     0/0     0/0 598098[23],598106,598110[167],598110[168],598110[169],598110[170]\nansys16         job-busy            37    37      0  140gb/376gb    0/52     0/0     0/0 598098[22],598110[171],598110[172],598110[173],598110[174],598110[175],598110[176],598110[177],598110[178],598110[179],598110[180],598110[181],598110[182],598110[183],598110[184],598110[185],598110[186],598110[187],598110[188],598110[189],598110[190],598110[191],598110[192],598110[193],598110[194],598110[195],598110[196],598110[197],598110[198],598110[199],598110[200],598110[201],598110[202],598110[203],598110[204],598110[205],598110[206]\nansys17         job-busy            29    29      0  128gb/376gb    0/52     0/0     0/0 598098[25],598110[207],598098[25],598110[208],598110[209],598110[210],598110[211],598098[25],598110[212],598110[213],598110[214],598110[215],598098[25],598110[216],598110[217],598098[25],598110[218],598098[25],598110[219],598098[25],598110[220],598110[221],598110[222],598098[25],598098[33],598399[79],598399[48],598399[70],598399[80]\nansys18         job-busy            49    49      0  397mb/376gb    0/52     0/0     0/0 598096,598110[223],598110[224],598110[225],598110[226],598110[227],598110[228],598110[229],598110[230],598110[231],598110[232],598110[233],598110[234],598110[235],598110[236],598110[237],598110[238],598110[239],598110[240],598110[241],598110[242],598110[243],598110[244],598110[245],598110[246],598110[247],598110[248],598110[249],598110[250],598110[251],598110[252],598399[100],598400[4],598399[92],598399[89],598400[1],598399[86],598399[94],598399[97],598399[83],598399[90],598399[98],598399[95],598399[81],598399[93],598399[103],598399[96],598399[85],598399[82]\nansys19         job-busy            39    39      0   65gb/376gb    0/52     0/0     0/0 598110[253],589381,597952[22],598110[254],597952[22],598110[255],598110[256],597952[22],598399[21],598399[20],598398[4],598398[58],598399[2],598397[80],598399[50],598399[72],598399[39],598399[63],598376[68],598376[69],598376[70],598376[71],598376[72],598376[73],598376[74],598376[75],598376[76],598376[77],598376[78],598376[79],598376[80],598376[81],598376[82],598376[83],598376[84],598376[85],598376[86],598376[87],598398[111]\nansys20         job-busy            22    22      0   59gb/376gb    0/52     0/0     0/0 597954[23],598098[30],598388[0],598388[1],598388[2],598397[105],598397[103],598398[12],598398[21],598397[85],598397[95],598398[76],598398[71],598398[91],598398[39],598397[109],598398[29],598397[110],598398[33],598397[61],598397[100],598398[8]\nansys21         job-busy            37    37      0  151gb/376gb    0/52     0/0     0/0 598390[35],598390[36],598390[37],598390[38],598390[39],598390[40],598390[41],598390[42],598390[43],598390[44],598390[45],598390[46],598390[47],598390[48],598390[49],598390[50],597954[26],598390[51],598390[52],598390[53],598390[54],598390[55],598390[56],598390[57],598390[58],598390[59],598390[60],598390[61],598390[62],598390[63],598390[64],598390[65],598390[66],598398[20],598398[7],598398[6],598397[106]\nansys22         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598389[79],598389[80],598389[81],598389[82],598389[83],598389[84],598389[85],598389[86],598389[87],598389[88],598389[89],598389[90],598389[91],598389[92],598389[93],598389[94],598389[95],598390[16],598390[17],598390[18],598390[19],598399[109],598399[111],598399[107],598399[102],598399[101],598400[5],598399[104],598400[0],598399[110],598399[108],598400[3],598400[2],598399[106],598399[105],598400[6],598390[0],598390[1],598390[2],598390[3],598390[4],598390[5],598390[6],598390[7],598390[8],598390[9],598390[10],598390[11],598390[12],598390[13],598390[14],598390[15]\nansys23         job-busy            22    22      0   59gb/376gb    0/52     0/0     0/0 597954[22],598098[26],598398[82],598399[29],598399[32],598398[40],598398[83],598398[72],598399[9],598398[86],598399[8],598398[50],598399[14],598399[4],598398[85],598398[103],598398[104],598398[46],598398[88],598398[68],598398[90],598398[99]\nansys24         job-busy            22    22      0   59gb/376gb    0/52     0/0     0/0 597952[26],598098[29],598399[5],598399[25],598399[17],598398[100],598399[10],598398[89],598398[66],598398[80],598399[56],598398[95],598398[109],598398[97],598398[78],598399[6],598398[102],598398[105],598399[58],598399[30],598399[11],598399[66]\nansys01         job-busy            37    37      0  111gb/376gb    0/52     0/0     0/0 597952[27],598398[101],598396[70],598397[75],598398[62],598397[63],598398[96],598396[43],598397[5],598396[22],598396[86],598396[91],598397[53],598397[76],598377[16],598399[44],598399[22],598398[98],598398[92],598398[73],598399[26],598398[106],595514,598396[71],598397[20],598398[64],598397[37],598397[30],598398[63],598397[60],598398[70],598398[47],598397[57],598397[42],598396[79],598398[52],598398[27]\nansys02         job-busy            22    22      0   59gb/376gb    0/52     0/0     0/0 598098[31],597954[24],598399[28],598398[94],598399[67],598398[110],598399[35],598399[65],598398[108],598399[57],598399[3],598399[62],598398[81],598398[87],598399[43],598399[55],598399[76],598399[27],598398[107],598399[19],598399[69],598399[41]\nansys25         job-busy            49    49      0  120gb/376gb    0/52     0/0     0/0 598096,598393[90],598393[54],598393[77],598398[30],598397[39],598394[5],598399[91],598384[121],598384[122],598399[99],598384[124],598384[125],598384[126],598384[127],598387[85],598387[86],598387[87],598388[3],598388[4],598388[5],598388[6],598241,598388[7],598388[8],598398[65],598388[10],598398[79],598394[105],598395[92],598395[47],598396[107],598394[88],598395[34],598394[91],598393[23],598384[0],598393[35],598384[1],598384[2],598399[42],598384[3],598384[4],598399[47],598384[5],598384[6],598399[49],598399[54],598384[7]\nansys03         job-busy            37    37      0  151gb/376gb    0/52     0/0     0/0 597952[25],598399[34],598399[53],598399[52],598399[45],598399[31],598399[64],598399[46],598399[40],598399[60],598399[38],598386[0],598386[1],598386[2],598386[3],598386[4],598386[5],598386[6],598386[7],598386[8],598386[9],598386[10],598386[11],598386[12],598386[13],598386[14],598386[15],598386[16],598386[17],598386[18],598386[19],598398[93],598399[23],598398[56],598399[24],598399[13],598399[18]\nansys04         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598396[42],598396[7],598397[8],598397[45],598395[91],598396[73],598397[36],598397[91],598395[23],598378[0],598378[1],598378[2],598378[3],598378[4],598378[5],598378[6],598378[7],598378[8],598378[9],598378[10],598378[11],598378[12],598378[13],598378[14],598378[15],598378[16],598378[17],598378[18],598378[19],598398[2],598397[70],598397[74],598398[34],598398[16],598397[69],598395[65],598396[68],598396[66],598396[95],598396[3],598396[48],598396[15],598397[9],598397[28],598397[0],598395[96],598396[65],598397[81],598397[54],598395[106],598397[71],598396[24]\nansys26         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598394[48],598393[103],598394[81],598395[25],598394[58],598393[62],598393[43],598394[74],598393[68],598394[28],598394[45],598393[107],598394[13],598394[6],598393[87],598393[47],598398[60],598393[97],598393[106],598393[83],598394[37],598393[100],598397[3],598394[26],598393[101],598393[67],598394[80],598393[96],598394[60],598393[63],598394[15],598394[7],598393[49],598393[105],598394[39],598393[40],598394[76],598396[101],598397[78],598395[45],598396[27],598378[84],598378[85],598378[86],598378[87],598378[88],598378[89],598378[90],598378[91],598378[92],598378[93],598378[94]\nansys05         job-busy            49    49      0  120gb/376gb    0/52     0/0     0/0 598096,598378[95],598378[96],598378[97],598378[98],598378[99],598395[54],598395[72],598395[55],598395[67],598397[40],598395[50],598395[31],598395[80],598395[30],598397[10],598395[85],598395[83],598396[100],598396[97],598395[94],598397[33],598395[58],598395[24],598397[96],598396[58],598397[38],598395[46],598396[37],598395[61],598395[68],598395[105],598396[40],598396[20],598397[48],598395[13],598397[35],598395[78],598396[81],598396[50],598395[87],598395[62],598395[95],598396[14],598396[46],598395[93],598395[40],598395[79],598398[25]\nansys27         job-busy             1     1      0  301gb/376gb    0/52     0/0     0/0 596876\nansys28         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598393[75],598393[56],598393[88],598393[89],598394[41],598393[86],598394[64],598399[16],598395[0],598394[106],598394[95],598394[29],598394[14],598393[71],598394[59],598397[56],598393[94],598394[35],598394[87],598393[57],598393[42],598394[12],598394[25],598393[69],598394[57],598393[73],598393[70],598393[58],598393[104],598394[9],598394[85],598393[81],598393[74],598393[46],598393[66],598394[107],598395[29],598393[30],598393[61],598394[32],598393[44],598393[50],598395[101],598396[4],598393[41],598393[99],598394[10],598394[21],598394[18],598393[76],598393[85],598394[1]\nansys29         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598395[52],598396[39],598396[31],598395[57],598396[10],598397[16],598395[104],598395[81],598397[49],598397[98],598396[30],598396[11],598396[56],598396[45],598397[12],598396[49],598396[25],598395[33],598395[77],598395[37],598395[41],598395[99],598395[38],598396[16],598396[94],598397[52],598397[55],598397[22],598396[33],598396[2],598397[46],598396[83],598395[76],598396[96],598396[88],598396[110],598396[26],598386[116],598399[87],598386[118],598386[119],598386[120],598386[121],598386[122],598386[123],598386[124],598386[125],598386[126],598386[127],598386[128],598386[129],598386[130]\nansys30         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598396[19],598395[20],598394[20],598394[2],598395[89],598393[79],598396[85],598396[90],598395[56],598396[17],598394[101],598394[49],598395[71],598394[62],598396[67],598395[36],598395[97],598396[12],598394[24],598394[3],598394[102],598396[5],598395[88],598395[98],598394[53],598394[17],598394[77],598396[78],598394[79],598394[4],598395[9],598394[69],598395[73],598397[27],598395[60],598394[104],598396[63],598397[6],598393[60],598394[44],598396[35],598398[84],598395[35],598394[43],598394[27],598395[74],598395[27],598393[82],598394[68],598393[102],598397[65],598395[39]\nansys31         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598397[73],598380[0],598380[1],598380[2],598380[3],598380[4],598380[5],598380[6],598380[7],598380[8],598380[9],598380[10],598380[11],598380[12],598380[13],598380[14],598380[15],598399[88],598396[38],598397[87],598396[80],598394[82],598397[83],598393[65],598394[54],598395[43],598398[3],598395[42],598398[18],598394[99],598395[11],598394[84],598394[16],598398[61],598395[22],598395[6],598397[17],598395[86],598396[8],598397[13],598395[8],598394[30],598397[26],598393[52],598394[11],598396[28],598394[22],598395[1],598394[46],598397[11],598395[63],598396[98]\nansys32         job-busy             1     1      0  276gb/376gb    0/52     0/0     0/0 598100\nansys33         job-busy            49    49      0  120gb/376gb    0/52     0/0     0/0 598096,598396[103],598396[92],598398[23],598397[86],598393[20],598395[103],598393[55],598397[64],598396[60],598393[95],598396[34],598397[47],598395[3],598397[19],598396[55],598393[32],598397[34],598395[100],598393[38],598393[37],598397[29],598393[28],598393[33],598393[29],598393[93],598393[48],598393[51],598396[99],598397[58],598396[84],598398[5],598398[38],598393[39],598393[34],598393[27],598397[41],598397[24],598397[93],598393[84],598393[36],598393[31],598395[26],598395[16],598399[33],598399[0],598380[96],598380[97],598380[98]\nansys34         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598380[99],598380[100],598380[101],598380[102],598380[103],598380[104],598380[105],598380[106],598380[107],598397[88],598396[102],598396[104],598398[0],598397[111],598398[53],598398[49],598398[57],598397[67],598397[101],598396[51],598399[7],598388[84],598388[85],598388[86],598388[87],598388[88],598388[89],598388[90],598388[91],598388[92],598388[93],598388[94],598388[95],598397[82],598396[59],598398[31],598398[44],598398[74],598396[89],598397[18],598398[17],598397[50],598397[97],598397[94],598397[99],598397[44],598397[43],598397[68],598397[23],598397[79],598396[62],598395[18]\nansys35         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598391[48],598391[49],598391[50],598391[51],598391[52],598391[53],598391[54],598391[55],598391[56],598391[57],598391[58],598391[59],598391[0],598391[1],598391[2],598391[3],598391[4],598391[5],598391[6],598391[7],598391[8],598391[9],598391[10],598391[11],598391[12],598391[13],598391[14],598391[15],598391[16],598391[17],598391[18],598391[19],598391[20],598391[21],598391[22],598391[23],598391[24],598391[25],598391[26],598391[27],598391[28],598391[29],598391[30],598391[31],598391[32],598391[33],598391[34],598391[35],598391[36],598391[37],598391[38],598391[39]\nansys36         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598397[14],598394[94],598396[18],598396[77],598396[93],598396[61],598396[29],598394[83],598395[5],598396[0],598399[68],598398[55],598394[86],598396[75],598396[41],598394[78],598394[75],598396[52],598397[1],598394[89],598397[77],598395[10],598396[76],598398[9],598394[61],598394[92],598396[13],598396[54],598394[103],598394[38],598396[23],598396[72],598396[47],598395[53],598394[19],598395[59],598394[70],598395[84],598394[93],598396[57],598398[10],598397[107],598396[109],598398[11],598398[22],598397[84],598397[108],598398[51],598397[72],598399[12],598398[41],598398[13]\nansys2          free                 5     5      0    488gb/1tb    1/56     0/0     0/0 597957[14],597957[13],596244,598428,598440\nansys1          job-busy             2     2      0      1tb/1tb    0/56     0/0     0/0 598266,598439\nansys37         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598386[131],598386[132],598386[133],598386[134],598386[135],598396[106],598398[15],598398[36],598397[2],598397[90],598398[43],598398[1],598397[51],598398[77],598399[15],598398[26],598398[32],598397[15],598397[7],598387[0],598387[1],598387[2],598387[3],598398[54],598387[5],598397[102],598387[7],598395[28],598397[4],598394[72],598394[66],598396[21],598394[51],598394[96],598396[64],598394[0],598395[19],598396[105],598395[70],598397[31],598395[102],598397[92],598398[24],598394[47],598395[49],598396[87],598394[73],598397[59],598396[36],598395[14],598395[7],598396[108]\nansys38         job-busy            52    52      0  376gb/376gb    0/52     0/0     0/0 598395[2],598395[75],598394[98],598394[55],598394[100],598394[36],598394[50],598397[66],598395[12],598394[63],598395[69],598394[71],598394[40],598396[6],598395[15],598396[32],598396[9],598396[69],598395[82],598396[1],598394[52],598395[66],598396[44],598396[111],598395[90],598398[48],598396[74],598394[42],598395[44],598394[67],598395[4],598397[25],598397[21],598394[56],598396[53],598397[32],598395[32],598396[82],598395[64],598394[65],598395[51],598394[31],598394[90],598394[97],598397[89],598397[104],598398[67],598399[61],598399[75],598397[62],598395[21],598395[17]\nansys39         job-busy             1     1      0  376gb/376gb    0/52     0/0     0/0 598330\nansys40         job-busy            21    21      0   76gb/376gb    0/52     0/0     0/0 590251,598399[36],598390[85],598390[77],598390[78],598390[80],598390[81],598390[72],598390[75],598390[68],598390[84],598390[69],598390[73],598390[71],598390[67],598390[70],598390[82],598390[76],598390[79],598390[74],598390[83]\ndb02            job-busy            48    48      0  376gb/376gb    0/48     0/0     0/0 598392[72],598391[73],598393[21],598392[75],598392[78],598392[88],598392[45],598392[33],598392[14],598391[76],598392[84],598392[37],598393[7],598391[98],598392[69],598391[100],598392[9],598392[77],598392[44],598392[71],598392[39],598393[0],598392[17],598392[60],598392[89],598391[82],598392[26],598392[41],598392[81],598393[4],598392[35],598393[59],598394[34],598392[94],598392[93],598393[22],598393[1],598392[57],598391[74],598391[87],598392[74],598392[53],598391[97],598392[70],598391[81],598392[54],598392[40],598392[28]\ndb03            job-busy            48    48      0  376gb/376gb    0/48     0/0     0/0 598392[36],598390[103],598392[12],598392[20],598390[101],598391[63],598391[94],598391[66],598391[42],598391[88],598391[69],598391[70],598392[52],598391[65],598391[60],598392[13],598392[1],598391[43],598392[92],598392[30],598391[75],598391[96],598393[17],598392[59],598391[45],598392[25],598391[71],598392[58],598392[32],598391[64],598393[92],598391[46],598392[61],598392[29],598392[7],598392[80],598382[111],598392[76],598392[23],598392[62],598392[19],598392[63],598392[55],598387[80],598398[19],598395[48],598395[107],598387[84]\ndb01            job-busy            48    48      0  376gb/376gb    0/48     0/0     0/0 598393[80],598394[33],598393[98],598393[45],598393[25],598393[26],598393[53],598393[72],598393[91],598393[64],598394[23],598399[71],598393[78],598389[0],598389[1],598389[2],598389[3],598389[4],598389[5],598389[6],598389[7],598389[8],598389[9],598389[10],598389[11],598398[14],598389[13],598391[61],598391[84],598390[102],598392[22],598391[102],598391[79],598391[90],598391[67],598393[14],598391[78],598392[96],598392[100],598391[80],598391[44],598391[68],598392[3],598392[18],598391[103],598392[4],598391[92],598391[40]\ndb04            job-busy            48    48      0  376gb/376gb    0/48     0/0     0/0 598392[83],598392[104],598392[90],598391[101],598391[89],598392[27],598392[97],598392[15],598392[5],598392[24],598392[65],598392[51],598392[43],598392[95],598393[2],598391[95],598392[103],598391[86],598392[67],598392[98],598392[42],598392[107],598392[102],598392[87],598392[85],598392[21],598392[34],598391[83],598392[99],598393[13],598391[99],598393[19],598392[47],598392[106],598392[82],598393[11],598393[6],598392[6],598392[0],598392[31],598391[91],598392[91],598391[72],598392[11],598392[64],598392[56],598392[48],598392[8]\ndb05            job-busy            48    48      0  376gb/376gb    0/48     0/0     0/0 598392[50],598391[62],598390[87],598390[97],598390[92],598392[66],598393[3],598392[16],598393[10],598390[88],598392[73],598393[18],598392[68],598390[90],598390[91],598393[16],598390[94],598393[8],598391[93],598390[95],598392[105],598392[101],598390[93],598390[86],598390[89],598393[12],598390[98],598392[79],598390[96],598390[100],598392[10],598392[86],598393[15],598390[99],598391[85],598393[9],598393[24],598399[84],598389[15],598391[77],598392[38],598391[47],598392[49],598391[41],598394[8],598392[2],598392[46],598393[5]\ndb06            state-unknown        0     0      0  376gb/376gb   48/48     0/0     0/0 --\n",
+  "queues": "Queue: mini\n    queue_type = Execution\n    Priority = 20\n    total_jobs = 40\n    state_count = Transit:0 Queued:10 Held:17 Waiting:0 Running:12 Exiting:0 Be\n\tgun:1 \n    resources_max.ncpus = 52\n    resources_max.nodect = 1\n    default_chunk.host_group = GroupA\n    resources_assigned.mem = 2070937600kb\n    resources_assigned.mpiprocs = 92\n    resources_assigned.ncpus = 316\n    resources_assigned.nodect = 12\n    max_user_run = 6\n    enabled = True\n    started = True\n\nQueue: mini2\n    queue_type = Execution\n    Priority = 20\n    total_jobs = 13\n    state_count = Transit:0 Queued:4 Held:1 Waiting:0 Running:7 Exiting:0 Begun\n\t:1 \n    resources_max.ncpus = 56\n    resources_max.nodect = 2\n    default_chunk.host_group = GroupB\n    resources_assigned.mem = 1278gb\n    resources_assigned.mpiprocs = 1\n    resources_assigned.ncpus = 111\n    resources_assigned.nodect = 7\n    max_user_run = 2\n    enabled = True\n    started = True\n\nQueue: small\n    queue_type = Execution\n    Priority = 20\n    total_jobs = 9\n    state_count = Transit:0 Queued:1 Held:0 Waiting:0 Running:7 Exiting:0 Begun\n\t:1 \n    resources_max.ncpus = 208\n    resources_max.nodect = 4\n    default_chunk.host_group = GroupA\n    resources_assigned.mem = 2149gb\n    resources_assigned.mpiprocs = 0\n    resources_assigned.ncpus = 97\n    resources_assigned.nodect = 10\n    max_user_run = 5\n    enabled = True\n    started = True\n\nQueue: mini_B\n    queue_type = Execution\n    Priority = -10\n    total_jobs = 25\n    state_count = Transit:0 Queued:1 Held:5 Waiting:0 Running:18 Exiting:0 Begu\n\tn:1 \n    resources_max.ncpus = 52\n    resources_max.nodect = 1\n    default_chunk.host_group = GroupA\n    resources_assigned.mem = 1672gb\n    resources_assigned.mpiprocs = 16\n    resources_assigned.ncpus = 340\n    resources_assigned.nodect = 18\n    max_user_run = 16\n    enabled = True\n    started = True\n\n"
+}

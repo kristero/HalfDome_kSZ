@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -N FLAM_prior_audit
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${PILOT:?Set PILOT}"
+: "${CAMPAIGN:?Set CAMPAIGN}"
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=26
+export PYTHONUNBUFFERED=1 MPLBACKEND=Agg HDF5_USE_FILE_LOCKING=FALSE
+exec > "${PILOT}/logs/prepare.log" 2>&1
+trap 'status=$?; printf "%s\n" "$status" > "${PILOT}/logs/prepare.exit_code"' EXIT
+/usr/bin/time -v -o "${PILOT}/logs/prepare.time.txt" /home/anaconda3/bin/python3 \
+  "${PILOT}/code/prepare_pilot.py" --root "${PILOT}" --campaign "${CAMPAIGN}" \
+  --catalogue /lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5

@@ -1,0 +1,218 @@
+{
+  "passed": true,
+  "manifest_sha256": "994333174a0c5a1e636a5cc065d000464ea3b4ddee2bb0082ccb4cfdd70cc600",
+  "reused_count": 23,
+  "selected_old_points": 663,
+  "unavailable_old_selected_count": 640,
+  "reused": [
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00000/row_0000004.h5",
+      "source_group": null,
+      "source_sha256": "53a846852464ad02237f39c1f752bb541391d9f806c8960086195aec391ba527",
+      "old_row_id": 4,
+      "new_row_id": 0,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00000/row_0000024.h5",
+      "source_group": null,
+      "source_sha256": "87cf6a5e1516aea3cad9902752dafc4e0e6f31c3fa18f44627a2274cc1336811",
+      "old_row_id": 24,
+      "new_row_id": 8,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00000/row_0000028.h5",
+      "source_group": null,
+      "source_sha256": "022f3a8559af07e1a50d199e627389e7c3d825d988dc792431eb6ee10d70d804",
+      "old_row_id": 28,
+      "new_row_id": 16,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00001/row_0000146.h5",
+      "source_group": null,
+      "source_sha256": "36b7bffd427d57faf62850fd53018027939bbe71d7a3d714d9d87f5913856bb3",
+      "old_row_id": 146,
+      "new_row_id": 64,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00001/row_0000166.h5",
+      "source_group": null,
+      "source_sha256": "d474a97716ffcf1441f028b388f186e1c20911c444709661556548a5e13692ca",
+      "old_row_id": 166,
+      "new_row_id": 72,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00001/row_0000167.h5",
+      "source_group": null,
+      "source_sha256": "3dfaa8d952f01cb6a2a131502c861edd033994da86e9f521a3b171c2f5492b60",
+      "old_row_id": 167,
+      "new_row_id": 80,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00002/row_0000263.h5",
+      "source_group": null,
+      "source_sha256": "1152bc8616ec5da80df2bb194fec1d6ac27ca158cd6ee14fb32eee85f3aa1f25",
+      "old_row_id": 263,
+      "new_row_id": 160,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00002/row_0000273.h5",
+      "source_group": null,
+      "source_sha256": "f0618e584e294448db5849f0dd18fca26b36bff3569462b2666f932449768237",
+      "old_row_id": 273,
+      "new_row_id": 168,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00002/row_0000288.h5",
+      "source_group": null,
+      "source_sha256": "68c7811a8180b5e182d17519ffd1de5a5018bc18f6882fb314b37326798db187",
+      "old_row_id": 288,
+      "new_row_id": 176,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00002/row_0000291.h5",
+      "source_group": null,
+      "source_sha256": "14efbe6d4821d68ba95bae98263e0e8ea9a97cd02ac6a4791ecdff6a0ed6b941",
+      "old_row_id": 291,
+      "new_row_id": 184,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00002/row_0000295.h5",
+      "source_group": null,
+      "source_sha256": "e129c585c672ac0081e4e90f5bcd21de7df2bca4a88598dc0a178093bef56aab",
+      "old_row_id": 295,
+      "new_row_id": 192,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00003/row_0000391.h5",
+      "source_group": null,
+      "source_sha256": "e296eaa98cf856640241c92adf8e344802fe763645c883ca39f1b8c0f0ac8147",
+      "old_row_id": 391,
+      "new_row_id": 288,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00003/row_0000401.h5",
+      "source_group": null,
+      "source_sha256": "d37a1794afae58aede5c640683234ba30dcd9bb687b55f10a5a6eefe412258a7",
+      "old_row_id": 401,
+      "new_row_id": 296,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00004/row_0000516.h5",
+      "source_group": null,
+      "source_sha256": "2c22868b781c31ca479d4d12b479b16d80e51393a07ecbc9cee1b2cbeaaeee38",
+      "old_row_id": 516,
+      "new_row_id": 352,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00005/row_0000643.h5",
+      "source_group": null,
+      "source_sha256": "e841178d76963cea862a762c33aeb005eb6426b3f03c4c9498a824b01dc01691",
+      "old_row_id": 643,
+      "new_row_id": 440,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00005/row_0000645.h5",
+      "source_group": null,
+      "source_sha256": "eb64056b881345c7c70b6ba1d34374e0500b04c0deb72024fedc566fe41106b3",
+      "old_row_id": 645,
+      "new_row_id": 448,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00005/row_0000650.h5",
+      "source_group": null,
+      "source_sha256": "f36389848354ab826715b1021baee3fd24b867fbdca7b29b92480427b6014185",
+      "old_row_id": 650,
+      "new_row_id": 456,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00006/row_0000776.h5",
+      "source_group": null,
+      "source_sha256": "5b9ae99f2ccc108dc1ff8660fec4d71a77ec7f8b93366d6a185c50fa50de3d6b",
+      "old_row_id": 776,
+      "new_row_id": 536,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00006/row_0000780.h5",
+      "source_group": null,
+      "source_sha256": "fc5b04927171d0c3173b9ccd7ce61c2d3a7aa78d85f349e842925e9241163426",
+      "old_row_id": 780,
+      "new_row_id": 544,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00008/row_0001036.h5",
+      "source_group": null,
+      "source_sha256": "18f1cdc59cc0e9e500ef526b180cf7234aae922d9f1b64ab70ace4286a566943",
+      "old_row_id": 1036,
+      "new_row_id": 720,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00008/row_0001037.h5",
+      "source_group": null,
+      "source_sha256": "4b843518405937f15473603f30698ca06bfef8dcc769492618ba915472cbcb9e",
+      "old_row_id": 1037,
+      "new_row_id": 728,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00010/row_0001286.h5",
+      "source_group": null,
+      "source_sha256": "bdde0a4e08d92d66e9a1f103fdfc9df6540bb5421ae57c24cfe9aedac29e19cd",
+      "old_row_id": 1286,
+      "new_row_id": 920,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    },
+    {
+      "source": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/chunks/chunk_00010/row_0001292.h5",
+      "source_group": null,
+      "source_sha256": "4ade49c3b25539affd48aaa24d52e98d6bce3291b7502ff4368ada8f31e3123e",
+      "old_row_id": 1292,
+      "new_row_id": 928,
+      "source_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "selection": "P0*xc/240 thinning of the full frozen old design; independent of completion"
+    }
+  ],
+  "all_previous_completed_files_preserved": true,
+  "previous_completed_files": 273
+}

@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -N FLAM_prior_part
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${PILOT:?Set PILOT}"
+: "${CAMPAIGN:?Set CAMPAIGN}"
+: "${PILOT_ROLE:?Set fiducial, other_feedback, or extremes}"
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=26
+export PYTHONUNBUFFERED=1 MPLBACKEND=Agg HDF5_USE_FILE_LOCKING=FALSE
+case "$PILOT_ROLE" in
+  fiducial) options=(--variants L1_m9 --skip-extremes) ;;
+  other_feedback) options=(--variants fgas-8sigma Mstar-1sigma --skip-extremes) ;;
+  extremes) options=(--extremes-only) ;;
+  *) exit 2 ;;
+esac
+exec > "${PILOT}/logs/${PILOT_ROLE}.log" 2>&1
+trap 'status=$?; printf "%s\n" "$status" > "${PILOT}/logs/${PILOT_ROLE}.exit_code"' EXIT
+/usr/bin/time -v -o "${PILOT}/logs/${PILOT_ROLE}.time.txt" /home/anaconda3/bin/python3 \
+  "${PILOT}/code/run_pilot.py" --root "${PILOT}" --campaign "${CAMPAIGN}" \
+  --run-label "${PILOT_ROLE}" "${options[@]}"

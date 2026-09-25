@@ -1,0 +1,1086 @@
+{
+  "rows": [
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 0.5069981664681564,
+      "beta": 3.973646754188787,
+      "retained_projected_flux_fraction": 0.8596447394114357,
+      "omitted_projected_flux_fraction": 0.1403552605885643
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 0.6819132028379638,
+      "beta": 4.701832238891007,
+      "retained_projected_flux_fraction": 0.9373663992701791,
+      "omitted_projected_flux_fraction": 0.06263360072982094
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 0.8415100665119433,
+      "beta": 5.298057960587645,
+      "retained_projected_flux_fraction": 0.9628533353122865,
+      "omitted_projected_flux_fraction": 0.03714666468771355
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 1.3967292958354554,
+      "beta": 7.063893670004001,
+      "retained_projected_flux_fraction": 0.9865677803280783,
+      "omitted_projected_flux_fraction": 0.013432219671921652
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 0.497,
+      "beta": 4.35,
+      "retained_projected_flux_fraction": 0.929489475739975,
+      "omitted_projected_flux_fraction": 0.07051052426002502
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 0.6684656557466157,
+      "beta": 5.1471536108778535,
+      "retained_projected_flux_fraction": 0.9704141796681033,
+      "omitted_projected_flux_fraction": 0.029585820331896717
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 0.8249152180764426,
+      "beta": 5.799849245346713,
+      "retained_projected_flux_fraction": 0.9830810181680432,
+      "omitted_projected_flux_fraction": 0.016918981831956836
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 1.3691853461048387,
+      "beta": 7.73293132614916,
+      "retained_projected_flux_fraction": 0.9942438475206254,
+      "omitted_projected_flux_fraction": 0.005756152479374554
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 0.48719900058162086,
+      "beta": 4.761998529449805,
+      "retained_projected_flux_fraction": 0.9679262219574147,
+      "omitted_projected_flux_fraction": 0.032073778042585266
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 0.6552832985973621,
+      "beta": 5.634652396747724,
+      "retained_projected_flux_fraction": 0.9873860029232772,
+      "omitted_projected_flux_fraction": 0.012613997076722838
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 0.8086476253750758,
+      "beta": 6.349166339625658,
+      "retained_projected_flux_fraction": 0.9930610178787653,
+      "omitted_projected_flux_fraction": 0.006938982121234671
+    },
+    {
+      "name": "Battaglia12",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 1.3421845718979437,
+      "beta": 8.465335081254858,
+      "retained_projected_flux_fraction": 0.9977890106155016,
+      "omitted_projected_flux_fraction": 0.002210989384498374
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 3.2386365767409404,
+      "beta": 7.443068751490507,
+      "retained_projected_flux_fraction": 0.9100220164598355,
+      "omitted_projected_flux_fraction": 0.08997798354016451
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 5.423304241248008,
+      "beta": 9.935228803104598,
+      "retained_projected_flux_fraction": 0.9145415408087185,
+      "omitted_projected_flux_fraction": 0.08545845919128148
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 7.818524291638251,
+      "beta": 12.194638334773181,
+      "retained_projected_flux_fraction": 0.9044079047068959,
+      "omitted_projected_flux_fraction": 0.09559209529310408
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 18.875017511366536,
+      "beta": 19.979555352910037,
+      "retained_projected_flux_fraction": 0.8351247146967972,
+      "omitted_projected_flux_fraction": 0.16487528530320283
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 1.378849450857866,
+      "beta": 7.273537628593472,
+      "retained_projected_flux_fraction": 0.9898781671431424,
+      "omitted_projected_flux_fraction": 0.010121832856857638
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 2.3089716606625332,
+      "beta": 9.70893363487953,
+      "retained_projected_flux_fraction": 0.9943168000180359,
+      "omitted_projected_flux_fraction": 0.005683199981964093
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 3.3287365440962318,
+      "beta": 11.916880490630826,
+      "retained_projected_flux_fraction": 0.9949185210236432,
+      "omitted_projected_flux_fraction": 0.005081478976356801
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 8.036038287651985,
+      "beta": 19.52448009201257,
+      "retained_projected_flux_fraction": 0.9909458512882324,
+      "omitted_projected_flux_fraction": 0.009054148711767573
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 0.5870451231808952,
+      "beta": 7.107867923962252,
+      "retained_projected_flux_fraction": 0.9993362588050212,
+      "omitted_projected_flux_fraction": 0.0006637411949788063
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 0.9830446334162969,
+      "beta": 9.487792802219035,
+      "retained_projected_flux_fraction": 0.9998695218571615,
+      "omitted_projected_flux_fraction": 0.00013047814283850823
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 1.4172095099649522,
+      "beta": 11.64544914981433,
+      "retained_projected_flux_fraction": 0.9999405824944289,
+      "omitted_projected_flux_fraction": 5.9417505571146556e-05
+    },
+    {
+      "name": "fit_L1_m9",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 3.4213431230842466,
+      "beta": 19.079770101483884,
+      "retained_projected_flux_fraction": 0.9999598086560396,
+      "omitted_projected_flux_fraction": 4.019134396038293e-05
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 2.2459975561680974,
+      "beta": 5.678645056381751,
+      "retained_projected_flux_fraction": 0.8483275374892906,
+      "omitted_projected_flux_fraction": 0.15167246251070943
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 4.065109942751551,
+      "beta": 7.771713139799621,
+      "retained_projected_flux_fraction": 0.8778902929245516,
+      "omitted_projected_flux_fraction": 0.12210970707544844
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 6.192800867470995,
+      "beta": 9.709644107687984,
+      "retained_projected_flux_fraction": 0.8711910488313099,
+      "omitted_projected_flux_fraction": 0.12880895116869007
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 17.075166657607536,
+      "beta": 16.602056962868247,
+      "retained_projected_flux_fraction": 0.7815757887762725,
+      "omitted_projected_flux_fraction": 0.21842421122372746
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 1.3772759831840422,
+      "beta": 7.00167495745385,
+      "retained_projected_flux_fraction": 0.9861589051850391,
+      "omitted_projected_flux_fraction": 0.013841094814960875
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 2.492780224884331,
+      "beta": 9.582393110887885,
+      "retained_projected_flux_fraction": 0.9914154903299384,
+      "omitted_projected_flux_fraction": 0.008584509670061635
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 3.7975089865907017,
+      "beta": 11.97182977974421,
+      "retained_projected_flux_fraction": 0.9912014686693449,
+      "omitted_projected_flux_fraction": 0.008798531330655113
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 10.470722410985426,
+      "beta": 20.470060256451863,
+      "retained_projected_flux_fraction": 0.9772820000593554,
+      "omitted_projected_flux_fraction": 0.022717999940644606
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 0.8445642020607795,
+      "beta": 8.632948832528816,
+      "retained_projected_flux_fraction": 0.9997735891423465,
+      "omitted_projected_flux_fraction": 0.00022641085765351399
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 1.5286064428969262,
+      "beta": 11.814931416004255,
+      "retained_projected_flux_fraction": 0.9999217658497792,
+      "omitted_projected_flux_fraction": 7.823415022079061e-05
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 2.328683710627109,
+      "beta": 14.761067108699429,
+      "retained_projected_flux_fraction": 0.9999355290764593,
+      "omitted_projected_flux_fraction": 6.447092354067152e-05
+    },
+    {
+      "name": "fit_fgas-8sigma",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 6.420788154302791,
+      "beta": 25.239244018975928,
+      "retained_projected_flux_fraction": 0.9997697565611193,
+      "omitted_projected_flux_fraction": 0.0002302434388806729
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 3.03615948733556,
+      "beta": 8.818495774820851,
+      "retained_projected_flux_fraction": 0.9695923489541215,
+      "omitted_projected_flux_fraction": 0.030407651045878503
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 5.76035442068773,
+      "beta": 12.366089836689508,
+      "retained_projected_flux_fraction": 0.9643121991312851,
+      "omitted_projected_flux_fraction": 0.035687800868714925
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 9.073644642795879,
+      "beta": 15.718660552441415,
+      "retained_projected_flux_fraction": 0.949571235395344,
+      "omitted_projected_flux_fraction": 0.05042876460465595
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 27.11683211872032,
+      "beta": 28.01796313928576,
+      "retained_projected_flux_fraction": 0.8506205018025087,
+      "omitted_projected_flux_fraction": 0.1493794981974913
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 1.3705116615597033,
+      "beta": 8.661816391074165,
+      "retained_projected_flux_fraction": 0.9981008157868809,
+      "omitted_projected_flux_fraction": 0.0018991842131190761
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 2.6002036260610306,
+      "beta": 12.146379878841504,
+      "retained_projected_flux_fraction": 0.9987445122823922,
+      "omitted_projected_flux_fraction": 0.0012554877176077506
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 4.0958111218042506,
+      "beta": 15.43938502614227,
+      "retained_projected_flux_fraction": 0.9984479102865049,
+      "omitted_projected_flux_fraction": 0.001552089713495075
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 12.2404421764671,
+      "beta": 27.520164273062473,
+      "retained_projected_flux_fraction": 0.992081090150454,
+      "omitted_projected_flux_fraction": 0.007918909849546019
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 0.618644120081939,
+      "beta": 8.507920750713888,
+      "retained_projected_flux_fraction": 0.9999374364208824,
+      "omitted_projected_flux_fraction": 6.256357911760269e-05
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 1.1737227266258605,
+      "beta": 11.930573536947701,
+      "retained_projected_flux_fraction": 0.9999882269522969,
+      "omitted_projected_flux_fraction": 1.1773047703056427e-05
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 1.848834664118638,
+      "beta": 15.165071425150275,
+      "retained_projected_flux_fraction": 0.9999927150865292,
+      "omitted_projected_flux_fraction": 7.284913470795296e-06
+    },
+    {
+      "name": "fit_Mstar-1sigma",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 5.525292335751836,
+      "beta": 27.03120986530254,
+      "retained_projected_flux_fraction": 0.999973424053903,
+      "omitted_projected_flux_fraction": 2.6575946097007197e-05
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 4.080468140588784,
+      "beta": 3.973646754188787,
+      "retained_projected_flux_fraction": 0.2964578253649004,
+      "omitted_projected_flux_fraction": 0.7035421746350996
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 5.488235032901117,
+      "beta": 4.701832238891007,
+      "retained_projected_flux_fraction": 0.359235845502159,
+      "omitted_projected_flux_fraction": 0.6407641544978411
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 6.772716833094111,
+      "beta": 5.298057960587645,
+      "retained_projected_flux_fraction": 0.385350804752748,
+      "omitted_projected_flux_fraction": 0.6146491952472519
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 11.24128205903787,
+      "beta": 7.063893670004001,
+      "retained_projected_flux_fraction": 0.4025864587127042,
+      "omitted_projected_flux_fraction": 0.5974135412872958
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 4.0,
+      "beta": 4.35,
+      "retained_projected_flux_fraction": 0.39497354950308733,
+      "omitted_projected_flux_fraction": 0.6050264504969127
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 5.380005277638758,
+      "beta": 5.1471536108778535,
+      "retained_projected_flux_fraction": 0.44942329689127813,
+      "omitted_projected_flux_fraction": 0.5505767031087219
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 6.63915668471986,
+      "beta": 5.799849245346713,
+      "retained_projected_flux_fraction": 0.47032478421545076,
+      "omitted_projected_flux_fraction": 0.5296752157845492
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 11.0196003710651,
+      "beta": 7.73293132614916,
+      "retained_projected_flux_fraction": 0.4773807515088905,
+      "omitted_projected_flux_fraction": 0.5226192484911095
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 3.921118716954695,
+      "beta": 4.761998529449805,
+      "retained_projected_flux_fraction": 0.49633381528469495,
+      "omitted_projected_flux_fraction": 0.503666184715305
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 5.2739098478660935,
+      "beta": 5.634652396747724,
+      "retained_projected_flux_fraction": 0.5410464097207482,
+      "omitted_projected_flux_fraction": 0.45895359027925176
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 6.508230385312482,
+      "beta": 6.349166339625658,
+      "retained_projected_flux_fraction": 0.5564904630498885,
+      "omitted_projected_flux_fraction": 0.4435095369501115
+    },
+    {
+      "name": "xc_high",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 10.802290317086065,
+      "beta": 8.465335081254858,
+      "retained_projected_flux_fraction": 0.5540022287412536,
+      "omitted_projected_flux_fraction": 0.4459977712587464
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 0.5069981664681564,
+      "beta": 2.557749634880139,
+      "retained_projected_flux_fraction": null,
+      "omitted_projected_flux_fraction": null
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 0.6819132028379638,
+      "beta": 3.026466728481568,
+      "retained_projected_flux_fraction": 0.30686638459396914,
+      "omitted_projected_flux_fraction": 0.6931336154060308
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 0.8415100665119433,
+      "beta": 3.4102442045161854,
+      "retained_projected_flux_fraction": 0.5265338740407618,
+      "omitted_projected_flux_fraction": 0.4734661259592382
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 1.3967292958354554,
+      "beta": 4.546874086439357,
+      "retained_projected_flux_fraction": 0.790408150144239,
+      "omitted_projected_flux_fraction": 0.20959184985576096
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 0.497,
+      "beta": 2.8,
+      "retained_projected_flux_fraction": 0.12157662817172622,
+      "omitted_projected_flux_fraction": 0.8784233718282738
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 0.6684656557466157,
+      "beta": 3.313110370220228,
+      "retained_projected_flux_fraction": 0.5223849923376397,
+      "omitted_projected_flux_fraction": 0.4776150076623603
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 0.8249152180764426,
+      "beta": 3.7332362958553555,
+      "retained_projected_flux_fraction": 0.6860076398270918,
+      "omitted_projected_flux_fraction": 0.3139923601729082
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 1.3691853461048387,
+      "beta": 4.977519014532793,
+      "retained_projected_flux_fraction": 0.8691636724785416,
+      "omitted_projected_flux_fraction": 0.13083632752145835
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 0.48719900058162086,
+      "beta": 3.0651944557378057,
+      "retained_projected_flux_fraction": 0.39918226093665776,
+      "omitted_projected_flux_fraction": 0.6008177390633422
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 0.6552832985973621,
+      "beta": 3.626902692159454,
+      "retained_projected_flux_fraction": 0.6946518773621253,
+      "omitted_projected_flux_fraction": 0.3053481226378747
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 0.8086476253750758,
+      "beta": 4.086819712862493,
+      "retained_projected_flux_fraction": 0.8064817682021757,
+      "omitted_projected_flux_fraction": 0.19351823179782435
+    },
+    {
+      "name": "beta_low",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 1.3421845718979437,
+      "beta": 5.448951316669794,
+      "retained_projected_flux_fraction": 0.9240471839151659,
+      "omitted_projected_flux_fraction": 0.07595281608483406
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 0.5069981664681564,
+      "beta": 14.61571219931508,
+      "retained_projected_flux_fraction": 0.9999999999222567,
+      "omitted_projected_flux_fraction": 7.774325627707412e-11
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 0.6819132028379638,
+      "beta": 17.294095591323245,
+      "retained_projected_flux_fraction": 0.9999999999884174,
+      "omitted_projected_flux_fraction": 1.158262374900687e-11
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 0.8415100665119433,
+      "beta": 19.48710974009249,
+      "retained_projected_flux_fraction": 0.9999999999962979,
+      "omitted_projected_flux_fraction": 3.702149697915047e-12
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 1.3967292958354554,
+      "beta": 25.982137636796327,
+      "retained_projected_flux_fraction": 0.9999999999994161,
+      "omitted_projected_flux_fraction": 5.838662886503698e-13
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 0.497,
+      "beta": 16.0,
+      "retained_projected_flux_fraction": 0.9999999999966293,
+      "omitted_projected_flux_fraction": 3.3707481250644378e-12
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 0.6684656557466157,
+      "beta": 18.932059258401303,
+      "retained_projected_flux_fraction": 0.9999999999995748,
+      "omitted_projected_flux_fraction": 4.2521541843143495e-13
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 0.8249152180764426,
+      "beta": 21.332778833459177,
+      "retained_projected_flux_fraction": 0.9999999999998758,
+      "omitted_projected_flux_fraction": 1.2423395645555502e-13
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 1.3691853461048387,
+      "beta": 28.442965797330245,
+      "retained_projected_flux_fraction": 0.9999999999999808,
+      "omitted_projected_flux_fraction": 1.9206858326015208e-14
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 0.48719900058162086,
+      "beta": 17.51539688993032,
+      "retained_projected_flux_fraction": 0.9999999999998935,
+      "omitted_projected_flux_fraction": 1.0647038806155251e-13
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 0.6552832985973621,
+      "beta": 20.725158240911167,
+      "retained_projected_flux_fraction": 0.999999999999987,
+      "omitted_projected_flux_fraction": 1.2989609388114332e-14
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 0.8086476253750758,
+      "beta": 23.353255502071388,
+      "retained_projected_flux_fraction": 0.9999999999999951,
+      "omitted_projected_flux_fraction": 4.884981308350689e-15
+    },
+    {
+      "name": "beta_high",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 1.3421845718979437,
+      "beta": 31.136864666684538,
+      "retained_projected_flux_fraction": 0.9999999999999958,
+      "omitted_projected_flux_fraction": 4.218847493575595e-15
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 4.080468140588784,
+      "beta": 14.61571219931508,
+      "retained_projected_flux_fraction": 0.9975062720791185,
+      "omitted_projected_flux_fraction": 0.002493727920881539
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 5.488235032901117,
+      "beta": 17.294095591323245,
+      "retained_projected_flux_fraction": 0.9969756933374757,
+      "omitted_projected_flux_fraction": 0.00302430666252429
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 6.772716833094111,
+      "beta": 19.48710974009249,
+      "retained_projected_flux_fraction": 0.9962661774381357,
+      "omitted_projected_flux_fraction": 0.003733822561864275
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 11.24128205903787,
+      "beta": 25.982137636796327,
+      "retained_projected_flux_fraction": 0.9926131644324259,
+      "omitted_projected_flux_fraction": 0.007386835567574135
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 4.0,
+      "beta": 16.0,
+      "retained_projected_flux_fraction": 0.9990423569036047,
+      "omitted_projected_flux_fraction": 0.0009576430963953442
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 5.380005277638758,
+      "beta": 18.932059258401303,
+      "retained_projected_flux_fraction": 0.9987880904665445,
+      "omitted_projected_flux_fraction": 0.001211909533455513
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 6.63915668471986,
+      "beta": 21.332778833459177,
+      "retained_projected_flux_fraction": 0.9984462563249669,
+      "omitted_projected_flux_fraction": 0.0015537436750331368
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 11.0196003710651,
+      "beta": 28.442965797330245,
+      "retained_projected_flux_fraction": 0.9965733853851426,
+      "omitted_projected_flux_fraction": 0.0034266146148573817
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 3.921118716954695,
+      "beta": 17.51539688993032,
+      "retained_projected_flux_fraction": 0.9996741654460548,
+      "omitted_projected_flux_fraction": 0.00032583455394519234
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 5.2739098478660935,
+      "beta": 20.725158240911167,
+      "retained_projected_flux_fraction": 0.9995678208911327,
+      "omitted_projected_flux_fraction": 0.00043217910886728106
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 6.508230385312482,
+      "beta": 23.353255502071388,
+      "retained_projected_flux_fraction": 0.9994223013982213,
+      "omitted_projected_flux_fraction": 0.0005776986017786978
+    },
+    {
+      "name": "wide_steep",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 10.802290317086065,
+      "beta": 31.136864666684538,
+      "retained_projected_flux_fraction": 0.9985625703168594,
+      "omitted_projected_flux_fraction": 0.0014374296831406452
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 0.10201170351471961,
+      "beta": 14.61571219931508,
+      "retained_projected_flux_fraction": 0.9999999999999989,
+      "omitted_projected_flux_fraction": 1.1102230246251565e-15
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 0.13720587582252794,
+      "beta": 26.85077783676994,
+      "retained_projected_flux_fraction": 1.0,
+      "omitted_projected_flux_fraction": 0.0
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 0.16931792082735278,
+      "beta": 41.33947683202657,
+      "retained_projected_flux_fraction": 1.0,
+      "omitted_projected_flux_fraction": 0.0
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 0.2810320514759468,
+      "beta": 116.92569759452064,
+      "retained_projected_flux_fraction": 1.0,
+      "omitted_projected_flux_fraction": 0.0
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 0.1,
+      "beta": 16.0,
+      "retained_projected_flux_fraction": 0.9999999999999982,
+      "omitted_projected_flux_fraction": 1.7763568394002505e-15
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 0.13450013194096896,
+      "beta": 29.393876913398135,
+      "retained_projected_flux_fraction": 0.9999999999999972,
+      "omitted_projected_flux_fraction": 2.7755575615628914e-15
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 0.1659789171179965,
+      "beta": 45.254833995939045,
+      "retained_projected_flux_fraction": 1.0,
+      "omitted_projected_flux_fraction": 0.0
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 0.2754900092766275,
+      "beta": 128.0,
+      "retained_projected_flux_fraction": 1.0,
+      "omitted_projected_flux_fraction": 0.0
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 0.09802796792386738,
+      "beta": 17.51539688993032,
+      "retained_projected_flux_fraction": 0.9999999999999979,
+      "omitted_projected_flux_fraction": 2.1094237467877974e-15
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 0.13184774619665235,
+      "beta": 32.17783876699552,
+      "retained_projected_flux_fraction": 0.9999999999999978,
+      "omitted_projected_flux_fraction": 2.220446049250313e-15
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 0.16270575963281203,
+      "beta": 49.54102366417398,
+      "retained_projected_flux_fraction": 1.0,
+      "omitted_projected_flux_fraction": 0.0
+    },
+    {
+      "name": "compact_steep_evolving",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 0.27005725792715163,
+      "beta": 140.12317511944255,
+      "retained_projected_flux_fraction": 0.9999999999999439,
+      "omitted_projected_flux_fraction": 5.6066262743570405e-14
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.0,
+      "xc": 0.5069981664681564,
+      "beta": 3.973646754188787,
+      "retained_projected_flux_fraction": 0.8596447394114357,
+      "omitted_projected_flux_fraction": 0.1403552605885643
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 10000000000000.0,
+      "z": 0.5,
+      "xc": 0.6819132028379638,
+      "beta": 4.701832238891007,
+      "retained_projected_flux_fraction": 0.9373663992701791,
+      "omitted_projected_flux_fraction": 0.06263360072982094
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 10000000000000.0,
+      "z": 1.0,
+      "xc": 0.8415100665119433,
+      "beta": 5.298057960587645,
+      "retained_projected_flux_fraction": 0.9628533353122865,
+      "omitted_projected_flux_fraction": 0.03714666468771355
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 10000000000000.0,
+      "z": 3.0,
+      "xc": 1.3967292958354554,
+      "beta": 7.063893670004001,
+      "retained_projected_flux_fraction": 0.9865677803280783,
+      "omitted_projected_flux_fraction": 0.013432219671921652
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.0,
+      "xc": 0.497,
+      "beta": 4.35,
+      "retained_projected_flux_fraction": 0.929489475739975,
+      "omitted_projected_flux_fraction": 0.07051052426002502
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 100000000000000.0,
+      "z": 0.5,
+      "xc": 0.6684656557466157,
+      "beta": 5.1471536108778535,
+      "retained_projected_flux_fraction": 0.9704141796681033,
+      "omitted_projected_flux_fraction": 0.029585820331896717
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 100000000000000.0,
+      "z": 1.0,
+      "xc": 0.8249152180764426,
+      "beta": 5.799849245346713,
+      "retained_projected_flux_fraction": 0.9830810181680432,
+      "omitted_projected_flux_fraction": 0.016918981831956836
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 100000000000000.0,
+      "z": 3.0,
+      "xc": 1.3691853461048387,
+      "beta": 7.73293132614916,
+      "retained_projected_flux_fraction": 0.9942438475206254,
+      "omitted_projected_flux_fraction": 0.005756152479374554
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.0,
+      "xc": 0.48719900058162086,
+      "beta": 4.761998529449805,
+      "retained_projected_flux_fraction": 0.9679262219574147,
+      "omitted_projected_flux_fraction": 0.032073778042585266
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 1000000000000000.0,
+      "z": 0.5,
+      "xc": 0.6552832985973621,
+      "beta": 5.634652396747724,
+      "retained_projected_flux_fraction": 0.9873860029232772,
+      "omitted_projected_flux_fraction": 0.012613997076722838
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 1000000000000000.0,
+      "z": 1.0,
+      "xc": 0.8086476253750758,
+      "beta": 6.349166339625658,
+      "retained_projected_flux_fraction": 0.9930610178787653,
+      "omitted_projected_flux_fraction": 0.006938982121234671
+    },
+    {
+      "name": "mass_redshift_amplitude",
+      "mass_Msun": 1000000000000000.0,
+      "z": 3.0,
+      "xc": 1.3421845718979437,
+      "beta": 8.465335081254858,
+      "retained_projected_flux_fraction": 0.9977890106155016,
+      "omitted_projected_flux_fraction": 0.002210989384498374
+    }
+  ],
+  "reference": "Untruncated GNFW total flux; fraction undefined if beta<=2.7",
+  "scope": "Intrinsic projected flux within 4R200, infinite LOS; not C_ell bias or observed exclusion"
+}

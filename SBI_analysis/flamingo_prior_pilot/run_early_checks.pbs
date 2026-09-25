@@ -1,0 +1,30 @@
+#!/bin/bash
+#PBS -N FLAM_prior_early
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=00:15:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${PILOT:?Set PILOT}"
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=26
+export PYTHONUNBUFFERED=1 MPLBACKEND=Agg HDF5_USE_FILE_LOCKING=FALSE
+exec > "${PILOT}/logs/early_checks.log" 2>&1
+trap 'status=$?; printf "%s\n" "$status" > "${PILOT}/logs/early_checks.exit_code"' EXIT
+/home/anaconda3/bin/python3 - "$PILOT" <<'PY'
+import sys
+from pathlib import Path
+root=Path(sys.argv[1])
+sys.path.insert(0,str(root/'code'))
+import diagnose_ranges as d
+from prior_model import FIDUCIAL
+from run_pilot import extreme_design
+print(d.pressure_validation(),flush=True)
+d.reference_interpolation_diagnostic(root)
+d.quadrature_cost_diagnostic(root)
+d.summarize_interpolation(root)
+d.catalogue_hull_diagnostic(root)
+d.resolution_diagnostic(root, {'Battaglia12': FIDUCIAL,
+    'compact_steep_evolving': extreme_design()['compact_steep_evolving']})
+print('Early checks completed',flush=True)
+PY

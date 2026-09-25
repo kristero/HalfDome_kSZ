@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -N guard_los
+#PBS -q tiny
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=01:00:00
+#PBS -j oe
+set -euo pipefail
+STUDY_ROOT="${STUDY_ROOT:-/lustre/work/kristero10/tsz_guardrail_study_20260915}"
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=1
+/home/anaconda3/bin/python3 "$STUDY_ROOT/code/los_support.py" --root "$STUDY_ROOT"

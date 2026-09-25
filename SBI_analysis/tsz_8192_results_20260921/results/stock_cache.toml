@@ -1,0 +1,6 @@
+interpolation_probes = 343
+nonfinite_interpolation_probes = 343
+floor = 0.0
+scope = "Exact original cleanup on synthetic subnormal cache, not a full-grid failure frequency"
+replaced = 1
+nonfinite_log_cells = 1

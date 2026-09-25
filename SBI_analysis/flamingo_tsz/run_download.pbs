@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -N FLAM_download
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=4gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${CAMPAIGN:?Set CAMPAIGN}"
+export OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export PYTHONUNBUFFERED=1
+exec > "${CAMPAIGN}/logs/download.log" 2>&1
+trap 'status=$?; printf "%s\n" "$status" > "${CAMPAIGN}/logs/download.exit_code"' EXIT
+/usr/bin/time -v /home/anaconda3/bin/python3 "${CAMPAIGN}/code/download_maps.py" --campaign "${CAMPAIGN}"

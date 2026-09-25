@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "features": 7900,
+  "cutoffs": [
+    1000,
+    1500,
+    2000,
+    3000,
+    4000,
+    5000,
+    6000,
+    7979
+  ],
+  "scope": "Synthetic analysis execution; no scientific resolution conclusion"
+}

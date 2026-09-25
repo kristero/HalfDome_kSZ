@@ -1,0 +1,83 @@
+{
+  "jobs": [
+    {
+      "job": "598554.idark",
+      "fields": {
+        "resources_used.cpupercent": "1156",
+        "resources_used.cput": "02:51:50",
+        "resources_used.mem": "32920008kb",
+        "resources_used.ncpus": "26",
+        "resources_used.vmem": "44218824kb",
+        "resources_used.walltime": "00:24:22",
+        "job_state": "R",
+        "exec_host": "ansys18/1*26"
+      }
+    },
+    {
+      "job": "598555.idark",
+      "fields": {
+        "resources_used.cpupercent": "1483",
+        "resources_used.cput": "05:23:21",
+        "resources_used.mem": "32253140kb",
+        "resources_used.ncpus": "26",
+        "resources_used.vmem": "40207104kb",
+        "resources_used.walltime": "00:24:21",
+        "job_state": "R",
+        "exec_host": "ansys19/2*26"
+      }
+    },
+    {
+      "job": "598556.idark",
+      "fields": {
+        "resources_used.cpupercent": "1931",
+        "resources_used.cput": "05:08:51",
+        "resources_used.mem": "32259260kb",
+        "resources_used.ncpus": "26",
+        "resources_used.vmem": "39913440kb",
+        "resources_used.walltime": "00:24:21",
+        "job_state": "R",
+        "exec_host": "ansys21/1*26"
+      }
+    },
+    {
+      "job": "598557.idark",
+      "fields": {
+        "resources_used.cpupercent": "1898",
+        "resources_used.cput": "05:00:59",
+        "resources_used.mem": "31604244kb",
+        "resources_used.ncpus": "26",
+        "resources_used.vmem": "41278008kb",
+        "resources_used.walltime": "00:24:17",
+        "job_state": "R",
+        "exec_host": "ansys01/1*26"
+      }
+    }
+  ],
+  "nodes": [
+    {
+      "host": "ansys01",
+      "returncode": 255,
+      "threads": [],
+      "error": "Host key verification failed."
+    },
+    {
+      "host": "ansys18",
+      "returncode": 255,
+      "threads": [],
+      "error": "Host key verification failed."
+    },
+    {
+      "host": "ansys19",
+      "returncode": 255,
+      "threads": [],
+      "error": "Host key verification failed."
+    },
+    {
+      "host": "ansys21",
+      "returncode": 255,
+      "threads": [],
+      "error": "Host key verification failed."
+    }
+  ],
+  "utc": "2026-09-21T13:44:28.491975+00:00"
+}

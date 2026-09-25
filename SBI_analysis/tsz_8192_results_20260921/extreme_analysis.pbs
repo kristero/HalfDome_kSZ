@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -N tsz_extreme_report
+#PBS -q mini2
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=00:20:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_8192_noise_extremes_20260921
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+/home/anaconda3/bin/python3 analyze_extreme_noise.py

@@ -1,0 +1,488 @@
+{
+  "checked_utc": "2026-09-15T11:32:44.664220Z",
+  "jobs": {
+    "597627.idark": {
+      "Job_Name": "xp441060d0",
+      "job_state": "R",
+      "exec_host": "ansys08/0*26",
+      "resources_used": {
+        "cpupercent": 10,
+        "cput": "00:00:02",
+        "mem": "69512kb",
+        "ncpus": 26,
+        "vmem": "427660kb",
+        "walltime": "00:00:48"
+      },
+      "comment": "Job run at Tue Sep 15 at 11:31 on (ansys08:ncpus=26:mem=67108864kb)"
+    },
+    "597628.idark": {
+      "Job_Name": "xp441060d1",
+      "job_state": "R",
+      "exec_host": "ansys13/2*26",
+      "resources_used": {
+        "cpupercent": 10,
+        "cput": "00:00:01",
+        "mem": "70692kb",
+        "ncpus": 26,
+        "vmem": "427660kb",
+        "walltime": "00:00:48"
+      },
+      "comment": "Job run at Tue Sep 15 at 11:31 on (ansys13:ncpus=26:mem=67108864kb)"
+    },
+    "597629.idark": {
+      "Job_Name": "xp441060d2",
+      "job_state": "R",
+      "exec_host": "ansys19/0*26",
+      "resources_used": {
+        "cpupercent": 10,
+        "cput": "00:00:01",
+        "mem": "70884kb",
+        "ncpus": 26,
+        "vmem": "427660kb",
+        "walltime": "00:00:48"
+      },
+      "comment": "Job run at Tue Sep 15 at 11:31 on (ansys19:ncpus=26:mem=67108864kb)"
+    },
+    "597630.idark": {
+      "Job_Name": "xp441060d3",
+      "job_state": "R",
+      "exec_host": "ansys20/1*26",
+      "resources_used": {
+        "cpupercent": 10,
+        "cput": "00:00:02",
+        "mem": "74320kb",
+        "ncpus": 26,
+        "vmem": "427660kb",
+        "walltime": "00:00:48"
+      },
+      "comment": "Job run at Tue Sep 15 at 11:31 on (ansys20:ncpus=26:mem=67108864kb)"
+    },
+    "597631.idark": {
+      "Job_Name": "xp441060d4",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597632.idark": {
+      "Job_Name": "xp441060d5",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597633.idark": {
+      "Job_Name": "xp441060d6",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597634.idark": {
+      "Job_Name": "xp441060d7",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597635.idark": {
+      "Job_Name": "xp441060d8",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597636.idark": {
+      "Job_Name": "xp441060d9",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597637.idark": {
+      "Job_Name": "xp441060d10",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597638.idark": {
+      "Job_Name": "xp441060d11",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597639.idark": {
+      "Job_Name": "xp441060d12",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597640.idark": {
+      "Job_Name": "xp441060d13",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597641.idark": {
+      "Job_Name": "xp441060d14",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597642.idark": {
+      "Job_Name": "xp441060d15",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597643.idark": {
+      "Job_Name": "xp441060d16",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597644.idark": {
+      "Job_Name": "xp441060d17",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597645.idark": {
+      "Job_Name": "xp441060d18",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597646.idark": {
+      "Job_Name": "xp441060d19",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597647.idark": {
+      "Job_Name": "xp441060d20",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597648.idark": {
+      "Job_Name": "xp441060d21",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597649.idark": {
+      "Job_Name": "xp441060d22",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597650.idark": {
+      "Job_Name": "xp441060d23",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597651.idark": {
+      "Job_Name": "xp441060d24",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597652.idark": {
+      "Job_Name": "xp441060d25",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597653.idark": {
+      "Job_Name": "xp441060d26",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597654.idark": {
+      "Job_Name": "xp441060d27",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597655.idark": {
+      "Job_Name": "xp441060d28",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597656.idark": {
+      "Job_Name": "xp441060d29",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597657.idark": {
+      "Job_Name": "xp441060d30",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597658.idark": {
+      "Job_Name": "xp441060d31",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597659.idark": {
+      "Job_Name": "xp441060d32",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597660.idark": {
+      "Job_Name": "xp441060d33",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597661.idark": {
+      "Job_Name": "xp441060d34",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597662.idark": {
+      "Job_Name": "xp441060d35",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597663.idark": {
+      "Job_Name": "xp441060d36",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597664.idark": {
+      "Job_Name": "xp441060d37",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597665.idark": {
+      "Job_Name": "xp441060d38",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597666.idark": {
+      "Job_Name": "xp441060d39",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597667.idark": {
+      "Job_Name": "xp441060d40",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597668.idark": {
+      "Job_Name": "xp441060d41",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597669.idark": {
+      "Job_Name": "xp441060d42",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597670.idark": {
+      "Job_Name": "xp441060d43",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597671.idark": {
+      "Job_Name": "xp441060d44",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597672.idark": {
+      "Job_Name": "xp441060d45",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597673.idark": {
+      "Job_Name": "xp441060d46",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597674.idark": {
+      "Job_Name": "xp441060d47",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597675.idark": {
+      "Job_Name": "xp441060d48",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597676.idark": {
+      "Job_Name": "xp441060d49",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597677.idark": {
+      "Job_Name": "xp441060d50",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597678.idark": {
+      "Job_Name": "xp441060d51",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597679.idark": {
+      "Job_Name": "xp441060d52",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597680.idark": {
+      "Job_Name": "xp441060d53",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597681.idark": {
+      "Job_Name": "xp441060d54",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597682.idark": {
+      "Job_Name": "xp441060d55",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597683.idark": {
+      "Job_Name": "xp441060d56",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597684.idark": {
+      "Job_Name": "xp441060d57",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597685.idark": {
+      "Job_Name": "xp441060d58",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597686.idark": {
+      "Job_Name": "xp441060d59",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597687.idark": {
+      "Job_Name": "xp441060d60",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597688.idark": {
+      "Job_Name": "xp441060d61",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597689.idark": {
+      "Job_Name": "xp441060d62",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597690.idark": {
+      "Job_Name": "xp441060d63",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    },
+    "597691.idark": {
+      "Job_Name": "extended_collect",
+      "job_state": "H",
+      "exec_host": null,
+      "resources_used": null,
+      "comment": null
+    }
+  }
+}

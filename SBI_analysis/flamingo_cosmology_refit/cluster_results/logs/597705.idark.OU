@@ -1,0 +1,40 @@
+Mstar-1sigma amplitude seed {'name': 'amplitude_from_existing_map', 'theta': [35.09442408026349, 1.3705116615597033, 8.661816391074165, 0.21115973720715092, -0.34544184574451775, -0.007785537632154893, -3.8312286030814304, 1.5794345830598515, 0.8338737927415714], 'rms_fractional': 0.01665204677407653, 'max_fractional': 0.06095770655331423, 'rms_log': 0.01700546695425665, 'basis': 'Exact P0 scaling of old full HD map times halo-model response'}
+Mstar-1sigma_iter0 Jacobian 1 log RMS 0.01700546695425662
+Mstar-1sigma_iter0 Jacobian 2 log RMS 0.01022825744571484
+Mstar-1sigma_iter0 Jacobian 3 log RMS 0.00943327532693363
+Mstar-1sigma_iter0 Jacobian 4 log RMS 0.008946210781882201
+Mstar-1sigma_iter0 Jacobian 5 log RMS 0.008615334661206692
+Mstar-1sigma_iter0 Jacobian 6 log RMS 0.00833892613171125
+Mstar-1sigma_iter0 Jacobian 7 log RMS 0.008094069692128343
+Mstar-1sigma_iter0 Jacobian 8 log RMS 0.007953738966973864
+Mstar-1sigma_iter0 Jacobian 9 log RMS 0.007811223650112672
+Mstar-1sigma_iter0 Jacobian 10 log RMS 0.007642431374398653
+Mstar-1sigma_iter0 Jacobian 11 log RMS 0.00755488185573972
+Mstar-1sigma_iter0 Jacobian 12 log RMS 0.007510824842380813
+Mstar-1sigma_iter0 Jacobian 13 log RMS 0.0074392050715947535
+Mstar-1sigma_iter0 Jacobian 14 log RMS 0.007427714622207424
+Mstar-1sigma_iter0 Jacobian 15 log RMS 0.007424402612160803
+Mstar-1sigma_iter0 Jacobian 16 log RMS 0.007419829309714136
+Mstar-1sigma_iter0 Jacobian 17 log RMS 0.007418686532512235
+Mstar-1sigma_iter0 Jacobian 18 log RMS 0.007418275940695713
+Mstar-1sigma_iter0 Jacobian 19 log RMS 0.007417799092612257
+Mstar-1sigma_iter0 Jacobian 20 log RMS 0.007416183880796217
+FULL-MAP-BASED Mstar-1sigma {'name': 'Mstar-1sigma_iter0', 'theta': [32.365909911367524, 1.386006936534218, 8.227327005558958, 0.09737600915842404, -0.38530145748292816, -0.04216025332879836, -3.828146351863589, 1.5679271552124923, 0.8986885309085477], 'rms_fractional': 0.01156698500005616, 'max_fractional': 0.056798043886041594, 'rms_log': 0.011373270337012078, 'basis': 'Fresh full HD map times halo-model response', 'painting_seconds': 283.13987105339766}
+Mstar-1sigma_iter1 Jacobian 1 log RMS 0.011373270337012069
+Mstar-1sigma_iter1 Jacobian 2 log RMS 0.008041832182516107
+Mstar-1sigma_iter1 Jacobian 3 log RMS 0.007914327988327967
+Mstar-1sigma_iter1 Jacobian 4 log RMS 0.007815186127796105
+Mstar-1sigma_iter1 Jacobian 5 log RMS 0.007729700151295253
+Mstar-1sigma_iter1 Jacobian 6 log RMS 0.007683436962235247
+Mstar-1sigma_iter1 Jacobian 7 log RMS 0.007661949107871901
+Mstar-1sigma_iter1 Jacobian 8 log RMS 0.007651628602783276
+Mstar-1sigma_iter1 Jacobian 9 log RMS 0.00763237226566935
+Mstar-1sigma_iter1 Jacobian 10 log RMS 0.007629930181126424
+Mstar-1sigma_iter1 Jacobian 11 log RMS 0.007628764249341709
+Mstar-1sigma_iter1 Jacobian 12 log RMS 0.007626442444281832
+Mstar-1sigma_iter1 Jacobian 13 log RMS 0.007626153229185851
+Mstar-1sigma_iter1 Jacobian 14 log RMS 0.007625594597665078
+Mstar-1sigma_iter1 Jacobian 15 log RMS 0.007625339701927268
+Mstar-1sigma_iter1 Jacobian 16 log RMS 0.007625207852034406
+Mstar-1sigma_iter1 Jacobian 17 log RMS 0.007625141779490736
+FULL-MAP-BASED Mstar-1sigma {'name': 'Mstar-1sigma_iter1', 'theta': [33.76527739241058, 1.3726902054783838, 8.376227180858422, 0.13203213879456643, -0.3834874836107727, -0.04321071424547937, -3.870613895010689, 1.6021986139875475, 0.8860745932601031], 'rms_fractional': 0.0076421133743133345, 'max_fractional': 0.025752016613964646, 'rms_log': 0.007679165510273316, 'basis': 'Fresh full HD map times halo-model response', 'painting_seconds': 282.8660781122744}

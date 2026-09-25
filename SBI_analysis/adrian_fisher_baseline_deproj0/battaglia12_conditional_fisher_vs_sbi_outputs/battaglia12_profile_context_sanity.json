@@ -1,0 +1,69 @@
+{
+  "training_reference_rows": 100000,
+  "nearest_theta_dataset_indices": [
+    369311,
+    107212,
+    64408,
+    152872,
+    246293,
+    347685,
+    237466,
+    427360
+  ],
+  "nearest_theta_prior_normalized_rms_distances": [
+    0.0633382298278522,
+    0.06634056533190108,
+    0.06987794626945515,
+    0.07110248103332518,
+    0.07241523352018543,
+    0.07473337257756751,
+    0.07543089846541028,
+    0.07878484529121879
+  ],
+  "observation_max_abs_marginal_z": 3.344676424551702,
+  "ensemble_mean_max_abs_marginal_z": 1.5622537272697095,
+  "battaglia_mahalanobis2_min_median_max": [
+    11.207853643262526,
+    111.12948324122166,
+    308.9444863466972
+  ],
+  "battaglia_mahalanobis_percentile_min_median_max": [
+    0.94273,
+    0.99999,
+    1.0
+  ],
+  "context_covariance_shrinkage": 0.02,
+  "contract_hypotheses": [
+    {
+      "name": "original",
+      "mahalanobis2": 241.64548243555794,
+      "mahalanobis_percentile": 1.0,
+      "max_abs_marginal_z": 3.344676424551702
+    },
+    {
+      "name": "divide_fsky",
+      "mahalanobis2": 589.0328221787499,
+      "mahalanobis_percentile": 1.0,
+      "max_abs_marginal_z": 4.602523825464349
+    },
+    {
+      "name": "multiply_fsky",
+      "mahalanobis2": 105.48155008623428,
+      "mahalanobis_percentile": 0.99999,
+      "max_abs_marginal_z": 2.539249122123394
+    },
+    {
+      "name": "deconvolve_2arcmin_beam_power",
+      "mahalanobis2": 3539.651708587826,
+      "mahalanobis_percentile": 1.0,
+      "max_abs_marginal_z": 9.346114852991592
+    },
+    {
+      "name": "apply_2arcmin_beam_power_again",
+      "mahalanobis2": 56.73184784489343,
+      "mahalanobis_percentile": 0.99917,
+      "max_abs_marginal_z": 1.935949386332542
+    }
+  ],
+  "figure": "/home/cbllover/HalfDome/SBI_analysis/adrian_fisher_baseline_deproj0/battaglia12_conditional_fisher_vs_sbi_outputs/battaglia12_training_profile_and_context_sanity.jpg"
+}

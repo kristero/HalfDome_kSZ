@@ -1,0 +1,24 @@
+{
+  "all_fisher_modes_identified": {
+    "baseline_conditional_noise": false,
+    "baseline_gaussian_total": false,
+    "goal_conditional_noise": false,
+    "goal_gaussian_total": false
+  },
+  "cases": [
+    "baseline",
+    "goal"
+  ],
+  "complete": true,
+  "covariance_scopes": [
+    "conditional_noise",
+    "gaussian_total"
+  ],
+  "fisher_ranks": {
+    "baseline_conditional_noise": 6,
+    "baseline_gaussian_total": 6,
+    "goal_conditional_noise": 6,
+    "goal_gaussian_total": 6
+  },
+  "output_dir": "/lustre/work/kristero10/adrian_fisher_nell_sensitivity_deproj0"
+}

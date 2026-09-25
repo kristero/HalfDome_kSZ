@@ -1,0 +1,12 @@
+label = "tail_underflow"
+beta_raw = 80.0
+stable_same_cylinder = 2.625426670986802e-209
+x = 10.0
+initial19_error = 7.065e-321
+cylinder_to_sphere = 2.625426670986802e91
+initial19_value = 7.065e-321
+xc = 0.025
+stock_value = 2.625426670986768e-209
+sphere4 = 0.0
+stock_relative_error = 1.2965637851481134e-14
+stock_seconds_after_compile = 8.1648e-5

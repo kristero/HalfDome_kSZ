@@ -1,0 +1,7 @@
+mass_min_Msun = 1.0e12
+selected_redshift_max = 3.8554277420043945
+Omega_b = 0.049
+Omega_c = 0.261
+selected_redshift_min = 0.002141594886779785
+selected_halos = 85224251
+h = 0.68

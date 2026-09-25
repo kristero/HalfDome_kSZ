@@ -1,0 +1,135 @@
+"""Independent integral checks, design checks, prior coverage and readable plots."""
+import argparse
+import itertools
+import json
+from pathlib import Path
+
+import numpy as np
+from scipy.integrate import quad
+from scipy.stats import qmc
+
+from prior import B12, JointPrior, evolved, log_y200, mass_redshift, write_json
+
+
+def lee22(mass,z):
+    """Table 1, Eq.12 of arXiv:2205.01710v1; illustrative fixed c=4.5.
+
+    ALL amplitude pivots are M_cut; P0 is ELECTRON pressure / P200.
+    """
+    m = np.asarray(mass)/(10**13.64/.6774)
+    return (6*.45*(1+z)**-1.38*m**np.where(m<1,1.09,.76),
+            1.02*.45**-1.24*(1+z)**-.33*m**-.29,
+            6.3*.45**-.82*(1+z)**-.07*m**.01)
+
+
+def main():
+    parser = argparse.ArgumentParser(__doc__)
+    parser.add_argument("--root",type=Path,required=True)
+    args = parser.parse_args()
+    root = args.root.resolve()
+    manifest = json.loads((root/"manifest.json").read_text())
+    prior = JointPrior(manifest["prior"])
+    theta = np.load(root/"design/theta.npy")
+    cases = json.loads((root/"preflight/cases.json").read_text())
+    assert prior.contains(theta).all()
+    prefix, indices = prior.sobol(min(16384,len(theta)*2))
+    count = min(len(theta),len(prefix))
+    np.testing.assert_array_equal(theta[:count],prefix[:count])
+    np.testing.assert_array_equal(np.load(root/"design/proposal_index.npy")[:count],indices[:count])
+    # Independent adaptive integration of physical radius (not incomplete beta).
+    maximum_error = 0.
+    rng = np.random.default_rng(707)
+    for index in rng.choice(len(theta),min(32,len(theta)),replace=False):
+        p,x,b = [float(v[0]) for v in evolved(theta[index],np.array([1e14]),np.array([.5]))]
+        direct = quad(lambda r:p*x**.3*r**1.7*(1+r/x)**(-b),0,1,
+                      epsabs=0,epsrel=1e-10,limit=400)[0]
+        actual = float(np.exp(log_y200(p,x,b)))
+        maximum_error = max(maximum_error,abs(actual/direct-1))
+    assert maximum_error < 1e-7
+    # Independent scrambled replicates estimate the conditional mass and its
+    # uncertainty; this estimate is never used to decide sample acceptance.
+    fractions = []
+    for seed in range(8100,8108):
+        unit = qmc.Sobol(9,scramble=True,seed=seed).random_base2(18)
+        fractions.append(float(prior.contains(prior.from_unit(unit)).mean()))
+    corners = prior.from_unit(np.array(list(itertools.product((0.,1.),repeat=9))))
+    accepted_corners = int(prior.contains(corners).sum())
+    # A denser validation grid quantifies the limitation of the finite Y gate.
+    mass,z = mass_redshift(prior.config["catalogue_enclosing_domain"],33)
+    reference = log_y200(*evolved(B12,mass,z))
+    dense_low,dense_high = [],[]
+    for start in range(0,len(theta),512):
+        ratio = np.exp(log_y200(*evolved(theta[start:start+512],mass,z))-reference)
+        dense_low.extend(ratio.min(1)); dense_high.extend(ratio.max(1))
+    dense_low,dense_high = np.array(dense_low),np.array(dense_high)
+    lo,hi = prior.config["Y200_ratio_to_battaglia12"]
+    report = dict(rows=len(theta),prefix_invariance_passed=True,
+        integral_checks=min(32,len(theta)),maximum_integral_relative_error=maximum_error,
+        accepted_rectangle_corners=accepted_corners,
+        normalizing_mass_Z=float(np.mean(fractions)),
+        normalizing_mass_standard_error=float(np.std(fractions,ddof=1)/np.sqrt(len(fractions))),
+        normalizing_mass_replicates=fractions,
+        denser_Y_grid=dict(size=33,min=float(dense_low.min()),max=float(dense_high.max()),
+            outside_9x9_gate_bounds=int(np.sum((dense_low<lo)|(dense_high>hi)))),
+        reference_support={case["name"]:prior.contains(case["theta"],True)[1] for case in cases})
+    write_json(root/"audit.json",report)
+    plots(root,prior,theta,cases)
+    print(json.dumps(report,indent=2))
+
+
+def plots(root,prior,theta,cases):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    plt.rcParams.update({"font.size":16,"axes.labelsize":18,"xtick.labelsize":14,
+        "ytick.labelsize":14,"legend.fontsize":11,"axes.titlesize":18,
+        "lines.linewidth":2,"pdf.fonttype":42,"ps.fonttype":42})
+    out = root/"plots"
+    out.mkdir(exist_ok=True)
+    colors = ["black","#0072B2","#D55E00","#009E73"]
+    labels = ["Battaglia12","FLAMINGO fid.","FLAMINGO low gas","FLAMINGO low stars"]
+    fig,axes = plt.subplots(1,3,figsize=(15,4.6),constrained_layout=True)
+    for ax,(a,b),xy in zip(axes,((1,0),(1,2),(6,7)),
+                          ((r"$x_{c,0}$",r"$P_{0,0}$"),(r"$x_{c,0}$",r"$\beta_0$"),
+                           (r"$\alpha_{z,P_0}$",r"$\alpha_{z,x_c}$"))):
+        ax.scatter(theta[:,a],theta[:,b],s=3,alpha=.2,color="#999999",rasterized=True)
+        for case,color,label in zip(cases[:4],colors,labels):
+            ax.scatter(case["theta"][a],case["theta"][b],marker="*",s=170,color=color,label=label,zorder=5)
+        ax.set(xlabel=xy[0],ylabel=xy[1])
+        if a==1: ax.set_xscale("log")
+        if b==0: ax.set_yscale("log")
+    axes[0].legend(frameon=False,loc="upper left")
+    for ext in ("png","pdf"): fig.savefig(out/("joint_prior."+ext),dpi=220)
+    plt.close(fig)
+    radius = np.geomspace(.02,4,220)
+    mass = np.geomspace(10**12.8167,10**15.5781,120)
+    fig,axes = plt.subplots(1,2,figsize=(12.5,5),constrained_layout=True)
+    selected = theta[np.linspace(0,len(theta)-1,min(512,len(theta))).astype(int)]
+    p,x,b = evolved(selected,np.array([1e14]),np.array([.5]))
+    profiles = .5176*p*(radius/x)**-.3*(1+radius/x)**(-b)
+    reference = log_y200(*evolved(B12,mass,np.full(len(mass),.5)))
+    ratios = np.exp(log_y200(*evolved(selected,mass,np.full(len(mass),.5)))-reference)
+    for ax,coord,values in ((axes[0],radius,profiles),(axes[1],mass,ratios)):
+        low,high = np.percentile(values,[5,95],axis=0)
+        ax.fill_between(coord,low,high,color=".8",label="Prior 5–95%")
+    for case,color,label in zip(cases[:4],colors,labels):
+        p,x,b = [v[0] for v in evolved(case["theta"],np.array([1e14]),np.array([.5]))]
+        axes[0].loglog(radius,.5176*p*(radius/x)**-.3*(1+radius/x)**(-b),color=color,label=label)
+        ratios = np.exp(log_y200(*evolved(case["theta"],mass,np.full(len(mass),.5)))-reference)
+        axes[1].loglog(mass,ratios,color=color)
+    p,x,b = lee22(1e14,.5)
+    valid = (radius>=.04)&(radius<=1.34)
+    axes[0].loglog(radius[valid],p*(radius[valid]/x)**-.3*(1+radius[valid]/x)**(-b),
+                   color="#CC79A7",ls="--",label="Lee22, c=4.5")
+    valid = (mass>=1e13/.6774)&(mass<=1e14/.6774)
+    p,x,b = lee22(mass[valid],.5)
+    axes[1].loglog(mass[valid],np.exp(log_y200(p/.5176,x,b)-reference[valid]),color="#CC79A7",ls="--")
+    axes[0].set(xlabel=r"$r/R_{200c}$",ylabel=r"$P_e/P_{200}$",title=r"$M=10^{14}M_\odot,\ z=0.5$")
+    axes[1].set(xlabel=r"$M_{200c}\ [M_\odot]$",ylabel=r"$Y_{200}/Y_{200}^{\rm B12}$",title=r"$z=0.5$")
+    axes[0].legend(frameon=False)
+    for ext in ("png","pdf"): fig.savefig(out/("pressure_prior."+ext),dpi=220)
+    plt.close(fig)
+
+
+if __name__ == "__main__":
+    main()

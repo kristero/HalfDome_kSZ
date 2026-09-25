@@ -1,0 +1,52 @@
+{
+  "jobs": [
+    {
+      "chunk": 0,
+      "job_id": "597790.idark",
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "lp994333p0",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915,CHUNK=0,PREFLIGHT=1",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/logs",
+        "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/run_worker.pbs"
+      ]
+    },
+    {
+      "chunk": 1,
+      "job_id": "597791.idark",
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "lp994333p1",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915,CHUNK=1,PREFLIGHT=1",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/logs",
+        "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/run_worker.pbs"
+      ]
+    },
+    {
+      "chunk": 2,
+      "job_id": "597792.idark",
+      "command": [
+        "qsub",
+        "-q",
+        "mini",
+        "-N",
+        "lp994333p2",
+        "-v",
+        "RUN_ROOT=/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915,CHUNK=2,PREFLIGHT=1",
+        "-o",
+        "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/logs",
+        "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/run_worker.pbs"
+      ]
+    }
+  ]
+}

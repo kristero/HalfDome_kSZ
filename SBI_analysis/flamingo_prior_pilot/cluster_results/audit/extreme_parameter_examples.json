@@ -1,0 +1,110 @@
+{
+  "sobol_largest_Y200": {
+    "theta": {
+      "P0": 51.345959409193,
+      "xc": 2.960239268750813,
+      "beta": 14.220127619430421,
+      "alpha_m_P0": 1.4449776573106647,
+      "alpha_m_xc": 0.32497773189097645,
+      "alpha_m_beta": -0.16691141240298749,
+      "alpha_z_P0": 0.4834036361426115,
+      "alpha_z_xc": 1.986347092781216,
+      "alpha_z_beta": -0.2220931388437748
+    },
+    "mass_Msun": 5011872336272715.0,
+    "z": 5.0,
+    "Y200_ratio": 450814.79374374106,
+    "minimum_grid_beta": 4.969721355871922,
+    "passes_outer_slope_screen": true
+  },
+  "sobol_smallest_Y200": {
+    "theta": {
+      "P0": 2.5140055005036883,
+      "xc": 0.19027042692816837,
+      "beta": 11.189921667799354,
+      "alpha_m_P0": 1.4475316712632775,
+      "alpha_m_xc": 0.3106257520616055,
+      "alpha_m_beta": -0.17791406009346247,
+      "alpha_z_P0": -4.036644029431045,
+      "alpha_z_xc": -1.435438487213105,
+      "alpha_z_beta": 1.1383510027080774
+    },
+    "mass_Msun": 1000000000000.0,
+    "z": 5.0,
+    "Y200_ratio": 8.95572988266759e-19,
+    "minimum_grid_beta": 5.58299548643602,
+    "passes_outer_slope_screen": true
+  },
+  "sobol_largest_admitted_Y200": {
+    "theta": {
+      "P0": 51.345959409193,
+      "xc": 2.960239268750813,
+      "beta": 14.220127619430421,
+      "alpha_m_P0": 1.4449776573106647,
+      "alpha_m_xc": 0.32497773189097645,
+      "alpha_m_beta": -0.16691141240298749,
+      "alpha_z_P0": 0.4834036361426115,
+      "alpha_z_xc": 1.986347092781216,
+      "alpha_z_beta": -0.2220931388437748
+    },
+    "mass_Msun": 5011872336272715.0,
+    "z": 5.0,
+    "Y200_ratio": 450814.79374374106,
+    "minimum_grid_beta": 4.969721355871922,
+    "passes_outer_slope_screen": true
+  },
+  "corners_largest_Y200": {
+    "theta": {
+      "P0": 59.999999999999986,
+      "xc": 4.000000000000001,
+      "beta": 2.8,
+      "alpha_m_P0": 1.5,
+      "alpha_m_xc": 0.4,
+      "alpha_m_beta": -0.2,
+      "alpha_z_P0": 0.5,
+      "alpha_z_xc": 2.0,
+      "alpha_z_beta": -0.5
+    },
+    "mass_Msun": 5011872336272715.0,
+    "z": 5.0,
+    "Y200_ratio": 818016.8150337641,
+    "minimum_grid_beta": 0.5224953216041855,
+    "passes_outer_slope_screen": false
+  },
+  "corners_smallest_Y200": {
+    "theta": {
+      "P0": 1.0,
+      "xc": 0.10000000000000002,
+      "beta": 16.0,
+      "alpha_m_P0": 1.5,
+      "alpha_m_xc": 0.4,
+      "alpha_m_beta": -0.2,
+      "alpha_z_P0": -4.5,
+      "alpha_z_xc": -1.5,
+      "alpha_z_beta": 1.5
+    },
+    "mass_Msun": 1000000000000.0,
+    "z": 5.0,
+    "Y200_ratio": 1.8000527034284133e-22,
+    "minimum_grid_beta": 7.324383892460979,
+    "passes_outer_slope_screen": true
+  },
+  "corners_largest_admitted_Y200": {
+    "theta": {
+      "P0": 59.999999999999986,
+      "xc": 4.000000000000001,
+      "beta": 16.0,
+      "alpha_m_P0": 1.5,
+      "alpha_m_xc": 0.4,
+      "alpha_m_beta": -0.2,
+      "alpha_z_P0": 0.5,
+      "alpha_z_xc": 2.0,
+      "alpha_z_beta": -0.5
+    },
+    "mass_Msun": 5011872336272715.0,
+    "z": 5.0,
+    "Y200_ratio": 815887.7794837591,
+    "minimum_grid_beta": 2.9856875520239172,
+    "passes_outer_slope_screen": true
+  }
+}

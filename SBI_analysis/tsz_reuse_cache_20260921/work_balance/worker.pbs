@@ -1,0 +1,9 @@
+#!/bin/bash
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_reuse_cache_20260921/work_balance
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=26 MKL_NUM_THREADS=1
+/home/anaconda3/bin/python3 run.py

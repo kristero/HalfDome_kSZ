@@ -1,0 +1,35 @@
+fgas-8sigma amplitude seed {'name': 'amplitude_from_existing_map', 'theta': [16.19329168091121, 1.3772759831840422, 7.00167495745385, 0.22873657409029463, -0.2123883050140173, 0.09095722144703261, -3.244485230507415, 1.4632356982720358, 0.7738716778594799], 'rms_fractional': 0.017502058294430266, 'max_fractional': 0.052021358471079804, 'rms_log': 0.01778112931713735, 'basis': 'Exact P0 scaling of old full HD map times halo-model response'}
+fgas-8sigma_iter0 Jacobian 1 log RMS 0.017781129317137427
+fgas-8sigma_iter0 Jacobian 2 log RMS 0.007440200199102077
+fgas-8sigma_iter0 Jacobian 3 log RMS 0.006969844676718937
+fgas-8sigma_iter0 Jacobian 4 log RMS 0.006796566784946167
+fgas-8sigma_iter0 Jacobian 5 log RMS 0.0066737356885162085
+fgas-8sigma_iter0 Jacobian 6 log RMS 0.006593504769283151
+fgas-8sigma_iter0 Jacobian 7 log RMS 0.006473145171709599
+fgas-8sigma_iter0 Jacobian 8 log RMS 0.006395171749660899
+fgas-8sigma_iter0 Jacobian 9 log RMS 0.006227239566553166
+fgas-8sigma_iter0 Jacobian 10 log RMS 0.00617700491898263
+fgas-8sigma_iter0 Jacobian 11 log RMS 0.006096593831097455
+fgas-8sigma_iter0 Jacobian 12 log RMS 0.006022332745211306
+fgas-8sigma_iter0 Jacobian 13 log RMS 0.005984732281516187
+fgas-8sigma_iter0 Jacobian 14 log RMS 0.005939914375078526
+fgas-8sigma_iter0 Jacobian 15 log RMS 0.005919566828271078
+fgas-8sigma_iter0 Jacobian 16 log RMS 0.005908116357400184
+fgas-8sigma_iter0 Jacobian 17 log RMS 0.005822224060718335
+fgas-8sigma_iter0 Jacobian 18 log RMS 0.005801108918273334
+fgas-8sigma_iter0 Jacobian 19 log RMS 0.005777607094894294
+fgas-8sigma_iter0 Jacobian 20 log RMS 0.005764027038431476
+fgas-8sigma_iter0 Jacobian 21 log RMS 0.005738635388321935
+fgas-8sigma_iter0 Jacobian 22 log RMS 0.005734517882467867
+fgas-8sigma_iter0 Jacobian 23 log RMS 0.005727157547130168
+fgas-8sigma_iter0 Jacobian 24 log RMS 0.005721658220456243
+fgas-8sigma_iter0 Jacobian 25 log RMS 0.005715621912464511
+fgas-8sigma_iter0 Jacobian 26 log RMS 0.005712136506321108
+fgas-8sigma_iter0 Jacobian 27 log RMS 0.005705435807258621
+FULL-MAP-BASED fgas-8sigma {'name': 'fgas-8sigma_iter0', 'theta': [18.198837200219064, 1.4665395183703251, 7.368517076759716, 0.27139851431150575, -0.29238830290255774, 0.06131472762901491, -3.4783015534227038, 1.559348997118387, 0.9334649136716362], 'rms_fractional': 0.006177762057758672, 'max_fractional': 0.016706741496920863, 'rms_log': 0.00618057220139351, 'basis': 'Fresh full HD map times halo-model response', 'painting_seconds': 287.3334646280855}
+fgas-8sigma_iter1 Jacobian 1 log RMS 0.006180572201393515
+fgas-8sigma_iter1 Jacobian 2 log RMS 0.006042164071663624
+fgas-8sigma_iter1 Jacobian 3 log RMS 0.006034337076109291
+fgas-8sigma_iter1 Jacobian 4 log RMS 0.00603409511891412
+fgas-8sigma_iter1 Jacobian 5 log RMS 0.006033611900188164
+FULL-MAP-BASED fgas-8sigma {'name': 'fgas-8sigma_iter1', 'theta': [18.23594732761984, 1.4671672867423466, 7.375469738110147, 0.27382836676318884, -0.29275997165682033, 0.06147581487544934, -3.481706690343786, 1.5604732323948403, 0.9338324085124106], 'rms_fractional': 0.006026492022148788, 'max_fractional': 0.016623767070350626, 'rms_log': 0.006021829881202311, 'basis': 'Fresh full HD map times halo-model response', 'painting_seconds': 267.45847376808524}

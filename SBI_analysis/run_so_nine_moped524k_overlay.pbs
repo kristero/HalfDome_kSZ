@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -N SO9_M524
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=8gb
+#PBS -l walltime=00:15:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${CODE_DIR:?Set CODE_DIR}"
+: "${OUTPUT_DIR:?Set OUTPUT_DIR}"
+: "${FISHER_DIR:?Set FISHER_DIR}"
+: "${BUNDLE:?Set BUNDLE}"
+: "${PYTHON:=python3}"
+: "${APP_THREADS:=${PBS_NCPUS:-26}}"
+export OMP_NUM_THREADS="${APP_THREADS}" OPENBLAS_NUM_THREADS="${APP_THREADS}"
+export MKL_NUM_THREADS="${APP_THREADS}" NUMEXPR_NUM_THREADS="${APP_THREADS}"
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1
+OVERLAY_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+record_exit() {
+  OVERLAY_EXIT_CODE=$?
+  trap - EXIT
+  "${PYTHON}" -c 'import json, os, socket, sys, datetime; from pathlib import Path; Path(sys.argv[1]).write_text(json.dumps(dict(exit_code=int(sys.argv[2]), job_id=os.environ.get("PBS_JOBID"), host=socket.gethostname(), threads=int(os.environ["OMP_NUM_THREADS"]), started_utc=sys.argv[3], finished_utc=datetime.datetime.utcnow().isoformat()+"Z"), indent=2)+"\n")' \
+    "${OUTPUT_DIR}.job_status.json" "${OVERLAY_EXIT_CODE}" "${OVERLAY_STARTED_UTC}"
+  exit "${OVERLAY_EXIT_CODE}"
+}
+trap record_exit EXIT
+cd "${CODE_DIR}"
+overlay_arguments=()
+if [[ -n "${FIXED_NOISE_POSTERIOR:-}" ]]; then
+  overlay_arguments+=(--fixed-noise-posterior "${FIXED_NOISE_POSTERIOR}")
+fi
+"${PYTHON}" plot_so_nine_fisher_moped524k.py --fisher "${FISHER_DIR}" \
+  --bundle "${BUNDLE}" --output "${OUTPUT_DIR}" --threads "${APP_THREADS}" "${overlay_arguments[@]}"

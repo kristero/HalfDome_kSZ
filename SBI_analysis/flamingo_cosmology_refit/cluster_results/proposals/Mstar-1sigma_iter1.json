@@ -1,0 +1,25 @@
+{
+  "theta": [
+    33.76527739241058,
+    1.3726902054783838,
+    8.376227180858422,
+    0.13203213879456643,
+    -0.3834874836107727,
+    -0.04321071424547937,
+    -3.870613895010689,
+    1.6021986139875475,
+    0.8860745932601031
+  ],
+  "success": false,
+  "message": "The maximum number of function evaluations is exceeded.",
+  "nfev": 30,
+  "seconds": 50.44178206473589,
+  "regularizer_residual_coefficient": 0.005,
+  "anchor": "Battaglia12",
+  "local_unit_cube_radius": 0.08,
+  "proposal_metrics": {
+    "rms_fractional": 0.007620668458652894,
+    "max_fractional": 0.022218083225906904,
+    "rms_log": 0.007625141779490736
+  }
+}

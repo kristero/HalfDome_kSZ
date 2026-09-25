@@ -1,0 +1,727 @@
+[
+  {
+    "size": 48,
+    "method": "bins40",
+    "shuffled": false,
+    "seed": 71,
+    "rmse_over_width": null,
+    "marginal_68_coverage": null,
+    "heldout_count": 16,
+    "sampling": [
+      {
+        "row": 48,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 49,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 50,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 51,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 52,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 53,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 54,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 55,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 56,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 57,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 58,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 59,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 60,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 61,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 62,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 63,
+        "accepted": 2,
+        "proposals": 2048
+      }
+    ],
+    "sampling_complete": false,
+    "compression": {},
+    "seconds": 2.62213144999987,
+    "limitation": "64 held-out rows do not establish precise coverage or SBC",
+    "flamingo": {
+      "synthetic_external": {
+        "accepted": 1,
+        "proposals": 2048,
+        "mean": [
+          51.0665168762207,
+          2.6024222373962402,
+          15.766775131225586,
+          0.779399573802948,
+          0.34182149171829224,
+          -0.08310482650995255,
+          -2.789191961288452,
+          0.4293254315853119,
+          0.4470111131668091
+        ],
+        "nearest_training_feature_distance": 0.0,
+        "interpretation": "Effective out-of-family posterior, not a FLAMINGO parameter truth"
+      }
+    }
+  },
+  {
+    "size": 48,
+    "method": "bins40",
+    "shuffled": true,
+    "seed": 71,
+    "rmse_over_width": null,
+    "marginal_68_coverage": null,
+    "heldout_count": 16,
+    "sampling": [
+      {
+        "row": 48,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 49,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 50,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 51,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 52,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 53,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 54,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 55,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 56,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 57,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 58,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 59,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 60,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 61,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 62,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 63,
+        "accepted": 2,
+        "proposals": 2048
+      }
+    ],
+    "sampling_complete": false,
+    "compression": {},
+    "seconds": 0.4339447599995765,
+    "limitation": "64 held-out rows do not establish precise coverage or SBC"
+  },
+  {
+    "size": 48,
+    "method": "pca",
+    "shuffled": false,
+    "seed": 71,
+    "rmse_over_width": null,
+    "marginal_68_coverage": null,
+    "heldout_count": 16,
+    "sampling": [
+      {
+        "row": 48,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 49,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 50,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 51,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 52,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 53,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 54,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 55,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 56,
+        "accepted": 3,
+        "proposals": 2048
+      },
+      {
+        "row": 57,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 58,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 59,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 60,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 61,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 62,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 63,
+        "accepted": 0,
+        "proposals": 2048
+      }
+    ],
+    "sampling_complete": false,
+    "compression": {
+      "singular_values": [
+        17.99480252082333,
+        13.72392224319258,
+        13.210170147568862,
+        12.238091680784402,
+        11.13827758360838,
+        10.690895145940386,
+        10.005389888766448,
+        8.537014256604898,
+        7.6570202999256605,
+        6.370885062623462,
+        5.6186358353476615,
+        5.09081337743244,
+        4.850241098304108,
+        4.730964689413483,
+        4.380544287358519,
+        4.356722582849778,
+        3.9741831206779406,
+        3.7731111736933,
+        3.455726671177859,
+        3.3405427518822837,
+        3.208785301715989,
+        3.1025389835590755,
+        2.5575543503064493,
+        2.451313717942888,
+        2.2134227343273944,
+        2.043002289821317,
+        1.8644469921202749,
+        1.7143704953551415,
+        1.6111573128285857,
+        1.4765878723929633,
+        1.2220423001867575,
+        1.0748358366531319,
+        1.041196354997039,
+        0.9321112527762085,
+        0.6500056405228609,
+        0.5408733558342205,
+        0.43132190480522986,
+        0.24190001942676873,
+        0.0806242115022754,
+        7.849299915293735e-15
+      ]
+    },
+    "seconds": 0.40246261799984495,
+    "limitation": "64 held-out rows do not establish precise coverage or SBC",
+    "flamingo": {
+      "synthetic_external": {
+        "accepted": 0,
+        "proposals": 2048,
+        "mean": null,
+        "nearest_training_feature_distance": 0.0,
+        "interpretation": "Effective out-of-family posterior, not a FLAMINGO parameter truth"
+      }
+    }
+  },
+  {
+    "size": 48,
+    "method": "pca",
+    "shuffled": true,
+    "seed": 71,
+    "rmse_over_width": null,
+    "marginal_68_coverage": null,
+    "heldout_count": 16,
+    "sampling": [
+      {
+        "row": 48,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 49,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 50,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 51,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 52,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 53,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 54,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 55,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 56,
+        "accepted": 3,
+        "proposals": 2048
+      },
+      {
+        "row": 57,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 58,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 59,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 60,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 61,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 62,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 63,
+        "accepted": 0,
+        "proposals": 2048
+      }
+    ],
+    "sampling_complete": false,
+    "compression": {
+      "singular_values": [
+        17.99480252082333,
+        13.72392224319258,
+        13.210170147568862,
+        12.238091680784402,
+        11.13827758360838,
+        10.690895145940386,
+        10.005389888766448,
+        8.537014256604898,
+        7.6570202999256605,
+        6.370885062623462,
+        5.6186358353476615,
+        5.09081337743244,
+        4.850241098304108,
+        4.730964689413483,
+        4.380544287358519,
+        4.356722582849778,
+        3.9741831206779406,
+        3.7731111736933,
+        3.455726671177859,
+        3.3405427518822837,
+        3.208785301715989,
+        3.1025389835590755,
+        2.5575543503064493,
+        2.451313717942888,
+        2.2134227343273944,
+        2.043002289821317,
+        1.8644469921202749,
+        1.7143704953551415,
+        1.6111573128285857,
+        1.4765878723929633,
+        1.2220423001867575,
+        1.0748358366531319,
+        1.041196354997039,
+        0.9321112527762085,
+        0.6500056405228609,
+        0.5408733558342205,
+        0.43132190480522986,
+        0.24190001942676873,
+        0.0806242115022754,
+        7.849299915293735e-15
+      ]
+    },
+    "seconds": 0.4290142289992218,
+    "limitation": "64 held-out rows do not establish precise coverage or SBC"
+  },
+  {
+    "size": 48,
+    "method": "moped_regression",
+    "shuffled": false,
+    "seed": 71,
+    "rmse_over_width": null,
+    "marginal_68_coverage": null,
+    "heldout_count": 16,
+    "sampling": [
+      {
+        "row": 48,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 49,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 50,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 51,
+        "accepted": 3,
+        "proposals": 2048
+      },
+      {
+        "row": 52,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 53,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 54,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 55,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 56,
+        "accepted": 3,
+        "proposals": 2048
+      },
+      {
+        "row": 57,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 58,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 59,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 60,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 61,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 62,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 63,
+        "accepted": 0,
+        "proposals": 2048
+      }
+    ],
+    "sampling_complete": false,
+    "compression": {
+      "singular_values": [
+        14.974110120162871,
+        12.580564936413886,
+        12.30075990271649,
+        11.036375565568962,
+        10.272866389073972,
+        9.765147022384324,
+        8.195690270821798,
+        7.471973731640196,
+        5.886239965149864
+      ],
+      "retained": 9,
+      "local_rows": 40,
+      "derivative_method": "local regression over broad-prior training rows",
+      "caveat": "Regression singular values do not certify physical identifiability"
+    },
+    "seconds": 0.4259308639993833,
+    "limitation": "64 held-out rows do not establish precise coverage or SBC",
+    "flamingo": {
+      "synthetic_external": {
+        "accepted": 0,
+        "proposals": 2048,
+        "mean": null,
+        "nearest_training_feature_distance": 0.0,
+        "interpretation": "Effective out-of-family posterior, not a FLAMINGO parameter truth"
+      }
+    }
+  },
+  {
+    "size": 48,
+    "method": "moped_regression",
+    "shuffled": true,
+    "seed": 71,
+    "rmse_over_width": null,
+    "marginal_68_coverage": null,
+    "heldout_count": 16,
+    "sampling": [
+      {
+        "row": 48,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 49,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 50,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 51,
+        "accepted": 3,
+        "proposals": 2048
+      },
+      {
+        "row": 52,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 53,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 54,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 55,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 56,
+        "accepted": 3,
+        "proposals": 2048
+      },
+      {
+        "row": 57,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 58,
+        "accepted": 0,
+        "proposals": 2048
+      },
+      {
+        "row": 59,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 60,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 61,
+        "accepted": 2,
+        "proposals": 2048
+      },
+      {
+        "row": 62,
+        "accepted": 1,
+        "proposals": 2048
+      },
+      {
+        "row": 63,
+        "accepted": 0,
+        "proposals": 2048
+      }
+    ],
+    "sampling_complete": false,
+    "compression": {
+      "singular_values": [
+        14.974110120162871,
+        12.580564936413886,
+        12.30075990271649,
+        11.036375565568962,
+        10.272866389073972,
+        9.765147022384324,
+        8.195690270821798,
+        7.471973731640196,
+        5.886239965149864
+      ],
+      "retained": 9,
+      "local_rows": 40,
+      "derivative_method": "local regression over broad-prior training rows",
+      "caveat": "Regression singular values do not certify physical identifiability"
+    },
+    "seconds": 0.4054100720004499,
+    "limitation": "64 held-out rows do not establish precise coverage or SBC"
+  }
+]

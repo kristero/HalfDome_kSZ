@@ -1,0 +1,731 @@
+{
+  "checked_utc": "2026-09-15T13:15:58.980475Z",
+  "production_jobs": [
+    {
+      "chunk": 0,
+      "job_id": "597627.idark",
+      "queue": "mini",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys08/0*26",
+      "comment": "Job run at Tue Sep 15 at 11:31 on (ansys08:ncpus=26:mem=67108864kb)",
+      "walltime": "01:42:56"
+    },
+    {
+      "chunk": 1,
+      "job_id": "597628.idark",
+      "queue": "mini",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys13/2*26",
+      "comment": "Job run at Tue Sep 15 at 11:31 on (ansys13:ncpus=26:mem=67108864kb)",
+      "walltime": "01:43:49"
+    },
+    {
+      "chunk": 2,
+      "job_id": "597629.idark",
+      "queue": "mini",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys19/0*26",
+      "comment": "Job run at Tue Sep 15 at 11:31 on (ansys19:ncpus=26:mem=67108864kb)",
+      "walltime": "01:42:18"
+    },
+    {
+      "chunk": 3,
+      "job_id": "597630.idark",
+      "queue": "mini",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys20/1*26",
+      "comment": "Job run at Tue Sep 15 at 11:31 on (ansys20:ncpus=26:mem=67108864kb)",
+      "walltime": "01:42:20"
+    },
+    {
+      "chunk": 4,
+      "job_id": "597715.idark",
+      "queue": "mini",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys21/1*26",
+      "comment": "Job run at Tue Sep 15 at 13:13 on (ansys21:ncpus=26:mem=67108864kb)",
+      "walltime": "00:02:30"
+    },
+    {
+      "chunk": 5,
+      "job_id": "597716.idark",
+      "queue": "mini",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys23/1*26",
+      "comment": "Job run at Tue Sep 15 at 13:13 on (ansys23:ncpus=26:mem=67108864kb)",
+      "walltime": "00:02:30"
+    },
+    {
+      "chunk": 6,
+      "job_id": "597717.idark",
+      "queue": "mini_B",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys24/0*26",
+      "comment": "Job run at Tue Sep 15 at 13:13 on (ansys24:ncpus=26:mem=67108864kb)",
+      "walltime": "00:02:31"
+    },
+    {
+      "chunk": 7,
+      "job_id": "597718.idark",
+      "queue": "mini_B",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys02/0*26",
+      "comment": "Job run at Tue Sep 15 at 13:13 on (ansys02:ncpus=26:mem=67108864kb)",
+      "walltime": "00:02:31"
+    },
+    {
+      "chunk": 8,
+      "job_id": "597719.idark",
+      "queue": "mini_B",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys03/1*26",
+      "comment": "Job run at Tue Sep 15 at 13:13 on (ansys03:ncpus=26:mem=67108864kb)",
+      "walltime": "00:02:30"
+    },
+    {
+      "chunk": 9,
+      "job_id": "597720.idark",
+      "queue": "mini_B",
+      "state": "R",
+      "hold": "n",
+      "host": "ansys28/0*26",
+      "comment": "Job run at Tue Sep 15 at 13:13 on (ansys28:ncpus=26:mem=67108864kb)",
+      "walltime": "00:02:30"
+    },
+    {
+      "chunk": 10,
+      "job_id": "597721.idark",
+      "queue": "mini_B",
+      "state": "R",
+      "hold": "n",
+      "host": "db05/0*26",
+      "comment": "Job run at Tue Sep 15 at 13:13 on (db05:ncpus=26:mem=67108864kb)",
+      "walltime": "00:02:31"
+    },
+    {
+      "chunk": 11,
+      "job_id": "597722.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 12,
+      "job_id": "597723.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 13,
+      "job_id": "597724.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 14,
+      "job_id": "597725.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 15,
+      "job_id": "597726.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 16,
+      "job_id": "597727.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 17,
+      "job_id": "597728.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 18,
+      "job_id": "597729.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 19,
+      "job_id": "597730.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 20,
+      "job_id": "597731.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 21,
+      "job_id": "597732.idark",
+      "queue": "mini_B",
+      "state": "Q",
+      "hold": "n",
+      "host": null,
+      "comment": "Not Running: Insufficient amount of resource: ncpus ",
+      "walltime": null
+    },
+    {
+      "chunk": 22,
+      "job_id": "597733.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 23,
+      "job_id": "597734.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 24,
+      "job_id": "597735.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 25,
+      "job_id": "597736.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 26,
+      "job_id": "597737.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 27,
+      "job_id": "597738.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 28,
+      "job_id": "597739.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 29,
+      "job_id": "597740.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 30,
+      "job_id": "597741.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 31,
+      "job_id": "597742.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 32,
+      "job_id": "597743.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 33,
+      "job_id": "597744.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 34,
+      "job_id": "597745.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 35,
+      "job_id": "597746.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 36,
+      "job_id": "597747.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 37,
+      "job_id": "597748.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 38,
+      "job_id": "597749.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 39,
+      "job_id": "597750.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 40,
+      "job_id": "597751.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 41,
+      "job_id": "597752.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 42,
+      "job_id": "597753.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 43,
+      "job_id": "597754.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 44,
+      "job_id": "597755.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 45,
+      "job_id": "597756.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 46,
+      "job_id": "597757.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 47,
+      "job_id": "597758.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 48,
+      "job_id": "597759.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 49,
+      "job_id": "597760.idark",
+      "queue": "mini",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 50,
+      "job_id": "597761.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 51,
+      "job_id": "597762.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 52,
+      "job_id": "597763.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 53,
+      "job_id": "597764.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 54,
+      "job_id": "597765.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 55,
+      "job_id": "597766.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 56,
+      "job_id": "597767.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 57,
+      "job_id": "597768.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 58,
+      "job_id": "597769.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 59,
+      "job_id": "597770.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 60,
+      "job_id": "597771.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 61,
+      "job_id": "597772.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 62,
+      "job_id": "597773.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    },
+    {
+      "chunk": 63,
+      "job_id": "597774.idark",
+      "queue": "mini_B",
+      "state": "H",
+      "hold": "s",
+      "host": null,
+      "comment": null,
+      "walltime": null
+    }
+  ],
+  "collector": {
+    "job_id": "597775.idark",
+    "state": "H",
+    "depend": "afterok:597755.idark@idark:597756.idark@idark:597757.idark@idark:597758.idark@idark:597759.idark@idark:597760.idark@idark:597761.idark@idark:597762.idark@idark:597763.idark@idark:597764.idark@idark:597765.idark@idark:597766.idark@idark:597767.idark@idark:597768.idark@idark:597769.idark@idark:597770.idark@idark:597771.idark@idark:597772.idark@idark:597773.idark@idark:597774.idark@idark:597753.idark@idark:597754.idark@idark"
+  },
+  "completed_individual_rows": 93,
+  "packed_chunks": 0,
+  "new_worker_startup_checks": [
+    {
+      "chunk": 4,
+      "job_id": "597715.idark",
+      "log": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/scratch/row_512_z5_a3hja/row.log",
+      "operator_probe_passed": true,
+      "interpolator_started": true,
+      "tail": [
+        "[interpolator] START profile_grid threaded evaluation",
+        "[interpolator] END   profile_grid threaded evaluation wall=15.107 s"
+      ]
+    },
+    {
+      "chunk": 5,
+      "job_id": "597716.idark",
+      "log": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/scratch/row_640_b0t08w5z/row.log",
+      "operator_probe_passed": true,
+      "interpolator_started": true,
+      "tail": [
+        "[interpolator] START profile_grid threaded evaluation",
+        "[interpolator] END   profile_grid threaded evaluation wall=16.488 s"
+      ]
+    },
+    {
+      "chunk": 6,
+      "job_id": "597717.idark",
+      "log": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/scratch/row_768___vne4oh/row.log",
+      "operator_probe_passed": true,
+      "interpolator_started": true,
+      "tail": [
+        "[interpolator] START profile_grid threaded evaluation",
+        "[interpolator] END   profile_grid threaded evaluation wall=17.015 s"
+      ]
+    },
+    {
+      "chunk": 7,
+      "job_id": "597718.idark",
+      "log": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/scratch/row_896_zm5qxcqi/row.log",
+      "operator_probe_passed": true,
+      "interpolator_started": true,
+      "tail": [
+        "[interpolator] END   profile_grid threaded evaluation wall=17.642 s",
+        "Strictly positive cache floor: count=29724 floor=5.0e-324"
+      ]
+    },
+    {
+      "chunk": 8,
+      "job_id": "597719.idark",
+      "log": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/scratch/row_1024_aruscotw/row.log",
+      "operator_probe_passed": true,
+      "interpolator_started": true,
+      "tail": [
+        "[interpolator] START profile_grid threaded evaluation",
+        "[interpolator] END   profile_grid threaded evaluation wall=16.483 s"
+      ]
+    },
+    {
+      "chunk": 9,
+      "job_id": "597720.idark",
+      "log": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/scratch/row_1152_uc4ntk3y/row.log",
+      "operator_probe_passed": true,
+      "interpolator_started": true,
+      "tail": [
+        "[interpolator] START profile_grid threaded evaluation",
+        "[interpolator] END   profile_grid threaded evaluation wall=18.171 s"
+      ]
+    },
+    {
+      "chunk": 10,
+      "job_id": "597721.idark",
+      "log": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915/scratch/row_1280_wd72ut0t/row.log",
+      "operator_probe_passed": true,
+      "interpolator_started": true,
+      "tail": [
+        "[interpolator] START profile_grid threaded evaluation",
+        "[interpolator] END   profile_grid threaded evaluation wall=12.067 s"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "completed_full_maps": 17,
+  "maximum_map_RSS_GiB": 11.282196044921875,
+  "median_map_seconds": 294.2814323492348,
+  "maximum_map_seconds": 388.02878678031266,
+  "estimated_serial_hours_per_1000_maps": 81.74484231923189,
+  "estimated_core_hours_per_1000_maps": 2125.3659003000294,
+  "estimate_scope": "Completed full map, clean/noisy spectra and profile checks; excludes optimizer and failed attempts",
+  "incomplete_map_attempts": {
+    "fit_L1_m9_iter1": {
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0265336707234
+    },
+    "fit_fgas-8sigma_iter4": {
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0072701675817
+    },
+    "extreme_compact_steep_evolving": {
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0165002122521
+    },
+    "fit_fgas-8sigma_iter2": {
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0070134447888
+    },
+    "fit_L1_m9_iter3": {
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0228825807571
+    }
+  },
+  "retained_interpolator_cache_bytes": 2281802781,
+  "retained_interpolator_caches": 17,
+  "median_interpolator_cache_bytes": 134223693.0,
+  "estimated_cache_GiB_per_1000_models": 125.00555533915758
+}

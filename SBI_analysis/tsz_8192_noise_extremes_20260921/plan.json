@@ -1,0 +1,49 @@
+{
+  "tasks": [
+    {
+      "id": 86,
+      "label": "compact",
+      "theta": [
+        18.1,
+        0.025,
+        16,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "nside": 8192,
+      "grid_factor": 1,
+      "noise_draws": 128,
+      "lean_maps": false,
+      "threads": 26,
+      "paired_4096": true,
+      "identity_sha256": "f906790d41ce8745aa209540cfaf9ef34ea20f41571554d00b2ba8557e52d225"
+    },
+    {
+      "id": 87,
+      "label": "extended_shallow",
+      "theta": [
+        18.1,
+        4,
+        2.8,
+        0.154,
+        -0.00865,
+        0,
+        -0.758,
+        0.731,
+        0
+      ],
+      "nside": 8192,
+      "grid_factor": 1,
+      "noise_draws": 128,
+      "lean_maps": false,
+      "threads": 26,
+      "paired_4096": true,
+      "identity_sha256": "4115a8023a2e4ce400b282737a5bd4d7ca4fcca67039c59bb7bcac7f0f5bbd9e"
+    }
+  ],
+  "scope": "Row-specific conditional noise at compact and extended-shallow extremes"
+}

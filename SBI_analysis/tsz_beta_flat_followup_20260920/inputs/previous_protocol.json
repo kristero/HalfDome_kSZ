@@ -1,0 +1,20 @@
+{
+  "version": "guardrail_evidence_v1",
+  "remote_root": "/lustre/work/kristero10/tsz_guardrail_study_20260915",
+  "campaign": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914",
+  "pilot": "/lustre/work/kristero10/flamingo_prior_pilot_20260914",
+  "active_run": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915",
+  "parameter_order": ["P0", "xc", "beta", "alpha_m_P0", "alpha_m_xc", "alpha_m_beta", "alpha_z_P0", "alpha_z_xc", "alpha_z_beta"],
+  "exploration_lower": [1, 0.025, 2.8, -0.6, -1.0, -0.2, -6.0, -1.5, -0.5],
+  "exploration_upper": [60, 4, 16, 1.5, 0.4, 0.4, 0.5, 3.0, 2.0],
+  "range_interpretation": "Finite exploration window, not inferred physical limits. Linear-uniform proposals, never weighted toward FLAMINGO.",
+  "finite_untruncated_energy_assumption": true,
+  "statistical_error_budgets": [0.05, 0.1, 0.3],
+  "reference_budget": 0.1,
+  "budget_interpretation": "Declared numerical systematic allowance in covariance-whitened units; sensitivity reported, not a physical constant.",
+  "seed": 20260915,
+  "threads": 8,
+  "case_timeout_seconds": 7200,
+  "unchanged_operator": "Physical M200c; archived cosmology including radiation; same catalogue; projected 4R200; LOS 1e5R200; alpha=1 gamma=-0.3; clean signal; 2 arcmin beam; fsky=0.4 mask; 40 original Dl bins. Noise used only to define an explicit reference covariance.",
+  "production_policy": "Never edit, cancel, replace, or submit work into the active 8k run. No new production certification from proxy tests alone."
+}

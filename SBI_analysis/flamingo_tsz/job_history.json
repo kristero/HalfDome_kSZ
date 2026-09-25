@@ -1,0 +1,50 @@
+{
+  "download_jobs": [
+    {
+      "job_id": "597287.idark",
+      "status": "stopped_at_byte_order_validation"
+    },
+    {
+      "job_id": "597323.idark",
+      "status": "completed"
+    }
+  ],
+  "runtime_jobs": [
+    {
+      "job_id": "597324.idark",
+      "status": "failed_in_incomplete_manifest"
+    },
+    {
+      "job_id": "597325.idark",
+      "status": "failed_in_old_system_cpp_runtime"
+    },
+    {
+      "job_id": "597326.idark",
+      "status": "failed_missing_XGPaint_Artifacts_toml"
+    },
+    {
+      "job_id": "597328.idark",
+      "status": "completed_with_matching_Julia_1.12.2"
+    }
+  ],
+  "campaign_jobs": [
+    {
+      "job_id": "597327.idark",
+      "status": "removed_after_failed_runtime_dependency_never_ran",
+      "queue": "mini",
+      "ncpus": 26,
+      "memory_gb": 64,
+      "walltime": "23:59:00"
+    },
+    {
+      "job_id": "597329.idark",
+      "status": "completed",
+      "exit_code": 0,
+      "finished_utc": "2026-09-14T11:32:16.810408+00:00",
+      "queue": "mini",
+      "ncpus": 26,
+      "memory_gb": 64,
+      "walltime": "23:59:00"
+    }
+  ]
+}

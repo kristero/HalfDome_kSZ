@@ -1,0 +1,8 @@
+{
+  "original_baseline_job": "598561.idark",
+  "original_failure": "Python module-name collision between two analyze.py modules; no simulation failure",
+  "replacement_baseline_job": "598562.idark",
+  "replacement_entrypoint": "baseline_cache_v2.py",
+  "original_log_preserved": "baseline.log",
+  "replacement_log": "baseline_v2.log"
+}

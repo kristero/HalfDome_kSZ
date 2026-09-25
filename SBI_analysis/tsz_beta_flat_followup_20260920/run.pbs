@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -N beta_flat_tests
+#PBS -q tiny
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+set -euo pipefail
+ROOT=/lustre/work/kristero10/tsz_beta_flat_followup_20260920
+CAMPAIGN=/lustre/work/kristero10/flamingo_tsz_comparison_20260914
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=1 JULIA_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE
+export JULIA_DEPOT_PATH="$CAMPAIGN/runtime/depot:/home/kristero10/.julia"
+export LD_LIBRARY_PATH="$CAMPAIGN/runtime/julia-1.12.2/lib:${LD_LIBRARY_PATH:-}"
+cd "$ROOT"
+if [[ "${TEST_STAGE:-all}" != "julia" ]]; then
+    /home/anaconda3/bin/python3 study.py --root "$ROOT" > logs/python.log 2>&1
+fi
+"$CAMPAIGN/runtime/julia-1.12.2/bin/julia" --project="$CAMPAIGN/runtime/julia_env" finite_los_test.jl > logs/julia.log 2>&1
+/home/anaconda3/bin/python3 validate.py --root "$ROOT" > logs/validation.log 2>&1

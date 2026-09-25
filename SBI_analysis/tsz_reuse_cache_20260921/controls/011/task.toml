@@ -1,0 +1,13 @@
+id = 11
+label = "extended_shallow_reference16384"
+mode = "fused"
+nodes = [ 512, 256, 128,]
+nside = 16384
+threads = 26
+pixel_targets = [ 8192, 4096,]
+reference_only = true
+[[cases]]
+label = "extended_shallow"
+theta = [ 18.1, 4, 2.8, 0.154, -0.00865, 0, -0.758, 0.731, 0,]
+reference_id = 4
+

@@ -1,0 +1,255 @@
+{
+  "passed": true,
+  "manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+  "cases": [
+    {
+      "name": "Battaglia12",
+      "elapsed_seconds": 262.3964513037354,
+      "peak_rss_GiB": 13.015071868896484,
+      "numerics": {
+        "stable_los_sha256": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+        "cache_nonpositive_replaced": 0,
+        "column_checks": 108,
+        "cache_floor": 0.0,
+        "maximum_column_relative_error": 1.3322676295501878e-15,
+        "map_definition": "unchanged historical HalfDome; scaled finite LOS quadrature"
+      },
+      "generation_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "noise": {
+        "noise2_pixel_sha256": "876d52372fb48dc193cd646e2f0b70a260eeec5ae7badc86faa1c54e299d4456",
+        "seed_row_id": 524288,
+        "seed_algorithm": "sha256-halfdome-so-v1-first64be-shift1",
+        "noise1_pixel_sha256": "052476065dc3e1d269d20c73202854fa5a6b5e409522b7841bf86aacc68fbeee",
+        "split_seeds": [
+          4792095270833211519,
+          7570708455084302805
+        ],
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise_table_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+        "mode": "independent_per_row",
+        "split_Nell_multiplier": 1.0,
+        "noise_beam_applied": false,
+        "master_seed": 12345,
+        "noise_lmax": 7979,
+        "checks": {
+          "full_resolution_replay_passed": true,
+          "harmonic_ensemble": {
+            "standardized_errors": [
+              1.1313574246630493,
+              -0.058424694367734474,
+              -0.07874999698142313
+            ],
+            "auto1_over_Nell": 1.002001578170867,
+            "modes_per_draw": 9984,
+            "draw_pairs": 64,
+            "auto2_over_Nell": 0.999896636031782,
+            "cross_over_Nell": -9.851634084993336e-05
+          }
+        }
+      },
+      "full_map_regression_max_error_over_peak": {
+        "unmasked_clean_cl": 4.870300531494913e-16,
+        "masked_clean_cl": 4.642444840246385e-16
+      }
+    },
+    {
+      "name": "L1_m9",
+      "elapsed_seconds": 244.06613529473543,
+      "peak_rss_GiB": 11.474189758300781,
+      "numerics": {
+        "stable_los_sha256": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+        "cache_nonpositive_replaced": 0,
+        "column_checks": 108,
+        "cache_floor": 0.0,
+        "maximum_column_relative_error": 1.9984014443252818e-15,
+        "map_definition": "unchanged historical HalfDome; scaled finite LOS quadrature"
+      },
+      "generation_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "noise": {
+        "noise2_pixel_sha256": "b5ec0b954dca32bc267251e6e6b822686d51be182d1499e5743c2716b1c1f8ba",
+        "seed_row_id": 524289,
+        "seed_algorithm": "sha256-halfdome-so-v1-first64be-shift1",
+        "noise1_pixel_sha256": "3dc354d6ea0baeaf38b1cee3ce0a3929b51b8229adeb642c7d5b9a994229db27",
+        "split_seeds": [
+          5963691567128217496,
+          7135188934043169364
+        ],
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise_table_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+        "mode": "independent_per_row",
+        "split_Nell_multiplier": 1.0,
+        "noise_beam_applied": false,
+        "master_seed": 12345,
+        "noise_lmax": 7979,
+        "checks": {}
+      },
+      "full_map_regression_max_error_over_peak": {
+        "unmasked_clean_cl": 1.926710372683465e-16,
+        "masked_clean_cl": 2.429817921253721e-16
+      }
+    },
+    {
+      "name": "fgas-8sigma",
+      "elapsed_seconds": 267.27820369787514,
+      "peak_rss_GiB": 11.475082397460938,
+      "numerics": {
+        "stable_los_sha256": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+        "cache_nonpositive_replaced": 0,
+        "column_checks": 108,
+        "cache_floor": 0.0,
+        "maximum_column_relative_error": 2.886579864025407e-15,
+        "map_definition": "unchanged historical HalfDome; scaled finite LOS quadrature"
+      },
+      "generation_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "noise": {
+        "noise2_pixel_sha256": "f228224e9962039f956575194551632fd3ebe2fae146b593d879df46eb518b5e",
+        "seed_row_id": 524290,
+        "seed_algorithm": "sha256-halfdome-so-v1-first64be-shift1",
+        "noise1_pixel_sha256": "f6efebce01f36a10150e49f2aa2eb0c2816c1981d54650910429b47881376edd",
+        "split_seeds": [
+          5992426060251856378,
+          5236940866384462269
+        ],
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise_table_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+        "mode": "independent_per_row",
+        "split_Nell_multiplier": 1.0,
+        "noise_beam_applied": false,
+        "master_seed": 12345,
+        "noise_lmax": 7979,
+        "checks": {}
+      },
+      "full_map_regression_max_error_over_peak": {
+        "unmasked_clean_cl": 4.81439048188264e-16,
+        "masked_clean_cl": 4.553681936004376e-16
+      }
+    },
+    {
+      "name": "Mstar-1sigma",
+      "elapsed_seconds": 261.38315657898784,
+      "peak_rss_GiB": 11.538684844970703,
+      "numerics": {
+        "stable_los_sha256": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+        "cache_nonpositive_replaced": 0,
+        "column_checks": 108,
+        "cache_floor": 0.0,
+        "maximum_column_relative_error": 1.5543122344752192e-15,
+        "map_definition": "unchanged historical HalfDome; scaled finite LOS quadrature"
+      },
+      "generation_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "noise": {
+        "noise2_pixel_sha256": "8c5b3777958a055be323a288fb5d4fd97fa04a68f9a3aaaabb5dc94d47733335",
+        "seed_row_id": 524291,
+        "seed_algorithm": "sha256-halfdome-so-v1-first64be-shift1",
+        "noise1_pixel_sha256": "905a2f37f6f1c8efde592e4be80bdd3e8ccb8015cbe40394876123c63f226100",
+        "split_seeds": [
+          1747797930595021771,
+          7591623069359272695
+        ],
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise_table_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+        "mode": "independent_per_row",
+        "split_Nell_multiplier": 1.0,
+        "noise_beam_applied": false,
+        "master_seed": 12345,
+        "noise_lmax": 7979,
+        "checks": {}
+      },
+      "full_map_regression_max_error_over_peak": {
+        "unmasked_clean_cl": 2.7448695507176603e-16,
+        "masked_clean_cl": 4.611102877722605e-16
+      }
+    },
+    {
+      "name": "compact_boundary",
+      "elapsed_seconds": 278.2058332040906,
+      "peak_rss_GiB": 11.482902526855469,
+      "numerics": {
+        "stable_los_sha256": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+        "cache_nonpositive_replaced": 0,
+        "column_checks": 108,
+        "cache_floor": 0.0,
+        "maximum_column_relative_error": 1.1102230246251565e-15,
+        "map_definition": "unchanged historical HalfDome; scaled finite LOS quadrature"
+      },
+      "generation_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "noise": {
+        "noise2_pixel_sha256": "ddc7173d97f9e56ad1847c2a65f62f95b4b86e959e1874278018c545435f5849",
+        "seed_row_id": 524292,
+        "seed_algorithm": "sha256-halfdome-so-v1-first64be-shift1",
+        "noise1_pixel_sha256": "60502028135d805d0af75cde20c0d102e9a7b17e65f1943449fc2f3dc2e05888",
+        "split_seeds": [
+          3110975480503239902,
+          6039828052092495657
+        ],
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise_table_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+        "mode": "independent_per_row",
+        "split_Nell_multiplier": 1.0,
+        "noise_beam_applied": false,
+        "master_seed": 12345,
+        "noise_lmax": 7979,
+        "checks": {}
+      }
+    },
+    {
+      "name": "steep_boundary",
+      "elapsed_seconds": 270.7835762798786,
+      "peak_rss_GiB": 11.531330108642578,
+      "numerics": {
+        "stable_los_sha256": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+        "cache_nonpositive_replaced": 19756,
+        "column_checks": 108,
+        "cache_floor": 5e-324,
+        "maximum_column_relative_error": 2.886579864025407e-15,
+        "map_definition": "unchanged historical HalfDome; scaled finite LOS quadrature"
+      },
+      "generation_manifest_sha256": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "noise": {
+        "noise2_pixel_sha256": "18808c48a35d7129c9aaf9b6b6b219772b53f274a0121650dc2fd71ad479932e",
+        "seed_row_id": 524293,
+        "seed_algorithm": "sha256-halfdome-so-v1-first64be-shift1",
+        "noise1_pixel_sha256": "86e497c231f6946fedfa23f4987e48edde8b834867cb61f81438c05d87fa0ab9",
+        "split_seeds": [
+          8262551939406288150,
+          9192419659831196161
+        ],
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise_table_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+        "mode": "independent_per_row",
+        "split_Nell_multiplier": 1.0,
+        "noise_beam_applied": false,
+        "master_seed": 12345,
+        "noise_lmax": 7979,
+        "checks": {}
+      }
+    }
+  ],
+  "scope": "Six NSIDE4096 maps with distinct SO splits, four historical clean regressions, full-resolution noise replay and harmonic ensemble; not all 8192 rows",
+  "distinct_noise_maps": 12,
+  "seed_check": {
+    "passed": true,
+    "algorithm": "sha256-halfdome-so-v1-first64be-shift1",
+    "maximum_production_rows": 524288,
+    "preflight_rows": 6,
+    "unique_split_seeds": 1048588,
+    "prefix_stable": true,
+    "observation_seed_overlap": false,
+    "first_three_rows": [
+      [
+        7542153507223994208,
+        4689516751162784668
+      ],
+      [
+        4238091825622451560,
+        6073344939521321046
+      ],
+      [
+        4358170466304955417,
+        8363958474261890633
+      ]
+    ],
+    "seed_code_sha256": "f76ef01bb5926e7e8bec7921b6eb60ab4036b312e2d4d590e77f5b03a51bcb92",
+    "design_sha256": "d1e90802565202bdac66d1c80643b627397db2ba45fb58472090569609998c41"
+  }
+}

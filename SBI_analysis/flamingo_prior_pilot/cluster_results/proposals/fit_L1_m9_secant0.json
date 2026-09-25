@@ -1,0 +1,28 @@
+{
+  "theta": [
+    21.967280263057663,
+    1.3755536572302156,
+    7.589363095494855,
+    0.04470223493431985,
+    -0.3469206591996796,
+    0.0031285914514265767,
+    -3.2870446388681462,
+    1.313809255046976,
+    0.7136786188806072
+  ],
+  "rms_fractional": 0.020941826746204872,
+  "max_fractional": 0.06260387351065078,
+  "rms_log": 0.021299682292582393,
+  "fit_type": "Local log-spectrum secant between measured full maps; requires new full-map validation",
+  "source_full_maps": [
+    "fit_L1_m9_iter2",
+    "fit_L1_m9_iter4"
+  ],
+  "second_map_fraction": 0.1993847645239009,
+  "amplitude_scale": 1.0026895546145294,
+  "nfev": 0,
+  "elapsed_seconds": 0.0,
+  "success": true,
+  "message": "Analytic interpolation proposal; not a globally optimized parameter fit",
+  "regularization_coefficient": 0.0
+}

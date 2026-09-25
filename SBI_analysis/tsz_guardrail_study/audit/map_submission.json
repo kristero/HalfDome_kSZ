@@ -1,0 +1,20 @@
+[
+  {
+    "label": "control",
+    "returncode": 0,
+    "stdout": "597892.idark\n",
+    "stderr": ""
+  },
+  {
+    "label": "flamingo",
+    "returncode": 0,
+    "stdout": "597893.idark\n",
+    "stderr": ""
+  },
+  {
+    "label": "tails",
+    "returncode": 0,
+    "stdout": "597894.idark\n",
+    "stderr": ""
+  }
+]

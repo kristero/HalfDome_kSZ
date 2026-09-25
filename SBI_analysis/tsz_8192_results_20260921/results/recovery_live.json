@@ -1,0 +1,286 @@
+{
+  "utc": "2026-09-21T06:30:50.688158+00:00",
+  "scheduler": "\nidark: \n                                                            Req'd  Req'd   Elap\nJob ID          Username Queue    Jobname    SessID NDS TSK Memory Time  S Time\n--------------- -------- -------- ---------- ------ --- --- ------ ----- - -----\n598526.idark    kristero mini     tszfix0    188723   1  26   64gb 23:59 R 00:22\n598527.idark    kristero mini     tszfix1    235586   1  26   64gb 23:59 R 00:22\n598528.idark    kristero mini     tszfix2    217057   1  26   64gb 23:59 R 00:22\n598529.idark    kristero mini     tszfix3    238873   1  26   64gb 23:59 R 00:22\n598530.idark    kristero mini     tszfix_rep    --    1  26   32gb 02:00 H   -- \n598533.idark    kristero mini     tsz_extrem 202413   1  26   64gb 06:00 R 00:06\n598534.idark    kristero mini     tsz_extrem 202998   1  26   64gb 06:00 R 00:06\n598535.idark    kristero mini2    tsz_extrem    --    1   1    4gb 00:20 H   -- \n",
+  "controls": [
+    {
+      "task_id": 0,
+      "returncode": 0,
+      "seconds": 4248.909454066306,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-20T22:08:34.554440+00:00"
+    },
+    {
+      "task_id": 1,
+      "returncode": 0,
+      "seconds": 5264.335048474371,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-20T23:36:18.899186+00:00"
+    },
+    {
+      "task_id": 2,
+      "returncode": 0,
+      "seconds": 934.3619863130152,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-20T23:51:53.271209+00:00"
+    },
+    {
+      "task_id": 3,
+      "returncode": 0,
+      "seconds": 445.52710167411715,
+      "attempt": 0,
+      "job": "598456.idark",
+      "utc": "2026-09-20T23:59:09.765004+00:00"
+    },
+    {
+      "task_id": 4,
+      "returncode": 0,
+      "seconds": 877.3044596500695,
+      "attempt": 0,
+      "job": "598456.idark",
+      "utc": "2026-09-21T00:13:47.079418+00:00"
+    },
+    {
+      "task_id": 5,
+      "returncode": 0,
+      "seconds": 382.83671309705824,
+      "attempt": 0,
+      "job": "598456.idark",
+      "utc": "2026-09-21T00:20:09.926967+00:00"
+    },
+    {
+      "task_id": 6,
+      "returncode": 0,
+      "seconds": 909.8697147434577,
+      "attempt": 0,
+      "job": "598456.idark",
+      "utc": "2026-09-21T00:35:19.805571+00:00"
+    },
+    {
+      "task_id": 7,
+      "returncode": 0,
+      "seconds": 447.70708865486085,
+      "attempt": 0,
+      "job": "598453.idark",
+      "utc": "2026-09-21T00:42:21.339297+00:00"
+    },
+    {
+      "task_id": 8,
+      "returncode": 0,
+      "seconds": 949.7202633582056,
+      "attempt": 0,
+      "job": "598456.idark",
+      "utc": "2026-09-21T00:57:40.531915+00:00"
+    },
+    {
+      "task_id": 9,
+      "returncode": 0,
+      "seconds": 459.4285538196564,
+      "attempt": 0,
+      "job": "598454.idark",
+      "utc": "2026-09-21T01:04:58.735821+00:00"
+    },
+    {
+      "task_id": 10,
+      "returncode": 0,
+      "seconds": 965.2358046323061,
+      "attempt": 0,
+      "job": "598454.idark",
+      "utc": "2026-09-21T01:21:03.981248+00:00"
+    },
+    {
+      "task_id": 11,
+      "returncode": 0,
+      "seconds": 974.9611356891692,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T01:37:14.109659+00:00"
+    },
+    {
+      "task_id": 12,
+      "returncode": 0,
+      "seconds": 1118.2334115058184,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T01:55:52.353898+00:00"
+    },
+    {
+      "task_id": 13,
+      "returncode": 0,
+      "seconds": 965.6834383644164,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T02:11:58.046934+00:00"
+    },
+    {
+      "task_id": 14,
+      "returncode": 0,
+      "seconds": 895.1761909797788,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T02:26:53.231471+00:00"
+    },
+    {
+      "task_id": 15,
+      "returncode": 0,
+      "seconds": 901.5143493339419,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T02:41:54.754713+00:00"
+    },
+    {
+      "task_id": 16,
+      "returncode": 0,
+      "seconds": 894.9627726599574,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T02:56:49.727111+00:00"
+    },
+    {
+      "task_id": 17,
+      "returncode": 0,
+      "seconds": 892.747153185308,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T03:11:42.483701+00:00"
+    },
+    {
+      "task_id": 18,
+      "returncode": 0,
+      "seconds": 897.0126144066453,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T03:26:39.505117+00:00"
+    },
+    {
+      "task_id": 19,
+      "returncode": 0,
+      "seconds": 894.7440305165946,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T03:41:34.257857+00:00"
+    },
+    {
+      "task_id": 20,
+      "returncode": 0,
+      "seconds": 891.8557756505907,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T03:56:26.122947+00:00"
+    },
+    {
+      "task_id": 21,
+      "returncode": 0,
+      "seconds": 886.4258665964007,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T04:11:12.558525+00:00"
+    },
+    {
+      "task_id": 22,
+      "returncode": 0,
+      "seconds": 884.3127405792475,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T04:25:56.880901+00:00"
+    },
+    {
+      "task_id": 23,
+      "returncode": 0,
+      "seconds": 891.4751869365573,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T04:40:48.365595+00:00"
+    },
+    {
+      "task_id": 24,
+      "returncode": 0,
+      "seconds": 880.542929649353,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T04:55:28.917412+00:00"
+    },
+    {
+      "task_id": 25,
+      "returncode": 0,
+      "seconds": 882.9077592492104,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T05:10:11.835342+00:00"
+    },
+    {
+      "task_id": 26,
+      "returncode": 0,
+      "seconds": 880.6428252868354,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T05:24:52.486282+00:00"
+    },
+    {
+      "task_id": 27,
+      "returncode": 0,
+      "seconds": 880.5281785652041,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T05:39:33.023396+00:00"
+    },
+    {
+      "task_id": 28,
+      "returncode": 0,
+      "seconds": 886.8337511084974,
+      "attempt": 0,
+      "job": "598455.idark",
+      "utc": "2026-09-21T05:54:19.865724+00:00"
+    },
+    {
+      "task_id": 78,
+      "returncode": null
+    },
+    {
+      "task_id": 79,
+      "returncode": null
+    },
+    {
+      "task_id": 80,
+      "returncode": 0,
+      "seconds": 1220.8232196886092,
+      "attempt": 0,
+      "job": "598526.idark",
+      "utc": "2026-09-21T06:28:15.789832+00:00"
+    },
+    {
+      "task_id": 81,
+      "returncode": 0,
+      "seconds": 1092.7255621310323,
+      "attempt": 0,
+      "job": "598527.idark",
+      "utc": "2026-09-21T06:26:07.691992+00:00"
+    },
+    {
+      "task_id": 82,
+      "returncode": 0,
+      "seconds": 1128.7255655881017,
+      "attempt": 0,
+      "job": "598528.idark",
+      "utc": "2026-09-21T06:26:43.692498+00:00"
+    },
+    {
+      "task_id": 83,
+      "returncode": 0,
+      "seconds": 1094.4872866328806,
+      "attempt": 0,
+      "job": "598529.idark",
+      "utc": "2026-09-21T06:26:09.454993+00:00"
+    },
+    {
+      "task_id": 84,
+      "returncode": null
+    },
+    {
+      "task_id": 85,
+      "returncode": null
+    }
+  ]
+}

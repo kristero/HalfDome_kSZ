@@ -1,0 +1,66 @@
+xgpaint_source = "/home/kn18001/.julia/dev/XGPaint/src/XGPaint.jl"
+normalization_without_old_los_passed = true
+maximum_relative_error = 7.251559330508738e-13
+seconds = 3.8219799995422363
+columns = 10180
+
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 3.0441138376188226e-5
+xc0 = 0.025
+beta0 = 0.1
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 9.956208755452891e-5
+xc0 = 0.497
+beta0 = 0.1
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 0.0002058101263804571
+xc0 = 4.0
+beta0 = 0.1
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 4.028287085781573e-6
+xc0 = 0.025
+beta0 = 0.644
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 5.256509987447663e-5
+xc0 = 0.497
+beta0 = 0.644
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 0.0001752486668547554
+xc0 = 4.0
+beta0 = 0.644
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 1.5325032559262824e-9
+xc0 = 0.025
+beta0 = 4.35
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 6.255143001016315e-6
+xc0 = 0.497
+beta0 = 4.35
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 7.633266848412605e-5
+xc0 = 4.0
+beta0 = 4.35
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 3.946043814173648e-18
+xc0 = 0.025
+beta0 = 16.0
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 3.893768165008901e-7
+xc0 = 0.497
+beta0 = 16.0
+[[normalization_cases]]
+amplitude = 1.751643642525706e-5
+value = 2.373014701153454e-5
+xc0 = 4.0
+beta0 = 16.0

@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "quadrature": {
+    "corner_columns": 36864,
+    "max_relative_error": 7.251559330508738e-13,
+    "rtol": 1e-10,
+    "reference_points": 10180,
+    "maxevals": 4096,
+    "failure_path_passed": true
+  },
+  "allocation_relative_error": 0.0,
+  "scope": "Small runtime/software tests only; not full-sky validation"
+}

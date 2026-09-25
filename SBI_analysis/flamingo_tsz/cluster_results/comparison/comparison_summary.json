@@ -1,0 +1,1160 @@
+{
+  "cache": {
+    "cache_file_sha256": "e3a8b88ca3d66794b0194fab204014102df38788a82dbb3d87936b7a95e43b62",
+    "mask_mean": 0.3957294473405482,
+    "mask_mean_square": 0.39466260563568895,
+    "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+    "mask_seed": 12345,
+    "noise1_pixel_sha256": "5d0d6bd4db70f0aec88320520c3efff1f779b315a0db5204634a7b615b8661dc",
+    "noise2_pixel_sha256": "dc6b755b997bb12d22c3386c60bed33aef5d2bb8b6d28802c300b610a3b55844",
+    "noise_root_seed": 12345,
+    "noise_table_sha256": "04cba7b20e06002b1a6af67e853aa643fbd3b5decea78f99e480cc7cc6b42f64",
+    "runtime": {
+      "adapter_sha256": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+      "beam_source_sha256": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+      "hdf5_version": "0.17.2",
+      "healpix_version": "4.2.4",
+      "julia_version": "1.12.2",
+      "operator_sha256": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+      "threads": 26,
+      "xgpaint_sha256": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+      "xgpaint_source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl"
+    },
+    "split_seeds": [
+      22446,
+      22447
+    ],
+    "support_fsky": 0.4000001549720764
+  },
+  "experiment_id": "35fbe0a27078c4b34d8aac9aee2b95fb4e2e4c977dc720ac516dd91176c302d6",
+  "helpers_sha256": {
+    "diagnose_so_compression_acceptance.py": "c40cbf7951eddaba0c6730e0e8dcbc49af37e13c42fedbe28b917f171fa57e8e",
+    "export_so_moped_bundle.py": "623306714edd608cf947d83a11f697cf876f3a75e83034bc9024d547e95bd988",
+    "plot_so_nine_fisher_moped524k.py": "a06b4caae35a50a7383dfcaa490800e91206642d8ca3073894633ddf97060cc9",
+    "prepare_validate_battaglia12_sbi_observation.py": "a4666bedb2d98dda9d232dd2cd16e1021d62476e0773ca28a636ac32990ec0ff",
+    "run_so_sbi_compression_comparison.py": "34dbf4a9d6a1c0b6619fef3bc2b06915626ddc20b334d41022457abb06034a6a",
+    "so_moped_local.py": "8e892bb6f33c7225d92d5e4dec3203df94b50ff936c818f272354050f712f7e2",
+    "so_sbi_compression.py": "153f26804b252601f6d3e7d5fea844e5d0029333551760f842c3f5bfb4f1ed81"
+  },
+  "limitations": [
+    "Fixed-noise conditional model; not noise-marginalized SO constraints",
+    "Different signal phases, cosmology, and gas models can cause out-of-distribution contexts",
+    "FLAMINGO L1 maps are lensed and integrated to z=3; no empirical corrections applied",
+    "Saved training-reference ranges are heuristic diagnostics, not hard support bounds"
+  ],
+  "model_sha256": "223494532fd812a5b8eeeaab202dc3cc243151da8ed6f0b6c41e8011205fab5e",
+  "models": {
+    "HalfDome": {
+      "acceptance": 0.99443359375,
+      "conditional_on_fixed_noise": true,
+      "context": [
+        0.14629985392093658,
+        -0.35324957966804504,
+        -0.1402793973684311,
+        0.21234171092510223,
+        -0.5444698929786682,
+        -0.5146021842956543,
+        0.4583679139614105,
+        0.617368757724762,
+        -0.16901442408561707
+      ],
+      "map": {
+        "beam_fwhm_arcmin": 2.0,
+        "cache_file_sha256": "e3a8b88ca3d66794b0194fab204014102df38788a82dbb3d87936b7a95e43b62",
+        "ell_max": 7979,
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise1_pixel_sha256": "5d0d6bd4db70f0aec88320520c3efff1f779b315a0db5204634a7b615b8661dc",
+        "noise2_pixel_sha256": "dc6b755b997bb12d22c3386c60bed33aef5d2bb8b6d28802c300b610a3b55844",
+        "nside": 4096,
+        "runtime": {
+          "adapter_sha256": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+          "beam_source_sha256": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+          "hdf5_version": "0.17.2",
+          "healpix_version": "4.2.4",
+          "julia_version": "1.12.2",
+          "operator_sha256": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+          "threads": 26,
+          "xgpaint_sha256": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+          "xgpaint_source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl"
+        },
+        "signal_beamed_pixel_sha256": "5d5e2d9448caa41c57a42519faa595a0a2d02fcfed3a90bae87f00c79f22f512",
+        "signal_max": 0.0002793889727883773,
+        "signal_mean": 1.0415991251430933e-06,
+        "signal_min": 8.350360869347952e-09,
+        "source": "halfdome",
+        "status": "map_processing_completed"
+      },
+      "max_absolute_moped_coordinate": 0.617368757724762,
+      "mean": [
+        18.560617446899414,
+        0.4885867238044739,
+        4.3106279373168945,
+        0.14771515130996704,
+        -0.002662630518898368,
+        0.04263856261968613,
+        -0.7830790877342224,
+        0.7434831261634827,
+        0.41699346899986267
+      ],
+      "median": [
+        18.503507614135742,
+        0.4870114326477051,
+        4.302386283874512,
+        0.1474631279706955,
+        -0.0022028088569641113,
+        0.04294847697019577,
+        -0.7814680337905884,
+        0.7428473234176636,
+        0.41724997758865356
+      ],
+      "physics_interpretation": "Effective HalfDome/Battaglia inference, not FLAMINGO input-parameter recovery",
+      "proposals": 10240,
+      "q16": [
+        17.519971542358398,
+        0.44648597717285154,
+        4.086299114227295,
+        0.12723635673522948,
+        -0.03561895564198494,
+        0.021550634056329728,
+        -0.8463226819038391,
+        0.6577894735336304,
+        0.36459235191345213
+      ],
+      "q84": [
+        19.611943817138673,
+        0.531087019443512,
+        4.535838832855225,
+        0.16826995611190795,
+        0.03006558045744896,
+        0.06367826282978058,
+        -0.718998556137085,
+        0.8310882902145386,
+        0.46968465924263003
+      ],
+      "sample_count": 10000,
+      "sampling_preflight": {
+        "acceptance": 0.99435,
+        "accepted_count": 19887,
+        "context": [
+          0.14629985392093658,
+          -0.35324957966804504,
+          -0.1402793973684311,
+          0.21234171092510223,
+          -0.5444698929786682,
+          -0.5146021842956543,
+          0.4583679139614105,
+          0.617368757724762,
+          -0.16901442408561707
+        ],
+        "interpretation": "Reference bounds are a heuristic, not a hard likelihood support test.",
+        "outside_reference_range": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "per_parameter": [
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "P0",
+            "prior_fraction_median": 0.5134380459785461,
+            "prior_fraction_q05": 0.46356172412633895,
+            "prior_fraction_q95": 0.5706600189208985
+          },
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "xc",
+            "prior_fraction_median": 0.48416323959827423,
+            "prior_fraction_q05": 0.39290585517883303,
+            "prior_fraction_q95": 0.5940902411937714
+          },
+          {
+            "above": 0.0002,
+            "below": 0.0,
+            "param": "beta",
+            "prior_fraction_median": 0.47136835753917694,
+            "prior_fraction_q05": 0.2767847031354904,
+            "prior_fraction_q95": 0.7040387064218521
+          },
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "alpha_m_P0",
+            "prior_fraction_median": 0.5053583085536957,
+            "prior_fraction_q05": 0.3903298959136009,
+            "prior_fraction_q95": 0.6223664730787277
+          },
+          {
+            "above": 0.0004,
+            "below": 0.00275,
+            "param": "alpha_m_xc",
+            "prior_fraction_median": 0.4880580008029938,
+            "prior_fraction_q05": 0.20923627987504007,
+            "prior_fraction_q95": 0.7548278629779815
+          },
+          {
+            "above": 0.00235,
+            "below": 0.00325,
+            "param": "alpha_m_beta",
+            "prior_fraction_median": 0.5251865088939667,
+            "prior_fraction_q05": 0.224525997787714,
+            "prior_fraction_q95": 0.8086679756641387
+          },
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "alpha_z_P0",
+            "prior_fraction_median": 0.5129188597202301,
+            "prior_fraction_q05": 0.41532617807388306,
+            "prior_fraction_q95": 0.6027816951274871
+          },
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "alpha_z_xc",
+            "prior_fraction_median": 0.5107543766498566,
+            "prior_fraction_q05": 0.3879486009478569,
+            "prior_fraction_q95": 0.633642852306366
+          },
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "alpha_z_beta",
+            "prior_fraction_median": 0.5033837258815765,
+            "prior_fraction_q05": 0.37248003035783767,
+            "prior_fraction_q95": 0.6325888425111771
+          }
+        ],
+        "raw_count": 20000,
+        "reference_count": 512,
+        "reference_max": [
+          0.9614934325218201,
+          4.1031951904296875,
+          3.839855432510376,
+          2.5874998569488525,
+          3.696063280105591,
+          7.540235996246338,
+          3.0079269409179688,
+          7.060149192810059,
+          5.602825164794922
+        ],
+        "reference_min": [
+          -4.084718227386475,
+          -3.858185291290283,
+          -3.2827677726745605,
+          -4.732479095458984,
+          -5.9348649978637695,
+          -2.0812227725982666,
+          -5.017172336578369,
+          -3.4427874088287354,
+          -3.893524408340454
+        ]
+      },
+      "status": "posterior_sampled",
+      "std": [
+        1.0582274198532104,
+        0.04207569733262062,
+        0.22202716767787933,
+        0.0203109048306942,
+        0.03263314440846443,
+        0.02095808833837509,
+        0.06426095217466354,
+        0.08589202165603638,
+        0.051542479544878006
+      ]
+    },
+    "L1_m9": {
+      "conditional_on_fixed_noise": true,
+      "context": [
+        0.006671823561191559,
+        -0.26527783274650574,
+        1.1798392534255981,
+        -2.903801679611206,
+        -6.068613529205322,
+        3.669367790222168,
+        2.306574821472168,
+        2.3010294437408447,
+        -3.84838604927063
+      ],
+      "error": "Sampling stopped at preflight: 0/20000 raw draws lie inside the prior, but the training control accepts 55.37%. Largest absolute standardized MOPED coordinate: 6.07. Check the simulator/noise-realization contract before sampling again. More proposals, clipping, or an MCMC fallback do not repair a distribution mismatch. Report: /lustre/work/kristero10/flamingo_tsz_comparison_20260914/results/L1_m9/diagnostics/sampling_preflight.json.",
+      "map": {
+        "beam_fwhm_arcmin": 2.0,
+        "cache_file_sha256": "e3a8b88ca3d66794b0194fab204014102df38788a82dbb3d87936b7a95e43b62",
+        "ell_max": 7979,
+        "input_sha256": "8bb8d37c1b65579f1daf990f7432316690169ca1d790ece479ae114ec62b66a3",
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise1_pixel_sha256": "5d0d6bd4db70f0aec88320520c3efff1f779b315a0db5204634a7b615b8661dc",
+        "noise2_pixel_sha256": "dc6b755b997bb12d22c3386c60bed33aef5d2bb8b6d28802c300b610a3b55844",
+        "nside": 4096,
+        "runtime": {
+          "adapter_sha256": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+          "beam_source_sha256": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+          "hdf5_version": "0.17.2",
+          "healpix_version": "4.2.4",
+          "julia_version": "1.12.2",
+          "operator_sha256": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+          "threads": 26,
+          "xgpaint_sha256": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+          "xgpaint_source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl"
+        },
+        "signal_beamed_pixel_sha256": "5b6f70003c26d2015ad51fcb0997be89cf622a9d5870620601c02125b6f4eff1",
+        "signal_max": 0.0002002400001545241,
+        "signal_mean": 1.5028392182425852e-06,
+        "signal_min": 2.1801839574546471e-07,
+        "source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/inputs/L1_m9.hdf5",
+        "status": "map_processing_completed"
+      },
+      "max_absolute_moped_coordinate": 6.068613529205322,
+      "physics_interpretation": "Effective HalfDome/Battaglia inference, not FLAMINGO input-parameter recovery",
+      "sampling_preflight": {
+        "acceptance": 0.0,
+        "accepted_count": 0,
+        "context": [
+          0.006671823561191559,
+          -0.26527783274650574,
+          1.1798392534255981,
+          -2.903801679611206,
+          -6.068613529205322,
+          3.669367790222168,
+          2.306574821472168,
+          2.3010294437408447,
+          -3.84838604927063
+        ],
+        "interpretation": "Reference bounds are a heuristic, not a hard likelihood support test.",
+        "outside_reference_range": [
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          false
+        ],
+        "per_parameter": [
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "P0",
+            "prior_fraction_median": 0.34572573006153107,
+            "prior_fraction_q05": 0.31786098331213,
+            "prior_fraction_q95": 0.37454316914081576
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "xc",
+            "prior_fraction_median": 2.552937865257263,
+            "prior_fraction_q05": 2.3902612209320067,
+            "prior_fraction_q95": 2.724601078033447
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "beta",
+            "prior_fraction_median": 2.375361680984497,
+            "prior_fraction_q05": 2.1737118124961854,
+            "prior_fraction_q95": 2.6022185921669005
+          },
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "alpha_m_P0",
+            "prior_fraction_median": 0.51210618019104,
+            "prior_fraction_q05": 0.43921472430229186,
+            "prior_fraction_q95": 0.5861258149147034
+          },
+          {
+            "above": 0.0,
+            "below": 0.91615,
+            "param": "alpha_m_xc",
+            "prior_fraction_median": -0.11400998756289482,
+            "prior_fraction_q05": -0.25139373540878296,
+            "prior_fraction_q95": 0.02277380926534527
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "alpha_m_beta",
+            "prior_fraction_median": 2.082035779953003,
+            "prior_fraction_q05": 1.8951040267944337,
+            "prior_fraction_q95": 2.2542271733283994
+          },
+          {
+            "above": 0.0,
+            "below": 1.0,
+            "param": "alpha_z_P0",
+            "prior_fraction_median": -0.8775546550750732,
+            "prior_fraction_q05": -0.9898272901773453,
+            "prior_fraction_q95": -0.7630312204360962
+          },
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "alpha_z_xc",
+            "prior_fraction_median": 0.8183839917182922,
+            "prior_fraction_q05": 0.7570706486701966,
+            "prior_fraction_q95": 0.8778548091650009
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "alpha_z_beta",
+            "prior_fraction_median": 1.5999487042427063,
+            "prior_fraction_q05": 1.4972013890743257,
+            "prior_fraction_q95": 1.7020323932170867
+          }
+        ],
+        "raw_count": 20000,
+        "reference_count": 512,
+        "reference_max": [
+          0.9614934325218201,
+          4.1031951904296875,
+          3.839855432510376,
+          2.5874998569488525,
+          3.696063280105591,
+          7.540235996246338,
+          3.0079269409179688,
+          7.060149192810059,
+          5.602825164794922
+        ],
+        "reference_min": [
+          -4.084718227386475,
+          -3.858185291290283,
+          -3.2827677726745605,
+          -4.732479095458984,
+          -5.9348649978637695,
+          -2.0812227725982666,
+          -5.017172336578369,
+          -3.4427874088287354,
+          -3.893524408340454
+        ],
+        "training_control": {
+          "acceptance": 0.5537109375,
+          "accepted_count": 2268,
+          "per_parameter": [
+            {
+              "above": 0.0,
+              "below": 0.0,
+              "param": "P0",
+              "prior_fraction_median": 0.07084866985678673,
+              "prior_fraction_q05": 0.05296514742076397,
+              "prior_fraction_q95": 0.09173768386244774
+            },
+            {
+              "above": 0.17236328125,
+              "below": 0.0,
+              "param": "xc",
+              "prior_fraction_median": 0.8733000457286835,
+              "prior_fraction_q05": 0.6842454522848129,
+              "prior_fraction_q95": 1.1049284040927887
+            },
+            {
+              "above": 0.0,
+              "below": 0.021484375,
+              "param": "beta",
+              "prior_fraction_median": 0.2738770395517349,
+              "prior_fraction_q05": 0.049465928226709366,
+              "prior_fraction_q95": 0.5116282254457474
+            },
+            {
+              "above": 0.0,
+              "below": 0.0,
+              "param": "alpha_m_P0",
+              "prior_fraction_median": 0.3916095197200775,
+              "prior_fraction_q05": 0.2579672262072563,
+              "prior_fraction_q95": 0.5227994024753571
+            },
+            {
+              "above": 0.000244140625,
+              "below": 0.093017578125,
+              "param": "alpha_m_xc",
+              "prior_fraction_median": 0.25467993319034576,
+              "prior_fraction_q05": -0.06675267964601517,
+              "prior_fraction_q95": 0.5797560065984726
+            },
+            {
+              "above": 0.207763671875,
+              "below": 0.001220703125,
+              "param": "alpha_m_beta",
+              "prior_fraction_median": 0.7968018651008606,
+              "prior_fraction_q05": 0.3832900747656822,
+              "prior_fraction_q95": 1.204603761434555
+            },
+            {
+              "above": 0.0,
+              "below": 0.000732421875,
+              "param": "alpha_z_P0",
+              "prior_fraction_median": 0.3839515745639801,
+              "prior_fraction_q05": 0.19368718564510345,
+              "prior_fraction_q95": 0.5713835507631302
+            },
+            {
+              "above": 0.0,
+              "below": 0.01904296875,
+              "param": "alpha_z_xc",
+              "prior_fraction_median": 0.26961278915405273,
+              "prior_fraction_q05": 0.0551306139677763,
+              "prior_fraction_q95": 0.480295792222023
+            },
+            {
+              "above": 0.080810546875,
+              "below": 0.0,
+              "param": "alpha_z_beta",
+              "prior_fraction_median": 0.8071853220462799,
+              "prior_fraction_q05": 0.5750140398740768,
+              "prior_fraction_q95": 1.0415416955947876
+            }
+          ],
+          "raw_count": 4096
+        },
+        "zero_count_95pct_upper_bound": 0.00014977539622296285
+      },
+      "status": "posterior_unavailable"
+    },
+    "Mstar-1sigma": {
+      "conditional_on_fixed_noise": true,
+      "context": [
+        -0.0005630968371406198,
+        -0.21547910571098328,
+        1.332637071609497,
+        -2.915353536605835,
+        -5.993658542633057,
+        3.755617141723633,
+        2.5032894611358643,
+        2.0942819118499756,
+        -4.001369953155518
+      ],
+      "error": "Sampling stopped at preflight: 0/20000 raw draws lie inside the prior, but the training control accepts 55.37%. Largest absolute standardized MOPED coordinate: 5.99. Check the simulator/noise-realization contract before sampling again. More proposals, clipping, or an MCMC fallback do not repair a distribution mismatch. Report: /lustre/work/kristero10/flamingo_tsz_comparison_20260914/results/Mstar-1sigma/diagnostics/sampling_preflight.json.",
+      "map": {
+        "beam_fwhm_arcmin": 2.0,
+        "cache_file_sha256": "e3a8b88ca3d66794b0194fab204014102df38788a82dbb3d87936b7a95e43b62",
+        "ell_max": 7979,
+        "input_sha256": "33a0c0e6ff2c9dae54802746cc89e881dbe423f9f514e6d09d89f9f00c0e8c8b",
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise1_pixel_sha256": "5d0d6bd4db70f0aec88320520c3efff1f779b315a0db5204634a7b615b8661dc",
+        "noise2_pixel_sha256": "dc6b755b997bb12d22c3386c60bed33aef5d2bb8b6d28802c300b610a3b55844",
+        "nside": 4096,
+        "runtime": {
+          "adapter_sha256": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+          "beam_source_sha256": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+          "hdf5_version": "0.17.2",
+          "healpix_version": "4.2.4",
+          "julia_version": "1.12.2",
+          "operator_sha256": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+          "threads": 26,
+          "xgpaint_sha256": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+          "xgpaint_source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl"
+        },
+        "signal_beamed_pixel_sha256": "c3d9b6620e097d55ade644c6fb8449105594d0ccd22796b67eba2b49a00660df",
+        "signal_max": 0.00020419735830055276,
+        "signal_mean": 1.5856831302301635e-06,
+        "signal_min": 2.624192011584706e-07,
+        "source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/inputs/Mstar-1sigma.hdf5",
+        "status": "map_processing_completed"
+      },
+      "max_absolute_moped_coordinate": 5.993658542633057,
+      "physics_interpretation": "Effective HalfDome/Battaglia inference, not FLAMINGO input-parameter recovery",
+      "sampling_preflight": {
+        "acceptance": 0.0,
+        "accepted_count": 0,
+        "context": [
+          -0.0005630968371406198,
+          -0.21547910571098328,
+          1.332637071609497,
+          -2.915353536605835,
+          -5.993658542633057,
+          3.755617141723633,
+          2.5032894611358643,
+          2.0942819118499756,
+          -4.001369953155518
+        ],
+        "interpretation": "Reference bounds are a heuristic, not a hard likelihood support test.",
+        "outside_reference_range": [
+          false,
+          false,
+          false,
+          false,
+          true,
+          false,
+          false,
+          false,
+          true
+        ],
+        "per_parameter": [
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "P0",
+            "prior_fraction_median": 0.3699202686548233,
+            "prior_fraction_q05": 0.3403178408741951,
+            "prior_fraction_q95": 0.40050597935914994
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "xc",
+            "prior_fraction_median": 2.5629974603652954,
+            "prior_fraction_q05": 2.405139911174774,
+            "prior_fraction_q95": 2.7284260749816895
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "beta",
+            "prior_fraction_median": 2.493705630302429,
+            "prior_fraction_q05": 2.2820779919624328,
+            "prior_fraction_q95": 2.7309113144874573
+          },
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "alpha_m_P0",
+            "prior_fraction_median": 0.33258260786533356,
+            "prior_fraction_q05": 0.2572633907198906,
+            "prior_fraction_q95": 0.4098299890756607
+          },
+          {
+            "above": 0.0,
+            "below": 0.85035,
+            "param": "alpha_m_xc",
+            "prior_fraction_median": -0.0852891057729721,
+            "prior_fraction_q05": -0.22190122678875923,
+            "prior_fraction_q95": 0.051342609152197814
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "alpha_m_beta",
+            "prior_fraction_median": 2.0898176431655884,
+            "prior_fraction_q05": 1.9059639692306518,
+            "prior_fraction_q95": 2.2627003669738768
+          },
+          {
+            "above": 0.0,
+            "below": 1.0,
+            "param": "alpha_z_P0",
+            "prior_fraction_median": -1.0701833367347717,
+            "prior_fraction_q05": -1.1942611336708069,
+            "prior_fraction_q95": -0.944696718454361
+          },
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "alpha_z_xc",
+            "prior_fraction_median": 0.7449518144130707,
+            "prior_fraction_q05": 0.6774641752243042,
+            "prior_fraction_q95": 0.8107539594173431
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "alpha_z_beta",
+            "prior_fraction_median": 1.3508923649787903,
+            "prior_fraction_q05": 1.2419783353805542,
+            "prior_fraction_q95": 1.459079670906067
+          }
+        ],
+        "raw_count": 20000,
+        "reference_count": 512,
+        "reference_max": [
+          0.9614934325218201,
+          4.1031951904296875,
+          3.839855432510376,
+          2.5874998569488525,
+          3.696063280105591,
+          7.540235996246338,
+          3.0079269409179688,
+          7.060149192810059,
+          5.602825164794922
+        ],
+        "reference_min": [
+          -4.084718227386475,
+          -3.858185291290283,
+          -3.2827677726745605,
+          -4.732479095458984,
+          -5.9348649978637695,
+          -2.0812227725982666,
+          -5.017172336578369,
+          -3.4427874088287354,
+          -3.893524408340454
+        ],
+        "training_control": {
+          "acceptance": 0.5537109375,
+          "accepted_count": 2268,
+          "per_parameter": [
+            {
+              "above": 0.0,
+              "below": 0.0,
+              "param": "P0",
+              "prior_fraction_median": 0.07084866985678673,
+              "prior_fraction_q05": 0.05296514742076397,
+              "prior_fraction_q95": 0.09173768386244774
+            },
+            {
+              "above": 0.17236328125,
+              "below": 0.0,
+              "param": "xc",
+              "prior_fraction_median": 0.8733000457286835,
+              "prior_fraction_q05": 0.6842454522848129,
+              "prior_fraction_q95": 1.1049284040927887
+            },
+            {
+              "above": 0.0,
+              "below": 0.021484375,
+              "param": "beta",
+              "prior_fraction_median": 0.2738770395517349,
+              "prior_fraction_q05": 0.049465928226709366,
+              "prior_fraction_q95": 0.5116282254457474
+            },
+            {
+              "above": 0.0,
+              "below": 0.0,
+              "param": "alpha_m_P0",
+              "prior_fraction_median": 0.3916095197200775,
+              "prior_fraction_q05": 0.2579672262072563,
+              "prior_fraction_q95": 0.5227994024753571
+            },
+            {
+              "above": 0.000244140625,
+              "below": 0.093017578125,
+              "param": "alpha_m_xc",
+              "prior_fraction_median": 0.25467993319034576,
+              "prior_fraction_q05": -0.06675267964601517,
+              "prior_fraction_q95": 0.5797560065984726
+            },
+            {
+              "above": 0.207763671875,
+              "below": 0.001220703125,
+              "param": "alpha_m_beta",
+              "prior_fraction_median": 0.7968018651008606,
+              "prior_fraction_q05": 0.3832900747656822,
+              "prior_fraction_q95": 1.204603761434555
+            },
+            {
+              "above": 0.0,
+              "below": 0.000732421875,
+              "param": "alpha_z_P0",
+              "prior_fraction_median": 0.3839515745639801,
+              "prior_fraction_q05": 0.19368718564510345,
+              "prior_fraction_q95": 0.5713835507631302
+            },
+            {
+              "above": 0.0,
+              "below": 0.01904296875,
+              "param": "alpha_z_xc",
+              "prior_fraction_median": 0.26961278915405273,
+              "prior_fraction_q05": 0.0551306139677763,
+              "prior_fraction_q95": 0.480295792222023
+            },
+            {
+              "above": 0.080810546875,
+              "below": 0.0,
+              "param": "alpha_z_beta",
+              "prior_fraction_median": 0.8071853220462799,
+              "prior_fraction_q05": 0.5750140398740768,
+              "prior_fraction_q95": 1.0415416955947876
+            }
+          ],
+          "raw_count": 4096
+        },
+        "zero_count_95pct_upper_bound": 0.00014977539622296285
+      },
+      "status": "posterior_unavailable"
+    },
+    "fgas-8sigma": {
+      "conditional_on_fixed_noise": true,
+      "context": [
+        0.2173444926738739,
+        0.2889302372932434,
+        1.9478121995925903,
+        -2.022465467453003,
+        -4.369638919830322,
+        0.7355355024337769,
+        1.2143155336380005,
+        0.6490615010261536,
+        -0.5969682335853577
+      ],
+      "error": "Sampling stopped at preflight: 0/20000 raw draws lie inside the prior, but the training control accepts 55.37%. Largest absolute standardized MOPED coordinate: 4.37. Check the simulator/noise-realization contract before sampling again. More proposals, clipping, or an MCMC fallback do not repair a distribution mismatch. Report: /lustre/work/kristero10/flamingo_tsz_comparison_20260914/results/fgas-8sigma/diagnostics/sampling_preflight.json.",
+      "map": {
+        "beam_fwhm_arcmin": 2.0,
+        "cache_file_sha256": "e3a8b88ca3d66794b0194fab204014102df38788a82dbb3d87936b7a95e43b62",
+        "ell_max": 7979,
+        "input_sha256": "bfc15a18babaa3d4780be4926f5c349aec5e761ec6c3174129a407dbae0e51c2",
+        "mask_pixel_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+        "noise1_pixel_sha256": "5d0d6bd4db70f0aec88320520c3efff1f779b315a0db5204634a7b615b8661dc",
+        "noise2_pixel_sha256": "dc6b755b997bb12d22c3386c60bed33aef5d2bb8b6d28802c300b610a3b55844",
+        "nside": 4096,
+        "runtime": {
+          "adapter_sha256": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+          "beam_source_sha256": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+          "hdf5_version": "0.17.2",
+          "healpix_version": "4.2.4",
+          "julia_version": "1.12.2",
+          "operator_sha256": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+          "threads": 26,
+          "xgpaint_sha256": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+          "xgpaint_source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl"
+        },
+        "signal_beamed_pixel_sha256": "259cecee2e8d67b05e1033c50e40d403d92c0de8391713147cf2e31aec3cb1d0",
+        "signal_max": 0.0001778827746236366,
+        "signal_mean": 1.7544418287696425e-06,
+        "signal_min": 3.9807176157924464e-07,
+        "source": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/inputs/fgas-8sigma.hdf5",
+        "status": "map_processing_completed"
+      },
+      "max_absolute_moped_coordinate": 4.369638919830322,
+      "physics_interpretation": "Effective HalfDome/Battaglia inference, not FLAMINGO input-parameter recovery",
+      "sampling_preflight": {
+        "acceptance": 0.0,
+        "accepted_count": 0,
+        "context": [
+          0.2173444926738739,
+          0.2889302372932434,
+          1.9478121995925903,
+          -2.022465467453003,
+          -4.369638919830322,
+          0.7355355024337769,
+          1.2143155336380005,
+          0.6490615010261536,
+          -0.5969682335853577
+        ],
+        "interpretation": "Reference bounds are a heuristic, not a hard likelihood support test.",
+        "outside_reference_range": [
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false,
+          false
+        ],
+        "per_parameter": [
+          {
+            "above": 0.0,
+            "below": 0.0,
+            "param": "P0",
+            "prior_fraction_median": 0.524376630783081,
+            "prior_fraction_q05": 0.474720387160778,
+            "prior_fraction_q95": 0.577224513888359
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "xc",
+            "prior_fraction_median": 1.5123516917228699,
+            "prior_fraction_q05": 1.3986873567104339,
+            "prior_fraction_q95": 1.6379567623138427
+          },
+          {
+            "above": 1.0,
+            "below": 0.0,
+            "param": "beta",
+            "prior_fraction_median": 1.5550730228424072,
+            "prior_fraction_q05": 1.4161456763744353,
+            "prior_fraction_q95": 1.70944727063179
+          },
+          {
+            "above": 0.0,
+            "below": 0.19045,
+            "param": "alpha_m_P0",
+            "prior_fraction_median": 0.04761323146522045,
+            "prior_fraction_q05": -0.040591778606176375,
+            "prior_fraction_q95": 0.13769576624035834
+          },
+          {
+            "above": 0.0,
+            "below": 0.3306,
+            "param": "alpha_m_xc",
+            "prior_fraction_median": 0.037189776077866554,
+            "prior_fraction_q05": -0.09946670606732368,
+            "prior_fraction_q95": 0.17395721599459635
+          },
+          {
+            "above": 0.99615,
+            "below": 0.0,
+            "param": "alpha_m_beta",
+            "prior_fraction_median": 1.283765435218811,
+            "prior_fraction_q05": 1.1115167737007141,
+            "prior_fraction_q95": 1.4462959647178648
+          },
+          {
+            "above": 0.0,
+            "below": 1.0,
+            "param": "alpha_z_P0",
+            "prior_fraction_median": -2.012696146965027,
+            "prior_fraction_q05": -2.1903008818626404,
+            "prior_fraction_q95": -1.8399486243724823
+          },
+          {
+            "above": 0.96065,
+            "below": 0.0,
+            "param": "alpha_z_xc",
+            "prior_fraction_median": 1.0769599080085754,
+            "prior_fraction_q05": 1.0054067313671111,
+            "prior_fraction_q95": 1.147047334909439
+          },
+          {
+            "above": 0.99995,
+            "below": 0.0,
+            "param": "alpha_z_beta",
+            "prior_fraction_median": 1.2108870148658752,
+            "prior_fraction_q05": 1.1191715538501739,
+            "prior_fraction_q95": 1.3054966390132905
+          }
+        ],
+        "raw_count": 20000,
+        "reference_count": 512,
+        "reference_max": [
+          0.9614934325218201,
+          4.1031951904296875,
+          3.839855432510376,
+          2.5874998569488525,
+          3.696063280105591,
+          7.540235996246338,
+          3.0079269409179688,
+          7.060149192810059,
+          5.602825164794922
+        ],
+        "reference_min": [
+          -4.084718227386475,
+          -3.858185291290283,
+          -3.2827677726745605,
+          -4.732479095458984,
+          -5.9348649978637695,
+          -2.0812227725982666,
+          -5.017172336578369,
+          -3.4427874088287354,
+          -3.893524408340454
+        ],
+        "training_control": {
+          "acceptance": 0.5537109375,
+          "accepted_count": 2268,
+          "per_parameter": [
+            {
+              "above": 0.0,
+              "below": 0.0,
+              "param": "P0",
+              "prior_fraction_median": 0.07084866985678673,
+              "prior_fraction_q05": 0.05296514742076397,
+              "prior_fraction_q95": 0.09173768386244774
+            },
+            {
+              "above": 0.17236328125,
+              "below": 0.0,
+              "param": "xc",
+              "prior_fraction_median": 0.8733000457286835,
+              "prior_fraction_q05": 0.6842454522848129,
+              "prior_fraction_q95": 1.1049284040927887
+            },
+            {
+              "above": 0.0,
+              "below": 0.021484375,
+              "param": "beta",
+              "prior_fraction_median": 0.2738770395517349,
+              "prior_fraction_q05": 0.049465928226709366,
+              "prior_fraction_q95": 0.5116282254457474
+            },
+            {
+              "above": 0.0,
+              "below": 0.0,
+              "param": "alpha_m_P0",
+              "prior_fraction_median": 0.3916095197200775,
+              "prior_fraction_q05": 0.2579672262072563,
+              "prior_fraction_q95": 0.5227994024753571
+            },
+            {
+              "above": 0.000244140625,
+              "below": 0.093017578125,
+              "param": "alpha_m_xc",
+              "prior_fraction_median": 0.25467993319034576,
+              "prior_fraction_q05": -0.06675267964601517,
+              "prior_fraction_q95": 0.5797560065984726
+            },
+            {
+              "above": 0.207763671875,
+              "below": 0.001220703125,
+              "param": "alpha_m_beta",
+              "prior_fraction_median": 0.7968018651008606,
+              "prior_fraction_q05": 0.3832900747656822,
+              "prior_fraction_q95": 1.204603761434555
+            },
+            {
+              "above": 0.0,
+              "below": 0.000732421875,
+              "param": "alpha_z_P0",
+              "prior_fraction_median": 0.3839515745639801,
+              "prior_fraction_q05": 0.19368718564510345,
+              "prior_fraction_q95": 0.5713835507631302
+            },
+            {
+              "above": 0.0,
+              "below": 0.01904296875,
+              "param": "alpha_z_xc",
+              "prior_fraction_median": 0.26961278915405273,
+              "prior_fraction_q05": 0.0551306139677763,
+              "prior_fraction_q95": 0.480295792222023
+            },
+            {
+              "above": 0.080810546875,
+              "below": 0.0,
+              "param": "alpha_z_beta",
+              "prior_fraction_median": 0.8071853220462799,
+              "prior_fraction_q05": 0.5750140398740768,
+              "prior_fraction_q95": 1.0415416955947876
+            }
+          ],
+          "raw_count": 4096
+        },
+        "zero_count_95pct_upper_bound": 0.00014977539622296285
+      },
+      "status": "posterior_unavailable"
+    }
+  },
+  "original_prior_high": [
+    34.34122085571289,
+    0.8445029854774475,
+    5.216610908508301,
+    0.29225099086761475,
+    0.09979499876499176,
+    0.09976699948310852,
+    -0.2288389950990677,
+    1.3144739866256714,
+    0.7458840012550354
+  ],
+  "original_prior_low": [
+    1.8325239419937134,
+    0.15001100301742554,
+    3.4806270599365234,
+    0.000311999989207834,
+    -0.09971799701452255,
+    -0.0199350006878376,
+    -1.3634569644927979,
+    0.14739300310611725,
+    0.08380799740552902
+  ],
+  "reference_comparison": {
+    "binned_difference": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "max_absolute_context_difference": 0.0,
+    "new_context": [
+      0.14629985392093658,
+      -0.35324957966804504,
+      -0.1402793973684311,
+      0.21234171092510223,
+      -0.5444698929786682,
+      -0.5146021842956543,
+      0.4583679139614105,
+      0.617368757724762,
+      -0.16901442408561707
+    ],
+    "note": "Raw signed differences are retained; only the L2 metric is relative. All FLAMINGO maps share the fresh control's exact cached noise arrays.",
+    "old_context": [
+      0.14629985392093658,
+      -0.35324957966804504,
+      -0.1402793973684311,
+      0.21234171092510223,
+      -0.5444698929786682,
+      -0.5146021842956543,
+      0.4583679139614105,
+      0.617368757724762,
+      -0.16901442408561707
+    ],
+    "relative_l2_difference": 0.0,
+    "saved_reference": "/lustre/work/kristero10/so9_fisher_moped524k_20260913/fixed_noise_observation",
+    "saved_reference_report": {
+      "conditional_on_fixed_noise": true,
+      "experiment_id": "35fbe0a27078c4b34d8aac9aee2b95fb4e2e4c977dc720ac516dd91176c302d6",
+      "independent_noise_validated": false,
+      "mask_seed": 12345,
+      "n_samples": 10000,
+      "noise_seed": 12345,
+      "proposals": 10240,
+      "raw_prior_acceptance": 0.9951171875,
+      "raw_profile": "/home/cbllover/HalfDome/SBI_analysis/outputs/moped_local_profiles/0669be4fb61ca0d5/fixed_noise_diagnostic/raw/halfdome_fullsky_masked_baseline_noise_cross_cl_m200c_nside4096_base_cosmo_fid_gaussbeam_2p0arcmin_so_fsky0p4_apo60p0arcmin_seed12345_deproj0_lmax7979.npy",
+      "raw_sha256": "1282435bc72af8849f5a2f60dc651bab3563eebcc7b2d5d7c186c9ad31585b96",
+      "samples_sha256": "632d74deb409fd636f5de47e17ca7bdb6b83509021bbcc8eb51a127b9168e998",
+      "sampling_seed": 47,
+      "theta_true": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ]
+    }
+  },
+  "status": "comparison_completed",
+  "training": {
+    "best_validation_performance": [
+      24.2518
+    ],
+    "converged_by_early_stopping": false,
+    "epochs_trained": 201,
+    "experiment_id": "35fbe0a27078c4b34d8aac9aee2b95fb4e2e4c977dc720ac516dd91176c302d6",
+    "method": "moped",
+    "n_fit": 461737,
+    "n_train": 513042,
+    "python": "3.8.10 (default, Jun  4 2021, 15:09:15) \n[GCC 7.5.0]",
+    "returned_weights_differed_from_best": true,
+    "sbi": "0.22.0",
+    "torch": "2.4.1+cu121",
+    "training_seconds": 4604.381679812446,
+    "weights_selection": "best_validation_snapshot",
+    "x_dim": 9
+  }
+}

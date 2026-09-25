@@ -1,0 +1,28 @@
+{
+  "active_prior_changed": false,
+  "cluster_jobs_submitted": false,
+  "explanation": "With seven fixed B12 parameters the size ratio is 4.35/beta0, independent of P0",
+  "upper_beta_from_size": 10.874999999999998,
+  "beta16_pressure_amplitude_range": [
+    3.6741096011497656,
+    60.0
+  ],
+  "beta16_size_ratio": 0.271875,
+  "required_size_lower_bound_to_include_16": 0.271875,
+  "minimum_xc_amplitude_for_beta16_with_B12_evolution": 0.7312183908045978,
+  "diagnostic_curve_points": 1601,
+  "all_other_guards_pass": true,
+  "counterfactual_is_validated_production_prior": false,
+  "source_sha256": {
+    "prior.json": "49e67836c66ce2c590afe3a5f1688225e0ce05846dbd8bdb69bc653075c4b485",
+    "flat_prior.py": "d0b5e3195d0da8771a2d1953cd8377dc424473d0ab321464b2e1f661c45f7951",
+    "guardrails.py": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0",
+    "guardrails.json": "b4868a66630009e51bcadeed544f13cb3af49e13dab3b83f3c440933260574a9",
+    "torch_prior.py": "72494468986eff19919f34d4717613edcc17969b1d858724093007c51f0cf6f7"
+  },
+  "script_sha256": "861e8febcbb59cacb33c2a1f4090cec29bf3d0aad878ff682785da0afcbd6e94",
+  "reference_sha256": {
+    "old_metadata.json": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf",
+    "flamingo_fits.json": "e87150fc059baf458564b8ca75a790e2986b4702f683733f44eb73cbf0f454d6"
+  }
+}

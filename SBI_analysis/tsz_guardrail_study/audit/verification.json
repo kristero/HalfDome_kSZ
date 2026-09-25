@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "analytic_normalization": 0.6738505846576491,
+  "analytic_log_density": -12.502786407611291,
+  "finite_integral_cases": 30,
+  "frozen_production_rows_inside_analytic_support": 8192,
+  "finite_integral_max_relative_error": 7.105427357600977e-15,
+  "missing_evidence_fails_closed": true,
+  "scipy_special_max_relative_error": 1.7621459846834959e-12,
+  "fisher_projector_rank": 6,
+  "fisher_inequality_examples": 100,
+  "gaussian_budget_interpretation": {
+    "0.05": {
+      "mean_shift_KL_nats": 0.0012500000000000002,
+      "total_variation": 0.019945036390476067,
+      "central_68_interval_coverage_loss_percentage_points": 0.06046748214635356
+    },
+    "0.1": {
+      "mean_shift_KL_nats": 0.005000000000000001,
+      "total_variation": 0.03987761167674497,
+      "central_68_interval_coverage_loss_percentage_points": 0.2415678430228052
+    },
+    "0.3": {
+      "mean_shift_KL_nats": 0.045,
+      "total_variation": 0.119235384740485,
+      "central_68_interval_coverage_loss_percentage_points": 2.145362894576924
+    }
+  },
+  "historical_B12_max_relative_difference": 7.771561172376096e-15,
+  "limits": "Checks mathematical identities, frozen inputs and completed numerical comparisons. Does not certify untested parameter combinations or nonlinear SBI."
+}

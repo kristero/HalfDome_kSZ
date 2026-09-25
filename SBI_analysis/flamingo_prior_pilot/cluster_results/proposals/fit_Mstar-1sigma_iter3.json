@@ -1,0 +1,47 @@
+{
+  "theta": [
+    34.19894902857776,
+    1.370131544828284,
+    8.661793999225534,
+    0.21112218691184487,
+    -0.34547554258068824,
+    -0.007772865946179985,
+    -3.831074704810517,
+    1.579545007426176,
+    0.8338786784946912
+  ],
+  "rms_fractional": 0.007833099760011298,
+  "max_fractional": 0.020498684578278192,
+  "rms_log": 0.007838195303845389,
+  "elapsed_seconds": 20.08655023574829,
+  "nfev": 40,
+  "success": true,
+  "message": "`xtol` termination condition is satisfied.",
+  "searches": [
+    {
+      "theta": [
+        34.19894902857776,
+        1.370131544828284,
+        8.661793999225534,
+        0.21112218691184487,
+        -0.34547554258068824,
+        -0.007772865946179985,
+        -3.831074704810517,
+        1.579545007426176,
+        0.8338786784946912
+      ],
+      "rms_fractional": 0.007833099760011298,
+      "max_fractional": 0.020498684578278192,
+      "rms_log": 0.007838195303845389,
+      "elapsed_seconds": 20.08655023574829,
+      "nfev": 40,
+      "success": true,
+      "message": "`xtol` termination condition is satisfied."
+    }
+  ],
+  "fit_type": "regularized catalogue-forward proposal; requires full-map validation",
+  "regularization_coefficient": 0.005,
+  "minimum_grid_beta_for_proposal": 1.3,
+  "maximum_grid_beta_for_proposal": 40.0,
+  "local_unit_cube_trust_radius": 0.12
+}

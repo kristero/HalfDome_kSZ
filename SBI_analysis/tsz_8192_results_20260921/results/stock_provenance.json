@@ -1,0 +1,10 @@
+{
+  "profiles.jl": {
+    "commit_sha256": "9801dbac85fd078d890fa953349db3b555db510b7d70697317a4566f19ccd4a1",
+    "installed_sha256": "0c6dd605c3ad4d2a85c07a474b234f7b6178d8b0139bbd14e706b262126179d3"
+  },
+  "profiles_y.jl": {
+    "commit_sha256": "98d034e7ebacf8f37c252f1448dd77d71ee26412b7a9694e20106bcb82c4891c",
+    "installed_sha256": "98d034e7ebacf8f37c252f1448dd77d71ee26412b7a9694e20106bcb82c4891c"
+  }
+}

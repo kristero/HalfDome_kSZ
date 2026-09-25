@@ -1,0 +1,27 @@
+{
+  "sha256": {
+    "illustration_data.json": "f68789622f78c79e9135740857ce1ce7f2a0ceb4d7a60c107f9cf40ddc7d5d68",
+    "FILES.md": "5e8b2633e7140f405d78f812f3cd3db4cb18d878c0fb9207ed61104773bb75a1",
+    "publish.py": "4fe2458a05104b1ceb37ac3514d6ded14e9084ba2ad1845d8fc7077f68975d33",
+    "boundary_curves.csv": "c4ddda0db4dc119304bb0cb9cb17ef96efd11926b10a339d8498811b8b23ba52",
+    "build_note.py": "3cb8183e323f4e17c67aca0487655850663de531bb4eaaef4a6e5ee833b85b68",
+    "EXPLANATION.md": "2cf8cb646fe87319d4bc5673adc6be1a98a5afae879a228cba27f468692b771d",
+    "make_figures.py": "dd73c3aa4ae4788589c31217c928ad9e9d06d2ca090a26011e7e70069517b042",
+    "qa.json": "dfc7d9c8eccf8fa6b66425d8741ba93fafff4f9df361d2d076b2190884977854",
+    "plots/child_centres.png": "3f8b7876c38b2c400e2f2f0cea0c2e26ffd90c1e7ae23c0ff7a6143f34137836",
+    "plots/smooth_boundary.png": "340b5248c9c296887f97e1e00cf29e776f06e5712001a9a468c369d603340ac5",
+    "plots/output_pipeline.png": "a4c9b0042a6711e98db453583251d14d33599f1732a55d5d3c558ca274eed480",
+    "plots/spherical_chord.svg": "90685750669baf644134719b0d43f382f3de86fa6c70685c1398d6e84dfc3ca2",
+    "plots/cache_nodes.png": "158a6cf397f64e491cec16481647234ce1db8776f0e0e654f2b1049e2fe791e0",
+    "plots/smooth_boundary.svg": "64d7ab1c0641ca6f53f94cb272307a1b96356b36c7dd964ff6a7ab3d0a9bb701",
+    "plots/output_pipeline.svg": "4272658b7996711952165ad841655bb96e7d6394d2697966c0d1353a15d6d870",
+    "plots/child_centres.svg": "96a73370fc2d5146ef60694898cdc306f67dd7008b8f2e0c3212814aa3f4996c",
+    "plots/cache_nodes.svg": "cd46d4e2a58138d37e536f75398e2554d6ff96ec4bdcaa059b17a6e704456d00",
+    "plots/spherical_chord.png": "fbc767f5c00da4c5bddaadc7de295e619af614fe95f45effef08bfbca162f27a",
+    "plots/sampling_before_after_beam.png": "c84f407078d176809233df559dca7d6cfa3367751fa40dce9ef8c6525d041387",
+    "plots/sampling_before_after_beam.svg": "45f71c1cf1febb15ca72a6afcf6a396a982f4eb79dbb18ba990826bd2ac40c5d",
+    "plots/greedy_scheduling.png": "2704f401de1e2b770d443285d21fa820d14fae2f95a451d13a10de5f7c760534",
+    "plots/greedy_scheduling.svg": "f2869394f369e91842dbefd905dfb08e1415876e6dc050107f1bc9385a6ced71",
+    "report.pdf": "dbc9b5472e32a4b9260adf678bb7b7d2d2bfe7d545e88a7e65ff16c1eca69628"
+  }
+}

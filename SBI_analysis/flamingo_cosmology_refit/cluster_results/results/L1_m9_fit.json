@@ -1,0 +1,105 @@
+{
+  "variant": "L1_m9",
+  "best": {
+    "name": "L1_m9_iter1",
+    "theta": [
+      27.895767029523494,
+      1.3742797203838153,
+      8.096506971978265,
+      0.24068706895722208,
+      -0.3708722120914735,
+      -0.027131779826878644,
+      -3.2950451155410274,
+      1.3212811497156247,
+      0.7123048539608454
+    ],
+    "rms_fractional": 0.011724679844956199,
+    "max_fractional": 0.04265329655551675,
+    "rms_log": 0.01187738758684551,
+    "basis": "Fresh full HD map times halo-model response",
+    "painting_seconds": 283.6501187644899,
+    "response_resolution_error": 0.0005181301496007817
+  },
+  "candidates": [
+    {
+      "name": "amplitude_from_existing_map",
+      "theta": [
+        20.329740906738444,
+        1.378849450857866,
+        7.273537628593472,
+        0.004031541178634246,
+        -0.3708453659453409,
+        -0.01000634064400005,
+        -3.2031983230820584,
+        1.2715097462230687,
+        0.7122775044426832
+      ],
+      "rms_fractional": 0.021338276365977397,
+      "max_fractional": 0.08644004490461588,
+      "rms_log": 0.021167580977515095,
+      "basis": "Exact P0 scaling of old full HD map times halo-model response",
+      "response_resolution_error": 0.00030300382958081684
+    },
+    {
+      "name": "L1_m9_iter0",
+      "theta": [
+        28.20473390531043,
+        1.3612561403347527,
+        8.204098355812238,
+        0.14001305086752325,
+        -0.2908864229351608,
+        0.020864166202563844,
+        -3.3585680759553282,
+        1.2362743342467586,
+        0.5523050539379601
+      ],
+      "rms_fractional": 0.02720480625740407,
+      "max_fractional": 0.09667783479844783,
+      "rms_log": 0.028273030464243995,
+      "basis": "Fresh full HD map times halo-model response",
+      "painting_seconds": 292.01521085202694,
+      "response_resolution_error": 0.00047038077019856406
+    },
+    {
+      "name": "L1_m9_iter1",
+      "theta": [
+        27.895767029523494,
+        1.3742797203838153,
+        8.096506971978265,
+        0.24068706895722208,
+        -0.3708722120914735,
+        -0.027131779826878644,
+        -3.2950451155410274,
+        1.3212811497156247,
+        0.7123048539608454
+      ],
+      "rms_fractional": 0.011724679844956199,
+      "max_fractional": 0.04265329655551675,
+      "rms_log": 0.01187738758684551,
+      "basis": "Fresh full HD map times halo-model response",
+      "painting_seconds": 283.6501187644899,
+      "response_resolution_error": 0.0005181301496007817
+    }
+  ],
+  "original": {
+    "name": "fit_L1_m9_iter2",
+    "theta": [
+      19.863946898236897,
+      1.378849450857866,
+      7.273537628593472,
+      0.004031541178634246,
+      -0.3708453659453409,
+      -0.01000634064400005,
+      -3.2031983230820584,
+      1.2715097462230687,
+      0.7122775044426832
+    ],
+    "rms_fractional": 0.02310241347102159,
+    "max_fractional": 0.07575155398450151,
+    "rms_log": 0.02324752034271393,
+    "proposal_rms_fractional": 0.01784062963002098
+  },
+  "scope": "Approximate cosmology-corrected full-map spectral fit; not a posterior or direct halo pressure fit",
+  "production_run_modified": false,
+  "manifest_sha256": "5b116da2f8100e578cdafa394e736c1218d8a61f26c148463a83306f2a6117e7"
+}

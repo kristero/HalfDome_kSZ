@@ -1,0 +1,24 @@
+{
+  "version": "tsz_P0_beta_flat_v1",
+  "parameter_order": ["P0", "beta"],
+  "lower": [1.0, 2.8],
+  "upper": [60.0, 16.0],
+  "distribution": "Independent uniform in physical values over the entire rectangle",
+  "log_uniform_indices": [],
+  "rejection_cuts": [],
+  "full_parameter_order": ["P0", "xc", "beta", "alpha_m_P0", "alpha_m_xc", "alpha_m_beta", "alpha_z_P0", "alpha_z_xc", "alpha_z_beta"],
+  "fixed_parameters": {
+    "xc": 0.497,
+    "alpha_m_P0": 0.154,
+    "alpha_m_xc": -0.00865,
+    "alpha_m_beta": 0.0393,
+    "alpha_z_P0": -0.758,
+    "alpha_z_xc": 0.731,
+    "alpha_z_beta": 0.415
+  },
+  "reference_parameters": {"P0": 18.1, "beta": 4.35},
+  "design_seed": 20260917,
+  "default_design_count": 8192,
+  "flamingo_marker_interpretation": "P0 and beta projections of saved cosmology-corrected nine-parameter clean-spectrum fits; not fits in this fixed-seven-parameter model",
+  "production_status": "Separate parameter design and plots; no map generation or cluster submission"
+}

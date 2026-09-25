@@ -1,0 +1,5 @@
+case,covariance_scope,fisher_rank,n_parameters,all_modes_identified,output_dir
+baseline,conditional_noise,6,9,False,/lustre/work/kristero10/adrian_fisher_nell_sensitivity_deproj0/baseline/conditional_noise
+baseline,gaussian_total,6,9,False,/lustre/work/kristero10/adrian_fisher_nell_sensitivity_deproj0/baseline/gaussian_total
+goal,conditional_noise,6,9,False,/lustre/work/kristero10/adrian_fisher_nell_sensitivity_deproj0/goal/conditional_noise
+goal,gaussian_total,6,9,False,/lustre/work/kristero10/adrian_fisher_nell_sensitivity_deproj0/goal/gaussian_total

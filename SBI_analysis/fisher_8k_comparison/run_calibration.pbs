@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N B12F8k
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${RUN_ROOT:?}"
+: "${WORKER:?}"
+: "${CPUS:=26}"
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS="${CPUS}"
+export HDF5_USE_FILE_LOCKING=FALSE PYTHONUNBUFFERED=1
+unset PYTHONNOUSERSITE
+/home/anaconda3/bin/python3 "${RUN_ROOT}/code/calibration.py" work \
+  --root "${RUN_ROOT}" --worker "${WORKER}" --workers 5 --threads "${CPUS}"

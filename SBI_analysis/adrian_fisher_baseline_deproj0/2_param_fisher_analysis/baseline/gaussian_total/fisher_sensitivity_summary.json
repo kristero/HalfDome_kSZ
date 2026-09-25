@@ -1,0 +1,29 @@
+{
+  "all_fisher_modes_identified": false,
+  "case": "baseline",
+  "covariance_model": "narrow-kernel fsky Gaussian split-cross approximation",
+  "covariance_rank": 40,
+  "covariance_scope": "gaussian_total",
+  "covariance_scope_description": "Gaussian signal + SO noise",
+  "data_marginalized_blanks_mean_not_estimable": true,
+  "deprojection": 0,
+  "fisher_rank": 6,
+  "fisher_rcond": 1e-08,
+  "fisher_threshold": 0.13100288255697345,
+  "fsky_effective": 0.4,
+  "input_noise_is_dl": false,
+  "limitations": [
+    "No mask coupling matrix was supplied; this uses an fsky approximation.",
+    "Gaussian-total omits connected tSZ trispectrum and super-sample covariance.",
+    "Conditional-noise conditions on the fixed Battaglia12 signal.",
+    "Finite prior-regularized errors do not establish data identifiability."
+  ],
+  "n_bins": 40,
+  "n_parameters": 9,
+  "prior_regularization": "moment-matched Gaussian approximation to bounded uniform priors",
+  "prior_sigma_fraction": 0.2886751345948129,
+  "so_noise_one_based_column": 2,
+  "so_noise_zero_based_column": 1,
+  "split_noise_factor": 1.0,
+  "statistic": "masked pseudo-D_ell, 2ell+1 weighted bins"
+}

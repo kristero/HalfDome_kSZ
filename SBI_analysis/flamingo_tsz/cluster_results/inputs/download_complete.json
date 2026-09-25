@@ -1,0 +1,49 @@
+{
+  "completed_utc": "2026-09-14T11:03:14.623395+00:00",
+  "manifest_sha256": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf",
+  "files": {
+    "L1_m9": {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/inputs/L1_m9.hdf5",
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/download/FLAMINGO/L1_m9/L1_m9/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "sha256": "8bb8d37c1b65579f1daf990f7432316690169ca1d790ece479ae114ec62b66a3",
+      "bytes": 1520700487,
+      "npix": 201326592,
+      "minimum": -1.3531253687672616e-05,
+      "maximum": 0.0003172009890091714,
+      "mean": 1.5028392223482155e-06,
+      "rms": 2.5273167409244214e-06,
+      "all_pixels_finite": true,
+      "stored_dtype": ">f8",
+      "metadata_dtype": "<f8"
+    },
+    "fgas-8sigma": {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/inputs/fgas-8sigma.hdf5",
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/download/FLAMINGO/L1_m9/fgas-8sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "sha256": "bfc15a18babaa3d4780be4926f5c349aec5e761ec6c3174129a407dbae0e51c2",
+      "bytes": 1516150395,
+      "npix": 201326592,
+      "minimum": -1.1374885448188953e-05,
+      "maximum": 0.00024965461962855027,
+      "mean": 1.7544418315941795e-06,
+      "rms": 2.480726472879836e-06,
+      "all_pixels_finite": true,
+      "stored_dtype": ">f8",
+      "metadata_dtype": "<f8"
+    },
+    "Mstar-1sigma": {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/inputs/Mstar-1sigma.hdf5",
+      "url": "https://dataweb.cosma.dur.ac.uk:8443/hdfstream/download/FLAMINGO/L1_m9/Mstar-1sigma/integrated_maps/yang26/lightcone0_shells/lensed_tSZ_rot_same_rot.hdf5",
+      "sha256": "33a0c0e6ff2c9dae54802746cc89e881dbe423f9f514e6d09d89f9f00c0e8c8b",
+      "bytes": 1519858814,
+      "npix": 201326592,
+      "minimum": -1.4397903656941508e-05,
+      "maximum": 0.00032391584112733286,
+      "mean": 1.5856831341203788e-06,
+      "rms": 2.5899634595258926e-06,
+      "all_pixels_finite": true,
+      "stored_dtype": ">f8",
+      "metadata_dtype": "<f8"
+    }
+  },
+  "total_file_bytes": 4556709696
+}

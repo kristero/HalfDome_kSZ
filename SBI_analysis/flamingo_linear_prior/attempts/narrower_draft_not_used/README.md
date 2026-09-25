@@ -1,0 +1,1 @@
+Superseded draft: this narrower uniform box was not frozen or run on the cluster. The user selected the previous broad support with linear-uniform proposals instead. Active replacement code is in ../flamingo_linear_prior/.

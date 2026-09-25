@@ -1,0 +1,11 @@
+{
+  "ell_max": 1247.0,
+  "ell_min": 23.5,
+  "n_rows": 100000,
+  "noise_enabled": false,
+  "noise_mode": "none",
+  "source_dataset": "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\emulator_tSZ\\outputs\\binned_16e3_16\\sbi16e3_bin16_dataset_100_000.npz",
+  "source_observed_dl": "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\HPC_output\\HalfDome\\tSZ_HalfDome_fiducial_nside4096_cluster.npy",
+  "theta_dim": 9,
+  "x_dim": 16
+}

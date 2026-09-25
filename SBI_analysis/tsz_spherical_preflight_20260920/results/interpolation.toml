@@ -1,0 +1,54 @@
+[[cases]]
+cache_underflow_cells = 0
+relative_error_p50_p95_p99_max = [1.0259238458765196e-9, 0.00018721692449742385, 0.0004629715941422519, 0.009227435061619493]
+case = "B12"
+scope = "Pointwise cache + historical angular floor; not a bandpower error budget"
+grid_factor = 1
+angular_floor_hits = 1731
+seconds = 30.997730016708374
+central_scaled_error_p50_p95_p99_max = [4.734986276742911e-10, 0.00016723316802551627, 0.00040279897747044557, 0.0006338662093971374]
+[[cases]]
+cache_underflow_cells = 0
+relative_error_p50_p95_p99_max = [5.338501862794942e-11, 0.00017757005138995237, 0.00043409008154914123, 0.0026208803100623568]
+case = "B12"
+scope = "Pointwise cache + historical angular floor; not a bandpower error budget"
+grid_factor = 2
+angular_floor_hits = 1731
+seconds = 196.07475805282593
+central_scaled_error_p50_p95_p99_max = [2.4813313389708674e-11, 0.0001686830207086612, 0.0004071686421921881, 0.0006354028914382027]
+[[cases]]
+cache_underflow_cells = 0
+relative_error_p50_p95_p99_max = [4.890219229558568e-9, 0.00394610751837696, 0.009114689015037255, 0.013875683244776837]
+case = "compact"
+scope = "Pointwise cache + historical angular floor; not a bandpower error budget"
+grid_factor = 1
+angular_floor_hits = 1731
+seconds = 34.34350109100342
+central_scaled_error_p50_p95_p99_max = [1.6956265754625266e-10, 0.003729188374823633, 0.008900503768556212, 0.013872920239156991]
+[[cases]]
+cache_underflow_cells = 0
+relative_error_p50_p95_p99_max = [2.5865709574190987e-10, 0.0039461089266613, 0.009114677080551699, 0.01387711896900401]
+case = "compact"
+scope = "Pointwise cache + historical angular floor; not a bandpower error budget"
+grid_factor = 2
+angular_floor_hits = 1731
+seconds = 268.42303490638733
+central_scaled_error_p50_p95_p99_max = [8.871736345754948e-12, 0.003729165985187352, 0.008900511028740229, 0.0138743556774945]
+[[cases]]
+cache_underflow_cells = 0
+relative_error_p50_p95_p99_max = [4.901826167191814e-10, 3.7070002766853426e-5, 0.00010003619271937854, 0.0031796749128707447]
+case = "shallow"
+scope = "Pointwise cache + historical angular floor; not a bandpower error budget"
+grid_factor = 1
+angular_floor_hits = 1731
+seconds = 20.818172216415405
+central_scaled_error_p50_p95_p99_max = [4.4414494465166037e-10, 3.4411820446873525e-5, 8.428484434107933e-5, 0.00016581728382674682]
+[[cases]]
+cache_underflow_cells = 0
+relative_error_p50_p95_p99_max = [2.585193170645539e-11, 3.4544494875704495e-5, 8.972534176195055e-5, 0.000936759083818961]
+case = "shallow"
+scope = "Pointwise cache + historical angular floor; not a bandpower error budget"
+grid_factor = 2
+angular_floor_hits = 1731
+seconds = 157.05665397644043
+central_scaled_error_p50_p95_p99_max = [2.2977071758206025e-11, 3.247635035104735e-5, 8.25074314535269e-5, 0.0001379518404248289]

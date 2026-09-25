@@ -1,0 +1,14 @@
+{
+  "count": 8192,
+  "chunk_size": 128,
+  "campaign": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914",
+  "pilot": "/lustre/work/kristero10/flamingo_prior_pilot_20260914",
+  "catalogue": "/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5",
+  "threads": 26,
+  "row_timeout_seconds": 1200,
+  "worker_budget_seconds": 82800,
+  "retain_full_cl": false,
+  "training_noise_mode": "independent_per_row",
+  "noise_master_seed": 12345,
+  "notes": "Change count to 524288 or pass prepare.py --count 524288 in a NEW run directory. No emulator and no old SBI extrapolation."
+}

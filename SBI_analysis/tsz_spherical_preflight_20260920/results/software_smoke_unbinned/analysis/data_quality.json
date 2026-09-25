@@ -1,0 +1,29 @@
+{
+  "count": 64,
+  "heldout": 16,
+  "training_pool": 48,
+  "negative_cross_bins": 0,
+  "negative_cross_multipoles": 0,
+  "moped_input": {
+    "features": 7900,
+    "ell_min": 80,
+    "ell_max": 7979,
+    "binned": false
+  },
+  "prior_mean_rmse_over_width": [
+    0.2886726568818451,
+    0.2887894582677392,
+    0.27081636868920117,
+    0.2936792324419884,
+    0.2888402588026746,
+    0.28867149759030075,
+    0.28871668779587756,
+    0.2893993612664466,
+    0.2886743392001195
+  ],
+  "clean_dl_range": [
+    9.6316338874723e-14,
+    1.0702570358954559e-13
+  ],
+  "scope": "Experimental spherical point painter; numerical systematics are not certified"
+}

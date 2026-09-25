@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -N sphere_diag256
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_spherical_preflight_20260920
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=26 MKL_NUM_THREADS=1
+# Prepared only: this file has not been submitted. Four workers would each
+# process 64 distinct rows; actual starts are subject to PBS capacity/limits.
+/home/anaconda3/bin/python3 diagnostic.py --count 256 --threads 26 \
+  --run-root /lustre/work/kristero10/tsz_spherical_diagnostic_256_prepared_20260920 \
+  --worker "${DIAGNOSTIC_WORKER:-0}" --workers "${DIAGNOSTIC_WORKERS:-1}"

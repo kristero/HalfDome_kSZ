@@ -1,0 +1,125 @@
+{
+  "utc": "2026-09-22T12:40:41.938572+00:00",
+  "root": "/lustre/work/kristero10/tsz_reuse_cache_20260921",
+  "verified": {
+    "manifest.json": 18,
+    "edge_extension/manifest.json": 10,
+    "work_balance/manifest.json": 9,
+    "products": 312
+  },
+  "qstat_returncode": 0,
+  "qstat_stdout": "",
+  "qstat_stderr": "",
+  "total_files": 398,
+  "total_bytes": 24776222,
+  "largest_files": [
+    {
+      "path": "evidence.tar.gz",
+      "bytes": 11015890
+    },
+    {
+      "path": "followup/compression_context.npz",
+      "bytes": 1832826
+    },
+    {
+      "path": "reports.tar.gz",
+      "bytes": 354405
+    },
+    {
+      "path": "results/report.json",
+      "bytes": 325428
+    },
+    {
+      "path": "inputs/pixwin4096.txt",
+      "bytes": 307200
+    },
+    {
+      "path": "inputs/pixwin8192.txt",
+      "bytes": 307200
+    },
+    {
+      "path": "source.tar.gz",
+      "bytes": 256824
+    },
+    {
+      "path": "plots/cache_probe_accuracy.png",
+      "bytes": 160171
+    },
+    {
+      "path": "plots/pixel_quadrature_progress.png",
+      "bytes": 149945
+    },
+    {
+      "path": "controls/002/compact/masked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/compact/unmasked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/Battaglia12/masked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/Battaglia12/unmasked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/FL_L1_m9_pixel4096_dewindow/masked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/FL_L1_m9_pixel4096_dewindow/unmasked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/extended_shallow/masked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/extended_shallow/unmasked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/FL_L1_m9/masked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/FL_L1_m9/unmasked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/compact_pixel4096_dewindow/masked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/compact_pixel4096_dewindow/unmasked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/extended_shallow_pixel4096/masked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/extended_shallow_pixel4096/unmasked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/compact_pixel4096/masked_clean_cl.npy",
+      "bytes": 63920
+    },
+    {
+      "path": "controls/002/compact_pixel4096/unmasked_clean_cl.npy",
+      "bytes": 63920
+    }
+  ],
+  "archives": [
+    "source.tar.gz",
+    "reports.tar.gz",
+    "evidence.tar.gz",
+    "edge_extension/source.tar.gz",
+    "work_balance/source.tar.gz",
+    "followup/source.tar.gz"
+  ]
+}

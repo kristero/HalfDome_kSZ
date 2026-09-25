@@ -1,0 +1,16 @@
+{
+  "roles": {
+    "fiducial": "597354.idark",
+    "other_feedback": "597380.idark",
+    "extremes": "597356.idark"
+  },
+  "diagnostics": "597381.idark",
+  "early": "597358.idark",
+  "fiducial_refinement": "597379.idark",
+  "other_feedback_previous": "597355.idark",
+  "diagnostics_previous": "597357.idark",
+  "fiducial_refinement_previous": "597371.idark",
+  "other_feedback_restart_previous": "597374.idark",
+  "diagnostics_move_previous": "597377.idark",
+  "plot_review": "597383.idark"
+}

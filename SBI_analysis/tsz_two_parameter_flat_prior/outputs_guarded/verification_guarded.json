@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "guarded_design_rows": 8192,
+  "all_guarded_rows_pass": true,
+  "previous_unfiltered_rows_rejected": 3525,
+  "boundary_pairs": 96,
+  "both_sides_of_Y_boundary_checked": true,
+  "accepted_prefix_checked_through": 16384,
+  "independent_pressure_integrals": 40,
+  "maximum_integral_relative_error": 3.552713678800501e-15,
+  "torch_float64_draws": 2048,
+  "torch_float32_draws": 1024,
+  "torch_invalid_support_check": "passed",
+  "torch_numpy_log_density_agreement": "passed",
+  "source_sha256": {
+    "verify_guarded.py": "eef26e143522e0b96bc3a2be4b4e53c07d8c76d750c6ac742198855006349239",
+    "torch_prior.py": "72494468986eff19919f34d4717613edcc17969b1d858724093007c51f0cf6f7"
+  }
+}

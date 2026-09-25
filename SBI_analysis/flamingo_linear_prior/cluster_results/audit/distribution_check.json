@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "design_rows": 8192,
+  "independent_reference_rows": 32768,
+  "reference_seed": 88001,
+  "marginal_KS_distances": {
+    "P0": 0.00701904296875,
+    "xc": 0.005279541015625,
+    "beta": 0.004364013671875,
+    "alpha_m_P0": 0.006622314453125,
+    "alpha_m_xc": 0.0091552734375,
+    "alpha_m_beta": 0.005859375,
+    "alpha_z_P0": 0.006683349609375,
+    "alpha_z_xc": 0.00531005859375,
+    "alpha_z_beta": 0.00762939453125
+  },
+  "maximum_correlation_difference": 0.02317640396358861,
+  "interpretation": "Distribution consistency diagnostic, not IID KS significance: both samples use randomized Sobol with rejection.",
+  "manifest_sha256": "994333174a0c5a1e636a5cc065d000464ea3b4ddee2bb0082ccb4cfdd70cc600"
+}

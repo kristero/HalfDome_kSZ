@@ -1,0 +1,18 @@
+{
+  "input": {
+    "h": 0.6774,
+    "Omega_m": 0.3089,
+    "Omega_b": 0.0486,
+    "sigma8": 0.8159,
+    "n_s": 0.9667,
+    "mnu_eV": 0.0,
+    "source": "https://arxiv.org/html/2407.17462v2"
+  },
+  "camb_version": "1.5.9",
+  "sigma8": 0.8159,
+  "A_s_effective": 2.0673493721563616e-09,
+  "Omega_nu": 0.0,
+  "Omega_cb": 0.3089,
+  "units": "k in 1/Mpc, P in Mpc^3, distances in Mpc, H in km/s/Mpc",
+  "normalization": "native HD normalized to published sigma8; FL uses published A_s"
+}

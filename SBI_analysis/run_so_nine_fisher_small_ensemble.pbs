@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -N SO9_F16
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=8gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${CODE_DIR:?Set CODE_DIR}"
+: "${OUTPUT_DIR:?Set OUTPUT_DIR}"
+: "${CONFIG:?Set CONFIG}"
+: "${PYTHON:=python3}"
+: "${N_NOISE:=16}"
+: "${FISHER_ROOT:=/lustre/work/kristero10/adrian_fisher_baseline_deproj0}"
+export OMP_NUM_THREADS="${PBS_NCPUS:-26}" OPENBLAS_NUM_THREADS="${PBS_NCPUS:-26}"
+export MKL_NUM_THREADS="${PBS_NCPUS:-26}" NUMEXPR_NUM_THREADS="${PBS_NCPUS:-26}"
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1
+PILOT_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+# This server disables PBS job history. Keep an explicit exit receipt outside
+# the fresh result directory so a failed calculation cannot resemble completion.
+record_exit() {
+  PILOT_EXIT_CODE=$?
+  trap - EXIT
+  "${PYTHON}" -c 'import json, os, socket, sys, datetime; from pathlib import Path; Path(sys.argv[1]).write_text(json.dumps(dict(exit_code=int(sys.argv[2]), job_id=os.environ.get("PBS_JOBID"), host=socket.gethostname(), threads=int(os.environ["OMP_NUM_THREADS"]), started_utc=sys.argv[3], finished_utc=datetime.datetime.utcnow().isoformat()+"Z"), indent=2)+"\n")' \
+    "${OUTPUT_DIR}.job_status.json" "${PILOT_EXIT_CODE}" "${PILOT_STARTED_UTC}"
+  exit "${PILOT_EXIT_CODE}"
+}
+trap record_exit EXIT
+cd "${CODE_DIR}"
+"${PYTHON}" run_so_nine_fisher_small_ensemble.py --fisher-root "${FISHER_ROOT}" \
+  --config "${CONFIG}" --output "${OUTPUT_DIR}" --n-noise "${N_NOISE}"

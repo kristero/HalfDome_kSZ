@@ -1,0 +1,47 @@
+{
+  "theta": [
+    8.339926710217773,
+    1.3712477853921199,
+    5.140900317594783,
+    -0.10477169924339709,
+    -0.3718642602554446,
+    -0.012543159825767314,
+    -3.0785961144645015,
+    1.4548994549419128,
+    1.013578613715732
+  ],
+  "rms_fractional": 0.006073732611390181,
+  "max_fractional": 0.018599861148507868,
+  "rms_log": 0.006059562591554389,
+  "elapsed_seconds": 59.92222233116627,
+  "nfev": 100,
+  "success": false,
+  "message": "The maximum number of function evaluations is exceeded.",
+  "searches": [
+    {
+      "theta": [
+        8.339926710217773,
+        1.3712477853921199,
+        5.140900317594783,
+        -0.10477169924339709,
+        -0.3718642602554446,
+        -0.012543159825767314,
+        -3.0785961144645015,
+        1.4548994549419128,
+        1.013578613715732
+      ],
+      "rms_fractional": 0.006073732611390181,
+      "max_fractional": 0.018599861148507868,
+      "rms_log": 0.006059562591554389,
+      "elapsed_seconds": 59.92222233116627,
+      "nfev": 100,
+      "success": false,
+      "message": "The maximum number of function evaluations is exceeded."
+    }
+  ],
+  "fit_type": "regularized catalogue-forward proposal; requires full-map validation",
+  "regularization_coefficient": 0.005,
+  "minimum_grid_beta_for_proposal": 1.3,
+  "maximum_grid_beta_for_proposal": 64.0,
+  "local_unit_cube_trust_radius": null
+}

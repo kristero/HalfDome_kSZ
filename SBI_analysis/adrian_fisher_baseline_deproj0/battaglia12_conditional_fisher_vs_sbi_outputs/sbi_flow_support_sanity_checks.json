@@ -1,0 +1,129 @@
+{
+  "control_contexts": [
+    {
+      "label": "saved dataset-row observation",
+      "draws": 2000,
+      "all_parameter_prior_acceptance": 0.523,
+      "finite_fraction": 1.0
+    },
+    {
+      "label": "training row 329534",
+      "draws": 2000,
+      "all_parameter_prior_acceptance": 0.456,
+      "finite_fraction": 1.0
+    },
+    {
+      "label": "training row 367218",
+      "draws": 2000,
+      "all_parameter_prior_acceptance": 0.7085,
+      "finite_fraction": 1.0
+    },
+    {
+      "label": "training row 96621",
+      "draws": 2000,
+      "all_parameter_prior_acceptance": 0.5495,
+      "finite_fraction": 1.0
+    },
+    {
+      "label": "training row 160017",
+      "draws": 2000,
+      "all_parameter_prior_acceptance": 0.4055,
+      "finite_fraction": 1.0
+    }
+  ],
+  "control_acceptance_median": 0.523,
+  "flow_is_healthy_on_controls": true,
+  "battaglia_seed_acceptance_min_median_max": [
+    0.0,
+    0.0,
+    0.0
+  ],
+  "battaglia_seeds_with_any_accepted_sample": 0,
+  "selected_observation_raw_acceptance": 0.0,
+  "estimated_proposals_for_requested_samples": 1e+305,
+  "sbi_conditioning_is_viable": false,
+  "parameter_diagnostics": [
+    {
+      "parameter": "P0",
+      "prior_low": 1.8325239419937134,
+      "prior_high": 34.34122085571289,
+      "inside_prior_fraction": 0.0064,
+      "raw_q01": 34.97608055114746,
+      "raw_median": 54.7007999420166,
+      "raw_q99": 84.84869552612305
+    },
+    {
+      "parameter": "xc",
+      "prior_low": 0.15001100301742554,
+      "prior_high": 0.8445029854774475,
+      "inside_prior_fraction": 0.0,
+      "raw_q01": 1.2292564964294435,
+      "raw_median": 1.3957444429397583,
+      "raw_q99": 1.5961315727233887
+    },
+    {
+      "parameter": "beta",
+      "prior_low": 3.4806270599365234,
+      "prior_high": 5.216610908508301,
+      "inside_prior_fraction": 0.0,
+      "raw_q01": 7.289735593795776,
+      "raw_median": 7.6780736446380615,
+      "raw_q99": 8.085960693359375
+    },
+    {
+      "parameter": "alpha_m_P0",
+      "prior_low": 0.000311999989207834,
+      "prior_high": 0.29225099086761475,
+      "inside_prior_fraction": 0.1564,
+      "raw_q01": -0.08360840126872063,
+      "raw_median": -0.024863338097929955,
+      "raw_q99": 0.03404321622103456
+    },
+    {
+      "parameter": "alpha_m_xc",
+      "prior_low": -0.09971799701452255,
+      "prior_high": 0.09979499876499176,
+      "inside_prior_fraction": 0.2264,
+      "raw_q01": -0.14597822919487954,
+      "raw_median": -0.11142989993095398,
+      "raw_q99": -0.07510633789002895
+    },
+    {
+      "parameter": "alpha_m_beta",
+      "prior_low": -0.0199350006878376,
+      "prior_high": 0.09976699948310852,
+      "inside_prior_fraction": 0.0,
+      "raw_q01": 0.3508005341887474,
+      "raw_median": 0.38467399775981903,
+      "raw_q99": 0.416818283200264
+    },
+    {
+      "parameter": "alpha_z_P0",
+      "prior_low": -1.3634569644927979,
+      "prior_high": -0.2288389950990677,
+      "inside_prior_fraction": 0.0,
+      "raw_q01": -2.4456641101837158,
+      "raw_median": -2.263152599334717,
+      "raw_q99": -1.9701760935783386
+    },
+    {
+      "parameter": "alpha_z_xc",
+      "prior_low": 0.14739300310611725,
+      "prior_high": 1.3144739866256714,
+      "inside_prior_fraction": 0.0,
+      "raw_q01": -0.9358298134803772,
+      "raw_median": -0.6037975549697876,
+      "raw_q99": -0.3123368015885353
+    },
+    {
+      "parameter": "alpha_z_beta",
+      "prior_low": 0.08380799740552902,
+      "prior_high": 0.7458840012550354,
+      "inside_prior_fraction": 1.0,
+      "raw_q01": 0.3886336967349052,
+      "raw_median": 0.48029549419879913,
+      "raw_q99": 0.566972469687462
+    }
+  ],
+  "figure": "/home/cbllover/HalfDome/SBI_analysis/adrian_fisher_baseline_deproj0/battaglia12_conditional_fisher_vs_sbi_outputs/sbi_flow_support_sanity_checks.jpg"
+}

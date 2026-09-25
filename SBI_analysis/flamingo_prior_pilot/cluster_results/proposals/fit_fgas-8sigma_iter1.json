@@ -1,0 +1,47 @@
+{
+  "theta": [
+    13.631397560268843,
+    1.3966242706690803,
+    6.724900020899845,
+    0.09922830075660083,
+    -0.25186426025544467,
+    0.03721950739471877,
+    -3.2461110439823346,
+    1.510232869250495,
+    0.7735786137157381
+  ],
+  "rms_fractional": 0.018387971366345925,
+  "max_fractional": 0.09059862672039065,
+  "rms_log": 0.01797120442020579,
+  "elapsed_seconds": 35.140185641124845,
+  "nfev": 57,
+  "success": true,
+  "message": "`ftol` termination condition is satisfied.",
+  "searches": [
+    {
+      "theta": [
+        13.631397560268843,
+        1.3966242706690803,
+        6.724900020899845,
+        0.09922830075660083,
+        -0.25186426025544467,
+        0.03721950739471877,
+        -3.2461110439823346,
+        1.510232869250495,
+        0.7735786137157381
+      ],
+      "rms_fractional": 0.018387971366345925,
+      "max_fractional": 0.09059862672039065,
+      "rms_log": 0.01797120442020579,
+      "elapsed_seconds": 35.140185641124845,
+      "nfev": 57,
+      "success": true,
+      "message": "`ftol` termination condition is satisfied."
+    }
+  ],
+  "fit_type": "regularized catalogue-forward proposal; requires full-map validation",
+  "regularization_coefficient": 0.005,
+  "minimum_grid_beta_for_proposal": 1.3,
+  "maximum_grid_beta_for_proposal": 64.0,
+  "local_unit_cube_trust_radius": 0.12
+}

@@ -1,0 +1,119 @@
+{
+  "clean_eight_thread_experiments": [
+    {
+      "case": "Battaglia12",
+      "rows": [
+        {
+          "variant": "historical1",
+          "nside": 4096,
+          "grid_refinement": 1,
+          "seconds": 330.2822353467345,
+          "cache_seconds": 30.804,
+          "rss_gib": 10.263816833496094
+        },
+        {
+          "variant": "logz2",
+          "nside": 4096,
+          "grid_refinement": 2,
+          "seconds": 551.4168815612793,
+          "cache_seconds": 256.869,
+          "rss_gib": 12.095108032226562
+        },
+        {
+          "variant": "pixel8192_2",
+          "nside": 8192,
+          "grid_refinement": 2,
+          "seconds": 1118.6971567496657,
+          "cache_seconds": 259.025,
+          "rss_gib": 19.18914031982422
+        },
+        {
+          "variant": "pixel16384_2",
+          "nside": 16384,
+          "grid_refinement": 2,
+          "seconds": 3346.8266660161316,
+          "cache_seconds": 255.88,
+          "rss_gib": 55.5235481262207
+        }
+      ],
+      "matched_grid_time_ratio": 2.0287684221458573,
+      "matched_grid_memory_ratio": 1.5865207874701166
+    },
+    {
+      "case": "FL_L1_m9",
+      "rows": [
+        {
+          "variant": "historical1",
+          "nside": 4096,
+          "grid_refinement": 1,
+          "seconds": 337.9823526442051,
+          "cache_seconds": 32.764,
+          "rss_gib": 10.265819549560547
+        },
+        {
+          "variant": "logz2",
+          "nside": 4096,
+          "grid_refinement": 2,
+          "seconds": 558.0400602519512,
+          "cache_seconds": 265.904,
+          "rss_gib": 12.116535186767578
+        },
+        {
+          "variant": "pixel8192_2",
+          "nside": 8192,
+          "grid_refinement": 2,
+          "seconds": 1126.311002973467,
+          "cache_seconds": 266.815,
+          "rss_gib": 19.277610778808594
+        },
+        {
+          "variant": "pixel16384_2",
+          "nside": 16384,
+          "grid_refinement": 2,
+          "seconds": 3350.003977507353,
+          "cache_seconds": 264.061,
+          "rss_gib": 55.85129165649414
+        }
+      ],
+      "matched_grid_time_ratio": 2.0183335986039164,
+      "matched_grid_memory_ratio": 1.5910167784484792
+    }
+  ],
+  "completed_production": {
+    "rows": 8192,
+    "validation_rows": 843,
+    "reused_design_points": 663,
+    "imported_spectra": 23,
+    "fresh_points": 7529,
+    "generated_maps_in_logs": 8169,
+    "median_seconds": 261.45075568556786,
+    "max_seconds": 361.26070653647184,
+    "worker_hours": 602.3942451514163,
+    "negative_noisy_bin_fraction": 0.02890625,
+    "target_quantile_in_design_ell3000": {
+      "HalfDome": 0.21142578125,
+      "L1_m9": 0.2451171875,
+      "fgas-8sigma": 0.19970703125,
+      "Mstar-1sigma": 0.247314453125
+    },
+    "target_quantile_range_over_bins": {
+      "HalfDome": [
+        0.168701171875,
+        0.3680419921875
+      ],
+      "L1_m9": [
+        0.1900634765625,
+        0.3304443359375
+      ],
+      "fgas-8sigma": [
+        0.1768798828125,
+        0.227783203125
+      ],
+      "Mstar-1sigma": [
+        0.1934814453125,
+        0.325927734375
+      ]
+    }
+  },
+  "caveat": "New spherical/prebeam/noise pipeline has not been benchmarked; do not scale 26-thread production using these ratios as a measured forecast"
+}

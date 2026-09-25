@@ -1,0 +1,6 @@
+{
+  "validation_rows": 809,
+  "fraction": 0.0987548828125,
+  "algorithm": "SplitMix64(proposal_index), hash modulo 10; stable across dataset sizes",
+  "forward_parameters_unchanged": true
+}

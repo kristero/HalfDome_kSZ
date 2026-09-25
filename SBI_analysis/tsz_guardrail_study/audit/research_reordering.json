@@ -1,0 +1,15 @@
+{
+  "previous_job": "597904",
+  "qstat": "Job Id: 597904.idark\n    Job_Name = guard_more_tails\n    Job_Owner = kristero10@idark.ipmu.jp\n    resources_used.cpupercent = 0\n    resources_used.cput = 00:00:00\n    resources_used.mem = 13640kb\n    resources_used.ncpus = 8\n    resources_used.vmem = 377480kb\n    resources_used.walltime = 00:05:08\n    job_state = R\n    queue = mini2\n    server = idark\n    Checkpoint = u\n    ctime = Wed Sep 16 01:53:57 2026\n    Error_Path = idark.ipmu.jp:/home/kristero10/guard_more_tails.e597904\n    exec_host = ansys1/2*8\n    exec_vnode = (ansys1:ncpus=8:mem=67108864kb)\n    Hold_Types = n\n    Join_Path = oe\n    Keep_Files = n\n    Mail_Points = a\n    mtime = Wed Sep 16 02:14:18 2026\n    Output_Path = idark.ipmu.jp:/lustre/work/kristero10/tsz_guardrail_study_202\n\t60915/logs/more_tails.log\n    Priority = 0\n    qtime = Wed Sep 16 01:53:57 2026\n    Rerunable = True\n    Resource_List.mem = 64gb\n    Resource_List.ncpus = 8\n    Resource_List.nodect = 1\n    Resource_List.place = free\n    Resource_List.select = 1:ncpus=8:mem=64gb\n    Resource_List.walltime = 23:59:00\n    stime = Wed Sep 16 02:09:11 2026\n    session_id = 234210\n    jobdir = /home/kristero10\n    substate = 42\n    Variable_List = PBS_O_HOME=/home/kristero10,PBS_O_LANG=en_US.UTF-8,\n\tPBS_O_LOGNAME=kristero10,\n\tPBS_O_PATH=/opt/intel/psxe2018/compilers_and_libraries_2018.5.274/linu\n\tx/mpi/intel64/bin:/opt/intel/psxe2019/compilers_and_libraries_2019.5.28\n\t1/linux/bin/intel64:/opt/intel/psxe2019/compilers_and_libraries_2019.5.\n\t281/linux/bin:/opt/intel/psxe2019/compilers_and_libraries_2019.5.281/li\n\tnux/mpi/intel64/libfabric/bin:/opt/intel/psxe2019/compilers_and_librari\n\tes_2019.5.281/linux/mpi/intel64/bin:/opt/intel/psxe2019/debugger_2019/g\n\tdb/intel64/bin:/opt/local/bin:/home/anaconda3/bin:/home/anaconda3/conda\n\tbin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/usr/bin:/opt/ibutils/bin:/opt\n\t/pbs/bin:/opt/intel/psxe2019/parallel_studio_xe_2019.5.075/bin,\n\tPBS_O_MAIL=/var/mail/kristero10,PBS_O_SHELL=/bin/bash,\n\tPBS_O_WORKDIR=/home/kristero10,PBS_O_SYSTEM=Linux,PBS_O_QUEUE=mini2,\n\tPBS_O_HOST=idark.ipmu.jp\n    etime = Wed Sep 16 01:53:57 2026\n    run_count = 1\n    Submit_arguments = /lustre/work/kristero10/tsz_guardrail_study_20260915/run\n\t_more_tails.pbs\n    project = _pbs_project_default\n\n",
+  "reason": "Prioritize full-observable pixel convergence before additional interpolation-only examples; active 8k jobs untouched.",
+  "qdel": {
+    "returncode": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "replacement": {
+    "returncode": 0,
+    "stdout": "597908.idark\n",
+    "stderr": ""
+  }
+}

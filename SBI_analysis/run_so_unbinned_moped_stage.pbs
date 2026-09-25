@@ -1,0 +1,45 @@
+#!/bin/bash
+#PBS -N SO_unbin
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=32gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${CAMPAIGN:?Set CAMPAIGN to the staged campaign directory}"
+: "${STAGE:?Set STAGE to prepare, train_evaluate, evaluate, or summarize}"
+: "${METHOD:=unbinned_moped}"
+: "${PYTHON:=/home/anaconda3/bin/python3}"
+: "${APP_THREADS:=${PBS_NCPUS:-26}}"
+: "${EVAL_MAX_PROPOSALS:=5000000}"
+: "${EVAL_SAMPLING_SECONDS:=600}"
+export OMP_NUM_THREADS="${APP_THREADS}" OPENBLAS_NUM_THREADS="${APP_THREADS}"
+export MKL_NUM_THREADS="${APP_THREADS}" NUMEXPR_NUM_THREADS="${APP_THREADS}"
+export TORCH_NUM_THREADS="${APP_THREADS}" TORCH_NUM_INTEROP_THREADS=1
+# Torch/SBI are installed in the cluster user's Python 3.8 site-packages.
+unset PYTHONNOUSERSITE
+export PYTHONUNBUFFERED=1 MPLBACKEND=Agg
+UNBINNED_STARTED_UTC=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+record_exit() {
+  UNBINNED_EXIT_CODE=$?
+  trap - EXIT
+  "${PYTHON}" -c 'import datetime,json,os,socket,sys; from pathlib import Path; Path(sys.argv[1]).write_text(json.dumps(dict(exit_code=int(sys.argv[2]),job_id=os.environ.get("PBS_JOBID"),host=socket.gethostname(),threads=int(os.environ["OMP_NUM_THREADS"]),started_utc=sys.argv[3],finished_utc=datetime.datetime.utcnow().isoformat()+"Z"),indent=2)+"\n")' \
+    "${CAMPAIGN}/logs/${STAGE}_${METHOD}.status.json" "${UNBINNED_EXIT_CODE}" "${UNBINNED_STARTED_UTC}"
+  exit "${UNBINNED_EXIT_CODE}"
+}
+trap record_exit EXIT
+exec > "${CAMPAIGN}/logs/${STAGE}_${METHOD}.log" 2>&1
+cd "${CAMPAIGN}/code"
+if [[ "${STAGE}" != "prepare" ]]; then
+  "${PYTHON}" -c 'import sys, torch, sbi, nflows; print("Runtime:", sys.executable, "Torch", torch.__version__, "SBI", sbi.__version__, flush=True)'
+fi
+if [[ "${STAGE}" == "train_evaluate" ]]; then
+  "${PYTHON}" run_so_unbinned_moped_comparison.py train --root "${CAMPAIGN}/analysis" --method "${METHOD}"
+  "${PYTHON}" run_so_unbinned_moped_comparison.py evaluate --root "${CAMPAIGN}/analysis" --method "${METHOD}" \
+    --max-proposals "${EVAL_MAX_PROPOSALS}" --sampling-seconds "${EVAL_SAMPLING_SECONDS}"
+elif [[ "${STAGE}" == "evaluate" ]]; then
+  "${PYTHON}" run_so_unbinned_moped_comparison.py evaluate --root "${CAMPAIGN}/analysis" --method "${METHOD}" \
+    --max-proposals "${EVAL_MAX_PROPOSALS}" --sampling-seconds "${EVAL_SAMPLING_SECONDS}"
+else
+  "${PYTHON}" run_so_unbinned_moped_comparison.py "${STAGE}" --root "${CAMPAIGN}/analysis" --method "${METHOD}"
+fi

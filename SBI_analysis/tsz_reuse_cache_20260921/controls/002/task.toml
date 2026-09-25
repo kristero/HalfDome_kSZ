@@ -1,0 +1,27 @@
+id = 2
+label = "shared_geometry_four_profiles"
+mode = "fused"
+nodes = [ 512, 256, 128,]
+nside = 8192
+threads = 26
+pixel_targets = [ 4096,]
+[[cases]]
+label = "Battaglia12"
+theta = [ 18.1, 0.497, 4.35, 0.154, -0.00865, 0.0393, -0.758, 0.731, 0.415,]
+reference_id = 0
+
+[[cases]]
+label = "FL_L1_m9"
+theta = [ 27.895767029523494, 1.3742797203838153, 8.096506971978265, 0.24068706895722208, -0.3708722120914735, -0.027131779826878644, -3.2950451155410274, 1.3212811497156247, 0.7123048539608454,]
+reference_id = 1
+
+[[cases]]
+label = "compact"
+theta = [ 18.1, 0.025, 16, 0.154, -0.00865, 0.0393, -0.758, 0.731, 0.415,]
+reference_id = 2
+
+[[cases]]
+label = "extended_shallow"
+theta = [ 18.1, 4, 2.8, 0.154, -0.00865, 0, -0.758, 0.731, 0,]
+reference_id = 4
+

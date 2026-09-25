@@ -1,0 +1,32 @@
+{
+  "utc": "2026-09-22T12:49:20.641253+00:00",
+  "sha256": {
+    "pixel_quadrature.csv": "52eb2bf1ccac8cff5bcda859bc92c73c45893c09ab33e0177ff0b1ccea1cc917",
+    "publish_and_cleanup.py": "c5ac881b0ea8ff150ed400feb409c203dcefe6d7e9f34b443eee1035ed54e3b6",
+    "build_report.py": "c0344a0b1efceefbdedc13e5c14199d02599f22d43d9de127cba847be65dcd09",
+    "cluster_evidence.py": "3d3dd786cadce9fbb85699b45e35ce571c510b012cbd419bfbca4683979e3c9d",
+    "timings.csv": "55b5062ad833c79c671e5449ff0965862573ac85b9a09ddde7dcacecf8d62732",
+    "analyze_completed.py": "921542b574987c2cff85f69f50375a9729283cdcf0d2e528fb95301bde4f61bf",
+    "FILES.md": "a9dc445c81ceda4a4e78aacf5fb8992597bdc62c6585af7d313d2cee49fd2d16",
+    "errors.csv": "78218273d896eb21b9815295e20a347d7d644d6ef42235b1b1304c0a43ba90ae",
+    "cleanup.json": "9a63c50fd40fc945044108daee90f2408c26cc74e314a1d3b4eced062a1748eb",
+    "resolution.csv": "1192eb07eb890b7fac3e04f1b9b8e85aabe11c274212cf13b978730efa6315c6",
+    "REPORT.md": "1f44a84a945b07e5ae2539bb8f44f9a7d3eccda277e646573afddab617750cf2",
+    "spectra.npz": "260a185a06d93856f00c09c76b6d7d57e77961981d27a2f60eed231777a3083f",
+    "cluster_audit.json": "84a505a3e3a9f141d5ca97920f340f8009e6abe0a88dd9d113c185ab6a18fcb2",
+    "make_plots.py": "ffc9569d639705ab987a223a108dfa3df4b9f3e2ab14bc7e31d82a42ab6f9c0a",
+    "results.json": "e8dc5aa6d8bcfd693cdaed4141225ad4635ffce16a6015cc3b6a46649773ed6c",
+    "qa.json": "01d02bebc9bd49a06e6edb6522da4969214c09659decc9eded0195fef4503d20",
+    "plots/painting_time.png": "62a1218470ed6559d3f37c68b2e1ab4a70d72d550d9522303e361a4b67c7afba",
+    "plots/resolution_spectra.png": "2c48e307dacdc361c723c46b5607a231da83c5ebca8151899abf7de14e5cf7d9",
+    "plots/pixel_refinement.png": "d72d8dd6098b0a59646bf0f3a9e02c5a2d1c3985d1055ad43fd669232a33e55e",
+    "plots/resolution_spectra.svg": "b3293ef1d3a932bf01e65602511d1aec4e7b60f3da2577910e379f4d9ced3658",
+    "plots/painting_time.svg": "7db081e2aec600b861072ed2fedffbe5c6fca37417965f7d84f4eb1079f7d74a",
+    "plots/cache_spectral_residuals.svg": "f955bc25d393e80b0fce950adc42f8a41a524a801deb9362767e9b7ff484d25f",
+    "plots/cache_common_reference.svg": "76f679e924a71fc52afb0f43a25dd9019f4fc4d9801d9f9e84f90ee752f8a26a",
+    "plots/cache_common_reference.png": "0911c49d0ca200413ba9409c5f7dba9bb1ada02a7bdca2577279c1564bcd5fa4",
+    "plots/pixel_refinement.svg": "3f1b1b36e913955cef9448ab2b87fbb3c8eff230a796b5884e66a95edda350b2",
+    "plots/cache_spectral_residuals.png": "107a22b708b799f3c6f55bbc275407c4693ce8ac165d0587e410b74682ab6d2a",
+    "report.pdf": "e818770e3591d673c0f2c78af084c893ed3a14c1cf6fef614f420a707b35b520"
+  }
+}

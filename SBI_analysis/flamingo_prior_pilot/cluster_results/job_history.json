@@ -1,0 +1,357 @@
+{
+  "completed_utc": "2026-09-14T15:00:18.787738Z",
+  "jobs": {
+    "roles": {
+      "fiducial": "597354.idark",
+      "other_feedback": "597380.idark",
+      "extremes": "597356.idark"
+    },
+    "diagnostics": "597381.idark",
+    "early": "597358.idark",
+    "fiducial_refinement": "597379.idark",
+    "other_feedback_previous": "597355.idark",
+    "diagnostics_previous": "597357.idark",
+    "fiducial_refinement_previous": "597371.idark",
+    "other_feedback_restart_previous": "597374.idark",
+    "diagnostics_move_previous": "597377.idark",
+    "plot_review": "597383.idark"
+  },
+  "final_diagnostics_exit_code": 0,
+  "map_attempts": {
+    "extreme_beta_high": {
+      "job_id": "597356.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 245.6951275076717,
+      "peak_rss_GiB": 11.084808349609375,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 245.6951275076717,
+          "peak_rss_GiB": 11.084808349609375,
+          "job_id": "597356.idark"
+        }
+      ]
+    },
+    "extreme_beta_low": {
+      "job_id": "597356.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 241.75629275292158,
+      "peak_rss_GiB": 11.11859130859375,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 241.75629275292158,
+          "peak_rss_GiB": 11.11859130859375,
+          "job_id": "597356.idark"
+        }
+      ]
+    },
+    "extreme_compact_steep_evolving": {
+      "job_id": "597356.idark",
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0165002122521,
+      "peak_rss_GiB": 0,
+      "attempts": [
+        {
+          "exit_code": 124,
+          "elapsed_seconds": 1200.0165002122521,
+          "peak_rss_GiB": null,
+          "job_id": "597356.idark"
+        }
+      ]
+    },
+    "extreme_mass_redshift_amplitude": {
+      "job_id": "597356.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 388.02878678031266,
+      "peak_rss_GiB": 11.01287841796875,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 388.02878678031266,
+          "peak_rss_GiB": 11.01287841796875,
+          "job_id": "597356.idark"
+        }
+      ]
+    },
+    "extreme_wide_steep": {
+      "job_id": "597356.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 244.48022609949112,
+      "peak_rss_GiB": 11.076675415039062,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 244.48022609949112,
+          "peak_rss_GiB": 11.076675415039062,
+          "job_id": "597356.idark"
+        }
+      ]
+    },
+    "extreme_xc_high": {
+      "job_id": "597356.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 258.140641387552,
+      "peak_rss_GiB": 11.105792999267578,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 258.140641387552,
+          "peak_rss_GiB": 11.105792999267578,
+          "job_id": "597356.idark"
+        }
+      ]
+    },
+    "fit_L1_m9_iter0": {
+      "job_id": "597349.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 364.62139293551445,
+      "peak_rss_GiB": 11.06649398803711,
+      "attempts": [
+        {
+          "exit_code": 1,
+          "elapsed_seconds": 324.2781797647476,
+          "peak_rss_GiB": 11.06649398803711,
+          "job_id": "597344.idark"
+        },
+        {
+          "exit_code": 1,
+          "elapsed_seconds": 1.9261869192123413,
+          "peak_rss_GiB": 0.4837532043457031,
+          "job_id": "597347.idark"
+        },
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 38.41702625155449,
+          "peak_rss_GiB": 1.6593055725097656,
+          "job_id": "597349.idark"
+        }
+      ]
+    },
+    "fit_L1_m9_iter1": {
+      "job_id": "597349.idark",
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0265336707234,
+      "peak_rss_GiB": 0,
+      "attempts": [
+        {
+          "exit_code": 124,
+          "elapsed_seconds": 1200.0265336707234,
+          "peak_rss_GiB": null,
+          "job_id": "597349.idark"
+        }
+      ]
+    },
+    "fit_L1_m9_iter2": {
+      "job_id": "597354.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 310.2809954956174,
+      "peak_rss_GiB": 11.05072021484375,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 310.2809954956174,
+          "peak_rss_GiB": 11.05072021484375,
+          "job_id": "597354.idark"
+        }
+      ]
+    },
+    "fit_L1_m9_iter3": {
+      "job_id": "597354.idark",
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0228825807571,
+      "peak_rss_GiB": 0,
+      "attempts": [
+        {
+          "exit_code": 124,
+          "elapsed_seconds": 1200.0228825807571,
+          "peak_rss_GiB": null,
+          "job_id": "597354.idark"
+        }
+      ]
+    },
+    "fit_L1_m9_iter4": {
+      "job_id": "597354.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 317.3021806627512,
+      "peak_rss_GiB": 10.9996337890625,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 317.3021806627512,
+          "peak_rss_GiB": 10.9996337890625,
+          "job_id": "597354.idark"
+        }
+      ]
+    },
+    "fit_L1_m9_secant0": {
+      "job_id": "597379.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 313.23265996947885,
+      "peak_rss_GiB": 11.12972640991211,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 313.23265996947885,
+          "peak_rss_GiB": 11.12972640991211,
+          "job_id": "597379.idark"
+        }
+      ]
+    },
+    "fit_Mstar-1sigma_iter0": {
+      "job_id": "597380.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 304.25210729427636,
+      "peak_rss_GiB": 11.15396499633789,
+      "attempts": [
+        {
+          "exit_code": 1,
+          "elapsed_seconds": 2.178506610915065,
+          "peak_rss_GiB": 0.4700126647949219,
+          "job_id": "597355.idark"
+        },
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 302.0736006833613,
+          "peak_rss_GiB": 11.15396499633789,
+          "job_id": "597380.idark"
+        }
+      ]
+    },
+    "fit_Mstar-1sigma_iter1": {
+      "job_id": "597380.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 302.14083836600184,
+      "peak_rss_GiB": 11.132122039794922,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 302.14083836600184,
+          "peak_rss_GiB": 11.132122039794922,
+          "job_id": "597380.idark"
+        }
+      ]
+    },
+    "fit_Mstar-1sigma_iter2": {
+      "job_id": "597380.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 294.2814323492348,
+      "peak_rss_GiB": 11.209648132324219,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 294.2814323492348,
+          "peak_rss_GiB": 11.209648132324219,
+          "job_id": "597380.idark"
+        }
+      ]
+    },
+    "fit_Mstar-1sigma_iter3": {
+      "job_id": "597380.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 297.2107222266495,
+      "peak_rss_GiB": 11.282196044921875,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 297.2107222266495,
+          "peak_rss_GiB": 11.282196044921875,
+          "job_id": "597380.idark"
+        }
+      ]
+    },
+    "fit_Mstar-1sigma_iter4": {
+      "job_id": "597380.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 290.6568727120757,
+      "peak_rss_GiB": 11.106414794921875,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 290.6568727120757,
+          "peak_rss_GiB": 11.106414794921875,
+          "job_id": "597380.idark"
+        }
+      ]
+    },
+    "fit_fgas-8sigma_iter0": {
+      "job_id": "597355.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 285.6673909891397,
+      "peak_rss_GiB": 11.124324798583984,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 285.6673909891397,
+          "peak_rss_GiB": 11.124324798583984,
+          "job_id": "597355.idark"
+        }
+      ]
+    },
+    "fit_fgas-8sigma_iter1": {
+      "job_id": "597355.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 274.5318259820342,
+      "peak_rss_GiB": 11.086170196533203,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 274.5318259820342,
+          "peak_rss_GiB": 11.086170196533203,
+          "job_id": "597355.idark"
+        }
+      ]
+    },
+    "fit_fgas-8sigma_iter2": {
+      "job_id": "597355.idark",
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0070134447888,
+      "peak_rss_GiB": 0,
+      "attempts": [
+        {
+          "exit_code": 124,
+          "elapsed_seconds": 1200.0070134447888,
+          "peak_rss_GiB": null,
+          "job_id": "597355.idark"
+        }
+      ]
+    },
+    "fit_fgas-8sigma_iter3": {
+      "job_id": "597355.idark",
+      "exit_code": 0,
+      "elapsed_seconds": 289.0972981788218,
+      "peak_rss_GiB": 11.279380798339844,
+      "attempts": [
+        {
+          "exit_code": 0,
+          "elapsed_seconds": 289.0972981788218,
+          "peak_rss_GiB": 11.279380798339844,
+          "job_id": "597355.idark"
+        }
+      ]
+    },
+    "fit_fgas-8sigma_iter4": {
+      "job_id": "597355.idark",
+      "exit_code": 124,
+      "elapsed_seconds": 1200.0072701675817,
+      "peak_rss_GiB": 0,
+      "attempts": [
+        {
+          "exit_code": 124,
+          "elapsed_seconds": 1200.0072701675817,
+          "peak_rss_GiB": null,
+          "job_id": "597355.idark"
+        }
+      ]
+    }
+  },
+  "preparation_job": "597339.idark",
+  "notes": [
+    "Completed original campaign remains unchanged.",
+    "597355 stopped at a map boundary to restart the optimizer with its recorded maximum beta=40 numerical cap.",
+    "tracejob confirmed that moving jobs 597371/597374/597377 encountered stale references to deleted dependency 597357; fresh mini2 jobs 597379/597380/597381 completed.",
+    "Individual source-era proposal constraints, parameter requests and run receipts are retained.",
+    "Full-map failed candidates remain recorded; completed-map throughput excludes them."
+  ],
+  "plot_review_exit_code": 0
+}

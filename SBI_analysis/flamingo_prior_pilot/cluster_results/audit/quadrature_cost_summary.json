@@ -1,0 +1,15 @@
+{
+  "probes": 926,
+  "native_budget_hits": 2,
+  "budget_hits_outside_painted_disc": 2,
+  "largest_native_evaluation_count": 4123,
+  "largest_scaled_evaluation_count": 247,
+  "scaled_counts_at_native_budget_hits": [
+    19,
+    19
+  ],
+  "maximum_regular_value_relative_disagreement": 1.136868377216225e-13,
+  "regular_value_comparison_threshold": 1e-280,
+  "conclusion": "Native faint-tail integration can hit a relative-precision floor far outside 4R200; this is a numerical failure, not physical exclusion",
+  "scope": "Bounded diagnostic only; production operators were not replaced"
+}

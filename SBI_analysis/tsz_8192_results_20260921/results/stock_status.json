@@ -1,0 +1,42 @@
+[
+  {
+    "case": "parse",
+    "returncode": 0,
+    "seconds": 9.005494556000485
+  },
+  {
+    "case": "B12",
+    "returncode": 0,
+    "seconds": 8.45705575700049
+  },
+  {
+    "case": "compact_pivot",
+    "returncode": 0,
+    "seconds": 8.403391949999786
+  },
+  {
+    "case": "steep_cache",
+    "returncode": 0,
+    "seconds": 8.403866488999483
+  },
+  {
+    "case": "steep_occupied",
+    "returncode": 0,
+    "seconds": 8.251478043999668
+  },
+  {
+    "case": "shallow",
+    "returncode": 0,
+    "seconds": 8.25240566100183
+  },
+  {
+    "case": "tail_underflow",
+    "returncode": 0,
+    "seconds": 8.302779385998292
+  },
+  {
+    "case": "stress_slow",
+    "returncode": 0,
+    "seconds": 7.797799873002077
+  }
+]

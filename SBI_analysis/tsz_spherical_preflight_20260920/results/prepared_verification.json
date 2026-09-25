@@ -1,0 +1,38 @@
+{
+  "count": 256,
+  "training_pool": 192,
+  "heldout": 64,
+  "unique_split_seeds": 512,
+  "generated_rows": 0,
+  "diagnostic_jobs": {},
+  "source_sha256": {
+    "diagnostic.py": "4b4c73d86bb8e9c80e346def735d33aac19a50688dff98a0500e4debd6ba9fee",
+    "diagnostic_row.jl": "422749c34e765ded467ddd4d4e9e07decf2bf53b343540efe049cffbbfeb2402",
+    "fullsky_test.jl": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+    "spherical_truncation_profiles.jl": "00316f3fbcce4e218fe4282426d322573d960b8be8b787b5bab8d935e49f1cff",
+    "design_tests.py": "a788da1b70d951afcf74e9203be0dfb9f434ca18654f7121c4d407184fc3337f"
+  },
+  "analysis_sha256": "7d62216fc0294e8c8be7f241fb2f8d413c2b3eead5354eedb21313cc8c8fbe69",
+  "moped_module_sha256": "992b3250e664afd411bd9a84fee4416200325112a614865f325f5be19459d494",
+  "moped_input": {
+    "ell_min": 80,
+    "ell_max": 7979,
+    "features": 7900,
+    "binned": false
+  },
+  "observation_multipoles": {
+    "L1_m9": 7900,
+    "fgas-8sigma": 7900,
+    "Mstar-1sigma": 7900
+  },
+  "runtime": {
+    "numpy": "1.24.4",
+    "scipy": "1.10.1",
+    "sklearn": "0.24.2",
+    "torch": "2.4.1+cu121",
+    "sbi": "0.22.0"
+  },
+  "loader_signature": "(self, starting_round: int = 0, training_batch_size: int = 50, validation_fraction: float = 0.1, resume_training: bool = False, dataloader_kwargs: Union[dict, NoneType] = None) -> Tuple[torch.utils.data.dataloader.DataLoader, torch.utils.data.dataloader.DataLoader]",
+  "scope": "Read-only preparation verification; no physical row or inference run",
+  "utc": "2026-09-20T15:29:57.645436+00:00"
+}

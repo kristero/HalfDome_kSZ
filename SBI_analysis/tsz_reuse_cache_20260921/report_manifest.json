@@ -1,0 +1,21 @@
+{
+  "sha256": {
+    "README.md": "f68972fea3a255752e80c4a9f21ab3101c2373f9b240e11ec74512f882993c44",
+    "REPORT.md": "90f98493dba5c4d3a4afb7762485e338c4a8c5851e99842e02f12a2965d92efb",
+    "PIXEL_PROGRESS.md": "3e7e2c27a254b0a95a20e976fbdef03fcebb2fdaaffaa24441ec6b6680678fd4",
+    "FILES.md": "b6e1d457e669e27454f8d6d0d254099351552e18bfd5021c4d53470c13aa2375",
+    "report_progress.py": "4b5189f2987018c44ae210fae7be0db8efb4130c4c8edbbde41a8ff23dfc1764",
+    "pixel_progress.py": "cec571f23bc51a2db6b3a9717baeb52dd5eb34221d40f8506807ec498150f83f",
+    "fetch.py": "fdc4506667b271f65c33eb116d2fef53f853e93185a32d3cc3fca585119a366e",
+    "snapshot_cluster.py": "3ed90a03af46b3c61801286cb14cff4c153c0fdb04ddc6ec23e36f69be493e63",
+    "publish_report.py": "65f2c5ac5c0c46891ecccb69e70b1064d7a775eb67d6b6d166565a5c095c3acf",
+    "results/progress.json": "d3af7252067c5dd4d687e0fa50e6c6cfb6795774e22bf5659a67fd5a2440b222",
+    "results/pixel_progress.json": "639b551a9d362752cc056abc95c7bf784b95708ca0c3c892d79b392ce6481346",
+    "results/cluster_snapshot.json": "db830fe38475cd12aeb3b6f7a365010e60ed65e0ff3f1fa39d7295dbf02296e2",
+    "followup/recovery.json": "025baa90e43aac57b5f35ae48bb45ad119bbe2c1d6dc36e0c54f72e78570f7b4",
+    "edge_extension/README.md": "0e022f9215b70fb81e5a40e02b8a44460f7279261198e21e33ab7f1195d869cd",
+    "plots/cache_noise_accuracy.png": "3cae69611a4b49256fa251bd7ded032566889b693ecc7f86e9ff092e9d751b72",
+    "plots/pixel_quadrature_progress.png": "044a993b148e752ce157fcda5bcedb130a42ae22da50a6e5c227f825ba50a237",
+    "plots/cache_probe_accuracy.png": "ba61cb9bbf89ced70c342368c9332a31aecccbe70fb7a3209f6945c50e2d0106"
+  }
+}

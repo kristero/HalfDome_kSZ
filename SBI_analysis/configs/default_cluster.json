@@ -1,0 +1,45 @@
+{
+  "combined_dataset_path": "/lustre/work/kristero10/tSZ_data/emulator_battaglia_y100_y102_full/combined_battaglia_profiles.npz",
+  "emulator_artifact_path": "/lustre/work/kristero10/tSZ_data/emulator_battaglia_y100_y102_full/battaglia_tsz_emulator.joblib",
+  "output_dir": "/lustre/work/kristero10/tSZ_data/sbi_battaglia9_full_ell",
+  "observed_spectrum_path": "",
+  "observed_input_kind": "auto",
+  "data_vector": "log10_dl",
+  "ell_min": 2,
+  "ell_max": 4096,
+  "random_seed": 1234,
+  "prior": {
+    "P0": [2.0, 25.0],
+    "xc": [0.12, 0.70],
+    "beta": [3.8, 5.2],
+    "alpha_m_P0": [0.0, 0.30],
+    "alpha_m_xc": [-0.08, 0.08],
+    "alpha_m_beta": [0.0, 0.08],
+    "alpha_z_P0": [-1.10, -0.40],
+    "alpha_z_xc": [0.10, 0.90],
+    "alpha_z_beta": [0.25, 0.55]
+  },
+  "noise": {
+    "mode": "paired_lightcone_diagonal",
+    "target": "single_lightcone",
+    "scale": 1.0,
+    "sigma_floor": 1.0e-4
+  },
+  "simulator": {
+    "num_simulations": 20000,
+    "batch_size": 512,
+    "add_noise": true,
+    "include_dataset_simulations": true,
+    "save_training_data": true
+  },
+  "sbi": {
+    "method": "SNPE",
+    "density_estimator": "maf",
+    "training_batch_size": 256,
+    "max_num_epochs": 300,
+    "validation_fraction": 0.1,
+    "posterior_samples": 50000,
+    "posterior_predictive_samples": 512,
+    "device": "cpu"
+  }
+}

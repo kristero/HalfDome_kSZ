@@ -1,0 +1,62 @@
+{
+  "parity_passed": true,
+  "rows": [
+    {
+      "label": "Battaglia12",
+      "relative_Dell_l2": 6.835399339767015e-16
+    },
+    {
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 7.719985338993383e-16
+    },
+    {
+      "label": "compact",
+      "relative_Dell_l2": 4.872701597876443e-16
+    },
+    {
+      "label": "extended_shallow",
+      "relative_Dell_l2": 7.887430999757213e-16
+    }
+  ],
+  "status": {
+    "returncode": 0,
+    "seconds": 1121.880189154297,
+    "job": "598578.idark"
+  },
+  "timing": {
+    "mode": "fused",
+    "output_nside": 4096,
+    "threads": 26,
+    "ell_max": 7979,
+    "scope": "Fixed-cosmology controls, not production certification",
+    "catalogue_seconds": 892.1228928565979,
+    "selected_halos_per_case": [
+      85224251,
+      85224251,
+      85224251,
+      85224251
+    ],
+    "raw_nside": 8192,
+    "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+    "nodes": [
+      512,
+      256,
+      128
+    ],
+    "noise_generated": false,
+    "peak_raw_map_GiB": 24.0,
+    "cases": 4,
+    "timings": {
+      "selection": 2.530707597732544,
+      "cache": 59.97525191307068,
+      "allocation": 10.62477993965149,
+      "masked_spectrum": 12.842313051223755,
+      "read_positions": 7.02186918258667,
+      "painting": 878.5634202957153,
+      "output_alm2map": 25.133979082107544,
+      "read_mass_redshift": 2.94530987739563,
+      "map2alm": 47.46920919418335
+    }
+  },
+  "ell_max": 7979
+}

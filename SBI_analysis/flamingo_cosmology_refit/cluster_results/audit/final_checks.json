@@ -1,0 +1,66 @@
+{
+  "passed": true,
+  "maps": [
+    {
+      "name": "L1_m9_iter0",
+      "column_checks": 108,
+      "maximum_column_relative_error": 2.6645352591003757e-15,
+      "peak_rss_GiB": 11.472206115722656,
+      "elapsed_seconds": 292.01521085202694,
+      "optimizer_success": false,
+      "optimizer_message": "The maximum number of function evaluations is exceeded.",
+      "response_resolution_error": 0.00047038077019856406
+    },
+    {
+      "name": "L1_m9_iter1",
+      "column_checks": 108,
+      "maximum_column_relative_error": 4.773959005888173e-15,
+      "peak_rss_GiB": 11.770751953125,
+      "elapsed_seconds": 283.6501187644899,
+      "optimizer_success": false,
+      "optimizer_message": "The maximum number of function evaluations is exceeded.",
+      "response_resolution_error": 0.0005181301496007817
+    },
+    {
+      "name": "fgas-8sigma_iter0",
+      "column_checks": 108,
+      "maximum_column_relative_error": 2.4424906541753444e-15,
+      "peak_rss_GiB": 11.480705261230469,
+      "elapsed_seconds": 287.3334646280855,
+      "optimizer_success": false,
+      "optimizer_message": "The maximum number of function evaluations is exceeded.",
+      "response_resolution_error": 0.0005362682687588549
+    },
+    {
+      "name": "fgas-8sigma_iter1",
+      "column_checks": 108,
+      "maximum_column_relative_error": 3.6637359812630166e-15,
+      "peak_rss_GiB": 11.501914978027344,
+      "elapsed_seconds": 267.45847376808524,
+      "optimizer_success": true,
+      "optimizer_message": "`xtol` termination condition is satisfied.",
+      "response_resolution_error": 0.0005374655638515913
+    },
+    {
+      "name": "Mstar-1sigma_iter0",
+      "column_checks": 108,
+      "maximum_column_relative_error": 3.4416913763379853e-15,
+      "peak_rss_GiB": 11.699729919433594,
+      "elapsed_seconds": 283.13987105339766,
+      "optimizer_success": false,
+      "optimizer_message": "The maximum number of function evaluations is exceeded.",
+      "response_resolution_error": 0.0004536526659487672
+    },
+    {
+      "name": "Mstar-1sigma_iter1",
+      "column_checks": 108,
+      "maximum_column_relative_error": 1.7763568394002505e-15,
+      "peak_rss_GiB": 11.580875396728516,
+      "elapsed_seconds": 282.8660781122744,
+      "optimizer_success": false,
+      "optimizer_message": "The maximum number of function evaluations is exceeded.",
+      "response_resolution_error": 0.00047297380473321216
+    }
+  ],
+  "scope": "Full-map numerics and prior support; cosmology transfer remains approximate"
+}

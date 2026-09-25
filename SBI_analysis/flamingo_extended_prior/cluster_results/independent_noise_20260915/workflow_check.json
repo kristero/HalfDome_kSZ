@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "synthetic_forward_model": true,
+  "failed_row_retried_without_replacement": true,
+  "successful_rows_not_recomputed": true,
+  "packed_chunk_resume_passed": true,
+  "collector_ordering_passed": true,
+  "corrupted_parameters_rejected": true
+}

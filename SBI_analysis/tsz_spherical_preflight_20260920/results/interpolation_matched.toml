@@ -1,0 +1,30 @@
+[[cases]]
+relative_error_p50_p95_p99_max = [2.5133858327919256e-9, 1.1608279050945292e-6, 0.000136323721486767, 0.00040144351830051495]
+grid_factor = 1
+theta_max_rad = 98217.18891880372
+h = 0.68
+central_scaled_error_p50_p95_p99_max = [1.3117145520591477e-10, 5.65651090315789e-8, 0.00011419316671643063, 0.00040139752354360393]
+cache_underflow_cells = 6851
+angular_pad = 256
+case = "compact"
+scope = "Pointwise cache + historical angular floor; not a bandpower error budget"
+Omega_b = 0.049
+Omega_c = 0.261
+seconds = 28.877744913101196
+theta_min_rad = 1.0181517217181793e-11
+angular_floor_hits = 214
+[[cases]]
+relative_error_p50_p95_p99_max = [1.3343959270883943e-10, 2.5706939627000694e-8, 0.00012880825727815842, 0.0004014434157961766]
+grid_factor = 2
+theta_max_rad = 98217.18891880372
+h = 0.68
+central_scaled_error_p50_p95_p99_max = [7.191566267529393e-12, 1.199455002870084e-9, 0.00011688457481370301, 0.0004013974210510565]
+cache_underflow_cells = 50491
+angular_pad = 256
+case = "compact"
+scope = "Pointwise cache + historical angular floor; not a bandpower error budget"
+Omega_b = 0.049
+Omega_c = 0.261
+seconds = 172.1829710006714
+theta_min_rad = 1.0181517217181793e-11
+angular_floor_hits = 214

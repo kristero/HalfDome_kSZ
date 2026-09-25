@@ -1,0 +1,1106 @@
+{
+  "utc": "2026-09-21T12:31:29.032297+00:00",
+  "queue": "",
+  "jobs": {
+    "598526": {
+      "returncode": 0,
+      "qstat": "qstat: PBS is not configured to maintain job history 598526.idark\n"
+    },
+    "598527": {
+      "returncode": 0,
+      "qstat": "qstat: PBS is not configured to maintain job history 598527.idark\n"
+    },
+    "598528": {
+      "returncode": 0,
+      "qstat": "qstat: PBS is not configured to maintain job history 598528.idark\n"
+    },
+    "598529": {
+      "returncode": 0,
+      "qstat": "qstat: PBS is not configured to maintain job history 598529.idark\n"
+    },
+    "598530": {
+      "returncode": 0,
+      "qstat": "qstat: PBS is not configured to maintain job history 598530.idark\n"
+    },
+    "598533": {
+      "returncode": 0,
+      "qstat": "qstat: PBS is not configured to maintain job history 598533.idark\n"
+    },
+    "598534": {
+      "returncode": 0,
+      "qstat": "qstat: PBS is not configured to maintain job history 598534.idark\n"
+    },
+    "598535": {
+      "returncode": 0,
+      "qstat": "qstat: PBS is not configured to maintain job history 598535.idark\n"
+    }
+  },
+  "roots": {
+    "tsz_8192_validation_recovery_20260921": [
+      {
+        "task_id": 0,
+        "returncode": 0,
+        "seconds": 4248.909454066306,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-20T22:08:34.554440+00:00"
+      },
+      {
+        "task_id": 1,
+        "returncode": 0,
+        "seconds": 5264.335048474371,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-20T23:36:18.899186+00:00"
+      },
+      {
+        "task_id": 2,
+        "returncode": 0,
+        "seconds": 934.3619863130152,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-20T23:51:53.271209+00:00"
+      },
+      {
+        "task_id": 3,
+        "returncode": 0,
+        "seconds": 445.52710167411715,
+        "attempt": 0,
+        "job": "598456.idark",
+        "utc": "2026-09-20T23:59:09.765004+00:00"
+      },
+      {
+        "task_id": 4,
+        "returncode": 0,
+        "seconds": 877.3044596500695,
+        "attempt": 0,
+        "job": "598456.idark",
+        "utc": "2026-09-21T00:13:47.079418+00:00"
+      },
+      {
+        "task_id": 5,
+        "returncode": 0,
+        "seconds": 382.83671309705824,
+        "attempt": 0,
+        "job": "598456.idark",
+        "utc": "2026-09-21T00:20:09.926967+00:00"
+      },
+      {
+        "task_id": 6,
+        "returncode": 0,
+        "seconds": 909.8697147434577,
+        "attempt": 0,
+        "job": "598456.idark",
+        "utc": "2026-09-21T00:35:19.805571+00:00"
+      },
+      {
+        "task_id": 7,
+        "returncode": 0,
+        "seconds": 447.70708865486085,
+        "attempt": 0,
+        "job": "598453.idark",
+        "utc": "2026-09-21T00:42:21.339297+00:00"
+      },
+      {
+        "task_id": 8,
+        "returncode": 0,
+        "seconds": 949.7202633582056,
+        "attempt": 0,
+        "job": "598456.idark",
+        "utc": "2026-09-21T00:57:40.531915+00:00"
+      },
+      {
+        "task_id": 9,
+        "returncode": 0,
+        "seconds": 459.4285538196564,
+        "attempt": 0,
+        "job": "598454.idark",
+        "utc": "2026-09-21T01:04:58.735821+00:00"
+      },
+      {
+        "task_id": 10,
+        "returncode": 0,
+        "seconds": 965.2358046323061,
+        "attempt": 0,
+        "job": "598454.idark",
+        "utc": "2026-09-21T01:21:03.981248+00:00"
+      },
+      {
+        "task_id": 11,
+        "returncode": 0,
+        "seconds": 974.9611356891692,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T01:37:14.109659+00:00"
+      },
+      {
+        "task_id": 12,
+        "returncode": 0,
+        "seconds": 1118.2334115058184,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T01:55:52.353898+00:00"
+      },
+      {
+        "task_id": 13,
+        "returncode": 0,
+        "seconds": 965.6834383644164,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T02:11:58.046934+00:00"
+      },
+      {
+        "task_id": 14,
+        "returncode": 0,
+        "seconds": 895.1761909797788,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T02:26:53.231471+00:00"
+      },
+      {
+        "task_id": 15,
+        "returncode": 0,
+        "seconds": 901.5143493339419,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T02:41:54.754713+00:00"
+      },
+      {
+        "task_id": 16,
+        "returncode": 0,
+        "seconds": 894.9627726599574,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T02:56:49.727111+00:00"
+      },
+      {
+        "task_id": 17,
+        "returncode": 0,
+        "seconds": 892.747153185308,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T03:11:42.483701+00:00"
+      },
+      {
+        "task_id": 18,
+        "returncode": 0,
+        "seconds": 897.0126144066453,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T03:26:39.505117+00:00"
+      },
+      {
+        "task_id": 19,
+        "returncode": 0,
+        "seconds": 894.7440305165946,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T03:41:34.257857+00:00"
+      },
+      {
+        "task_id": 20,
+        "returncode": 0,
+        "seconds": 891.8557756505907,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T03:56:26.122947+00:00"
+      },
+      {
+        "task_id": 21,
+        "returncode": 0,
+        "seconds": 886.4258665964007,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T04:11:12.558525+00:00"
+      },
+      {
+        "task_id": 22,
+        "returncode": 0,
+        "seconds": 884.3127405792475,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T04:25:56.880901+00:00"
+      },
+      {
+        "task_id": 23,
+        "returncode": 0,
+        "seconds": 891.4751869365573,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T04:40:48.365595+00:00"
+      },
+      {
+        "task_id": 24,
+        "returncode": 0,
+        "seconds": 880.542929649353,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T04:55:28.917412+00:00"
+      },
+      {
+        "task_id": 25,
+        "returncode": 0,
+        "seconds": 882.9077592492104,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T05:10:11.835342+00:00"
+      },
+      {
+        "task_id": 26,
+        "returncode": 0,
+        "seconds": 880.6428252868354,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T05:24:52.486282+00:00"
+      },
+      {
+        "task_id": 27,
+        "returncode": 0,
+        "seconds": 880.5281785652041,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T05:39:33.023396+00:00"
+      },
+      {
+        "task_id": 28,
+        "returncode": 0,
+        "seconds": 886.8337511084974,
+        "attempt": 0,
+        "job": "598455.idark",
+        "utc": "2026-09-21T05:54:19.865724+00:00"
+      },
+      {
+        "task_id": 29,
+        "returncode": 0,
+        "seconds": 980.6538172196597,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T07:00:16.501060+00:00"
+      },
+      {
+        "task_id": 30,
+        "returncode": 0,
+        "seconds": 992.624420536682,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T06:59:47.586473+00:00"
+      },
+      {
+        "task_id": 31,
+        "returncode": 0,
+        "seconds": 894.666469283402,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T07:02:17.774813+00:00"
+      },
+      {
+        "task_id": 32,
+        "returncode": 0,
+        "seconds": 1059.823718905449,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T07:05:39.551135+00:00"
+      },
+      {
+        "task_id": 33,
+        "returncode": 0,
+        "seconds": 963.2768498286605,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T07:16:19.785102+00:00"
+      },
+      {
+        "task_id": 34,
+        "returncode": 0,
+        "seconds": 971.8207347076386,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T07:15:59.414072+00:00"
+      },
+      {
+        "task_id": 35,
+        "returncode": 0,
+        "seconds": 889.6955031193793,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T07:17:07.477480+00:00"
+      },
+      {
+        "task_id": 36,
+        "returncode": 0,
+        "seconds": 1087.7346990928054,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T07:23:47.292617+00:00"
+      },
+      {
+        "task_id": 37,
+        "returncode": 0,
+        "seconds": 1011.0507878996432,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T07:33:10.842311+00:00"
+      },
+      {
+        "task_id": 38,
+        "returncode": 0,
+        "seconds": 979.4136232528836,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T07:32:18.835164+00:00"
+      },
+      {
+        "task_id": 39,
+        "returncode": 0,
+        "seconds": 854.4199919421226,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T07:31:21.905772+00:00"
+      },
+      {
+        "task_id": 40,
+        "returncode": 0,
+        "seconds": 1082.9365197885782,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T07:41:50.237608+00:00"
+      },
+      {
+        "task_id": 41,
+        "returncode": 0,
+        "seconds": 1023.830186355859,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T07:50:14.680219+00:00"
+      },
+      {
+        "task_id": 42,
+        "returncode": 0,
+        "seconds": 977.5418684855103,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T07:48:36.401733+00:00"
+      },
+      {
+        "task_id": 43,
+        "returncode": 0,
+        "seconds": 865.446648593992,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T07:45:47.359853+00:00"
+      },
+      {
+        "task_id": 44,
+        "returncode": 0,
+        "seconds": 1081.2116530016065,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T07:59:51.457804+00:00"
+      },
+      {
+        "task_id": 45,
+        "returncode": 0,
+        "seconds": 972.991681592539,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T08:06:27.678358+00:00"
+      },
+      {
+        "task_id": 46,
+        "returncode": 0,
+        "seconds": 974.8619380444288,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T08:04:51.270521+00:00"
+      },
+      {
+        "task_id": 47,
+        "returncode": 0,
+        "seconds": 873.8755514789373,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T08:00:21.242852+00:00"
+      },
+      {
+        "task_id": 48,
+        "returncode": 0,
+        "seconds": 1092.311880653724,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T08:18:03.776689+00:00"
+      },
+      {
+        "task_id": 49,
+        "returncode": 0,
+        "seconds": 1093.4452546313405,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T08:24:41.129444+00:00"
+      },
+      {
+        "task_id": 50,
+        "returncode": 0,
+        "seconds": 977.6746204085648,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T08:21:08.951698+00:00"
+      },
+      {
+        "task_id": 51,
+        "returncode": 0,
+        "seconds": 859.0207250546664,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T08:14:40.272793+00:00"
+      },
+      {
+        "task_id": 52,
+        "returncode": 0,
+        "seconds": 1051.9621328432113,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T08:35:35.746269+00:00"
+      },
+      {
+        "task_id": 53,
+        "returncode": 0,
+        "seconds": 986.0919097848237,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T08:41:07.228750+00:00"
+      },
+      {
+        "task_id": 54,
+        "returncode": 0,
+        "seconds": 979.6383209321648,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T08:37:28.598513+00:00"
+      },
+      {
+        "task_id": 55,
+        "returncode": 0,
+        "seconds": 882.5125293284655,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T08:29:22.791879+00:00"
+      },
+      {
+        "task_id": 56,
+        "returncode": 0,
+        "seconds": 1091.034287005663,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T08:53:46.788410+00:00"
+      },
+      {
+        "task_id": 57,
+        "returncode": 0,
+        "seconds": 984.9289639517665,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T08:57:32.165071+00:00"
+      },
+      {
+        "task_id": 58,
+        "returncode": 0,
+        "seconds": 976.7079198975116,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T08:53:45.313865+00:00"
+      },
+      {
+        "task_id": 59,
+        "returncode": 0,
+        "seconds": 879.3039791285992,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T08:44:02.103313+00:00"
+      },
+      {
+        "task_id": 60,
+        "returncode": 0,
+        "seconds": 1195.2661308944225,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T09:13:42.061401+00:00"
+      },
+      {
+        "task_id": 61,
+        "returncode": 0,
+        "seconds": 968.1649426445365,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T09:13:40.339724+00:00"
+      },
+      {
+        "task_id": 62,
+        "returncode": 0,
+        "seconds": 982.2509344872087,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T09:10:07.571153+00:00"
+      },
+      {
+        "task_id": 63,
+        "returncode": 0,
+        "seconds": 881.5334136784077,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T08:58:43.643045+00:00"
+      },
+      {
+        "task_id": 64,
+        "returncode": 0,
+        "seconds": 1057.0097962878644,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T09:31:19.079472+00:00"
+      },
+      {
+        "task_id": 65,
+        "returncode": 0,
+        "seconds": 977.0013132803142,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T09:29:57.347155+00:00"
+      },
+      {
+        "task_id": 66,
+        "returncode": 0,
+        "seconds": 979.1408338472247,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T09:26:26.719267+00:00"
+      },
+      {
+        "task_id": 67,
+        "returncode": 0,
+        "seconds": 876.7540133763105,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T09:13:20.404022+00:00"
+      },
+      {
+        "task_id": 68,
+        "returncode": 0,
+        "seconds": 1004.4557189941406,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T09:48:03.542088+00:00"
+      },
+      {
+        "task_id": 69,
+        "returncode": 0,
+        "seconds": 962.7135444991291,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T09:46:00.066962+00:00"
+      },
+      {
+        "task_id": 70,
+        "returncode": 0,
+        "seconds": 1104.5362397190183,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T09:44:51.262360+00:00"
+      },
+      {
+        "task_id": 71,
+        "returncode": 0,
+        "seconds": 871.1332940272987,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T09:27:51.544625+00:00"
+      },
+      {
+        "task_id": 72,
+        "returncode": 0,
+        "seconds": 989.7815788816661,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T10:04:33.331225+00:00"
+      },
+      {
+        "task_id": 73,
+        "returncode": 0,
+        "seconds": 928.7996494732797,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T10:01:28.873235+00:00"
+      },
+      {
+        "task_id": 74,
+        "returncode": 0,
+        "seconds": 1105.4947097245604,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T10:03:16.764685+00:00"
+      },
+      {
+        "task_id": 75,
+        "returncode": 0,
+        "seconds": 882.2137964852154,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T09:42:33.764879+00:00"
+      },
+      {
+        "task_id": 76,
+        "returncode": 0,
+        "seconds": 982.2139460816979,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T10:20:55.552617+00:00"
+      },
+      {
+        "task_id": 77,
+        "returncode": 0,
+        "seconds": 919.5894935112447,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T10:16:48.469906+00:00"
+      },
+      {
+        "task_id": 78,
+        "returncode": 0,
+        "seconds": 991.2499844655395,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T06:43:14.949724+00:00"
+      },
+      {
+        "task_id": 79,
+        "returncode": 0,
+        "seconds": 1273.634636938572,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T06:47:23.096085+00:00"
+      },
+      {
+        "task_id": 80,
+        "returncode": 0,
+        "seconds": 1220.8232196886092,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T06:28:15.789832+00:00"
+      },
+      {
+        "task_id": 81,
+        "returncode": 0,
+        "seconds": 1092.7255621310323,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T06:26:07.691992+00:00"
+      },
+      {
+        "task_id": 82,
+        "returncode": 0,
+        "seconds": 1128.7255655881017,
+        "attempt": 0,
+        "job": "598528.idark",
+        "utc": "2026-09-21T06:26:43.692498+00:00"
+      },
+      {
+        "task_id": 83,
+        "returncode": 0,
+        "seconds": 1094.4872866328806,
+        "attempt": 0,
+        "job": "598529.idark",
+        "utc": "2026-09-21T06:26:09.454993+00:00"
+      },
+      {
+        "task_id": 84,
+        "returncode": 0,
+        "seconds": 1183.9133758600801,
+        "attempt": 0,
+        "job": "598526.idark",
+        "utc": "2026-09-21T06:47:59.711772+00:00"
+      },
+      {
+        "task_id": 85,
+        "returncode": 0,
+        "seconds": 1068.1363738495857,
+        "attempt": 0,
+        "job": "598527.idark",
+        "utc": "2026-09-21T06:43:55.835288+00:00"
+      }
+    ],
+    "tsz_8192_noise_extremes_20260921": [
+      {
+        "task_id": 86,
+        "returncode": 0,
+        "seconds": 5605.9082718119025,
+        "attempt": 0,
+        "job": "598533.idark",
+        "utc": "2026-09-21T07:57:23.994688+00:00"
+      },
+      {
+        "task_id": 87,
+        "returncode": 0,
+        "seconds": 5432.595121271908,
+        "attempt": 0,
+        "job": "598534.idark",
+        "utc": "2026-09-21T07:54:33.361050+00:00"
+      }
+    ]
+  },
+  "noise_checks": {
+    "tsz_8192_validation_recovery_20260921": {
+      "0": {
+        "finite_spectra": 256,
+        "draws": 128
+      },
+      "1": {
+        "finite_spectra": 256,
+        "draws": 128
+      },
+      "2": {
+        "finite_spectra": 2,
+        "draws": 2
+      },
+      "3": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "4": {
+        "finite_spectra": 2,
+        "draws": 2
+      },
+      "5": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "6": {
+        "finite_spectra": 2,
+        "draws": 2
+      },
+      "7": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "8": {
+        "finite_spectra": 2,
+        "draws": 2
+      },
+      "9": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "10": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "11": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "12": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "13": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "14": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "15": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "16": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "17": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "18": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "19": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "20": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "21": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "22": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "23": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "24": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "25": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "26": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "27": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "28": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "29": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "30": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "31": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "32": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "33": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "34": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "35": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "36": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "37": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "38": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "39": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "40": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "41": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "42": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "43": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "44": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "45": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "46": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "47": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "48": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "49": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "50": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "51": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "52": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "53": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "54": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "55": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "56": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "57": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "58": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "59": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "60": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "61": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "62": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "63": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "64": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "65": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "66": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "67": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "68": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "69": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "70": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "71": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "72": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "73": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "74": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "75": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "76": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "77": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "78": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "79": {
+        "finite_spectra": 0,
+        "draws": 0
+      },
+      "80": {
+        "finite_spectra": 2,
+        "draws": 2
+      },
+      "81": {
+        "finite_spectra": 2,
+        "draws": 2
+      },
+      "82": {
+        "finite_spectra": 2,
+        "draws": 2
+      },
+      "83": {
+        "finite_spectra": 2,
+        "draws": 2
+      },
+      "84": {
+        "finite_spectra": 2,
+        "draws": 2
+      },
+      "85": {
+        "finite_spectra": 2,
+        "draws": 2
+      }
+    },
+    "tsz_8192_noise_extremes_20260921": {
+      "86": {
+        "finite_spectra": 256,
+        "draws": 128
+      },
+      "87": {
+        "finite_spectra": 256,
+        "draws": 128
+      }
+    }
+  }
+}

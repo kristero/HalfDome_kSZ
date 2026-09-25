@@ -1,0 +1,32 @@
+{
+  "code_sha256": {
+    "check_response.py": "f2a1d9fab351700cc2398fabb206e0d9814dac3a32d9d3d7b6123a649fc65be1",
+    "independent_noise.jl": "daca9ecc61eb7f08f10554e82950f8d95e5ae0d2e1cd6ec09c2e434848e2d0a9",
+    "prior.json": "300ee6769cf5e5e5d0f3c670a5a1e80a5748dabda8ffe034dbb70f4dec2344f0",
+    "run_analysis.pbs": "8e0e7dedc7d63c00f83ad6a5fb71a1a3b51c9f72aaf3af8c2df2d864d3bfbdfe",
+    "prior.py": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0",
+    "forward_proposals.py": "92a4243c03fc8a8d7bb3b8e0bf7ba7766cb024d0c616ea012030e68f769d6be3",
+    "halo_response.py": "8895866c9f70f3c1d814425a6b30e3c2064f59aaabe6244d0b68fdea286bab2c",
+    "background.py": "1e9844786c464d5cfd2cde8903c6b536026fbcf6d0a0a54ae30c7de9dbf59cd5",
+    "prior_model.py": "4c3670d82402578f370a3f509e6cb51cdc2df742ed69bbc3db2de7e038c477e5",
+    "stable_los.jl": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+    "cosmologies.json": "ea3d8d9fb695a278a319f14799f502763d403285397ae20be657ca9f6785952c",
+    "run_config.json": "b6b54b0687d403d5f6e518dd40c10af11dae7b378d08253b70da75530b9b816e",
+    "noise_seeds.py": "f76ef01bb5926e7e8bec7921b6eb60ab4036b312e2d4d590e77f5b03a51bcb92",
+    "worker.py": "448d91d1f95b0fde566cfbad594bc30815b9307c5ec8198ac8a1dedc709f5353",
+    "paint_row.jl": "a390825874831907aa492852ac93a6142e6595735bb31a27123dfc32f86f5cec",
+    "refit.py": "8e222ef3e8dca3255504b8c800e6b69ca8e1b6e7ee803bc105d41fa12362fb3e"
+  },
+  "input_sha256": {
+    "projection_table.npz": "1b5ac597d3de19be1a717305922cbd9f919941634cf9f01c09a0a6165bb989d6",
+    "catalogue_quadrature.npz": "4fbcf03939bac630f006ac40dca3d2cb3dfedde1309d1141cb38c2898a498fbe",
+    "pilot_results.json": "b4a64e52ae557ed0ad00b3eb571f34cd1df89649efe1d70b12968fe5a754d565",
+    "catalogue_support.json": "2a47bc00733c74a4eff56987805d2a3b25a5cf78d886e86395d31aeab3332ba9"
+  },
+  "dependencies": {
+    "camb": "1.5.9",
+    "colossus": "1.3.9"
+  },
+  "user_choice": "Include abundance and geometry using an approximate halo-model cosmology correction",
+  "production_root": "/lustre/work/kristero10/halfdome_flamingo_extended_8192_20260915"
+}

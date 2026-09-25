@@ -1,0 +1,6 @@
+corner_columns = 36864
+max_relative_error = 7.251559330508738e-13
+rtol = 1.0e-10
+reference_points = 10180
+maxevals = 4096
+failure_path_passed = true

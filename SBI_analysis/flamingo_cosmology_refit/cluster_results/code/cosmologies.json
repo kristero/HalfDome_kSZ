@@ -1,0 +1,27 @@
+{
+  "halfdome_native": {
+    "h": 0.6774, "Omega_m": 0.3089, "Omega_b": 0.0486,
+    "sigma8": 0.8159, "n_s": 0.9667, "mnu_eV": 0.0,
+    "source": "https://arxiv.org/html/2407.17462v2"
+  },
+  "flamingo_D3A": {
+    "h": 0.681, "Omega_m": 0.306, "Omega_b": 0.0486,
+    "A_s": 2.099e-9, "sigma8_published_rounded": 0.807,
+    "n_s": 0.967, "mnu_eV": 0.06,
+    "source": "https://flamingo.strw.leidenuniv.nl/simulations.html"
+  },
+  "halfdome_legacy_painter": {
+    "h": 0.68, "Omega_m": 0.31, "Omega_b": 0.049,
+    "catalogue_mass_divisor": 0.68,
+    "note": "This is the preserved painter configuration, not the N-body cosmology."
+  },
+  "background": {"T_CMB_K": 2.7255, "N_eff": 3.046},
+  "response": {
+    "model": "Tinker08 M200c, Tinker10 bias, CAMB linear cold+baryon power; projected GNFW to 4 R200",
+    "redshift_selection": "same full HalfDome support in numerator and denominator; cosmology-only comparison",
+    "neutrino_prescription": "cold+baryon variance and mean density for halo mass function and bias",
+    "pressure_baryon_fraction": "Omega_b/Omega_m, following the existing pressure convention",
+    "mask": "smooth binned cosmology ratio applied to exact masked HalfDome spectrum; mask-response approximation",
+    "interpretation": "Approximate halo-model correction, not a new N-body realization or FLAMINGO halo-profile measurement"
+  }
+}

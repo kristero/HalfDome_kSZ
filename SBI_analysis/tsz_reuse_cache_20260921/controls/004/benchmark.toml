@@ -1,0 +1,24 @@
+mode = "fused"
+output_nside = 4096
+threads = 26
+ell_max = 7979
+scope = "Fixed-cosmology controls, not production certification"
+catalogue_seconds = 2005.9246640205383
+selected_halos_per_case = [85224251, 85224251, 85224251, 85224251]
+raw_nside = 8192
+mask_sha256 = "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689"
+nodes = [512, 128, 128]
+noise_generated = false
+peak_raw_map_GiB = 24.0
+cases = 4
+
+[timings]
+selection = 3.1920857429504395
+cache = 42.63328981399536
+allocation = 11.836982011795044
+masked_spectrum = 14.30606484413147
+read_positions = 7.587419509887695
+painting = 1990.572015285492
+output_alm2map = 34.37733507156372
+read_mass_redshift = 3.100339412689209
+map2alm = 58.26022267341614

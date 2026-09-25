@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_diagnostic_256_8192_prepared_20260921
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=26 MKL_NUM_THREADS=1
+: "${DIAGNOSTIC_WORKER:?Set one of 0,1,2,3}"
+/home/anaconda3/bin/python3 diagnostic.py --count 256 --threads 26 --worker "$DIAGNOSTIC_WORKER" --workers 4

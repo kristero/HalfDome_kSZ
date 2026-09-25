@@ -1,0 +1,15 @@
+beta_alpha_m = 0.0393
+gamma_amp = -0.3
+alpha_alpha_m = 0.0
+alpha_alpha_z = 0.0
+beta_amp = 2.8
+gamma_alpha_z = 0.0
+x_c_alpha_m = -0.00865
+P0_alpha_m = 0.154
+x_c_amp = 0.497
+x_c_alpha_z = 0.731
+P0_alpha_z = -0.758
+beta_alpha_z = 0.415
+gamma_alpha_m = 0.0
+P0_amp = 18.1
+alpha_amp = 1.0

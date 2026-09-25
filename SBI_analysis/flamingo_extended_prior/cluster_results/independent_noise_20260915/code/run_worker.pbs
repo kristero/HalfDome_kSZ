@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -N extended_tsz
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${RUN_ROOT:?Set RUN_ROOT to the frozen run directory}"
+CHUNK="${CHUNK:-${PBS_ARRAY_INDEX:-}}"
+: "${CHUNK:?Set CHUNK or use a PBS array index}"
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=26
+export PYTHONUNBUFFERED=1 HDF5_USE_FILE_LOCKING=FALSE MPLBACKEND=Agg
+# Bash 4.3 treats an empty array as unset under nounset; keep both branches
+# explicit so the production branch works on the cluster's older shell.
+if [[ "${PREFLIGHT:-0}" == "1" ]]; then
+    exec /home/anaconda3/bin/python3 "${RUN_ROOT}/code/worker.py" \
+        --root "${RUN_ROOT}" --chunk "${CHUNK}" --preflight
+else
+    exec /home/anaconda3/bin/python3 "${RUN_ROOT}/code/worker.py" \
+        --root "${RUN_ROOT}" --chunk "${CHUNK}"
+fi

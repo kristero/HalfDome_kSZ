@@ -1,0 +1,52 @@
+{
+  "bin_weighting": "2ell_plus_1",
+  "cases": {
+    "masked_baseline_noise_cross_deproj0": {
+      "n_rows": 524288,
+      "obs_index": 524287,
+      "obs_source": "dataset-row",
+      "path": "/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz",
+      "product": "masked_baseline_noise_cross_deproj0",
+      "sobol_global_row_validation": {},
+      "source_cl_path": "/lustre/work/kristero10/adrian_dataset/sbi_masked_baseline_noise_cross_deproj0_cl.npy",
+      "source_metadata_csv_path": "/lustre/work/kristero10/adrian_dataset/sbi_masked_baseline_noise_cross_deproj0_metadata.csv",
+      "source_metadata_path": "/lustre/work/kristero10/adrian_dataset/sbi_masked_baseline_noise_cross_deproj0.npz",
+      "source_sobol_csv_path": "",
+      "source_sobol_global_row_path": "",
+      "test_last_n": 500,
+      "theta_source": "metadata_npz_theta",
+      "x_shape": [
+        524288,
+        40
+      ]
+    },
+    "masked_no_noise": {
+      "n_rows": 524288,
+      "obs_index": 524287,
+      "obs_source": "dataset-row",
+      "path": "/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_no_noise_ell80_7979_sbi_run.npz",
+      "product": "masked_no_noise",
+      "sobol_global_row_validation": {},
+      "source_cl_path": "/lustre/work/kristero10/adrian_dataset/sbi_masked_no_noise_cl.npy",
+      "source_metadata_csv_path": "/lustre/work/kristero10/adrian_dataset/sbi_masked_no_noise_metadata.csv",
+      "source_metadata_path": "/lustre/work/kristero10/adrian_dataset/sbi_masked_no_noise.npz",
+      "source_sobol_csv_path": "",
+      "source_sobol_global_row_path": "",
+      "test_last_n": 500,
+      "theta_source": "metadata_npz_theta",
+      "x_shape": [
+        524288,
+        40
+      ]
+    }
+  },
+  "ell_max": 7979.0,
+  "ell_min": 80.0,
+  "ell_selection": "center",
+  "ell_tag": "ell80_7979",
+  "input_dir": "/lustre/work/kristero10/adrian_dataset",
+  "missing_products": [],
+  "obs_source": "dataset-row",
+  "output_dir": "/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow",
+  "source": "adrian_consolidated_so_sbi_dataset"
+}

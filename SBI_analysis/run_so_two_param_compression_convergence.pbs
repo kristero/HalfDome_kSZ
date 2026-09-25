@@ -1,0 +1,48 @@
+#!/bin/bash
+#PBS -N SO2_compress
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=32gb
+#PBS -l walltime=23:59:00
+#PBS -o /home/kristero10/logs/SBI_runs/
+#PBS -e /home/kristero10/logs/SBI_runs/
+#PBS -S /bin/bash
+set -euo pipefail
+: "${COMPARISON_CONFIG:?Supply the experiment configuration file}"
+source "${COMPARISON_CONFIG}"
+: "${STAGE:=run}"
+: "${METHOD:=bins40}"
+: "${N_TRAIN:=256}"
+: "${PYTHON:=python3}"
+mkdir -p "${ROOT}/logs"
+exec > >(tee -a "${ROOT}/logs/${STAGE}_${METHOD}_N${N_TRAIN}_${PBS_JOBID:-manual}.log") 2>&1
+export OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=26 MKL_NUM_THREADS=26
+export TORCH_NUM_THREADS=26 TORCH_NUM_INTEROP_THREADS=1 PYTHONUNBUFFERED=1 MPLBACKEND=Agg
+cd "${CODE_DIR}"
+echo "Started $(date -Is) on $(hostname); stage=${STAGE}, root=${ROOT}"
+SCRIPT="${CODE_DIR}/run_so_two_param_compression_convergence.py"
+case "${STAGE}" in
+  prepare)
+    if [[ ! -f "${DATASET}" ]]; then
+      set -- --data "${RAW_DATA}" --sobol-csv "${SOBOL_CSV}" \
+        --expected-csv-sha256 "${CSV_SHA256}" --holdout-last-n "${HOLDOUT}" \
+        --prior-low "${P0_LOW}" "${BETA_LOW}" --prior-high "${P0_HIGH}" "${BETA_HIGH}" \
+        --battaglia-raw "${BATTAGLIA_RAW}" --output "${DATASET}"
+      if [[ "${ALLOW_CSV_PREFIX:-0}" == "1" ]]; then
+        set -- "$@" --allow-csv-prefix
+      fi
+      "${PYTHON}" "${CODE_DIR}/prepare_so_two_param_combined_convergence.py" "$@"
+    fi
+    "${PYTHON}" "${SCRIPT}" setup --data "${DATASET}" --root "${ROOT}" --fixed-noise \
+      --sizes "${SIZES}" --holdout "${HOLDOUT}" --samples "${POSTERIOR_SAMPLES}"
+    "${PYTHON}" "${SCRIPT}" prepare --root "${ROOT}"
+    ;;
+  run)
+    "${PYTHON}" "${CODE_DIR}/run_so_sbi_compression_comparison.py" check-runtime
+    "${PYTHON}" "${SCRIPT}" run --root "${ROOT}" --method "${METHOD}" --n-train "${N_TRAIN}"
+    ;;
+  summarize)
+    "${PYTHON}" "${SCRIPT}" summarize --root "${ROOT}"
+    ;;
+  *) echo "Unknown stage ${STAGE}" >&2; exit 2 ;;
+esac
+echo "Finished $(date -Is)"

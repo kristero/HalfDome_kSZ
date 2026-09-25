@@ -1,0 +1,32 @@
+{
+  "L1_m9": {
+    "source_sha256": {
+      "masked_clean_cl.npy": "7b1b8e5fc08d8671fdfa992e0eb547dde137e0f6aa10d65922ab1380de4f48f4",
+      "masked_noisy_cross_cl.npy": "fe852a3d5a9a85382b2bdd6ba15b5a9517f835e2342ae6f7e2100e06cfc75569",
+      "complete.toml": "2ca6edd7a0a8e33735cbde12dbdf52b3cd9b47b6a5a3d29dbd1501325039468a"
+    },
+    "convention": "Existing 2 arcmin beam, fsky .4 mask and fixed observation noise; direct FL cosmology",
+    "moped_input": "7900 individual D_ell values, ell=80..7979; no binning",
+    "interpretation": "Out-of-family observation, not a gNFW parameter truth"
+  },
+  "fgas-8sigma": {
+    "source_sha256": {
+      "masked_clean_cl.npy": "6c17f6abc88dfcca5277702ed332a820a8fca77af3f7fa810da43e2f39898436",
+      "masked_noisy_cross_cl.npy": "3677bffc90a868d5b3fd2cbcf48afe431d2430cb3c2d24eabaabd1ddfcc344a0",
+      "complete.toml": "c777ec340f32a882bf8c470243fee64de25bae049078807e2a9b3680693085f1"
+    },
+    "convention": "Existing 2 arcmin beam, fsky .4 mask and fixed observation noise; direct FL cosmology",
+    "moped_input": "7900 individual D_ell values, ell=80..7979; no binning",
+    "interpretation": "Out-of-family observation, not a gNFW parameter truth"
+  },
+  "Mstar-1sigma": {
+    "source_sha256": {
+      "masked_clean_cl.npy": "cd262ce1e08add3e444c9103f2533ba717ce9fee5465e02b4c0bdac1b45e1b27",
+      "masked_noisy_cross_cl.npy": "89366e63f2d6b72f124dae2c1971dba99275b880797d1413ec0edb91a848bcbc",
+      "complete.toml": "cd43b699cde010185fdf0d143ab91c126bf9196aa2b53181972920b3fd67c485"
+    },
+    "convention": "Existing 2 arcmin beam, fsky .4 mask and fixed observation noise; direct FL cosmology",
+    "moped_input": "7900 individual D_ell values, ell=80..7979; no binning",
+    "interpretation": "Out-of-family observation, not a gNFW parameter truth"
+  }
+}

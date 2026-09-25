@@ -1,0 +1,97 @@
+{
+  "prepared_dataset": "/misc/home/kristero10/HalfDome_kSZ/SBI_analysis/data_for_cluster/adrian_so_sbi_cases_ell80_7979_dataset_row_sobolrow/so_masked_baseline_noise_cross_deproj0_ell80_7979_sbi_run.npz",
+  "raw_dir": "/lustre/work/kristero10/adrian_dataset",
+  "fisher_analysis_dir": "/lustre/work/kristero10/adrian_fisher_baseline_deproj0/analysis",
+  "output_dir": "/lustre/work/kristero10/adrian_fisher_baseline_deproj0/analysis/covariance_convergence",
+  "sizes": [
+    500,
+    1000,
+    2000,
+    5000,
+    10000,
+    20000
+  ],
+  "preferred_method": "detrended_oas",
+  "preferred_max_n_metrics": {
+    "n_rows": 20000,
+    "method": "detrended_oas",
+    "method_label": "Detrended, OAS",
+    "detrended": true,
+    "shrinkage": 0.00016205219999068532,
+    "hartlap_factor": 0.9979498974948747,
+    "local_distance_median": 0.5660978782817604,
+    "local_distance_max": 0.6115533285921465,
+    "local_random_covariance_frobenius": 0.8182492807695457,
+    "local_random_sigma_ratio_min": 0.24270287323628056,
+    "local_random_sigma_ratio_median": 0.46384517117716206,
+    "local_random_sigma_ratio_max": 0.6666702609881766,
+    "residual_r2_median": 1.3952322935883998e-07,
+    "residual_r2_max": 2.1190743637600207e-07,
+    "residual_parameter_correlation_abs_max": 0.0002691394702301606,
+    "detrend_features": 10,
+    "detrend_fit_rank_min": 10,
+    "covariance_condition_before_floor": 4801936.306727176,
+    "covariance_condition_after_floor": 4801936.306727176,
+    "covariance_modes_floored": 0,
+    "fisher_condition_before_floor": 70852853511.04385,
+    "fisher_condition_after_floor": 9999999999.999998,
+    "fisher_modes_floored": 1,
+    "fisher_identified_rank": 6,
+    "fisher_identified_condition": 23137431.061143607
+  },
+  "constraint_convergence": {
+    "available": true,
+    "method": "detrended_oas",
+    "previous_n": 10000,
+    "final_n": 20000,
+    "relative_change_by_parameter": {
+      "P0": 0.08012064051670388,
+      "xc": 0.08843514063111088,
+      "beta": 0.06862480459251187,
+      "alpha_m_P0": 0.07922645071469636,
+      "alpha_m_xc": 0.0853417672897589,
+      "alpha_m_beta": 0.056861789221160454,
+      "alpha_z_P0": 0.06827099246376822,
+      "alpha_z_xc": 0.07218918244741282,
+      "alpha_z_beta": 0.07788125688678178
+    },
+    "maximum_relative_change": 0.08843514063111088,
+    "p0_relative_change": 0.08012064051670388,
+    "beta_relative_change": 0.06862480459251187
+  },
+  "fisher_floor_relative_range_by_parameter": {
+    "P0": 83.72661205009646,
+    "xc": 112.91906818545267,
+    "beta": 123.27763436908573,
+    "alpha_m_P0": 104.28177019854762,
+    "alpha_m_xc": 134.86720124231354,
+    "alpha_m_beta": 111.36588287585062,
+    "alpha_z_P0": 126.40920918002837,
+    "alpha_z_xc": 129.02401065026683,
+    "alpha_z_beta": 72.23500874571067
+  },
+  "configuration": {
+    "random_rows": 20000,
+    "bin_weighting": "2ell_plus_1",
+    "fixed_shrinkage": 0.05,
+    "detrend_degree": 1,
+    "crossfit_folds": 5,
+    "covariance_eigenvalue_floor": 1e-10,
+    "fisher_eigenvalue_floor": 1e-10,
+    "fisher_rcond": 1e-08,
+    "hartlap_applied": true,
+    "oas_hartlap_caveat": "Hartlap is exact for an unshrunk sample covariance, not OAS; at N=20000 and p=40 its numerical effect is about 0.2%."
+  },
+  "acceptance_checks": {
+    "local_residual_r2_below_0p05": true,
+    "p0_beta_last_step_below_10pct": true,
+    "all_constraints_last_step_below_10pct": true,
+    "all_fisher_modes_identified_at_rcond": false,
+    "p0_beta_floor_sensitivity_below_10pct": false
+  },
+  "limitations": [
+    "One noisy realization exists per theta, so detrending assumes a smooth conditional residual mean.",
+    "Fixed-theta repeated noise realizations remain the preferred covariance source.",
+    "A uniform bounded prior has no local Gaussian Fisher curvature; weak Fisher modes must not be hidden by flooring."
+  ]
+}

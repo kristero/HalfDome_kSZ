@@ -1,0 +1,7 @@
+box_corners = 512
+underflow_count = 976
+scope = "Scalar projection and amplitude; not interpolation or map fidelity"
+seconds = 4.004045009613037
+maximum_y = 12340.892951453303
+maximum_amplitude_on_grid = 134.61977433139464
+columns = 36864

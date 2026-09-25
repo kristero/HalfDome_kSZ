@@ -1,0 +1,30 @@
+{
+  "task": {
+    "id": 82,
+    "label": "compact_recheck",
+    "theta": [
+      18.1,
+      0.025,
+      16,
+      0.154,
+      -0.00865,
+      0.0393,
+      -0.758,
+      0.731,
+      0.415
+    ],
+    "nside": 8192,
+    "grid_factor": 1,
+    "noise_draws": 2,
+    "lean_maps": false,
+    "threads": 26,
+    "repeats_task": 2,
+    "identity_sha256": "7328bebf51f94338231fe023c87495396e422635a1e5f04ddbf265395a66abc2"
+  },
+  "source_sha256": {
+    "control.jl": "62de98e5f604f42f80149a10761f6d25c43ddf757324da460cc9219f5e07e690",
+    "fullsky_test.jl": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+    "spherical_truncation_profiles.jl": "d76ddb2bcbb90e1335ef1f80593b9a9a4a1f2892277bd30d91eb05850e8bd487",
+    "worker.py": "d4b727e91f23e4523b64789c776ac5ddfe405d3b6d3c5c14e9575903fd315304"
+  }
+}

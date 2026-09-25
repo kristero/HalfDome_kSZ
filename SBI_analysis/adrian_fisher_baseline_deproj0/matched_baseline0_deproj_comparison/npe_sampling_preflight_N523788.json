@@ -1,0 +1,39 @@
+{
+  "run_dir": "/misc/home/kristero10/HalfDome_kSZ/SBI_analysis/outputs/cluster_outputs/SBI_Adrian_SO_dataset_size_ell80_7979_dataset_row_metadata_verified_asinh/masked_baseline_noise_cross_deproj0/job_N523788/N523788",
+  "n_train": 523788,
+  "sampling_method": "mcmc",
+  "mcmc_method": "slice_np_vectorized",
+  "mcmc_warmup_steps": 200,
+  "mcmc_thin": 2,
+  "mcmc_num_chains": 8,
+  "mcmc_num_workers": 1,
+  "leakage": {
+    "status": "ok",
+    "n_raw_samples": 10000,
+    "n_finite": 10000,
+    "n_within_prior": 0,
+    "fraction_within_prior": 0.0,
+    "raw_min": [
+      161392.796875,
+      0.7651713490486145,
+      8.334980964660645,
+      -0.267947256565094,
+      0.2509487569332123,
+      0.3317264914512634,
+      -1.4005459547042847,
+      -1.0088294744491577,
+      0.4146097004413605
+    ],
+    "raw_max": [
+      443813.6875,
+      1.219227910041809,
+      9.10141372680664,
+      -0.04440804198384285,
+      0.5228885412216187,
+      0.3951944410800934,
+      -0.7219344973564148,
+      -0.782753050327301,
+      0.9240065217018127
+    ]
+  }
+}

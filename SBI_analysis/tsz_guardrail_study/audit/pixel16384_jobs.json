@@ -1,0 +1,43 @@
+{
+  "time": "2026-09-15T21:31:42.662117",
+  "jobs": [
+    {
+      "command": [
+        "qsub",
+        "-N",
+        "guard16k_B12",
+        "-q",
+        "mini2",
+        "-l",
+        "select=1:ncpus=8:mem=128gb",
+        "-o",
+        "/lustre/work/kristero10/tsz_guardrail_study_20260915/logs/pixel16384_Battaglia12.log",
+        "-v",
+        "STUDY_CASES=Battaglia12,STUDY_GRIDS=pixel2,STUDY_PIXEL_NSIDE=16384",
+        "/lustre/work/kristero10/tsz_guardrail_study_20260915/code/run_maps.pbs"
+      ],
+      "stdout": "597931.idark\n",
+      "stderr": "",
+      "returncode": 0
+    },
+    {
+      "command": [
+        "qsub",
+        "-N",
+        "guard16k_FL",
+        "-q",
+        "mini2",
+        "-l",
+        "select=1:ncpus=8:mem=128gb",
+        "-o",
+        "/lustre/work/kristero10/tsz_guardrail_study_20260915/logs/pixel16384_FL_L1_m9.log",
+        "-v",
+        "STUDY_CASES=FL_L1_m9,STUDY_GRIDS=pixel2,STUDY_PIXEL_NSIDE=16384",
+        "/lustre/work/kristero10/tsz_guardrail_study_20260915/code/run_maps.pbs"
+      ],
+      "stdout": "597932.idark\n",
+      "stderr": "",
+      "returncode": 0
+    }
+  ]
+}

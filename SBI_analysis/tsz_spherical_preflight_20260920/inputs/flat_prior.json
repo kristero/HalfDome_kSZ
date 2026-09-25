@@ -1,0 +1,41 @@
+{
+  "parameter_order": [
+    "P0",
+    "xc",
+    "beta",
+    "alpha_m_P0",
+    "alpha_m_xc",
+    "alpha_m_beta",
+    "alpha_z_P0",
+    "alpha_z_xc",
+    "alpha_z_beta"
+  ],
+  "lower": [
+    1.0,
+    0.025,
+    2.8,
+    -0.6,
+    -1.0,
+    -0.2,
+    -6.0,
+    -1.5,
+    -0.5
+  ],
+  "upper": [
+    60.0,
+    4.0,
+    16.0,
+    1.5,
+    0.4,
+    0.4,
+    0.5,
+    3.0,
+    2.0
+  ],
+  "density": "independent uniform in physical values; no rejection or FLAMINGO weighting",
+  "seed": 20260920,
+  "sampler": "scrambled Sobol; fixed seed and dimension preserve prefixes",
+  "physical_model": "B12 alpha=1, gamma=-0.3, pressure truncated at 4 physical R200c",
+  "old_dataset_reuse": "No clean spectrum can be relabelled across cylindrical/spherical geometry",
+  "production_status": "Not certified: full-map rendering and inference gates outstanding"
+}

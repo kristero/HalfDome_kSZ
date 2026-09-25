@@ -1,0 +1,461 @@
+{
+  "utc": "2026-09-15T21:38:44.416239",
+  "checks": [
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/manifest.json",
+      "original": "994333174a0c5a1e636a5cc065d000464ea3b4ddee2bb0082ccb4cfdd70cc600",
+      "current": "994333174a0c5a1e636a5cc065d000464ea3b4ddee2bb0082ccb4cfdd70cc600",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/process_maps.jl",
+      "original": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+      "current": "9804daebd07d195fdea7394ebbfeadd2f5488ad0643c80ae091d9f39ddacdd81",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_tSZ_visuals.jl",
+      "original": "a610742bc184f19d19c10b43b92a11856d7034f79ebf205db43af0cdc34216b9",
+      "current": "a610742bc184f19d19c10b43b92a11856d7034f79ebf205db43af0cdc34216b9",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/HalfDome_tSZ.jl",
+      "original": "211d17a59fcae9f53f7ba225ca2ff9167946d34b2d94f0c5795843089ace8411",
+      "current": "211d17a59fcae9f53f7ba225ca2ff9167946d34b2d94f0c5795843089ace8411",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_halfdome_fullsky_so_noise.jl",
+      "original": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+      "current": "f8232b253c6cef671a9a07f710e3060a184b2bc0e6f9eb66a3f526fbda4383fb",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_unphysical_vs_fiducial_full_map_default_grid.jl",
+      "original": "c466826ee33e1dbe8a3e5b8170a933a89a2a5d358e1eb629429d3ccdaefd8a21",
+      "current": "c466826ee33e1dbe8a3e5b8170a933a89a2a5d358e1eb629429d3ccdaefd8a21",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/painting.jl",
+      "original": "09d6abe4fff6c7bcbf2facdfebd4f072ed4c0d52ba895302d0aa86b409a9df9c",
+      "current": "09d6abe4fff6c7bcbf2facdfebd4f072ed4c0d52ba895302d0aa86b409a9df9c",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/build_interpolator_cache.jl",
+      "original": "55e4c5b40e19b022899a58b9656ef33913011197ee903cbecac1b55623012e5e",
+      "current": "55e4c5b40e19b022899a58b9656ef33913011197ee903cbecac1b55623012e5e",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/instrumentation.jl",
+      "original": "7294e60ba35ea21c50063dc0f8caaf05cde1eb90f07d4a956f769c39dcaa250c",
+      "current": "7294e60ba35ea21c50063dc0f8caaf05cde1eb90f07d4a956f769c39dcaa250c",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_single_profile.jl",
+      "original": "2d67b40b2551526af072f1db99a274b6b5a51863b58dee13bf81b3b6677c7533",
+      "current": "2d67b40b2551526af072f1db99a274b6b5a51863b58dee13bf81b3b6677c7533",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/config.jl",
+      "original": "a2e15531003b4360472d5173d538ddd9f9ec62a4072846308570922e30f8b3e8",
+      "current": "a2e15531003b4360472d5173d538ddd9f9ec62a4072846308570922e30f8b3e8",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_sobol_full_maps.jl",
+      "original": "536bdd0f74475723ce5d61ec20fcc2829ebbdf748c5d3a27834e27f611f05e1d",
+      "current": "536bdd0f74475723ce5d61ec20fcc2829ebbdf748c5d3a27834e27f611f05e1d",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_full_map.jl",
+      "original": "7c63e1426f8f4ea33a0b0746b021d4b8b515932f50b57c9b944cdce055f6a1c8",
+      "current": "7c63e1426f8f4ea33a0b0746b021d4b8b515932f50b57c9b944cdce055f6a1c8",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/catalog_halfdome.jl",
+      "original": "bae2d0e20e50e68e33396298b3dadd9f2d8106983818d81b503fb2ca0ad9d334",
+      "current": "bae2d0e20e50e68e33396298b3dadd9f2d8106983818d81b503fb2ca0ad9d334",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_xgpaint_binned40_edge_profiles.jl",
+      "original": "4c439a01867e0433552d548a3e1eab3d79a3e5bd3dd745a0c4eecc058dca27b0",
+      "current": "4c439a01867e0433552d548a3e1eab3d79a3e5bd3dd745a0c4eecc058dca27b0",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/generate_cosmology_0p05pct_variations.jl",
+      "original": "71249a16b17424d0dc76fca8071039f90f5284ae638f0bc860c668a9af19302b",
+      "current": "71249a16b17424d0dc76fca8071039f90f5284ae638f0bc860c668a9af19302b",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/catalog_websky.jl",
+      "original": "0a2db62935f40c679cc676c37a0c0ba1936874b359338e36462b1b8a97f19e24",
+      "current": "0a2db62935f40c679cc676c37a0c0ba1936874b359338e36462b1b8a97f19e24",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/paint_battaglia_redshift_slice.jl",
+      "original": "c415fd70bca319a2582dfb06c5d9b9981cd7b4f995a954ff107dedea8514bb0c",
+      "current": "c415fd70bca319a2582dfb06c5d9b9981cd7b4f995a954ff107dedea8514bb0c",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/generate_battaglia_5pct_variations.jl",
+      "original": "572b3d8a0b0c3ec4921a11749d736ebc1586af098f8f531c66e08e9f3a71b63d",
+      "current": "572b3d8a0b0c3ec4921a11749d736ebc1586af098f8f531c66e08e9f3a71b63d",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_by_redshift.jl",
+      "original": "5299f3562cc384c3f1dcae7cfaa1cbcf3ba403ce6c3eda6220d58da2f16a93da",
+      "current": "5299f3562cc384c3f1dcae7cfaa1cbcf3ba403ce6c3eda6220d58da2f16a93da",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/output.jl",
+      "original": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+      "current": "228607d6057f328c5876db1aa46540761c098b9a3796f5f5bc0aa8ca12863a0a",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/cosmology_helpers.jl",
+      "original": "6c3adc30d45cbd6ce43d309068093181f599cde7dc479b631edbc964d303c8d9",
+      "current": "6c3adc30d45cbd6ce43d309068093181f599cde7dc479b631edbc964d303c8d9",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/binning.jl",
+      "original": "39d9fd05378bad60553231263b83dedf9b72d552cec04680e5b9aa016783394a",
+      "current": "39d9fd05378bad60553231263b83dedf9b72d552cec04680e5b9aa016783394a",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_initial_batches.jl",
+      "original": "695fb52406eefd669c28c59f85e252cfd8ed695c0dffafcf84754073a7ab79a1",
+      "current": "695fb52406eefd669c28c59f85e252cfd8ed695c0dffafcf84754073a7ab79a1",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/HalfDome_tSZ_legacy_monolith.jl",
+      "original": "4b64e9f92241c22ada733b2f4c6941a06aef64575a5655fa29e0c84bbc52674c",
+      "current": "4b64e9f92241c22ada733b2f4c6941a06aef64575a5655fa29e0c84bbc52674c",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/run_by_mass.jl",
+      "original": "52becc6d59948e6fc42b93975ff4d6c53e903b66ec9f8959b0f91685525d89fc",
+      "current": "52becc6d59948e6fc42b93975ff4d6c53e903b66ec9f8959b0f91685525d89fc",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/code/halfdome/tSZ_visuals/model.jl",
+      "original": "1b2ce8c6cafdd78b10e72b0d7466fa08e01bdd45bd63baa63f3cce569fc0f7dc",
+      "current": "1b2ce8c6cafdd78b10e72b0d7466fa08e01bdd45bd63baa63f3cce569fc0f7dc",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_szp.jl",
+      "original": "dd3a8f14369873881f962292eb67a8b5ba09b4cd98ca0529bf427afb6ed44c3e",
+      "current": "dd3a8f14369873881f962292eb67a8b5ba09b4cd98ca0529bf427afb6ed44c3e",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_frb.jl",
+      "original": "c0344c11e905eed071da9b62532a0d3652df04b0dd187960974cc0e348343e8e",
+      "current": "c0344c11e905eed071da9b62532a0d3652df04b0dd187960974cc0e348343e8e",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/co_broadband.jl",
+      "original": "46d89704a3c1cb78ab668dcb160ef8345375b9be9c57a77362dfd690cdaeb1d5",
+      "current": "46d89704a3c1cb78ab668dcb160ef8345375b9be9c57a77362dfd690cdaeb1d5",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/cib.jl",
+      "original": "24fb58fddf510e638ca0a3eec0768fa52c7e7806b05c44e8015ea5d9e4f726cc",
+      "current": "24fb58fddf510e638ca0a3eec0768fa52c7e7806b05c44e8015ea5d9e4f726cc",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles.jl",
+      "original": "0c6dd605c3ad4d2a85c07a474b234f7b6178d8b0139bbd14e706b262126179d3",
+      "current": "0c6dd605c3ad4d2a85c07a474b234f7b6178d8b0139bbd14e706b262126179d3",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/healpixworkspace.jl",
+      "original": "e1a30d8cee9f2e8f5973c3ce50f89b7d2b3c13b16162f6fb34be8ca221bf16ef",
+      "current": "e1a30d8cee9f2e8f5973c3ce50f89b7d2b3c13b16162f6fb34be8ca221bf16ef",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_rksz.jl",
+      "original": "fd907722031b58a3570f8917c38ad7c2b349767ace47027e59a00c77ec5fcfa0",
+      "current": "fd907722031b58a3570f8917c38ad7c2b349767ace47027e59a00c77ec5fcfa0",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_y.jl",
+      "original": "98d034e7ebacf8f37c252f1448dd77d71ee26412b7a9694e20106bcb82c4891c",
+      "current": "98d034e7ebacf8f37c252f1448dd77d71ee26412b7a9694e20106bcb82c4891c",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/radio.jl",
+      "original": "52b403d456155d2d3c2f264e6baa27382f32f0c866af3fcb2908ab810efe17dc",
+      "current": "52b403d456155d2d3c2f264e6baa27382f32f0c866af3fcb2908ab810efe17dc",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_rsz.jl",
+      "original": "7ac16ac45599eaaabaf309ac0c42dcfe7e3ee5cda9bfa8a0efe256a2449002d5",
+      "current": "7ac16ac45599eaaabaf309ac0c42dcfe7e3ee5cda9bfa8a0efe256a2449002d5",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/lrg.jl",
+      "original": "3c3033ae273530e0015dd1f21e8846cddba28707e5050e68af8e8169284dd81a",
+      "current": "3c3033ae273530e0015dd1f21e8846cddba28707e5050e68af8e8169284dd81a",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/XGPaint.jl",
+      "original": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+      "current": "aadae01f8d78565c551ff8183829b21f4b27d6b3719d371d77c542c87e944664",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/profiles_tau.jl",
+      "original": "54de594bfc092e064b171eede6eca5db3788598bfdeda4f38fdf5591a933053b",
+      "current": "54de594bfc092e064b171eede6eca5db3788598bfdeda4f38fdf5591a933053b",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/util.jl",
+      "original": "564e240b435f8e8c04a25b0af6ca0a7c25b6bf9b2c221bbdca5c2c6eef648e9e",
+      "current": "564e240b435f8e8c04a25b0af6ca0a7c25b6bf9b2c221bbdca5c2c6eef648e9e",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint/src/model.jl",
+      "original": "ef9e50de2508febf9e9b48f43e17a9acd2cf17f507723c6521bf1145bd25a856",
+      "current": "ef9e50de2508febf9e9b48f43e17a9acd2cf17f507723c6521bf1145bd25a856",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/cache/complete.toml",
+      "original": "edfa3b179caaaf29dc49c688700b8da4194faf46fcf04d84507405c0c719e28a",
+      "current": "edfa3b179caaaf29dc49c688700b8da4194faf46fcf04d84507405c0c719e28a",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/flamingo_tsz_comparison_20260914/preflight/metadata_manifest.json",
+      "original": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf",
+      "current": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/inputs/old_metadata.json",
+      "original": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf",
+      "current": "3d757e22037c6a2f809fd0f85947cbe852d9bd49bd84a9d10ee1c359921a1dbf",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/inputs/old_comparison.json",
+      "original": "84c59f9bd9c08cab9f40e75c5a55196a0e6e405c31c9f89790df492768317178",
+      "current": "84c59f9bd9c08cab9f40e75c5a55196a0e6e405c31c9f89790df492768317178",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/inputs/previous_theta.npy",
+      "original": "a3afa9b7e332afca0375b8b3b2879f9a264ea8eea5c9209dec1c51d692be9175",
+      "current": "a3afa9b7e332afca0375b8b3b2879f9a264ea8eea5c9209dec1c51d692be9175",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/inputs/previous_manifest.json",
+      "original": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "current": "441060d28a51224e947d9f3073df0e439ae8df62349a0ce59e2222298edf25e3",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/inputs/flamingo_fits.json",
+      "original": "e87150fc059baf458564b8ca75a790e2986b4702f683733f44eb73cbf0f454d6",
+      "current": "e87150fc059baf458564b8ca75a790e2986b4702f683733f44eb73cbf0f454d6",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/audit.py",
+      "original": "28fc09274abf110111b550362c5380ffde79722699f89014de67b1c1aa77bd6c",
+      "current": "28fc09274abf110111b550362c5380ffde79722699f89014de67b1c1aa77bd6c",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/restart.py",
+      "original": "63426b1a6042378fda9b2fae4427d93ce29786eb33096270a4cc96a0cb668af2",
+      "current": "63426b1a6042378fda9b2fae4427d93ce29786eb33096270a4cc96a0cb668af2",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/independent_noise.jl",
+      "original": "daca9ecc61eb7f08f10554e82950f8d95e5ae0d2e1cd6ec09c2e434848e2d0a9",
+      "current": "daca9ecc61eb7f08f10554e82950f8d95e5ae0d2e1cd6ec09c2e434848e2d0a9",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/run_worker.pbs",
+      "original": "c26c964968591b6bb7df583acc488cfae958b81b0739730eef961142d93fa4b9",
+      "current": "c26c964968591b6bb7df583acc488cfae958b81b0739730eef961142d93fa4b9",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/prior.json",
+      "original": "b4868a66630009e51bcadeed544f13cb3af49e13dab3b83f3c440933260574a9",
+      "current": "b4868a66630009e51bcadeed544f13cb3af49e13dab3b83f3c440933260574a9",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/prepare.py",
+      "original": "e9200bd3fb7ee0b9662e5f9c39002f0d4c75bfbd47319df2b55d4ee84b0fb5f0",
+      "current": "e9200bd3fb7ee0b9662e5f9c39002f0d4c75bfbd47319df2b55d4ee84b0fb5f0",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/collect.py",
+      "original": "1537b60ecee7880d57a771da9e978a4615dd432cc855de334364f214034974e8",
+      "current": "1537b60ecee7880d57a771da9e978a4615dd432cc855de334364f214034974e8",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/prior.py",
+      "original": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0",
+      "current": "19b7dd7b6ef445feb8dfa96b771a5dbf2563f69ff47a861a07d7a1d57fb6c4d0",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/validate.py",
+      "original": "8fbab32eefd3bacf8125ba0c9097106d96460bf0751dafddac599fe4920a40bf",
+      "current": "8fbab32eefd3bacf8125ba0c9097106d96460bf0751dafddac599fe4920a40bf",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/README.md",
+      "original": "3830a36c35a390e150fef79ab76c51735704a31d1947abdd026130ebbaf1b92f",
+      "current": "3830a36c35a390e150fef79ab76c51735704a31d1947abdd026130ebbaf1b92f",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/plot_prior.py",
+      "original": "09b6842d85460380c4a5bb3e72ecf1d2ab0bb5c68900c1240039d135bfc1664a",
+      "current": "09b6842d85460380c4a5bb3e72ecf1d2ab0bb5c68900c1240039d135bfc1664a",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/stable_los.jl",
+      "original": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+      "current": "759f71f3b296228c91567e09a2531dacb75b40a264bf231da22326d307aad3ca",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/run_collect.pbs",
+      "original": "5072b6f1f7d1af601895041779bff56e4599d2af384946f6b7ae9faf871ea450",
+      "current": "5072b6f1f7d1af601895041779bff56e4599d2af384946f6b7ae9faf871ea450",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/design.py",
+      "original": "1b5558bee9eb3c02c429d24017d4f098696a05237b69aee9050f703648152de6",
+      "current": "1b5558bee9eb3c02c429d24017d4f098696a05237b69aee9050f703648152de6",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/check_noise_seeds.py",
+      "original": "5453e56defaff7c2d4ba0cf2340fc8d7fa77a64eb90c3d08d5339107be702011",
+      "current": "5453e56defaff7c2d4ba0cf2340fc8d7fa77a64eb90c3d08d5339107be702011",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/sbi_prior.py",
+      "original": "908f3ad1f2cb8b2f4f17ee4e1ff871dc660c8c6a6ca6df8dff001e49ddfa138d",
+      "current": "908f3ad1f2cb8b2f4f17ee4e1ff871dc660c8c6a6ca6df8dff001e49ddfa138d",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/run_config.json",
+      "original": "9b78efca5d10c319360587bbc77cef416d1b4405ffeeca10930adf249670ec7d",
+      "current": "9b78efca5d10c319360587bbc77cef416d1b4405ffeeca10930adf249670ec7d",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/noise_seeds.py",
+      "original": "f76ef01bb5926e7e8bec7921b6eb60ab4036b312e2d4d590e77f5b03a51bcb92",
+      "current": "f76ef01bb5926e7e8bec7921b6eb60ab4036b312e2d4d590e77f5b03a51bcb92",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/worker.py",
+      "original": "9ee65b7989849f23d8c7da31d85d253c16ae3d3c5155d2cce1339e1e15ce4d36",
+      "current": "9ee65b7989849f23d8c7da31d85d253c16ae3d3c5155d2cce1339e1e15ce4d36",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/code/paint_row.jl",
+      "original": "a390825874831907aa492852ac93a6142e6595735bb31a27123dfc32f86f5cec",
+      "current": "a390825874831907aa492852ac93a6142e6595735bb31a27123dfc32f86f5cec",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/proposal_index.npy",
+      "original": "e11d9c0f342f9067ede38a622907f2ca64c960df24dbb771d75f58785bccfcc0",
+      "current": "e11d9c0f342f9067ede38a622907f2ca64c960df24dbb771d75f58785bccfcc0",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/noise_split_seeds.npy",
+      "original": "5bfc8a552b2da6934a378aaab170d433ded88cfbcfc2e4226ca3a7b8f08fe9db",
+      "current": "5bfc8a552b2da6934a378aaab170d433ded88cfbcfc2e4226ca3a7b8f08fe9db",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/source_old_row.npy",
+      "original": "b933f9e787b4e98d82ac725f91e5feb15db043a790792dd930de6c517ef51b84",
+      "current": "b933f9e787b4e98d82ac725f91e5feb15db043a790792dd930de6c517ef51b84",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/noise_seed_row_ids.npy",
+      "original": "7c912a04ad5c040023810a17c59331c33287337a54bc5edc5cdde3de953ec3ca",
+      "current": "7c912a04ad5c040023810a17c59331c33287337a54bc5edc5cdde3de953ec3ca",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/theta.npy",
+      "original": "ecac74ace38af76f06bb91f4e00c239302a30738c8338de2d317c7196c2d22b8",
+      "current": "ecac74ace38af76f06bb91f4e00c239302a30738c8338de2d317c7196c2d22b8",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/parameters.csv",
+      "original": "a2e8c0bc6ad8a1d69048d7f528552a5436733e7bb8e48aa0e3906de3fcc087bd",
+      "current": "a2e8c0bc6ad8a1d69048d7f528552a5436733e7bb8e48aa0e3906de3fcc087bd",
+      "unchanged": true
+    },
+    {
+      "path": "/lustre/work/kristero10/halfdome_flamingo_linear_8192_20260915/design/validation_split.npy",
+      "original": "97fe238a2ce81d3120d04d29ff29c78df5f20d00429a1766fcf68471e3c3bd75",
+      "current": "97fe238a2ce81d3120d04d29ff29c78df5f20d00429a1766fcf68471e3c3bd75",
+      "unchanged": true
+    }
+  ]
+}

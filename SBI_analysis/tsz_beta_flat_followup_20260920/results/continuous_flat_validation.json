@@ -1,0 +1,17 @@
+{
+  "bins_per_axis": 48,
+  "iterations": 26,
+  "marginal_max_relative_error": 9.362000064072618e-11,
+  "all_cell_points_certified": true,
+  "hull_vertices": 876,
+  "analytic_minimum_beta_on_allowed_cells": 2.7000404949513346,
+  "sampled_count": 131072,
+  "sampled_minimum_beta": 2.710048982907458,
+  "sampled_violations": 0,
+  "density_integral": 1.0000000000000002,
+  "sampled_cache_minimum_beta": 1.1434925988736018,
+  "sampled_cache_below_energy_fraction": 0.2917022705078125,
+  "sampled_cache_below_los_fraction": 0.0,
+  "support_volume_fraction": 0.8322030526620371,
+  "scope": "Continuous correlated beta prior on whole allowed cells; catalogue-only energy condition; no pixel, cache or full nine-parameter production certification"
+}

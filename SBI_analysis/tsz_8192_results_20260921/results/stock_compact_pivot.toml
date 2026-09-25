@@ -1,0 +1,12 @@
+label = "compact_pivot"
+beta_raw = 16.0
+stable_same_cylinder = 0.009680643565430842
+x = 1.0e-8
+initial19_error = 3.260112937810608e-63
+cylinder_to_sphere = 1.0
+initial19_value = 3.260112937814632e-63
+xc = 0.025
+stock_value = 0.009680643565430835
+sphere4 = 0.009680643565430842
+stock_relative_error = 7.167802281953359e-16
+stock_seconds_after_compile = 0.000102741

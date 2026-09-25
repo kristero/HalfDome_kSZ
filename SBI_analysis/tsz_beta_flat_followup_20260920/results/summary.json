@@ -1,0 +1,255 @@
+{
+  "profiles": {
+    "mass_Msun": 10000000000000.0,
+    "redshift": 2.0,
+    "cases": [
+      {
+        "name": "b12",
+        "label": "Battaglia12",
+        "theta": [
+          18.1,
+          0.497,
+          4.35,
+          0.154,
+          -0.00865,
+          0.0393,
+          -0.758,
+          0.731,
+          0.415
+        ],
+        "evolved": [
+          5.521037078268104,
+          1.1318321497550994,
+          6.268946704018129
+        ],
+        "y_at_R200": {
+          "los1e5": 0.18198533991925928,
+          "sphere4": 0.18144604710429266,
+          "sphere8": 0.181964533326034,
+          "sphere16": 0.18198472656232703
+        },
+        "energy_16_over_4": 1.0323225150850173,
+        "los_doubling_fraction": -4.440892098500626e-16,
+        "infinite_energy_finite": true,
+        "infinite_los_finite": true
+      },
+      {
+        "name": "shallow",
+        "label": "Shallow outskirts",
+        "theta": [
+          18.1,
+          0.497,
+          2.8,
+          0.154,
+          -0.00865,
+          0.0,
+          -0.758,
+          0.731,
+          -0.5
+        ],
+        "evolved": [
+          5.521037078268104,
+          1.1318321497550994,
+          1.616580753730952
+        ],
+        "y_at_R200": {
+          "los1e5": 11.135369804515594,
+          "sphere4": 7.572813047183247,
+          "sphere8": 9.081638290999207,
+          "sphere16": 9.994067458015003
+        },
+        "energy_16_over_4": 7.474272349656571,
+        "los_doubling_fraction": 1.6852327055616456e-05,
+        "infinite_energy_finite": false,
+        "infinite_los_finite": true
+      },
+      {
+        "name": "very_shallow",
+        "label": "Very shallow outskirts",
+        "theta": [
+          18.1,
+          0.497,
+          2.8,
+          0.154,
+          -0.00865,
+          0.4,
+          -0.758,
+          0.731,
+          -0.5
+        ],
+        "evolved": [
+          5.521037078268104,
+          1.1318321497550994,
+          0.6435723898390692
+        ],
+        "y_at_R200": {
+          "los1e5": 200.09896848670525,
+          "sphere4": 18.91835112138376,
+          "sphere8": 27.488166786731114,
+          "sphere16": 36.797248614324
+        },
+        "energy_16_over_4": 20.611816927593498,
+        "los_doubling_fraction": 0.08395279572914571,
+        "infinite_energy_finite": false,
+        "infinite_los_finite": false
+      }
+    ],
+    "max_tolerance_refinement": 8.881784197001252e-16,
+    "python_probes": 48
+  },
+  "priors": {
+    "samples": 262144,
+    "beta_lower": [
+      2.8,
+      -0.2,
+      -0.5
+    ],
+    "beta_upper": [
+      16.0,
+      0.4,
+      2.0
+    ],
+    "cache_energy_acceptance": 0.6737442016601562,
+    "catalogue_energy_acceptance": 0.85125732421875,
+    "cache_los_failure_fraction": 0.0174407958984375,
+    "catalogue_los_failure_fraction": 0.000423431396484375,
+    "cache_alpha_m_beta_absolute_upper": 0.38681218672778733,
+    "correlated_uniform_grid_test": {
+      "cache": {
+        "feasible": false,
+        "reason": "Empty marginal slices",
+        "empty_slices": [
+          [],
+          [
+            47
+          ],
+          []
+        ]
+      },
+      "catalogue": {
+        "feasible": true,
+        "iterations": 15,
+        "max_relative_marginal_error": 6.3364765656714894e-09,
+        "scope": "48 cubed cell centres only"
+      }
+    }
+  },
+  "noise": {
+    "seed": 20260921,
+    "trials_per_case": 30000,
+    "independent_real_modes": 201,
+    "conditional_fixed_signal": true,
+    "results": [
+      {
+        "model": "two_full_depth",
+        "signal": 0.01,
+        "noise_each": 1.0,
+        "common_power": 0.0,
+        "expected_mean": 0.01,
+        "measured_mean": 0.010341243941716607,
+        "mean_z": 0.8297046423349863,
+        "expected_variance": 0.005074626865671642,
+        "measured_variance": 0.005070913132426468,
+        "variance_ratio": 0.999268176095804
+      },
+      {
+        "model": "two_half_depth",
+        "signal": 0.01,
+        "noise_each": 2.0,
+        "common_power": 0.0,
+        "expected_mean": 0.01,
+        "measured_mean": 0.010987237899058205,
+        "mean_z": 1.206117982679918,
+        "expected_variance": 0.02009950248756219,
+        "measured_variance": 0.019864795388042224,
+        "variance_ratio": 0.9883227408407146
+      },
+      {
+        "model": "shared_residual",
+        "signal": 0.01,
+        "noise_each": 2.0,
+        "common_power": 0.5,
+        "expected_mean": 0.51,
+        "measured_mean": 0.5080528283213656,
+        "mean_z": -1.9455591138206736,
+        "expected_variance": 0.030049751243781096,
+        "measured_variance": 0.02995090078692281,
+        "variance_ratio": 0.9967104400946167
+      },
+      {
+        "model": "two_full_depth",
+        "signal": 1.0,
+        "noise_each": 1.0,
+        "common_power": 0.0,
+        "expected_mean": 1.0,
+        "measured_mean": 0.9996355973392752,
+        "mean_z": -0.5166299364903779,
+        "expected_variance": 0.014925373134328358,
+        "measured_variance": 0.014909801949986593,
+        "variance_ratio": 0.9989567306491017
+      },
+      {
+        "model": "two_half_depth",
+        "signal": 1.0,
+        "noise_each": 2.0,
+        "common_power": 0.0,
+        "expected_mean": 1.0,
+        "measured_mean": 0.9997785936719904,
+        "mean_z": -0.19222226567135953,
+        "expected_variance": 0.03980099502487562,
+        "measured_variance": 0.03994245642073004,
+        "variance_ratio": 1.0035542175708423
+      },
+      {
+        "model": "shared_residual",
+        "signal": 1.0,
+        "noise_each": 2.0,
+        "common_power": 0.5,
+        "expected_mean": 1.5,
+        "measured_mean": 1.499769191567931,
+        "mean_z": -0.1792298440144322,
+        "expected_variance": 0.04975124378109453,
+        "measured_variance": 0.04974337256280161,
+        "variance_ratio": 0.9998417885123123
+      },
+      {
+        "model": "two_full_depth",
+        "signal": 100.0,
+        "noise_each": 1.0,
+        "common_power": 0.0,
+        "expected_mean": 100.0,
+        "measured_mean": 100.00435304868022,
+        "mean_z": 0.7539701481953832,
+        "expected_variance": 1.0,
+        "measured_variance": 0.9971974613297753,
+        "variance_ratio": 0.9971974613297753
+      },
+      {
+        "model": "two_half_depth",
+        "signal": 100.0,
+        "noise_each": 2.0,
+        "common_power": 0.0,
+        "expected_mean": 100.0,
+        "measured_mean": 99.99461034591916,
+        "mean_z": -0.6584591934255407,
+        "expected_variance": 2.009950248756219,
+        "measured_variance": 2.0074008236704493,
+        "variance_ratio": 0.9987315979152481
+      },
+      {
+        "model": "shared_residual",
+        "signal": 100.0,
+        "noise_each": 2.0,
+        "common_power": 0.5,
+        "expected_mean": 100.5,
+        "measured_mean": 100.5102489350998,
+        "mean_z": 1.2490343503574026,
+        "expected_variance": 2.0199004975124377,
+        "measured_variance": 2.045062701979279,
+        "variance_ratio": 1.0124571504872786
+      }
+    ]
+  },
+  "wall_seconds": 22.197857005987316,
+  "scope": "Profile integration, support and ideal noise tests only; no new full-sky production certification"
+}

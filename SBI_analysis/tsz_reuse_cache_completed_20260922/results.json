@@ -1,0 +1,3324 @@
+{
+  "utc": "2026-09-22T12:37:44.250583+00:00",
+  "audited": {
+    "manifest.json": 18,
+    "edge_extension/manifest.json": 10,
+    "work_balance/manifest.json": 9,
+    "fetched_products": 312
+  },
+  "completed_controls": 17,
+  "ell_min": 80,
+  "ell_max": 7979,
+  "cases": [
+    {
+      "label": "Battaglia12",
+      "theta": [
+        18.1,
+        0.497,
+        4.35,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "reference_id": 0
+    },
+    {
+      "label": "FL_L1_m9",
+      "theta": [
+        27.895767029523494,
+        1.3742797203838153,
+        8.096506971978265,
+        0.24068706895722208,
+        -0.3708722120914735,
+        -0.027131779826878644,
+        -3.2950451155410274,
+        1.3212811497156247,
+        0.7123048539608454
+      ],
+      "reference_id": 1
+    },
+    {
+      "label": "compact",
+      "theta": [
+        18.1,
+        0.025,
+        16,
+        0.154,
+        -0.00865,
+        0.0393,
+        -0.758,
+        0.731,
+        0.415
+      ],
+      "reference_id": 2
+    },
+    {
+      "label": "extended_shallow",
+      "theta": [
+        18.1,
+        4,
+        2.8,
+        0.154,
+        -0.00865,
+        0,
+        -0.758,
+        0.731,
+        0
+      ],
+      "reference_id": 4
+    }
+  ],
+  "timings": [
+    {
+      "group": "original_exterior",
+      "id": 0,
+      "label": "serial_four_catalogue_passes",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 4,
+      "process_seconds": 5233.848334312439,
+      "catalogue_seconds": 4908.134083032608,
+      "painting_seconds": 4850.232488393784,
+      "read_seconds": 43.73085045814514,
+      "cache_seconds": 67.28467607498169,
+      "peak_RSS_GiB": 35.35292053222656,
+      "cpu_hours": 10.810852777777777,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598554.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 12.425724744796753,
+        "cache": 67.28467607498169,
+        "allocation": 11.826946020126343,
+        "masked_spectrum": 14.964085340499878,
+        "read_positions": 29.685915231704712,
+        "painting": 4850.232488393784,
+        "output_alm2map": 32.87645196914673,
+        "read_mass_redshift": 14.04493522644043,
+        "map2alm": 58.39089488983154
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 1,
+      "label": "read_once_four_painters",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 4,
+      "process_seconds": 3723.6958761662245,
+      "catalogue_seconds": 3499.943368911743,
+      "painting_seconds": 3489.86288022995,
+      "read_seconds": 7.441098690032959,
+      "cache_seconds": 49.09965705871582,
+      "peak_RSS_GiB": 36.85737609863281,
+      "cpu_hours": 10.290713888888888,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598555.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 1.7135214805603027,
+        "cache": 49.09965705871582,
+        "allocation": 10.26987600326538,
+        "masked_spectrum": 12.83545184135437,
+        "read_positions": 4.834568738937378,
+        "painting": 3489.86288022995,
+        "output_alm2map": 29.060116291046143,
+        "read_mass_redshift": 2.606529951095581,
+        "map2alm": 49.94434595108032
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 2,
+      "label": "shared_geometry_four_profiles",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 4,
+      "process_seconds": 2037.065909679979,
+      "catalogue_seconds": 1622.9363210201263,
+      "painting_seconds": 1612.0402355194092,
+      "read_seconds": 8.357527494430542,
+      "cache_seconds": 52.276329040527344,
+      "peak_RSS_GiB": 36.808956146240234,
+      "cpu_hours": 6.940691666666667,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598556.idark",
+      "extra_pixel_transforms": true,
+      "stages": {
+        "selection": 1.5206255912780762,
+        "cache": 52.276329040527344,
+        "allocation": 9.565524816513062,
+        "masked_spectrum": 36.74917387962341,
+        "read_positions": 5.608312368392944,
+        "painting": 1612.0402355194092,
+        "output_alm2map": 75.77472352981567,
+        "pixel_average": 45.30692791938782,
+        "read_mass_redshift": 2.7492151260375977,
+        "map2alm": 95.13308000564575
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 3,
+      "label": "half_theta",
+      "raw_nside": 8192,
+      "nodes": [
+        256,
+        256,
+        128
+      ],
+      "profiles": 4,
+      "process_seconds": 1833.3334811422974,
+      "catalogue_seconds": 1637.401750087738,
+      "painting_seconds": 1627.4749548435211,
+      "read_seconds": 7.323740720748901,
+      "cache_seconds": 26.632356882095337,
+      "peak_RSS_GiB": 36.12276840209961,
+      "cpu_hours": 5.734677777777778,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598557.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 1.6146197319030762,
+        "cache": 26.632356882095337,
+        "allocation": 9.520642042160034,
+        "masked_spectrum": 12.593901872634888,
+        "read_positions": 4.497840881347656,
+        "painting": 1627.4749548435211,
+        "output_alm2map": 26.884005069732666,
+        "read_mass_redshift": 2.825899839401245,
+        "map2alm": 48.19041299819946
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 4,
+      "label": "half_logz",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        128,
+        128
+      ],
+      "profiles": 4,
+      "process_seconds": 2291.32647244446,
+      "catalogue_seconds": 2005.9246640205383,
+      "painting_seconds": 1990.572015285492,
+      "read_seconds": 10.687758922576904,
+      "cache_seconds": 42.63328981399536,
+      "peak_RSS_GiB": 36.448307037353516,
+      "cpu_hours": 5.807388888888889,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598554.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 3.1920857429504395,
+        "cache": 42.63328981399536,
+        "allocation": 11.836982011795044,
+        "masked_spectrum": 14.30606484413147,
+        "read_positions": 7.587419509887695,
+        "painting": 1990.572015285492,
+        "output_alm2map": 34.37733507156372,
+        "read_mass_redshift": 3.100339412689209,
+        "map2alm": 58.26022267341614
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 5,
+      "label": "half_logmass",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        256,
+        64
+      ],
+      "profiles": 4,
+      "process_seconds": 1806.920185096562,
+      "catalogue_seconds": 1615.0156769752502,
+      "painting_seconds": 1604.4956991672516,
+      "read_seconds": 7.687002897262573,
+      "cache_seconds": 26.127151012420654,
+      "peak_RSS_GiB": 36.518741607666016,
+      "cpu_hours": 5.713322222222222,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598555.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 1.8427178859710693,
+        "cache": 26.127151012420654,
+        "allocation": 8.641921997070312,
+        "masked_spectrum": 13.18100643157959,
+        "read_positions": 5.774531364440918,
+        "painting": 1604.4956991672516,
+        "output_alm2map": 28.30495285987854,
+        "read_mass_redshift": 1.9124715328216553,
+        "map2alm": 49.183900594711304
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 6,
+      "label": "half_all_axes",
+      "raw_nside": 8192,
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "profiles": 4,
+      "process_seconds": 1659.3685062527657,
+      "catalogue_seconds": 1491.994460105896,
+      "painting_seconds": 1484.265785932541,
+      "read_seconds": 5.668776512145996,
+      "cache_seconds": 10.07604193687439,
+      "peak_RSS_GiB": 35.77738952636719,
+      "cpu_hours": 5.340002777777778,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598556.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 1.1305606365203857,
+        "cache": 10.07604193687439,
+        "allocation": 8.698765993118286,
+        "masked_spectrum": 12.27084994316101,
+        "read_positions": 4.192607641220093,
+        "painting": 1484.265785932541,
+        "output_alm2map": 25.197784185409546,
+        "read_mass_redshift": 1.4761688709259033,
+        "map2alm": 48.399070262908936
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 7,
+      "label": "quarter_all_axes",
+      "raw_nside": 8192,
+      "nodes": [
+        128,
+        64,
+        32
+      ],
+      "profiles": 4,
+      "process_seconds": 1671.0324341040105,
+      "catalogue_seconds": 1497.8847329616547,
+      "painting_seconds": 1489.6233608722687,
+      "read_seconds": 5.950052976608276,
+      "cache_seconds": 5.975623846054077,
+      "peak_RSS_GiB": 35.658477783203125,
+      "cpu_hours": 5.292258333333333,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598557.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 1.4301342964172363,
+        "cache": 5.975623846054077,
+        "allocation": 8.818664073944092,
+        "masked_spectrum": 12.737746000289917,
+        "read_positions": 4.434608221054077,
+        "painting": 1489.6233608722687,
+        "output_alm2map": 27.775943994522095,
+        "read_mass_redshift": 1.5154447555541992,
+        "map2alm": 48.09447622299194
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 8,
+      "label": "shared_geometry_repeat",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 4,
+      "process_seconds": 2425.391499368474,
+      "catalogue_seconds": 2140.3025629520416,
+      "painting_seconds": 2125.2451272010803,
+      "read_seconds": 11.387139320373535,
+      "cache_seconds": 67.01372194290161,
+      "peak_RSS_GiB": 36.8411979675293,
+      "cpu_hours": 6.1323888888888884,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598554.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 2.350468873977661,
+        "cache": 67.01372194290161,
+        "allocation": 12.331472158432007,
+        "masked_spectrum": 14.399173736572266,
+        "read_positions": 8.887336492538452,
+        "painting": 2125.2451272010803,
+        "output_alm2map": 35.338624000549316,
+        "read_mass_redshift": 2.499802827835083,
+        "map2alm": 57.46939015388489
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 9,
+      "label": "shared_geometry_two_profiles",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 2,
+      "process_seconds": 1115.824906911701,
+      "catalogue_seconds": 968.2570250034332,
+      "painting_seconds": 959.4400520324707,
+      "read_seconds": 6.0733323097229,
+      "cache_seconds": 34.468904972076416,
+      "peak_RSS_GiB": 21.9473876953125,
+      "cpu_hours": 3.4301222222222223,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598555.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 1.7908852100372314,
+        "cache": 34.468904972076416,
+        "allocation": 6.328645944595337,
+        "masked_spectrum": 6.969851970672607,
+        "read_positions": 4.571541786193848,
+        "painting": 959.4400520324707,
+        "output_alm2map": 14.456676959991455,
+        "read_mass_redshift": 1.5017905235290527,
+        "map2alm": 25.500147104263306
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 10,
+      "label": "single_profile_optimized",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 1,
+      "process_seconds": 739.279802326113,
+      "catalogue_seconds": 645.7241671085358,
+      "painting_seconds": 638.6156115531921,
+      "read_seconds": 4.623307704925537,
+      "cache_seconds": 14.807236909866333,
+      "peak_RSS_GiB": 14.616680145263672,
+      "cpu_hours": 2.1757916666666666,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598556.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 1.5517525672912598,
+        "cache": 14.807236909866333,
+        "allocation": 2.106801986694336,
+        "masked_spectrum": 3.32614803314209,
+        "read_positions": 3.216339111328125,
+        "painting": 638.6156115531921,
+        "output_alm2map": 6.750831127166748,
+        "read_mass_redshift": 1.406968593597412,
+        "map2alm": 12.165003061294556
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 11,
+      "label": "extended_shallow_reference16384",
+      "raw_nside": 16384,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 1,
+      "process_seconds": 2769.2274867258966,
+      "catalogue_seconds": 2461.408066034317,
+      "painting_seconds": 2450.7796065807343,
+      "read_seconds": 7.765606641769409,
+      "cache_seconds": 18.124051094055176,
+      "peak_RSS_GiB": 40.20355987548828,
+      "cpu_hours": 8.666975,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598558.idark",
+      "extra_pixel_transforms": true,
+      "stages": {
+        "selection": 1.8903553485870361,
+        "cache": 18.124051094055176,
+        "allocation": 9.773561000823975,
+        "masked_spectrum": 15.301894903182983,
+        "read_positions": 4.741571664810181,
+        "painting": 2450.7796065807343,
+        "output_alm2map": 31.842561960220337,
+        "pixel_average": 85.36684703826904,
+        "read_mass_redshift": 3.0240349769592285,
+        "map2alm": 64.29948592185974
+      }
+    },
+    {
+      "group": "original_exterior",
+      "id": 12,
+      "label": "Battaglia12_reference16384",
+      "raw_nside": 16384,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 1,
+      "process_seconds": 2570.9658996760845,
+      "catalogue_seconds": 2274.294088125229,
+      "painting_seconds": 2263.1856956481934,
+      "read_seconds": 8.178605556488037,
+      "cache_seconds": 13.169513940811157,
+      "peak_RSS_GiB": 39.91289138793945,
+      "cpu_hours": 8.08783611111111,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598558.idark",
+      "extra_pixel_transforms": true,
+      "stages": {
+        "selection": 1.9780082702636719,
+        "cache": 13.169513940811157,
+        "allocation": 8.85981798171997,
+        "masked_spectrum": 15.691344022750854,
+        "read_positions": 5.170305967330933,
+        "painting": 2263.1856956481934,
+        "output_alm2map": 32.102195501327515,
+        "pixel_average": 87.81631994247437,
+        "read_mass_redshift": 3.0082995891571045,
+        "map2alm": 64.45266079902649
+      }
+    },
+    {
+      "group": "smooth_exterior",
+      "id": 0,
+      "label": "smooth_exterior_0",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 4,
+      "process_seconds": 1782.9357628151774,
+      "catalogue_seconds": 1556.707354068756,
+      "painting_seconds": 1544.3081800937653,
+      "read_seconds": 9.198489427566528,
+      "cache_seconds": 54.454386949539185,
+      "peak_RSS_GiB": 36.145973205566406,
+      "cpu_hours": 5.729566666666667,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598573.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 2.3055670261383057,
+        "cache": 54.454386949539185,
+        "allocation": 9.648562908172607,
+        "masked_spectrum": 12.73977017402649,
+        "read_positions": 6.360660076141357,
+        "painting": 1544.3081800937653,
+        "output_alm2map": 26.738901138305664,
+        "read_mass_redshift": 2.837829351425171,
+        "map2alm": 48.56207609176636
+      }
+    },
+    {
+      "group": "smooth_exterior",
+      "id": 1,
+      "label": "smooth_exterior_1",
+      "raw_nside": 8192,
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "profiles": 4,
+      "process_seconds": 1767.8653522357345,
+      "catalogue_seconds": 1593.8297729492188,
+      "painting_seconds": 1584.2020041942596,
+      "read_seconds": 6.699244976043701,
+      "cache_seconds": 12.11620306968689,
+      "peak_RSS_GiB": 36.273956298828125,
+      "cpu_hours": 5.565336111111111,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598573.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 1.9935662746429443,
+        "cache": 12.11620306968689,
+        "allocation": 9.228096008300781,
+        "masked_spectrum": 12.757259130477905,
+        "read_positions": 5.127161741256714,
+        "painting": 1584.2020041942596,
+        "output_alm2map": 26.62975311279297,
+        "read_mass_redshift": 1.5720832347869873,
+        "map2alm": 48.43000030517578
+      }
+    },
+    {
+      "group": "smooth_exterior",
+      "id": 2,
+      "label": "smooth_exterior_2",
+      "raw_nside": 8192,
+      "nodes": [
+        1024,
+        512,
+        256
+      ],
+      "profiles": 4,
+      "process_seconds": 2096.3694733045995,
+      "catalogue_seconds": 1529.9964139461517,
+      "painting_seconds": 1521.6023879051208,
+      "read_seconds": 5.217646598815918,
+      "cache_seconds": 399.5730998516083,
+      "peak_RSS_GiB": 39.6683464050293,
+      "cpu_hours": 7.345141666666666,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598573.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 2.245513677597046,
+        "cache": 399.5730998516083,
+        "allocation": 9.061025857925415,
+        "masked_spectrum": 13.232186794281006,
+        "read_positions": 3.98769474029541,
+        "painting": 1521.6023879051208,
+        "output_alm2map": 26.882166862487793,
+        "read_mass_redshift": 1.2299518585205078,
+        "map2alm": 48.67575979232788
+      }
+    },
+    {
+      "group": "balanced",
+      "id": 0,
+      "label": "shared_geometry_greedy256",
+      "raw_nside": 8192,
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "profiles": 4,
+      "process_seconds": 1121.880189154297,
+      "catalogue_seconds": 892.1228928565979,
+      "painting_seconds": 878.5634202957153,
+      "read_seconds": 9.9671790599823,
+      "cache_seconds": 59.97525191307068,
+      "peak_RSS_GiB": 36.747840881347656,
+      "cpu_hours": 6.098552777777778,
+      "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+      "job": "598578.idark",
+      "extra_pixel_transforms": false,
+      "stages": {
+        "selection": 2.530707597732544,
+        "cache": 59.97525191307068,
+        "allocation": 10.62477993965149,
+        "masked_spectrum": 12.842313051223755,
+        "read_positions": 7.02186918258667,
+        "painting": 878.5634202957153,
+        "output_alm2map": 25.133979082107544,
+        "read_mass_redshift": 2.94530987739563,
+        "map2alm": 47.46920919418335
+      }
+    }
+  ],
+  "errors": [
+    {
+      "group": "original_exterior",
+      "task": 0,
+      "variant": "serial_four_catalogue_passes",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 6.702446863390177e-16,
+      "max_fractional_Dell": 9.488486754017383e-15,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.4426915760789837e-14,
+        "Battaglia12_rcond1e-06": 1.7676526281993572e-14,
+        "FL_L1_m9_rcond0.001": 1.1463169513769865e-14,
+        "FL_L1_m9_rcond1e-06": 1.9564298702604304e-14
+      },
+      "distance5": 1.4426915760789837e-14,
+      "distance9": 1.9564298702604304e-14
+    },
+    {
+      "group": "common_reference",
+      "task": 0,
+      "variant": "serial_four_catalogue_passes",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.8994162915104683e-07,
+      "max_fractional_Dell": 1.401753887595444e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.8823878373894417e-05,
+        "Battaglia12_rcond1e-06": 3.083601605249237e-05,
+        "FL_L1_m9_rcond0.001": 3.1693579361256984e-05,
+        "FL_L1_m9_rcond1e-06": 3.479117600680757e-05
+      },
+      "distance5": 3.1693579361256984e-05,
+      "distance9": 3.479117600680757e-05
+    },
+    {
+      "group": "original_exterior",
+      "task": 0,
+      "variant": "serial_four_catalogue_passes",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 7.44188090561295e-16,
+      "max_fractional_Dell": 1.4611401700322648e-14,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.4977804692307774e-14,
+        "Battaglia12_rcond1e-06": 2.3039491820143272e-14,
+        "FL_L1_m9_rcond0.001": 1.3336736235860107e-14,
+        "FL_L1_m9_rcond1e-06": 2.9496784448492894e-14
+      },
+      "distance5": 1.4977804692307774e-14,
+      "distance9": 2.9496784448492894e-14
+    },
+    {
+      "group": "common_reference",
+      "task": 0,
+      "variant": "serial_four_catalogue_passes",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 3.98894497812958e-07,
+      "max_fractional_Dell": 4.002776602271597e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0002396148879842188,
+        "Battaglia12_rcond1e-06": 0.0002457673019096904,
+        "FL_L1_m9_rcond0.001": 0.00023978406983801446,
+        "FL_L1_m9_rcond1e-06": 0.0002437439250908445
+      },
+      "distance5": 0.00023978406983801446,
+      "distance9": 0.0002457673019096904
+    },
+    {
+      "group": "original_exterior",
+      "task": 0,
+      "variant": "serial_four_catalogue_passes",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.593794735372976e-16,
+      "max_fractional_Dell": 1.9907029713781594e-15,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.6417883152319537e-23,
+        "Battaglia12_rcond1e-06": 3.219754243368301e-23,
+        "FL_L1_m9_rcond0.001": 2.5633700352681015e-23,
+        "FL_L1_m9_rcond1e-06": 4.417612692363369e-23
+      },
+      "distance5": 2.6417883152319537e-23,
+      "distance9": 4.417612692363369e-23
+    },
+    {
+      "group": "common_reference",
+      "task": 0,
+      "variant": "serial_four_catalogue_passes",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.6174539286294407e-08,
+      "max_fractional_Dell": 5.185075750324839e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 8.933888741784117e-14,
+        "Battaglia12_rcond1e-06": 9.401466623307665e-14,
+        "FL_L1_m9_rcond0.001": 8.890843122926472e-14,
+        "FL_L1_m9_rcond1e-06": 8.967381937391292e-14
+      },
+      "distance5": 8.933888741784117e-14,
+      "distance9": 9.401466623307665e-14
+    },
+    {
+      "group": "original_exterior",
+      "task": 0,
+      "variant": "serial_four_catalogue_passes",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 7.657094579363295e-16,
+      "max_fractional_Dell": 1.8700895762367018e-13,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.954343161783824e-12,
+        "Battaglia12_rcond1e-06": 3.902037282870257e-12,
+        "FL_L1_m9_rcond0.001": 3.565822000262048e-12,
+        "FL_L1_m9_rcond1e-06": 7.152696699667858e-12
+      },
+      "distance5": 3.565822000262048e-12,
+      "distance9": 7.152696699667858e-12
+    },
+    {
+      "group": "common_reference",
+      "task": 0,
+      "variant": "serial_four_catalogue_passes",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 6.307874884325437e-06,
+      "max_fractional_Dell": 0.00017355366949655548,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.5181274049299663,
+        "Battaglia12_rcond1e-06": 0.5780989488815889,
+        "FL_L1_m9_rcond0.001": 0.5175832735999834,
+        "FL_L1_m9_rcond1e-06": 0.5318766721297226
+      },
+      "distance5": 0.5181274049299663,
+      "distance9": 0.5780989488815889
+    },
+    {
+      "group": "original_exterior",
+      "task": 1,
+      "variant": "read_once_four_painters",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 6.599130823301878e-16,
+      "max_fractional_Dell": 8.114396690617052e-15,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.196421381251517e-14,
+        "Battaglia12_rcond1e-06": 1.3445215563673759e-14,
+        "FL_L1_m9_rcond0.001": 1.0189838284002497e-14,
+        "FL_L1_m9_rcond1e-06": 1.2041339641172273e-14
+      },
+      "distance5": 1.196421381251517e-14,
+      "distance9": 1.3445215563673759e-14
+    },
+    {
+      "group": "common_reference",
+      "task": 1,
+      "variant": "read_once_four_painters",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.8994162914274604e-07,
+      "max_fractional_Dell": 1.4017538871207096e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.882387837707662e-05,
+        "Battaglia12_rcond1e-06": 3.083601605426321e-05,
+        "FL_L1_m9_rcond0.001": 3.169357936014245e-05,
+        "FL_L1_m9_rcond1e-06": 3.479117600927426e-05
+      },
+      "distance5": 3.169357936014245e-05,
+      "distance9": 3.479117600927426e-05
+    },
+    {
+      "group": "original_exterior",
+      "task": 1,
+      "variant": "read_once_four_painters",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 7.36622366722486e-16,
+      "max_fractional_Dell": 2.3859951846081402e-14,
+      "moped": {
+        "Battaglia12_rcond0.001": 6.14012971154919e-15,
+        "Battaglia12_rcond1e-06": 1.486238462635879e-14,
+        "FL_L1_m9_rcond0.001": 4.6909752142441344e-15,
+        "FL_L1_m9_rcond1e-06": 1.0661374330383914e-14
+      },
+      "distance5": 6.14012971154919e-15,
+      "distance9": 1.486238462635879e-14
+    },
+    {
+      "group": "common_reference",
+      "task": 1,
+      "variant": "read_once_four_painters",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 3.9889449782415046e-07,
+      "max_fractional_Dell": 4.002776602271597e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00023961488797741062,
+        "Battaglia12_rcond1e-06": 0.00024576730190442,
+        "FL_L1_m9_rcond0.001": 0.00023978406983218546,
+        "FL_L1_m9_rcond1e-06": 0.00024374392508741324
+      },
+      "distance5": 0.00023978406983218546,
+      "distance9": 0.00024576730190442
+    },
+    {
+      "group": "original_exterior",
+      "task": 1,
+      "variant": "read_once_four_painters",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.5034154129261e-16,
+      "max_fractional_Dell": 2.0362496548347415e-15,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.8285692381140046e-23,
+        "Battaglia12_rcond1e-06": 4.464475008771164e-23,
+        "FL_L1_m9_rcond0.001": 1.0191149687980891e-23,
+        "FL_L1_m9_rcond1e-06": 4.3012591674954293e-23
+      },
+      "distance5": 1.8285692381140046e-23,
+      "distance9": 4.464475008771164e-23
+    },
+    {
+      "group": "common_reference",
+      "task": 1,
+      "variant": "read_once_four_painters",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.617453929443032e-08,
+      "max_fractional_Dell": 5.185075727082312e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 8.933888743446944e-14,
+        "Battaglia12_rcond1e-06": 9.40146662504302e-14,
+        "FL_L1_m9_rcond0.001": 8.890843125101998e-14,
+        "FL_L1_m9_rcond1e-06": 8.967381939470444e-14
+      },
+      "distance5": 8.933888743446944e-14,
+      "distance9": 9.40146662504302e-14
+    },
+    {
+      "group": "original_exterior",
+      "task": 1,
+      "variant": "read_once_four_painters",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 7.777561543487104e-16,
+      "max_fractional_Dell": 1.2486369841333884e-13,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.866823837027501e-12,
+        "Battaglia12_rcond1e-06": 3.5450606826609997e-12,
+        "FL_L1_m9_rcond0.001": 2.7375794419510833e-12,
+        "FL_L1_m9_rcond1e-06": 5.008889076360194e-12
+      },
+      "distance5": 2.7375794419510833e-12,
+      "distance9": 5.008889076360194e-12
+    },
+    {
+      "group": "common_reference",
+      "task": 1,
+      "variant": "read_once_four_painters",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 6.3078748843322454e-06,
+      "max_fractional_Dell": 0.00017355366951574944,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.5181274049313983,
+        "Battaglia12_rcond1e-06": 0.5780989488837573,
+        "FL_L1_m9_rcond0.001": 0.5175832736015041,
+        "FL_L1_m9_rcond1e-06": 0.5318766721311896
+      },
+      "distance5": 0.5181274049313983,
+      "distance9": 0.5780989488837573
+    },
+    {
+      "group": "original_exterior",
+      "task": 2,
+      "variant": "shared_geometry_four_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.0,
+      "max_fractional_Dell": 0.0,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0,
+        "Battaglia12_rcond1e-06": 0.0,
+        "FL_L1_m9_rcond0.001": 0.0,
+        "FL_L1_m9_rcond1e-06": 0.0
+      },
+      "distance5": 0.0,
+      "distance9": 0.0
+    },
+    {
+      "group": "common_reference",
+      "task": 2,
+      "variant": "shared_geometry_four_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.8994162915111875e-07,
+      "max_fractional_Dell": 1.4017538867646587e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.8823878383909034e-05,
+        "Battaglia12_rcond1e-06": 3.083601605964754e-05,
+        "FL_L1_m9_rcond0.001": 3.169357936667042e-05,
+        "FL_L1_m9_rcond1e-06": 3.479117601606816e-05
+      },
+      "distance5": 3.169357936667042e-05,
+      "distance9": 3.479117601606816e-05
+    },
+    {
+      "group": "original_exterior",
+      "task": 2,
+      "variant": "shared_geometry_four_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 0.0,
+      "max_fractional_Dell": 0.0,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0,
+        "Battaglia12_rcond1e-06": 0.0,
+        "FL_L1_m9_rcond0.001": 0.0,
+        "FL_L1_m9_rcond1e-06": 0.0
+      },
+      "distance5": 0.0,
+      "distance9": 0.0
+    },
+    {
+      "group": "common_reference",
+      "task": 2,
+      "variant": "shared_geometry_four_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 3.988944978168219e-07,
+      "max_fractional_Dell": 4.002776603610908e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0002396148879794917,
+        "Battaglia12_rcond1e-06": 0.0002457673019076491,
+        "FL_L1_m9_rcond0.001": 0.0002397840698344667,
+        "FL_L1_m9_rcond1e-06": 0.0002437439250909073
+      },
+      "distance5": 0.0002397840698344667,
+      "distance9": 0.0002457673019076491
+    },
+    {
+      "group": "original_exterior",
+      "task": 2,
+      "variant": "shared_geometry_four_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 0.0,
+      "max_fractional_Dell": 0.0,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0,
+        "Battaglia12_rcond1e-06": 0.0,
+        "FL_L1_m9_rcond0.001": 0.0,
+        "FL_L1_m9_rcond1e-06": 0.0
+      },
+      "distance5": 0.0,
+      "distance9": 0.0
+    },
+    {
+      "group": "common_reference",
+      "task": 2,
+      "variant": "shared_geometry_four_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.617453928961306e-08,
+      "max_fractional_Dell": 5.1850757154610476e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 8.933888744149718e-14,
+        "Battaglia12_rcond1e-06": 9.401466625823332e-14,
+        "FL_L1_m9_rcond0.001": 8.890843125182334e-14,
+        "FL_L1_m9_rcond1e-06": 8.967381939691142e-14
+      },
+      "distance5": 8.933888744149718e-14,
+      "distance9": 9.401466625823332e-14
+    },
+    {
+      "group": "original_exterior",
+      "task": 2,
+      "variant": "shared_geometry_four_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.0,
+      "max_fractional_Dell": 0.0,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0,
+        "Battaglia12_rcond1e-06": 0.0,
+        "FL_L1_m9_rcond0.001": 0.0,
+        "FL_L1_m9_rcond1e-06": 0.0
+      },
+      "distance5": 0.0,
+      "distance9": 0.0
+    },
+    {
+      "group": "common_reference",
+      "task": 2,
+      "variant": "shared_geometry_four_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 6.3078748843299305e-06,
+      "max_fractional_Dell": 0.00017355366952591093,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.5181274049320761,
+        "Battaglia12_rcond1e-06": 0.5780989488835888,
+        "FL_L1_m9_rcond0.001": 0.517583273602152,
+        "FL_L1_m9_rcond1e-06": 0.5318766721314647
+      },
+      "distance5": 0.5181274049320761,
+      "distance9": 0.5780989488835888
+    },
+    {
+      "group": "original_exterior",
+      "task": 3,
+      "variant": "half_theta",
+      "nodes": [
+        256,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 9.800116450279615e-07,
+      "max_fractional_Dell": 8.030219769318672e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00017513924867727817,
+        "Battaglia12_rcond1e-06": 0.0001769625069565925,
+        "FL_L1_m9_rcond0.001": 0.0001811112072043102,
+        "FL_L1_m9_rcond1e-06": 0.00020278663535091648
+      },
+      "distance5": 0.0001811112072043102,
+      "distance9": 0.00020278663535091648
+    },
+    {
+      "group": "common_reference",
+      "task": 3,
+      "variant": "half_theta",
+      "nodes": [
+        256,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 9.908616704761884e-07,
+      "max_fractional_Dell": 9.034777776684119e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00020298287254379242,
+        "Battaglia12_rcond1e-06": 0.00020616111704690868,
+        "FL_L1_m9_rcond0.001": 0.00021170927634283143,
+        "FL_L1_m9_rcond1e-06": 0.00023608996403508574
+      },
+      "distance5": 0.00021170927634283143,
+      "distance9": 0.00023608996403508574
+    },
+    {
+      "group": "original_exterior",
+      "task": 3,
+      "variant": "half_theta",
+      "nodes": [
+        256,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 2.0729189296685966e-06,
+      "max_fractional_Dell": 2.1025242732224507e-05,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.001174680306723408,
+        "Battaglia12_rcond1e-06": 0.0012066749659478666,
+        "FL_L1_m9_rcond0.001": 0.0011773424155663579,
+        "FL_L1_m9_rcond1e-06": 0.0011910210670739371
+      },
+      "distance5": 0.0011773424155663579,
+      "distance9": 0.0012066749659478666
+    },
+    {
+      "group": "common_reference",
+      "task": 3,
+      "variant": "half_theta",
+      "nodes": [
+        256,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 2.427154277631953e-06,
+      "max_fractional_Dell": 2.4756023073264207e-05,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0014129947797927426,
+        "Battaglia12_rcond1e-06": 0.0014511296912819256,
+        "FL_L1_m9_rcond0.001": 0.0014160521467692152,
+        "FL_L1_m9_rcond1e-06": 0.0014333170282658865
+      },
+      "distance5": 0.0014160521467692152,
+      "distance9": 0.0014511296912819256
+    },
+    {
+      "group": "original_exterior",
+      "task": 3,
+      "variant": "half_theta",
+      "nodes": [
+        256,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 8.263812685230101e-07,
+      "max_fractional_Dell": 8.968952557880089e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.5990226074682937e-12,
+        "Battaglia12_rcond1e-06": 1.6825329447672104e-12,
+        "FL_L1_m9_rcond0.001": 1.5912852035980564e-12,
+        "FL_L1_m9_rcond1e-06": 1.6049991008487679e-12
+      },
+      "distance5": 1.5990226074682937e-12,
+      "distance9": 1.6825329447672104e-12
+    },
+    {
+      "group": "common_reference",
+      "task": 3,
+      "variant": "half_theta",
+      "nodes": [
+        256,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 8.725533342465149e-07,
+      "max_fractional_Dell": 9.424185521160215e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.6883614912715746e-12,
+        "Battaglia12_rcond1e-06": 1.7765475986692695e-12,
+        "FL_L1_m9_rcond0.001": 1.6801936240213656e-12,
+        "FL_L1_m9_rcond1e-06": 1.6946729078935947e-12
+      },
+      "distance5": 1.6883614912715746e-12,
+      "distance9": 1.7765475986692695e-12
+    },
+    {
+      "group": "original_exterior",
+      "task": 3,
+      "variant": "half_theta",
+      "nodes": [
+        256,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 3.174351674165646e-05,
+      "max_fractional_Dell": 0.0012339790190240684,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.756033094532534,
+        "Battaglia12_rcond1e-06": 2.893631681310498,
+        "FL_L1_m9_rcond0.001": 2.7001187346873547,
+        "FL_L1_m9_rcond1e-06": 3.0756688532154284
+      },
+      "distance5": 2.756033094532534,
+      "distance9": 3.0756688532154284
+    },
+    {
+      "group": "common_reference",
+      "task": 3,
+      "variant": "half_theta",
+      "nodes": [
+        256,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 3.6145857988116535e-05,
+      "max_fractional_Dell": 0.0013273657801503417,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.9179976244264307,
+        "Battaglia12_rcond1e-06": 3.0835240341633012,
+        "FL_L1_m9_rcond0.001": 2.859704576189729,
+        "FL_L1_m9_rcond1e-06": 3.261358940741011
+      },
+      "distance5": 2.9179976244264307,
+      "distance9": 3.261358940741011
+    },
+    {
+      "group": "original_exterior",
+      "task": 4,
+      "variant": "half_logz",
+      "nodes": [
+        512,
+        128,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.296431058725898e-07,
+      "max_fractional_Dell": 1.5468418803952413e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 3.763899440060466e-06,
+        "Battaglia12_rcond1e-06": 5.169322696121218e-06,
+        "FL_L1_m9_rcond0.001": 6.461383385981211e-06,
+        "FL_L1_m9_rcond1e-06": 6.7207619566405896e-06
+      },
+      "distance5": 6.461383385981211e-06,
+      "distance9": 6.7207619566405896e-06
+    },
+    {
+      "group": "common_reference",
+      "task": 4,
+      "variant": "half_logz",
+      "nodes": [
+        512,
+        128,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 2.2109586122011277e-07,
+      "max_fractional_Dell": 1.7945234578586117e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.9887026214128145e-05,
+        "Battaglia12_rcond1e-06": 3.249512339250525e-05,
+        "FL_L1_m9_rcond0.001": 3.372712882963465e-05,
+        "FL_L1_m9_rcond1e-06": 3.7036618100112586e-05
+      },
+      "distance5": 3.372712882963465e-05,
+      "distance9": 3.7036618100112586e-05
+    },
+    {
+      "group": "original_exterior",
+      "task": 4,
+      "variant": "half_logz",
+      "nodes": [
+        512,
+        128,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 1.0589449532103567e-07,
+      "max_fractional_Dell": 1.4628508243100256e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.4188353899237484e-05,
+        "Battaglia12_rcond1e-06": 1.4777461644285966e-05,
+        "FL_L1_m9_rcond0.001": 1.4125443161765666e-05,
+        "FL_L1_m9_rcond1e-06": 1.610633674325053e-05
+      },
+      "distance5": 1.4188353899237484e-05,
+      "distance9": 1.610633674325053e-05
+    },
+    {
+      "group": "common_reference",
+      "task": 4,
+      "variant": "half_logz",
+      "nodes": [
+        512,
+        128,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 3.9482002330179526e-07,
+      "max_fractional_Dell": 4.225555844270491e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00024627396768102513,
+        "Battaglia12_rcond1e-06": 0.0002531231842613477,
+        "FL_L1_m9_rcond0.001": 0.00024664937130592035,
+        "FL_L1_m9_rcond1e-06": 0.00025178108071185215
+      },
+      "distance5": 0.00024664937130592035,
+      "distance9": 0.0002531231842613477
+    },
+    {
+      "group": "original_exterior",
+      "task": 4,
+      "variant": "half_logz",
+      "nodes": [
+        512,
+        128,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 2.5136443556557347e-09,
+      "max_fractional_Dell": 8.089934285577465e-09,
+      "moped": {
+        "Battaglia12_rcond0.001": 4.731001722980441e-15,
+        "Battaglia12_rcond1e-06": 4.973552359741209e-15,
+        "FL_L1_m9_rcond0.001": 4.7180811735472836e-15,
+        "FL_L1_m9_rcond1e-06": 4.75495608233783e-15
+      },
+      "distance5": 4.731001722980441e-15,
+      "distance9": 4.973552359741209e-15
+    },
+    {
+      "group": "common_reference",
+      "task": 4,
+      "variant": "half_logz",
+      "nodes": [
+        512,
+        128,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.8635621744109366e-08,
+      "max_fractional_Dell": 5.7350408911469376e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 9.406987256615834e-14,
+        "Battaglia12_rcond1e-06": 9.898781736800361e-14,
+        "FL_L1_m9_rcond0.001": 9.362637811737566e-14,
+        "FL_L1_m9_rcond1e-06": 9.442833552671117e-14
+      },
+      "distance5": 9.406987256615834e-14,
+      "distance9": 9.898781736800361e-14
+    },
+    {
+      "group": "original_exterior",
+      "task": 4,
+      "variant": "half_logz",
+      "nodes": [
+        512,
+        128,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 2.726754954598402e-06,
+      "max_fractional_Dell": 3.897303284587554e-05,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.05237961519323542,
+        "Battaglia12_rcond1e-06": 0.06512753372553322,
+        "FL_L1_m9_rcond0.001": 0.049393803427412765,
+        "FL_L1_m9_rcond1e-06": 0.05128830772065849
+      },
+      "distance5": 0.05237961519323542,
+      "distance9": 0.06512753372553322
+    },
+    {
+      "group": "common_reference",
+      "task": 4,
+      "variant": "half_logz",
+      "nodes": [
+        512,
+        128,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 6.4022384712635846e-06,
+      "max_fractional_Dell": 0.00016565555249295252,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.48721658794989536,
+        "Battaglia12_rcond1e-06": 0.5351933367769086,
+        "FL_L1_m9_rcond0.001": 0.48700480498456433,
+        "FL_L1_m9_rcond1e-06": 0.5029754549484868
+      },
+      "distance5": 0.48721658794989536,
+      "distance9": 0.5351933367769086
+    },
+    {
+      "group": "original_exterior",
+      "task": 5,
+      "variant": "half_logmass",
+      "nodes": [
+        512,
+        256,
+        64
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 7.905734280270456e-08,
+      "max_fractional_Dell": 9.026036387798116e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 9.804347203883221e-06,
+        "Battaglia12_rcond1e-06": 1.0049852640190113e-05,
+        "FL_L1_m9_rcond0.001": 9.376800537533075e-06,
+        "FL_L1_m9_rcond1e-06": 1.0040470941872266e-05
+      },
+      "distance5": 9.804347203883221e-06,
+      "distance9": 1.0049852640190113e-05
+    },
+    {
+      "group": "common_reference",
+      "task": 5,
+      "variant": "half_logmass",
+      "nodes": [
+        512,
+        256,
+        64
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 2.1545322467350979e-07,
+      "max_fractional_Dell": 1.5671416201879145e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 3.337237728041706e-05,
+        "Battaglia12_rcond1e-06": 3.4704236035593636e-05,
+        "FL_L1_m9_rcond0.001": 3.538622276233584e-05,
+        "FL_L1_m9_rcond1e-06": 3.86685741566182e-05
+      },
+      "distance5": 3.538622276233584e-05,
+      "distance9": 3.86685741566182e-05
+    },
+    {
+      "group": "original_exterior",
+      "task": 5,
+      "variant": "half_logmass",
+      "nodes": [
+        512,
+        256,
+        64
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 9.275425634026085e-08,
+      "max_fractional_Dell": 7.603052131384274e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.2055988361923755e-05,
+        "Battaglia12_rcond1e-06": 1.2772274753273578e-05,
+        "FL_L1_m9_rcond0.001": 1.1439979342788552e-05,
+        "FL_L1_m9_rcond1e-06": 1.2489984326476376e-05
+      },
+      "distance5": 1.2055988361923755e-05,
+      "distance9": 1.2772274753273578e-05
+    },
+    {
+      "group": "common_reference",
+      "task": 5,
+      "variant": "half_logmass",
+      "nodes": [
+        512,
+        256,
+        64
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 4.1604346856588465e-07,
+      "max_fractional_Dell": 4.316559767031615e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00025138365922499755,
+        "Battaglia12_rcond1e-06": 0.0002581155985404896,
+        "FL_L1_m9_rcond0.001": 0.0002509239218037199,
+        "FL_L1_m9_rcond1e-06": 0.0002555515109597932
+      },
+      "distance5": 0.00025138365922499755,
+      "distance9": 0.0002581155985404896
+    },
+    {
+      "group": "original_exterior",
+      "task": 5,
+      "variant": "half_logmass",
+      "nodes": [
+        512,
+        256,
+        64
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 2.183914692495073e-09,
+      "max_fractional_Dell": 3.3737445346582876e-09,
+      "moped": {
+        "Battaglia12_rcond0.001": 4.2106123405815155e-15,
+        "Battaglia12_rcond1e-06": 4.432564633402303e-15,
+        "FL_L1_m9_rcond0.001": 4.194237805140062e-15,
+        "FL_L1_m9_rcond1e-06": 4.22949978340482e-15
+      },
+      "distance5": 4.2106123405815155e-15,
+      "distance9": 4.432564633402303e-15
+    },
+    {
+      "group": "common_reference",
+      "task": 5,
+      "variant": "half_logmass",
+      "nodes": [
+        512,
+        256,
+        64
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.835658113984037e-08,
+      "max_fractional_Dell": 5.4215263178798266e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 9.354948244751859e-14,
+        "Battaglia12_rcond1e-06": 9.844719460498354e-14,
+        "FL_L1_m9_rcond0.001": 9.31026481795596e-14,
+        "FL_L1_m9_rcond1e-06": 9.39032747665322e-14
+      },
+      "distance5": 9.354948244751859e-14,
+      "distance9": 9.844719460498354e-14
+    },
+    {
+      "group": "original_exterior",
+      "task": 5,
+      "variant": "half_logmass",
+      "nodes": [
+        512,
+        256,
+        64
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 1.7283043746108702e-06,
+      "max_fractional_Dell": 2.457469393806824e-05,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.016157408458612126,
+        "Battaglia12_rcond1e-06": 0.02251432427755076,
+        "FL_L1_m9_rcond0.001": 0.016017453215940558,
+        "FL_L1_m9_rcond1e-06": 0.020695248742850177
+      },
+      "distance5": 0.016157408458612126,
+      "distance9": 0.02251432427755076
+    },
+    {
+      "group": "common_reference",
+      "task": 5,
+      "variant": "half_logmass",
+      "nodes": [
+        512,
+        256,
+        64
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 6.3020906750767636e-06,
+      "max_fractional_Dell": 0.00016813219321814746,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.5088493280411323,
+        "Battaglia12_rcond1e-06": 0.5655711338369399,
+        "FL_L1_m9_rcond0.001": 0.5067796435395172,
+        "FL_L1_m9_rcond1e-06": 0.5234025089915847
+      },
+      "distance5": 0.5088493280411323,
+      "distance9": 0.5655711338369399
+    },
+    {
+      "group": "original_exterior",
+      "task": 6,
+      "variant": "half_all_axes",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.032205496729957e-06,
+      "max_fractional_Dell": 8.770705004264834e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00017618576340574894,
+        "Battaglia12_rcond1e-06": 0.00017934165495666504,
+        "FL_L1_m9_rcond0.001": 0.00018325233942137408,
+        "FL_L1_m9_rcond1e-06": 0.00019826788764539704
+      },
+      "distance5": 0.00018325233942137408,
+      "distance9": 0.00019826788764539704
+    },
+    {
+      "group": "common_reference",
+      "task": 6,
+      "variant": "half_all_axes",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.0494652604050222e-06,
+      "max_fractional_Dell": 9.445567464562955e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0002034112113378112,
+        "Battaglia12_rcond1e-06": 0.00020799278848380458,
+        "FL_L1_m9_rcond0.001": 0.00021319152664465237,
+        "FL_L1_m9_rcond1e-06": 0.00023104857364776585
+      },
+      "distance5": 0.00021319152664465237,
+      "distance9": 0.00023104857364776585
+    },
+    {
+      "group": "original_exterior",
+      "task": 6,
+      "variant": "half_all_axes",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 2.0536457711968456e-06,
+      "max_fractional_Dell": 2.1368450436344324e-05,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0011726027683784937,
+        "Battaglia12_rcond1e-06": 0.0012049208231500446,
+        "FL_L1_m9_rcond0.001": 0.001176573519696115,
+        "FL_L1_m9_rcond1e-06": 0.001192029218259244
+      },
+      "distance5": 0.001176573519696115,
+      "distance9": 0.0012049208231500446
+    },
+    {
+      "group": "common_reference",
+      "task": 6,
+      "variant": "half_all_axes",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 2.4088941611214436e-06,
+      "max_fractional_Dell": 2.509923205778966e-05,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0014112446234343433,
+        "Battaglia12_rcond1e-06": 0.001449707440739295,
+        "FL_L1_m9_rcond0.001": 0.001415521236405529,
+        "FL_L1_m9_rcond1e-06": 0.0014347046898408333
+      },
+      "distance5": 0.001415521236405529,
+      "distance9": 0.001449707440739295
+    },
+    {
+      "group": "original_exterior",
+      "task": 6,
+      "variant": "half_all_axes",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 8.310216878864413e-07,
+      "max_fractional_Dell": 9.025962054086718e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.607964185409422e-12,
+        "Battaglia12_rcond1e-06": 1.6919385980859095e-12,
+        "FL_L1_m9_rcond0.001": 1.6001973657184795e-12,
+        "FL_L1_m9_rcond1e-06": 1.6139830486348526e-12
+      },
+      "distance5": 1.607964185409422e-12,
+      "distance9": 1.6919385980859095e-12
+    },
+    {
+      "group": "common_reference",
+      "task": 6,
+      "variant": "half_all_axes",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 8.77193755831485e-07,
+      "max_fractional_Dell": 9.481195019962103e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.6973030693530997e-12,
+        "Battaglia12_rcond1e-06": 1.785953252318556e-12,
+        "FL_L1_m9_rcond0.001": 1.6891057859544908e-12,
+        "FL_L1_m9_rcond1e-06": 1.7036568557480567e-12
+      },
+      "distance5": 1.6973030693530997e-12,
+      "distance9": 1.785953252318556e-12
+    },
+    {
+      "group": "original_exterior",
+      "task": 6,
+      "variant": "half_all_axes",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 3.203864972740497e-05,
+      "max_fractional_Dell": 0.0012213753894621592,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.752782701983383,
+        "Battaglia12_rcond1e-06": 2.8868157325552106,
+        "FL_L1_m9_rcond0.001": 2.7037211812269164,
+        "FL_L1_m9_rcond1e-06": 3.051195425980396
+      },
+      "distance5": 2.752782701983383,
+      "distance9": 3.051195425980396
+    },
+    {
+      "group": "common_reference",
+      "task": 6,
+      "variant": "half_all_axes",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 3.6491146111903074e-05,
+      "max_fractional_Dell": 0.0013147609750269074,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.9116729356089817,
+        "Battaglia12_rcond1e-06": 3.071917964351717,
+        "FL_L1_m9_rcond0.001": 2.859995956827595,
+        "FL_L1_m9_rcond1e-06": 3.233896761820345
+      },
+      "distance5": 2.9116729356089817,
+      "distance9": 3.233896761820345
+    },
+    {
+      "group": "original_exterior",
+      "task": 7,
+      "variant": "quarter_all_axes",
+      "nodes": [
+        128,
+        64,
+        32
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 9.060160269172316e-06,
+      "max_fractional_Dell": 0.000100617219533156,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0021998137704388747,
+        "Battaglia12_rcond1e-06": 0.0024018719167863715,
+        "FL_L1_m9_rcond0.001": 0.0021218583097506703,
+        "FL_L1_m9_rcond1e-06": 0.0023238498888816846
+      },
+      "distance5": 0.0021998137704388747,
+      "distance9": 0.0024018719167863715
+    },
+    {
+      "group": "common_reference",
+      "task": 7,
+      "variant": "quarter_all_axes",
+      "nodes": [
+        128,
+        64,
+        32
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 9.076305219065531e-06,
+      "max_fractional_Dell": 0.00010171614135308173,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0022210055729273456,
+        "Battaglia12_rcond1e-06": 0.002423131897794786,
+        "FL_L1_m9_rcond0.001": 0.002146533303246294,
+        "FL_L1_m9_rcond1e-06": 0.002351452487929805
+      },
+      "distance5": 0.0022210055729273456,
+      "distance9": 0.002423131897794786
+    },
+    {
+      "group": "original_exterior",
+      "task": 7,
+      "variant": "quarter_all_axes",
+      "nodes": [
+        128,
+        64,
+        32
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 1.5839036150414844e-05,
+      "max_fractional_Dell": 0.00015946292812573878,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00817606543078914,
+        "Battaglia12_rcond1e-06": 0.008434087215238197,
+        "FL_L1_m9_rcond0.001": 0.00804004515097376,
+        "FL_L1_m9_rcond1e-06": 0.008126877205277426
+      },
+      "distance5": 0.00817606543078914,
+      "distance9": 0.008434087215238197
+    },
+    {
+      "group": "common_reference",
+      "task": 7,
+      "variant": "quarter_all_axes",
+      "nodes": [
+        128,
+        64,
+        32
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 1.6180955684465237e-05,
+      "max_fractional_Dell": 0.00016267323327662792,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.008395298110200443,
+        "Battaglia12_rcond1e-06": 0.008657271251677411,
+        "FL_L1_m9_rcond0.001": 0.008261313877078475,
+        "FL_L1_m9_rcond1e-06": 0.008348167434469875
+      },
+      "distance5": 0.008395298110200443,
+      "distance9": 0.008657271251677411
+    },
+    {
+      "group": "original_exterior",
+      "task": 7,
+      "variant": "quarter_all_axes",
+      "nodes": [
+        128,
+        64,
+        32
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 1.1996107276276392e-05,
+      "max_fractional_Dell": 1.3501072445549727e-05,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.320894171170445e-11,
+        "Battaglia12_rcond1e-06": 2.4421201585329506e-11,
+        "FL_L1_m9_rcond0.001": 2.3097771726599543e-11,
+        "FL_L1_m9_rcond1e-06": 2.3296073656891035e-11
+      },
+      "distance5": 2.320894171170445e-11,
+      "distance9": 2.4421201585329506e-11
+    },
+    {
+      "group": "common_reference",
+      "task": 7,
+      "variant": "quarter_all_axes",
+      "nodes": [
+        128,
+        64,
+        32
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 1.2042278498165766e-05,
+      "max_fractional_Dell": 1.3546346996698052e-05,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.3298280591955684e-11,
+        "Battaglia12_rcond1e-06": 2.4515216234139893e-11,
+        "FL_L1_m9_rcond0.001": 2.3186680155048232e-11,
+        "FL_L1_m9_rcond1e-06": 2.3385747465250576e-11
+      },
+      "distance5": 2.3298280591955684e-11,
+      "distance9": 2.4515216234139893e-11
+    },
+    {
+      "group": "original_exterior",
+      "task": 7,
+      "variant": "quarter_all_axes",
+      "nodes": [
+        128,
+        64,
+        32
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.00028123120629910134,
+      "max_fractional_Dell": 0.006282296143159893,
+      "moped": {
+        "Battaglia12_rcond0.001": 30.4760368208346,
+        "Battaglia12_rcond1e-06": 31.785790237318434,
+        "FL_L1_m9_rcond0.001": 29.71898569442928,
+        "FL_L1_m9_rcond1e-06": 31.65490506732251
+      },
+      "distance5": 30.4760368208346,
+      "distance9": 31.785790237318434
+    },
+    {
+      "group": "common_reference",
+      "task": 7,
+      "variant": "quarter_all_axes",
+      "nodes": [
+        128,
+        64,
+        32
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.0002846507423738843,
+      "max_fractional_Dell": 0.0063115829870893,
+      "moped": {
+        "Battaglia12_rcond0.001": 30.457951173593692,
+        "Battaglia12_rcond1e-06": 31.74385899255175,
+        "FL_L1_m9_rcond0.001": 29.688057263409167,
+        "FL_L1_m9_rcond1e-06": 31.656309287674276
+      },
+      "distance5": 30.457951173593692,
+      "distance9": 31.74385899255175
+    },
+    {
+      "group": "original_exterior",
+      "task": 8,
+      "variant": "shared_geometry_repeat",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 6.659945182185721e-16,
+      "max_fractional_Dell": 7.335964925478047e-15,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.4864584027028777e-14,
+        "Battaglia12_rcond1e-06": 1.6616200359189454e-14,
+        "FL_L1_m9_rcond0.001": 1.4923054629442618e-14,
+        "FL_L1_m9_rcond1e-06": 2.0678761490557757e-14
+      },
+      "distance5": 1.4923054629442618e-14,
+      "distance9": 2.0678761490557757e-14
+    },
+    {
+      "group": "common_reference",
+      "task": 8,
+      "variant": "shared_geometry_repeat",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.899416291420307e-07,
+      "max_fractional_Dell": 1.4017538871207096e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.8823878374874255e-05,
+        "Battaglia12_rcond1e-06": 3.08360160527973e-05,
+        "FL_L1_m9_rcond0.001": 3.1693579360389006e-05,
+        "FL_L1_m9_rcond1e-06": 3.479117600726941e-05
+      },
+      "distance5": 3.1693579360389006e-05,
+      "distance9": 3.479117600726941e-05
+    },
+    {
+      "group": "original_exterior",
+      "task": 8,
+      "variant": "shared_geometry_repeat",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 7.523049507578319e-16,
+      "max_fractional_Dell": 1.4710726731161195e-14,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.5076272424853816e-14,
+        "Battaglia12_rcond1e-06": 2.0200664752221253e-14,
+        "FL_L1_m9_rcond0.001": 1.3525866269732213e-14,
+        "FL_L1_m9_rcond1e-06": 1.5485282528908255e-14
+      },
+      "distance5": 1.5076272424853816e-14,
+      "distance9": 2.0200664752221253e-14
+    },
+    {
+      "group": "common_reference",
+      "task": 8,
+      "variant": "shared_geometry_repeat",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 3.988944978105747e-07,
+      "max_fractional_Dell": 4.0027766017845754e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00023961488797193407,
+        "Battaglia12_rcond1e-06": 0.0002457673018976602,
+        "FL_L1_m9_rcond0.001": 0.0002397840698255451,
+        "FL_L1_m9_rcond1e-06": 0.00024374392508141237
+      },
+      "distance5": 0.0002397840698255451,
+      "distance9": 0.0002457673018976602
+    },
+    {
+      "group": "original_exterior",
+      "task": 8,
+      "variant": "shared_geometry_repeat",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.548699001416031e-16,
+      "max_fractional_Dell": 2.2272523770049003e-15,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.2946275254096501e-23,
+        "Battaglia12_rcond1e-06": 3.740266202554642e-23,
+        "FL_L1_m9_rcond0.001": 2.149731499360006e-23,
+        "FL_L1_m9_rcond1e-06": 5.022911261589921e-23
+      },
+      "distance5": 2.149731499360006e-23,
+      "distance9": 5.022911261589921e-23
+    },
+    {
+      "group": "common_reference",
+      "task": 8,
+      "variant": "shared_geometry_repeat",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.617453929354309e-08,
+      "max_fractional_Dell": 5.1850757154610476e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 8.933888743688202e-14,
+        "Battaglia12_rcond1e-06": 9.401466625335665e-14,
+        "FL_L1_m9_rcond0.001": 8.890843124708067e-14,
+        "FL_L1_m9_rcond1e-06": 8.967381939273276e-14
+      },
+      "distance5": 8.933888743688202e-14,
+      "distance9": 9.401466625335665e-14
+    },
+    {
+      "group": "original_exterior",
+      "task": 8,
+      "variant": "shared_geometry_repeat",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 7.730240661171701e-16,
+      "max_fractional_Dell": 1.4276570946139186e-13,
+      "moped": {
+        "Battaglia12_rcond0.001": 3.828366215768831e-12,
+        "Battaglia12_rcond1e-06": 4.83672486572594e-12,
+        "FL_L1_m9_rcond0.001": 3.2842033636317475e-12,
+        "FL_L1_m9_rcond1e-06": 4.5018809418753585e-12
+      },
+      "distance5": 3.828366215768831e-12,
+      "distance9": 4.83672486572594e-12
+    },
+    {
+      "group": "common_reference",
+      "task": 8,
+      "variant": "shared_geometry_repeat",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 6.307874884312676e-06,
+      "max_fractional_Dell": 0.0001735536694884908,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.5181274049291227,
+        "Battaglia12_rcond1e-06": 0.5780989488799683,
+        "FL_L1_m9_rcond0.001": 0.5175832735999394,
+        "FL_L1_m9_rcond1e-06": 0.5318766721289193
+      },
+      "distance5": 0.5181274049291227,
+      "distance9": 0.5780989488799683
+    },
+    {
+      "group": "original_exterior",
+      "task": 9,
+      "variant": "shared_geometry_two_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 6.682752115709231e-16,
+      "max_fractional_Dell": 8.930096838419739e-15,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.1319553358472274e-14,
+        "Battaglia12_rcond1e-06": 1.4265327291983694e-14,
+        "FL_L1_m9_rcond0.001": 1.1433473134330931e-14,
+        "FL_L1_m9_rcond1e-06": 1.6700137366155786e-14
+      },
+      "distance5": 1.1433473134330931e-14,
+      "distance9": 1.6700137366155786e-14
+    },
+    {
+      "group": "common_reference",
+      "task": 9,
+      "variant": "shared_geometry_two_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.8994162914027935e-07,
+      "max_fractional_Dell": 1.4017538867646587e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.8823878373844425e-05,
+        "Battaglia12_rcond1e-06": 3.083601605273017e-05,
+        "FL_L1_m9_rcond0.001": 3.169357935965827e-05,
+        "FL_L1_m9_rcond1e-06": 3.47911760099346e-05
+      },
+      "distance5": 3.169357935965827e-05,
+      "distance9": 3.47911760099346e-05
+    },
+    {
+      "group": "original_exterior",
+      "task": 9,
+      "variant": "shared_geometry_two_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 7.730301981746344e-16,
+      "max_fractional_Dell": 1.4424240478912798e-14,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.563152588341054e-14,
+        "Battaglia12_rcond1e-06": 1.7792205323297665e-14,
+        "FL_L1_m9_rcond0.001": 6.021889786268594e-15,
+        "FL_L1_m9_rcond1e-06": 1.4710148192364183e-14
+      },
+      "distance5": 1.563152588341054e-14,
+      "distance9": 1.7792205323297665e-14
+    },
+    {
+      "group": "common_reference",
+      "task": 9,
+      "variant": "shared_geometry_two_profiles",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 3.9889449782181514e-07,
+      "max_fractional_Dell": 4.002776602271597e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00023961488798078748,
+        "Battaglia12_rcond1e-06": 0.00024576730190901985,
+        "FL_L1_m9_rcond0.001": 0.00023978406983754497,
+        "FL_L1_m9_rcond1e-06": 0.00024374392509183748
+      },
+      "distance5": 0.00023978406983754497,
+      "distance9": 0.00024576730190901985
+    },
+    {
+      "group": "original_exterior",
+      "task": 10,
+      "variant": "single_profile_optimized",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 6.616485405675697e-16,
+      "max_fractional_Dell": 1.0455078456543793e-14,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.8243339619435413e-14,
+        "Battaglia12_rcond1e-06": 1.9584529316304088e-14,
+        "FL_L1_m9_rcond0.001": 1.627571947215282e-14,
+        "FL_L1_m9_rcond1e-06": 2.0199458576909755e-14
+      },
+      "distance5": 1.8243339619435413e-14,
+      "distance9": 2.0199458576909755e-14
+    },
+    {
+      "group": "common_reference",
+      "task": 10,
+      "variant": "single_profile_optimized",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.8994162913896314e-07,
+      "max_fractional_Dell": 1.4017538870020259e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.8823878370729072e-05,
+        "Battaglia12_rcond1e-06": 3.0836016047424776e-05,
+        "FL_L1_m9_rcond0.001": 3.1693579356506044e-05,
+        "FL_L1_m9_rcond1e-06": 3.479117600697062e-05
+      },
+      "distance5": 3.1693579356506044e-05,
+      "distance9": 3.479117600697062e-05
+    },
+    {
+      "group": "original_exterior",
+      "task": 11,
+      "variant": "extended_shallow_reference16384",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 4.192067131878385e-05,
+      "max_fractional_Dell": 0.005218330514153364,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.8343328520755864,
+        "Battaglia12_rcond1e-06": 2.0066834084542506,
+        "FL_L1_m9_rcond0.001": 1.871426114660861,
+        "FL_L1_m9_rcond1e-06": 2.3343845404883568
+      },
+      "distance5": 1.871426114660861,
+      "distance9": 2.3343845404883568
+    },
+    {
+      "group": "original_exterior",
+      "task": 12,
+      "variant": "Battaglia12_reference16384",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.0009102366934877047,
+      "max_fractional_Dell": 0.01048219474590305,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.3780666208517196,
+        "Battaglia12_rcond1e-06": 0.38067237514972513,
+        "FL_L1_m9_rcond0.001": 0.39215457899353506,
+        "FL_L1_m9_rcond1e-06": 0.39458252226648605
+      },
+      "distance5": 0.39215457899353506,
+      "distance9": 0.39458252226648605
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 0,
+      "variant": "smooth_exterior_0",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.642837944463819e-08,
+      "max_fractional_Dell": 3.4013454606009994e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 6.708201617832419e-06,
+        "Battaglia12_rcond1e-06": 6.813418543577754e-06,
+        "FL_L1_m9_rcond0.001": 6.2919380397630686e-06,
+        "FL_L1_m9_rcond1e-06": 6.426613355213333e-06
+      },
+      "distance5": 6.708201617832419e-06,
+      "distance9": 6.813418543577754e-06
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 0,
+      "variant": "smooth_exterior_0",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 1.4165855395556152e-08,
+      "max_fractional_Dell": 5.3042062608313466e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.1953370501352545e-05,
+        "Battaglia12_rcond1e-06": 1.2200544604134952e-05,
+        "FL_L1_m9_rcond0.001": 1.1757411467672003e-05,
+        "FL_L1_m9_rcond1e-06": 1.2213023045967935e-05
+      },
+      "distance5": 1.1953370501352545e-05,
+      "distance9": 1.2213023045967935e-05
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 0,
+      "variant": "smooth_exterior_0",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.617453928215977e-08,
+      "max_fractional_Dell": 5.185075750324839e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 8.93388874051378e-14,
+        "Battaglia12_rcond1e-06": 9.401466621874777e-14,
+        "FL_L1_m9_rcond0.001": 8.89084312210842e-14,
+        "FL_L1_m9_rcond1e-06": 8.967381936329e-14
+      },
+      "distance5": 8.93388874051378e-14,
+      "distance9": 9.401466621874777e-14
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 0,
+      "variant": "smooth_exterior_0",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 4.047858849963239e-09,
+      "max_fractional_Dell": 1.1645601333174713e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.000379577027967301,
+        "Battaglia12_rcond1e-06": 0.0004142313043458687,
+        "FL_L1_m9_rcond0.001": 0.0003827068088781858,
+        "FL_L1_m9_rcond1e-06": 0.0003874123288298952
+      },
+      "distance5": 0.0003827068088781858,
+      "distance9": 0.0004142313043458687
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 1,
+      "variant": "smooth_exterior_1",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 2.92499784951177e-07,
+      "max_fractional_Dell": 6.018225187496089e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00011925832408073209,
+        "Battaglia12_rcond1e-06": 0.00012107604110415413,
+        "FL_L1_m9_rcond0.001": 0.00011157673289797625,
+        "FL_L1_m9_rcond1e-06": 0.00011397821970026326
+      },
+      "distance5": 0.00011925832408073209,
+      "distance9": 0.00012107604110415413
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 1,
+      "variant": "smooth_exterior_1",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 2.4535790709159767e-07,
+      "max_fractional_Dell": 9.011648523012177e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00020778645052114362,
+        "Battaglia12_rcond1e-06": 0.00021210430814096534,
+        "FL_L1_m9_rcond0.001": 0.00020415342801375779,
+        "FL_L1_m9_rcond1e-06": 0.00021224779650859892
+      },
+      "distance5": 0.00020778645052114362,
+      "distance9": 0.00021224779650859892
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 1,
+      "variant": "smooth_exterior_1",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 8.771937558560544e-07,
+      "max_fractional_Dell": 9.481195018688454e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.6973030694036082e-12,
+        "Battaglia12_rcond1e-06": 1.7859532523722346e-12,
+        "FL_L1_m9_rcond0.001": 1.6891057860059352e-12,
+        "FL_L1_m9_rcond1e-06": 1.7036568558021215e-12
+      },
+      "distance5": 1.6973030694036082e-12,
+      "distance9": 1.7859532523722346e-12
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 1,
+      "variant": "smooth_exterior_1",
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 7.45960730257892e-08,
+      "max_fractional_Dell": 2.4113076627840863e-07,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.00692858354937872,
+        "Battaglia12_rcond1e-06": 0.007487850839121517,
+        "FL_L1_m9_rcond0.001": 0.006964371928742271,
+        "FL_L1_m9_rcond1e-06": 0.0070505895279737284
+      },
+      "distance5": 0.006964371928742271,
+      "distance9": 0.007487850839121517
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 2,
+      "variant": "smooth_exterior_2",
+      "nodes": [
+        1024,
+        512,
+        256
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.0,
+      "max_fractional_Dell": 0.0,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0,
+        "Battaglia12_rcond1e-06": 0.0,
+        "FL_L1_m9_rcond0.001": 0.0,
+        "FL_L1_m9_rcond1e-06": 0.0
+      },
+      "distance5": 0.0,
+      "distance9": 0.0
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 2,
+      "variant": "smooth_exterior_2",
+      "nodes": [
+        1024,
+        512,
+        256
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 0.0,
+      "max_fractional_Dell": 0.0,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0,
+        "Battaglia12_rcond1e-06": 0.0,
+        "FL_L1_m9_rcond0.001": 0.0,
+        "FL_L1_m9_rcond1e-06": 0.0
+      },
+      "distance5": 0.0,
+      "distance9": 0.0
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 2,
+      "variant": "smooth_exterior_2",
+      "nodes": [
+        1024,
+        512,
+        256
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 0.0,
+      "max_fractional_Dell": 0.0,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0,
+        "Battaglia12_rcond1e-06": 0.0,
+        "FL_L1_m9_rcond0.001": 0.0,
+        "FL_L1_m9_rcond1e-06": 0.0
+      },
+      "distance5": 0.0,
+      "distance9": 0.0
+    },
+    {
+      "group": "smooth_exterior",
+      "task": 2,
+      "variant": "smooth_exterior_2",
+      "nodes": [
+        1024,
+        512,
+        256
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.0,
+      "max_fractional_Dell": 0.0,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0,
+        "Battaglia12_rcond1e-06": 0.0,
+        "FL_L1_m9_rcond0.001": 0.0,
+        "FL_L1_m9_rcond1e-06": 0.0
+      },
+      "distance5": 0.0,
+      "distance9": 0.0
+    },
+    {
+      "group": "balanced",
+      "task": 0,
+      "variant": "greedy256",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 6.752918359386826e-16,
+      "max_fractional_Dell": 9.45637362694917e-15,
+      "moped": {
+        "Battaglia12_rcond0.001": 5.126648664647071e-15,
+        "Battaglia12_rcond1e-06": 1.0610822039553444e-14,
+        "FL_L1_m9_rcond0.001": 2.629936273018402e-15,
+        "FL_L1_m9_rcond1e-06": 5.969553348587098e-15
+      },
+      "distance5": 5.126648664647071e-15,
+      "distance9": 1.0610822039553444e-14
+    },
+    {
+      "group": "boundary_change",
+      "task": 0,
+      "variant": "old_default_vs_smooth_double",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "Battaglia12",
+      "relative_Dell_l2": 1.8994162915111875e-07,
+      "max_fractional_Dell": 1.4017538867646587e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.8823878383909034e-05,
+        "Battaglia12_rcond1e-06": 3.083601605964754e-05,
+        "FL_L1_m9_rcond0.001": 3.169357936667042e-05,
+        "FL_L1_m9_rcond1e-06": 3.479117601606816e-05
+      },
+      "distance5": 3.169357936667042e-05,
+      "distance9": 3.479117601606816e-05
+    },
+    {
+      "group": "balanced",
+      "task": 0,
+      "variant": "greedy256",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 7.632003670677202e-16,
+      "max_fractional_Dell": 1.9666765366051682e-14,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.540350702448287e-14,
+        "Battaglia12_rcond1e-06": 2.071926783328274e-14,
+        "FL_L1_m9_rcond0.001": 1.2805441048342668e-14,
+        "FL_L1_m9_rcond1e-06": 2.0574665288541616e-14
+      },
+      "distance5": 1.540350702448287e-14,
+      "distance9": 2.071926783328274e-14
+    },
+    {
+      "group": "boundary_change",
+      "task": 0,
+      "variant": "old_default_vs_smooth_double",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 3.988944978168219e-07,
+      "max_fractional_Dell": 4.002776603610908e-06,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.0002396148879794917,
+        "Battaglia12_rcond1e-06": 0.0002457673019076491,
+        "FL_L1_m9_rcond0.001": 0.0002397840698344667,
+        "FL_L1_m9_rcond1e-06": 0.0002437439250909073
+      },
+      "distance5": 0.0002397840698344667,
+      "distance9": 0.0002457673019076491
+    },
+    {
+      "group": "balanced",
+      "task": 0,
+      "variant": "greedy256",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.837723154226661e-16,
+      "max_fractional_Dell": 2.7422442534508273e-15,
+      "moped": {
+        "Battaglia12_rcond0.001": 3.66332015970829e-23,
+        "Battaglia12_rcond1e-06": 4.9596989561420343e-23,
+        "FL_L1_m9_rcond0.001": 3.421160310304564e-23,
+        "FL_L1_m9_rcond1e-06": 7.152274924186767e-23
+      },
+      "distance5": 3.66332015970829e-23,
+      "distance9": 7.152274924186767e-23
+    },
+    {
+      "group": "boundary_change",
+      "task": 0,
+      "variant": "old_default_vs_smooth_double",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "compact",
+      "relative_Dell_l2": 4.617453928961306e-08,
+      "max_fractional_Dell": 5.1850757154610476e-08,
+      "moped": {
+        "Battaglia12_rcond0.001": 8.933888744149718e-14,
+        "Battaglia12_rcond1e-06": 9.401466625823332e-14,
+        "FL_L1_m9_rcond0.001": 8.890843125182334e-14,
+        "FL_L1_m9_rcond1e-06": 8.967381939691142e-14
+      },
+      "distance5": 8.933888744149718e-14,
+      "distance9": 9.401466625823332e-14
+    },
+    {
+      "group": "balanced",
+      "task": 0,
+      "variant": "greedy256",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 8.095803437650292e-16,
+      "max_fractional_Dell": 1.4489996629826994e-13,
+      "moped": {
+        "Battaglia12_rcond0.001": 3.5778505118258188e-12,
+        "Battaglia12_rcond1e-06": 6.36669213497433e-12,
+        "FL_L1_m9_rcond0.001": 3.47280201190769e-12,
+        "FL_L1_m9_rcond1e-06": 7.719255014604486e-12
+      },
+      "distance5": 3.5778505118258188e-12,
+      "distance9": 7.719255014604486e-12
+    },
+    {
+      "group": "boundary_change",
+      "task": 0,
+      "variant": "old_default_vs_smooth_double",
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "label": "extended_shallow",
+      "relative_Dell_l2": 6.3078748843299305e-06,
+      "max_fractional_Dell": 0.00017355366952591093,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.5181274049320761,
+        "Battaglia12_rcond1e-06": 0.5780989488835888,
+        "FL_L1_m9_rcond0.001": 0.517583273602152,
+        "FL_L1_m9_rcond1e-06": 0.5318766721314647
+      },
+      "distance5": 0.5181274049320761,
+      "distance9": 0.5780989488835888
+    }
+  ],
+  "resolution": [
+    {
+      "pair": "4096 vs 8192",
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.016723482718020793,
+      "max_fractional_Dell": 0.19188155768671422,
+      "moped": {
+        "Battaglia12_rcond0.001": 9.205516392555475,
+        "Battaglia12_rcond1e-06": 9.291007179460589,
+        "FL_L1_m9_rcond0.001": 9.51203088135997,
+        "FL_L1_m9_rcond1e-06": 9.587715237399316
+      },
+      "distance5": 9.51203088135997,
+      "distance9": 9.587715237399316
+    },
+    {
+      "pair": "4096 vs 8192",
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 0.002737966667732107,
+      "max_fractional_Dell": 0.05644266457748985,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.6321564759769718,
+        "Battaglia12_rcond1e-06": 1.6707269771640558,
+        "FL_L1_m9_rcond0.001": 1.5770203055974097,
+        "FL_L1_m9_rcond1e-06": 1.6107589821169006
+      },
+      "distance5": 1.6321564759769718,
+      "distance9": 1.6707269771640558
+    },
+    {
+      "pair": "4096 vs 8192",
+      "label": "compact",
+      "relative_Dell_l2": 2.660034073682398,
+      "max_fractional_Dell": 3.9269211976775535,
+      "moped": {
+        "Battaglia12_rcond0.001": 5.144249253375061e-06,
+        "Battaglia12_rcond1e-06": 5.413171020333114e-06,
+        "FL_L1_m9_rcond0.001": 5.12025332245593e-06,
+        "FL_L1_m9_rcond1e-06": 5.164789384242163e-06
+      },
+      "distance5": 5.144249253375061e-06,
+      "distance9": 5.413171020333114e-06
+    },
+    {
+      "pair": "4096 vs 8192",
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.00020299960039639077,
+      "max_fractional_Dell": 0.06633407125493682,
+      "moped": {
+        "Battaglia12_rcond0.001": 31.851558058351905,
+        "Battaglia12_rcond1e-06": 35.526841743657535,
+        "FL_L1_m9_rcond0.001": 33.11402675101805,
+        "FL_L1_m9_rcond1e-06": 42.86699879605708
+      },
+      "distance5": 33.11402675101805,
+      "distance9": 42.86699879605708
+    },
+    {
+      "pair": "8192 vs 16384",
+      "label": "extended_shallow",
+      "relative_Dell_l2": 4.192073005815053e-05,
+      "max_fractional_Dell": 0.005245704333143232,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.8343328520755864,
+        "Battaglia12_rcond1e-06": 2.0066834084542506,
+        "FL_L1_m9_rcond0.001": 1.871426114660861,
+        "FL_L1_m9_rcond1e-06": 2.3343845404883568
+      },
+      "distance5": 1.871426114660861,
+      "distance9": 2.3343845404883568
+    },
+    {
+      "pair": "8192 vs 16384",
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.0009105945886862765,
+      "max_fractional_Dell": 0.010593235099202021,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.3780666208517196,
+        "Battaglia12_rcond1e-06": 0.38067237514972513,
+        "FL_L1_m9_rcond0.001": 0.39215457899353506,
+        "FL_L1_m9_rcond1e-06": 0.39458252226648605
+      },
+      "distance5": 0.39215457899353506,
+      "distance9": 0.39458252226648605
+    },
+    {
+      "pair": "8192 vs 16384",
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 0.00015551395122818078,
+      "max_fractional_Dell": 0.0017199986144732775,
+      "moped": {
+        "Battaglia12_rcond0.001": 0.019784853842997784,
+        "Battaglia12_rcond1e-06": 0.026768110092865456,
+        "FL_L1_m9_rcond0.001": 0.02039242116067955,
+        "FL_L1_m9_rcond1e-06": 0.02139182490891602
+      },
+      "distance5": 0.02039242116067955,
+      "distance9": 0.026768110092865456
+    }
+  ],
+  "pixel_quadrature": [
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.03577991259652437,
+      "max_fractional_Dell": 0.21955019810460713,
+      "moped": {
+        "Battaglia12_rcond0.001": 21.40905465495862,
+        "Battaglia12_rcond1e-06": 21.63804701140788,
+        "FL_L1_m9_rcond0.001": 22.2419273191384,
+        "FL_L1_m9_rcond1e-06": 22.34833208022262
+      },
+      "distance5": 22.2419273191384,
+      "distance9": 22.34833208022262
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.013461752070859213,
+      "max_fractional_Dell": 0.12835887876803134,
+      "moped": {
+        "Battaglia12_rcond0.001": 7.846726574726036,
+        "Battaglia12_rcond1e-06": 7.922603722356082,
+        "FL_L1_m9_rcond0.001": 8.136753812473607,
+        "FL_L1_m9_rcond1e-06": 8.184184906264038
+      },
+      "distance5": 8.136753812473607,
+      "distance9": 8.184184906264038
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 0.034896476356557425,
+      "max_fractional_Dell": 0.2326097747453082,
+      "moped": {
+        "Battaglia12_rcond0.001": 26.67808371869819,
+        "Battaglia12_rcond1e-06": 27.22090299505363,
+        "FL_L1_m9_rcond0.001": 25.2715786018009,
+        "FL_L1_m9_rcond1e-06": 26.350305597725477
+      },
+      "distance5": 26.67808371869819,
+      "distance9": 27.22090299505363
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "label": "FL_L1_m9",
+      "relative_Dell_l2": 0.0123399035929221,
+      "max_fractional_Dell": 0.10515955940619165,
+      "moped": {
+        "Battaglia12_rcond0.001": 9.3168680303222,
+        "Battaglia12_rcond1e-06": 9.505769336741427,
+        "FL_L1_m9_rcond0.001": 8.83867027558835,
+        "FL_L1_m9_rcond1e-06": 9.190261406216493
+      },
+      "distance5": 9.3168680303222,
+      "distance9": 9.505769336741427
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "label": "compact",
+      "relative_Dell_l2": 0.006016900993738912,
+      "max_fractional_Dell": 0.028273118180788804,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.867142759236726e-09,
+        "Battaglia12_rcond1e-06": 3.1465168005803865e-09,
+        "FL_L1_m9_rcond0.001": 3.0966230968184224e-09,
+        "FL_L1_m9_rcond1e-06": 3.18123839312276e-09
+      },
+      "distance5": 3.0966230968184224e-09,
+      "distance9": 3.18123839312276e-09
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "label": "compact",
+      "relative_Dell_l2": 0.14190198175052154,
+      "max_fractional_Dell": 0.452815458592909,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.7558994586397468e-07,
+        "Battaglia12_rcond1e-06": 1.9728545809732316e-07,
+        "FL_L1_m9_rcond0.001": 1.8822290047335109e-07,
+        "FL_L1_m9_rcond1e-06": 1.932655335372818e-07
+      },
+      "distance5": 1.8822290047335109e-07,
+      "distance9": 1.9728545809732316e-07
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.007857033734648524,
+      "max_fractional_Dell": 0.23252123576000752,
+      "moped": {
+        "Battaglia12_rcond0.001": 2000.9348792523167,
+        "Battaglia12_rcond1e-06": 2107.7392597262933,
+        "FL_L1_m9_rcond0.001": 1977.4750408737946,
+        "FL_L1_m9_rcond1e-06": 2104.4754415275283
+      },
+      "distance5": 2000.9348792523167,
+      "distance9": 2107.7392597262933
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.002689186776479378,
+      "max_fractional_Dell": 0.10459174106346705,
+      "moped": {
+        "Battaglia12_rcond0.001": 692.95528128107,
+        "Battaglia12_rcond1e-06": 729.6496297838612,
+        "FL_L1_m9_rcond0.001": 685.1383723191235,
+        "FL_L1_m9_rcond1e-06": 731.6533095749181
+      },
+      "distance5": 692.95528128107,
+      "distance9": 731.6533095749181
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 8192,
+      "dewindow": false,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.0019825037624108632,
+      "max_fractional_Dell": 0.06450085839721417,
+      "moped": {
+        "Battaglia12_rcond0.001": 508.37849749762313,
+        "Battaglia12_rcond1e-06": 535.3828726047517,
+        "FL_L1_m9_rcond0.001": 502.5443267360718,
+        "FL_L1_m9_rcond1e-06": 535.8606265845731
+      },
+      "distance5": 508.37849749762313,
+      "distance9": 535.8606265845731
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 8192,
+      "dewindow": true,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.000670246904253363,
+      "max_fractional_Dell": 0.022737323305836814,
+      "moped": {
+        "Battaglia12_rcond0.001": 172.28902700695025,
+        "Battaglia12_rcond1e-06": 181.4272266053426,
+        "FL_L1_m9_rcond0.001": 170.32159798539047,
+        "FL_L1_m9_rcond1e-06": 181.7187612145057
+      },
+      "distance5": 172.28902700695025,
+      "distance9": 181.7187612145057
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.009777884334382486,
+      "max_fractional_Dell": 0.2820560687516193,
+      "moped": {
+        "Battaglia12_rcond0.001": 2481.908930132353,
+        "Battaglia12_rcond1e-06": 2614.7093301556456,
+        "FL_L1_m9_rcond0.001": 2452.5773400366716,
+        "FL_L1_m9_rcond1e-06": 2607.8842508634757
+      },
+      "distance5": 2481.908930132353,
+      "distance9": 2614.7093301556456
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.0006911552766374589,
+      "max_fractional_Dell": 0.03304804804008805,
+      "moped": {
+        "Battaglia12_rcond0.001": 177.0467700985909,
+        "Battaglia12_rcond1e-06": 186.44575009121672,
+        "FL_L1_m9_rcond0.001": 175.00986431259085,
+        "FL_L1_m9_rcond1e-06": 186.6888499742545
+      },
+      "distance5": 177.0467700985909,
+      "distance9": 186.6888499742545
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 8192,
+      "dewindow": false,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.009293780663181234,
+      "max_fractional_Dell": 0.06473180065923285,
+      "moped": {
+        "Battaglia12_rcond0.001": 5.5187312172171294,
+        "Battaglia12_rcond1e-06": 5.575950755635571,
+        "FL_L1_m9_rcond0.001": 5.730293971383803,
+        "FL_L1_m9_rcond1e-06": 5.759424043028832
+      },
+      "distance5": 5.730293971383803,
+      "distance9": 5.759424043028832
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 8192,
+      "dewindow": true,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.0031688132409364174,
+      "max_fractional_Dell": 0.023099988072133246,
+      "moped": {
+        "Battaglia12_rcond0.001": 1.8787464336699868,
+        "Battaglia12_rcond1e-06": 1.8979169219546377,
+        "FL_L1_m9_rcond0.001": 1.9500845088770844,
+        "FL_L1_m9_rcond1e-06": 1.9601620204573964
+      },
+      "distance5": 1.9500845088770844,
+      "distance9": 1.9601620204573964
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.04454879852242247,
+      "max_fractional_Dell": 0.27428143548311185,
+      "moped": {
+        "Battaglia12_rcond0.001": 26.64703648158537,
+        "Battaglia12_rcond1e-06": 26.932532771506576,
+        "FL_L1_m9_rcond0.001": 27.684230121966895,
+        "FL_L1_m9_rcond1e-06": 27.816330797344055
+      },
+      "distance5": 27.684230121966895,
+      "distance9": 27.816330797344055
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.0036587829053457096,
+      "max_fractional_Dell": 0.047872721841010255,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.08369510782573,
+        "Battaglia12_rcond1e-06": 2.102903112421813,
+        "FL_L1_m9_rcond0.001": 2.1568988018153994,
+        "FL_L1_m9_rcond1e-06": 2.1709539562313993
+      },
+      "distance5": 2.1568988018153994,
+      "distance9": 2.1709539562313993
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "common_reference_nside": 16384,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.007854610254535417,
+      "max_fractional_Dell": 0.23186766178198406,
+      "moped": {
+        "Battaglia12_rcond0.001": 1999.1791503573613,
+        "Battaglia12_rcond1e-06": 2105.952163208354,
+        "FL_L1_m9_rcond0.001": 1975.7382146557534,
+        "FL_L1_m9_rcond1e-06": 2102.3782784621294
+      },
+      "distance5": 1999.1791503573613,
+      "distance9": 2105.952163208354
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "common_reference_nside": 16384,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.002692132590424055,
+      "max_fractional_Dell": 0.10804771232874662,
+      "moped": {
+        "Battaglia12_rcond0.001": 694.7149041385134,
+        "Battaglia12_rcond1e-06": 731.4476322506448,
+        "FL_L1_m9_rcond0.001": 686.8820525748071,
+        "FL_L1_m9_rcond1e-06": 733.7648675474857
+      },
+      "distance5": 694.7149041385134,
+      "distance9": 733.7648675474857
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "common_reference_nside": 16384,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.009777884334382486,
+      "max_fractional_Dell": 0.2820560687516193,
+      "moped": {
+        "Battaglia12_rcond0.001": 2481.908930132353,
+        "Battaglia12_rcond1e-06": 2614.7093301556456,
+        "FL_L1_m9_rcond0.001": 2452.5773400366716,
+        "FL_L1_m9_rcond1e-06": 2607.8842508634757
+      },
+      "distance5": 2481.908930132353,
+      "distance9": 2614.7093301556456
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "common_reference_nside": 16384,
+      "label": "extended_shallow",
+      "relative_Dell_l2": 0.0006911552766374589,
+      "max_fractional_Dell": 0.03304804804008805,
+      "moped": {
+        "Battaglia12_rcond0.001": 177.0467700985909,
+        "Battaglia12_rcond1e-06": 186.44575009121672,
+        "FL_L1_m9_rcond0.001": 175.00986431259085,
+        "FL_L1_m9_rcond1e-06": 186.6888499742545
+      },
+      "distance5": 177.0467700985909,
+      "distance9": 186.6888499742545
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "common_reference_nside": 16384,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.03517703503959807,
+      "max_fractional_Dell": 0.2150473674821583,
+      "moped": {
+        "Battaglia12_rcond0.001": 21.034473436750336,
+        "Battaglia12_rcond1e-06": 21.26611645888046,
+        "FL_L1_m9_rcond0.001": 21.852868155683367,
+        "FL_L1_m9_rcond1e-06": 21.95719934670141
+      },
+      "distance5": 21.852868155683367,
+      "distance9": 21.95719934670141
+    },
+    {
+      "fine_nside": 8192,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "common_reference_nside": 16384,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.01411273835677564,
+      "max_fractional_Dell": 0.13799573042739155,
+      "moped": {
+        "Battaglia12_rcond0.001": 8.22277043412809,
+        "Battaglia12_rcond1e-06": 8.297185565318792,
+        "FL_L1_m9_rcond0.001": 8.527221694022032,
+        "FL_L1_m9_rcond1e-06": 8.57688379631502
+      },
+      "distance5": 8.527221694022032,
+      "distance9": 8.57688379631502
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 4096,
+      "dewindow": false,
+      "common_reference_nside": 16384,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.04454879852242247,
+      "max_fractional_Dell": 0.27428143548311185,
+      "moped": {
+        "Battaglia12_rcond0.001": 26.64703648158537,
+        "Battaglia12_rcond1e-06": 26.932532771506576,
+        "FL_L1_m9_rcond0.001": 27.684230121966895,
+        "FL_L1_m9_rcond1e-06": 27.816330797344055
+      },
+      "distance5": 27.684230121966895,
+      "distance9": 27.816330797344055
+    },
+    {
+      "fine_nside": 16384,
+      "parent_nside": 4096,
+      "dewindow": true,
+      "common_reference_nside": 16384,
+      "label": "Battaglia12",
+      "relative_Dell_l2": 0.0036587829053457096,
+      "max_fractional_Dell": 0.047872721841010255,
+      "moped": {
+        "Battaglia12_rcond0.001": 2.08369510782573,
+        "Battaglia12_rcond1e-06": 2.102903112421813,
+        "FL_L1_m9_rcond0.001": 2.1568988018153994,
+        "FL_L1_m9_rcond1e-06": 2.1709539562313993
+      },
+      "distance5": 2.1568988018153994,
+      "distance9": 2.1709539562313993
+    }
+  ],
+  "input_sha256": {
+    "tsz_reuse_cache_20260921/controls/002/Battaglia12/masked_clean_cl.npy": "3575f152bfd0ec76a9202d289aca23cdfa79cfebd309b70e190d337d1a56ee6d",
+    "tsz_reuse_cache_20260921/controls/002/FL_L1_m9/masked_clean_cl.npy": "def609cde86fea4bb98168781845262025056c0300ac8a89bfb68b2ad1a82152",
+    "tsz_reuse_cache_20260921/controls/002/compact/masked_clean_cl.npy": "bca85e5829833fc2c7f6e4f933ba02f5715ce95010eb21d2ddcba41d8062a40c",
+    "tsz_reuse_cache_20260921/controls/002/extended_shallow/masked_clean_cl.npy": "23e9fcb3a562015bdea3091ebc6c9a631ab66a17711ca67e3a3323ac481f7b85",
+    "tsz_reuse_cache_20260921/edge_extension/controls/002/Battaglia12/masked_clean_cl.npy": "f6c28c88c57c7d625a82f18f870a9a187f116474100203428cf3646c2283132e",
+    "tsz_reuse_cache_20260921/edge_extension/controls/002/FL_L1_m9/masked_clean_cl.npy": "51f345b58f0350e78c75f68c486ab3b7299d9dadaceb9791e98fe4738368da81",
+    "tsz_reuse_cache_20260921/edge_extension/controls/002/compact/masked_clean_cl.npy": "e80b639cba4d97cba864eb5adbc3e5891239dca6158e2683b4fc7d8a61788a8a",
+    "tsz_reuse_cache_20260921/edge_extension/controls/002/extended_shallow/masked_clean_cl.npy": "0d297681f51897dd32dbd0e23b3dbad71f9a2383f513f49b8d1afca4bacadc14",
+    "tsz_reuse_cache_20260921/controls/000/Battaglia12/masked_clean_cl.npy": "0529defb9c7fea205ea605972221cf65cd184bd6da37189b839efbc677f6f6f4",
+    "tsz_reuse_cache_20260921/controls/000/FL_L1_m9/masked_clean_cl.npy": "4e98932e5cefd2fa1d6f893ddef9e425ec9164b3221af52396dd11864dc5cc38",
+    "tsz_reuse_cache_20260921/controls/000/compact/masked_clean_cl.npy": "48d257dcb17c68d6af26d81d100e38c62954d98c633a6d626dd66c6e76e01146",
+    "tsz_reuse_cache_20260921/controls/000/extended_shallow/masked_clean_cl.npy": "31655f5f6594de61655646a98a0d13e5ef16628decc8b63ddc747c6e11d12606",
+    "tsz_reuse_cache_20260921/controls/001/Battaglia12/masked_clean_cl.npy": "5369dede5c72cd97c5ba4546e430754967013ce3fae44b7e9d43f225c1d92e23",
+    "tsz_reuse_cache_20260921/controls/001/FL_L1_m9/masked_clean_cl.npy": "5bf0050c9eb2d9bd974fc6daf1f32a08389a02b4409684d37d7c390ce4ff28f4",
+    "tsz_reuse_cache_20260921/controls/001/compact/masked_clean_cl.npy": "27464410da3d8cbe6c5769cbb11d65df16c28290fb10647f0a4326ac1f23495a",
+    "tsz_reuse_cache_20260921/controls/001/extended_shallow/masked_clean_cl.npy": "b2994eca01e8312d9a2861852b2e09f7c73b280aa7c94e7f2117f6ec198dae70",
+    "tsz_reuse_cache_20260921/controls/002/Battaglia12_pixel4096/masked_clean_cl.npy": "e9acb80da99f9fbf82c8b07e48b4fcd4149d9fd41008e371d26549e41eb17831",
+    "tsz_reuse_cache_20260921/controls/002/Battaglia12_pixel4096_dewindow/masked_clean_cl.npy": "edd5f7524f9520062629cf32db4ff2f0eec929171a229444a29df1a2274c92e8",
+    "tsz_reuse_cache_20260921/controls/002/FL_L1_m9_pixel4096/masked_clean_cl.npy": "42d9d7d8a2e1b214442626b0dc0df72cea6e62809ca6e3e0451696b31019682d",
+    "tsz_reuse_cache_20260921/controls/002/FL_L1_m9_pixel4096_dewindow/masked_clean_cl.npy": "67dfe10cf3b30f7480f50f3c268556379c5c7f13561fdfca89784e5dda9794af",
+    "tsz_reuse_cache_20260921/controls/002/compact_pixel4096/masked_clean_cl.npy": "8b570dc5295890887514b2c8c7253b79aaf47e4cbf7421a52b1a245379926397",
+    "tsz_reuse_cache_20260921/controls/002/compact_pixel4096_dewindow/masked_clean_cl.npy": "ecf84ff70cb36c06bd46a00cd212cf31b3250d2a8293d8d51a5c21ee770c70d6",
+    "tsz_reuse_cache_20260921/controls/002/extended_shallow_pixel4096/masked_clean_cl.npy": "54f7078519f4b88f57d74b469e5a6482142e12bc0294282996f329f02999098c",
+    "tsz_reuse_cache_20260921/controls/002/extended_shallow_pixel4096_dewindow/masked_clean_cl.npy": "3f4e091ff272e57d56d570322727adabb02b4c58c10267240f13510459857ae3",
+    "tsz_reuse_cache_20260921/controls/003/Battaglia12/masked_clean_cl.npy": "e1d735210d245c4aa092e3472614e6c33a1295d0b5188177a58c85c0f8dfc397",
+    "tsz_reuse_cache_20260921/controls/003/FL_L1_m9/masked_clean_cl.npy": "8b23dc98afef3567768852d6d6046a246544e33eaca4e136af1684d5663669db",
+    "tsz_reuse_cache_20260921/controls/003/compact/masked_clean_cl.npy": "14f2e03d04fb9e804cb8aaad178e6de396965ac990f7b894069777f1e7267670",
+    "tsz_reuse_cache_20260921/controls/003/extended_shallow/masked_clean_cl.npy": "15fdd9b1576aceeae19f4b0163521488810b81b725c214e480b28637e123e149",
+    "tsz_reuse_cache_20260921/controls/004/Battaglia12/masked_clean_cl.npy": "85b483cc62e6753fee5aebd441e3cbb44ea09454b9be972af3338a1db25d3d13",
+    "tsz_reuse_cache_20260921/controls/004/FL_L1_m9/masked_clean_cl.npy": "a00bde2fb0669ac70a1331408d5370f4617e595ec9fa3eaac0c055f96d0ca7c2",
+    "tsz_reuse_cache_20260921/controls/004/compact/masked_clean_cl.npy": "39d9096ab28a9a3c0fcc8a9e7e5ff43ae63ca4e6f00ae287b3b3c2f5ed7771fa",
+    "tsz_reuse_cache_20260921/controls/004/extended_shallow/masked_clean_cl.npy": "54ed3fc264431738f4c8e79808730527ebd4057d7126acee8e5a6b0502674ec5",
+    "tsz_reuse_cache_20260921/controls/005/Battaglia12/masked_clean_cl.npy": "a52048bc9151efabcf4e819433844120cf1e38dcc2768f5a9bb9bd7e02dbb6ef",
+    "tsz_reuse_cache_20260921/controls/005/FL_L1_m9/masked_clean_cl.npy": "7734fbb3c8fd0e3a48bf772cf2c708da2bfac0fd24a28262e79bd7e019872be9",
+    "tsz_reuse_cache_20260921/controls/005/compact/masked_clean_cl.npy": "fce5dbdcaed89e97b637c0dcb50589564620b3ff3822749331a9a4f24e7002fa",
+    "tsz_reuse_cache_20260921/controls/005/extended_shallow/masked_clean_cl.npy": "f720a755f8980243c968dd6c5c91c34965a55f33d65d5c15c310f4aadd7ecf2e",
+    "tsz_reuse_cache_20260921/controls/006/Battaglia12/masked_clean_cl.npy": "d7055caef989c64086ce03b7b6c2bc57cb7654f9be642b77b31a3d1611d60680",
+    "tsz_reuse_cache_20260921/controls/006/FL_L1_m9/masked_clean_cl.npy": "7c02f772e39eaf982bdfa0ea3a22d5926b3eaaf4b8efd8c53563ae7d5fa5d904",
+    "tsz_reuse_cache_20260921/controls/006/compact/masked_clean_cl.npy": "a9292d13e4576aab6e2d0ea7714fcf19aaedb7b0d3960d388fa076e6be7cd559",
+    "tsz_reuse_cache_20260921/controls/006/extended_shallow/masked_clean_cl.npy": "0b36e1b8377b5e2ce4251256c2420138b9f3fadc533c37940b058025544f6170",
+    "tsz_reuse_cache_20260921/controls/007/Battaglia12/masked_clean_cl.npy": "bf964a87ea65b75d50ae18ea722975a841a2d4ce14eae6d81a62b34ca73ce48a",
+    "tsz_reuse_cache_20260921/controls/007/FL_L1_m9/masked_clean_cl.npy": "871e9ce2eff33f78f7e9830c5c2b6b9af32898c16d675d4a21da81c17176fa43",
+    "tsz_reuse_cache_20260921/controls/007/compact/masked_clean_cl.npy": "8dab8a06fe52a25dc2b49a98098d5ebc6c4d4e8aede3a5f5fac888a981f33389",
+    "tsz_reuse_cache_20260921/controls/007/extended_shallow/masked_clean_cl.npy": "e9c2db7a709cb8d50fb778841098c5bd7ed77a3165afdfb03f7346bdb5e5eba6",
+    "tsz_reuse_cache_20260921/controls/008/Battaglia12/masked_clean_cl.npy": "efd8fd3d42148b5151c4976411d9b00f91bff25fff38f4df8c65338a9a46f0e7",
+    "tsz_reuse_cache_20260921/controls/008/FL_L1_m9/masked_clean_cl.npy": "f8743672b065b5227a31d72719e5779e3e309a4393d54d9d8b72d91b09882b6b",
+    "tsz_reuse_cache_20260921/controls/008/compact/masked_clean_cl.npy": "35f2866cf8013e4bbc0113f6aba53e06a9860baebe27908aecd8bb212ad6cd61",
+    "tsz_reuse_cache_20260921/controls/008/extended_shallow/masked_clean_cl.npy": "7d67ea17da67ae4e95346ec6d3a7ffe2b747a89cb234ffd30b361304d60a847c",
+    "tsz_reuse_cache_20260921/controls/009/Battaglia12/masked_clean_cl.npy": "d5a23b7637527ccd7926e96f92f07074e418953ace604cc95ddf966eeb5efc22",
+    "tsz_reuse_cache_20260921/controls/009/FL_L1_m9/masked_clean_cl.npy": "56abfa0201e2490fb7937af944b420bbfc7afb2c94e0654fb064da85fe20a39b",
+    "tsz_reuse_cache_20260921/controls/010/Battaglia12/masked_clean_cl.npy": "87da2f3d13100127d8d358fbefcf25b4836bc4c62b9627176a626e0197004b52",
+    "tsz_reuse_cache_20260921/controls/011/extended_shallow/masked_clean_cl.npy": "dac5445be6f1e63fb8e49558d3acb14111be4ed554fd1f7b1ed2831b9ea677f6",
+    "tsz_reuse_cache_20260921/controls/011/extended_shallow_pixel8192/masked_clean_cl.npy": "ecfd5eb39c72bd8e96ab79551a56dd86ad4cee135a41c49c2715557574400dae",
+    "tsz_reuse_cache_20260921/controls/011/extended_shallow_pixel8192_dewindow/masked_clean_cl.npy": "5f2c1af8eb21e7f79ed93ecfe95469c7f7ca185154345af85f04aa2d92e62976",
+    "tsz_reuse_cache_20260921/controls/011/extended_shallow_pixel4096/masked_clean_cl.npy": "e43652868ff016710055812f9930555d8648dbe98a9b43bb6f021780999fdeff",
+    "tsz_reuse_cache_20260921/controls/011/extended_shallow_pixel4096_dewindow/masked_clean_cl.npy": "544181a5cb2138863a5e6277bd57d7ac0a68be7e0c3ff370de176493de6bb004",
+    "tsz_reuse_cache_20260921/controls/012/Battaglia12/masked_clean_cl.npy": "8db0366e2a5028c06037c49aa763bd6425449fb9dfca7d8373ffb9c7de211e31",
+    "tsz_reuse_cache_20260921/controls/012/Battaglia12_pixel8192/masked_clean_cl.npy": "b8d497e7141f71035ed6b19a9787bef407cbeecd7fdc6a0b98a1edbf472d3d96",
+    "tsz_reuse_cache_20260921/controls/012/Battaglia12_pixel8192_dewindow/masked_clean_cl.npy": "77726bba291e4b712a87c7491a8800bb6b95456de868bd54e3ba3f83c0e32ece",
+    "tsz_reuse_cache_20260921/controls/012/Battaglia12_pixel4096/masked_clean_cl.npy": "e8cea9d445f7e6e33d1048d9205a34b0a587cc0c7ba7715ef4278b3ebaeb2f07",
+    "tsz_reuse_cache_20260921/controls/012/Battaglia12_pixel4096_dewindow/masked_clean_cl.npy": "872a0e6449df5cf84ab3e9ac2ff378f9b6b2eda0d6e53b4b256f6e42f7dcb3d5",
+    "tsz_reuse_cache_20260921/edge_extension/controls/000/Battaglia12/masked_clean_cl.npy": "5603b5b014fed1c05055bb9c9ddf2c0b2800a21750e1e2a5fff27a19bb2813b8",
+    "tsz_reuse_cache_20260921/edge_extension/controls/000/FL_L1_m9/masked_clean_cl.npy": "c0091b5ea27898d692622b676900ab1cd129c8ef09a5a81512b0848de9916375",
+    "tsz_reuse_cache_20260921/edge_extension/controls/000/compact/masked_clean_cl.npy": "58526511ee9f37d6d6a39d47e9292f35f0410784124c8289737811c1607a2122",
+    "tsz_reuse_cache_20260921/edge_extension/controls/000/extended_shallow/masked_clean_cl.npy": "1336a9a8b8c195b63ea0da0980745ee1e626583f43e7473e658de2dfd070979f",
+    "tsz_reuse_cache_20260921/edge_extension/controls/001/Battaglia12/masked_clean_cl.npy": "3c8055968fdd44d905c09377f91a49d675f42c85c8bba5fe6d09a891302b749b",
+    "tsz_reuse_cache_20260921/edge_extension/controls/001/FL_L1_m9/masked_clean_cl.npy": "f20d4080c3952b6174cac6c19e299efce6325cec38ce6e8f6520af2f1c69fc83",
+    "tsz_reuse_cache_20260921/edge_extension/controls/001/compact/masked_clean_cl.npy": "0e2b3d738b852facda4d0a6ab9a1dafb47253998543e04ae5007aa6c645568a8",
+    "tsz_reuse_cache_20260921/edge_extension/controls/001/extended_shallow/masked_clean_cl.npy": "31e2bd810118a19e87c368eabbc7252005b947be2691d2d305a3ab5257ce6153",
+    "tsz_reuse_cache_20260921/work_balance/controls/000/Battaglia12/masked_clean_cl.npy": "2a9edb3d4dff77101620a4c3d9be972864af20633408766db7cbc2cb46ee6c99",
+    "tsz_8192_validation_recovery_20260921/controls/000/masked_clean_cl.npy": "c2fbaa140f3d855a5d0a576eac566d50dee312b676eb212d8175332c4b645018",
+    "tsz_8192_validation_recovery_20260921/controls/000/paired4096_clean_cl.npy": "962c0504bfec48112e9e2e15554ac249e9486a01e299895140f4f8e87dbbe116",
+    "tsz_reuse_cache_20260921/work_balance/controls/000/FL_L1_m9/masked_clean_cl.npy": "30a3ed9b23cd5071a320602c3dc6796bd3dd5637d55c32793c917e57a26aebb0",
+    "tsz_8192_validation_recovery_20260921/controls/001/masked_clean_cl.npy": "7d8ca286e07d521e3c7e0732d2614a6835633511b6a27f7ba5f96e63c8ae0b71",
+    "tsz_8192_validation_recovery_20260921/controls/001/paired4096_clean_cl.npy": "3f909a8096b1cf251dc499a4befb11be18700a120ee02239bd82085672ba6c92",
+    "tsz_reuse_cache_20260921/work_balance/controls/000/compact/masked_clean_cl.npy": "463250f8298f1726d2242c787e549cc21957504593da48274bf730a99733ac1f",
+    "tsz_8192_validation_recovery_20260921/controls/002/masked_clean_cl.npy": "6db0c33d6881cd95afb9ddfc036667e1e925a69161de836dd1bf2006c3210128",
+    "tsz_8192_validation_recovery_20260921/controls/003/masked_clean_cl.npy": "90578d788f61a2909ae7b3b82c2988ad978659403a5b798957d6b15466934dce",
+    "tsz_reuse_cache_20260921/work_balance/controls/000/extended_shallow/masked_clean_cl.npy": "1f7c3f4f5f5136e2065b614c942016e3180199234361beda66a5495abfeb13f9",
+    "tsz_8192_validation_recovery_20260921/controls/004/masked_clean_cl.npy": "77f1d1cb78bc83119de1650251f887642a2ca783366b3d70118edc4e4d2f18ef",
+    "tsz_8192_validation_recovery_20260921/controls/005/masked_clean_cl.npy": "aa38ea41910d41bdc1738c9838318dec51c9adebd174744cd412c759318abebc",
+    "tsz_spherical_preflight_20260920/fullsky/FL_L1_m9/nside16384_grid1/masked_clean_cl.npy": "e14fee24f121de4b58393f50404360d4bd20a529eb929df9f771a0797d8685f6",
+    "tsz_reuse_cache_20260921/followup/compression_context.npz": "b99c42fb1f8c33bd62d0681fafa8e0ff2a93e00984dbb01580ac003dedf69f42"
+  },
+  "metric": "Maximum across two local unbinned MOPED anchors; held-out conditional SO noise",
+  "diagnostic_256_submitted": false,
+  "bright_extreme_tolerance": "User permits larger errors; no prior rejection"
+}

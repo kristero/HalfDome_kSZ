@@ -1,0 +1,10 @@
+{
+  "count": 85224251,
+  "mass_min": 6557110244859.98,
+  "mass_max": 3785236255949654.0,
+  "z_min": 0.002141594886779785,
+  "z_max": 3.8554277420043945,
+  "quadrature_points": 1550,
+  "individually_resolved_halos": 595,
+  "mask_approximation": "Continuous cap weight at halo centres, squared; exact pixel mask used in full maps"
+}

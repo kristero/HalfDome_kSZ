@@ -1,0 +1,92 @@
+{
+  "count": 256,
+  "parameter_order": [
+    "P0",
+    "xc",
+    "beta",
+    "alpha_m_P0",
+    "alpha_m_xc",
+    "alpha_m_beta",
+    "alpha_z_P0",
+    "alpha_z_xc",
+    "alpha_z_beta"
+  ],
+  "lower": [
+    1.0,
+    0.025,
+    2.8,
+    -0.6,
+    -1.0,
+    -0.2,
+    -6.0,
+    -1.5,
+    -0.5
+  ],
+  "upper": [
+    60.0,
+    4.0,
+    16.0,
+    1.5,
+    0.4,
+    0.4,
+    0.5,
+    3.0,
+    2.0
+  ],
+  "prior": "independent physical uniforms, no rejection",
+  "geometry": "sphere4",
+  "raw_nside": 4096,
+  "output_nside": 4096,
+  "beam_fwhm_arcmin": 2.0,
+  "fsky": 0.4,
+  "mask_seed": 12345,
+  "cosmo_h": 0.68,
+  "cosmo_omegab": 0.049,
+  "cosmo_omegac": 0.261,
+  "mass_min_msun": 1000000000000.0,
+  "noise_master_seed": 20260920,
+  "noise_stream": "engineering",
+  "noise_split_Nell_multiplier": 1.0,
+  "cl_lmax": 7979,
+  "cl_niter": 0,
+  "cache_grid_factor": 1,
+  "painting": "experimental point painter",
+  "cache_grid_nodes": [
+    512,
+    256,
+    128
+  ],
+  "cache_coordinates": [
+    "log_theta",
+    "log_z",
+    "log10_mass"
+  ],
+  "cache_angular_padding": 256,
+  "cache_theta_min_rad": 1.0181517217181794e-11,
+  "cache_quantity": "Physical amplitude times chord-mean pressure",
+  "cache_value_floor": 1e-300,
+  "retained_spectra": "Per-row masked clean and signed split-cross C_ell, ell=0..7979",
+  "moped_input": {
+    "ell_min": 80,
+    "ell_max": 7979,
+    "features": 7900,
+    "binned": false
+  },
+  "known_limitations": [
+    "compact-halo pixel aliasing",
+    "inherited angular interpolation floor",
+    "corrected production renderer and nine-parameter calibration remain unvalidated"
+  ],
+  "validation_rows": 64,
+  "training_pool_rows": 192,
+  "split_rule": "last quarter held out; all preprocessing fitted on training only",
+  "production_certified": false,
+  "submission_authorized": false,
+  "source_sha256": {
+    "diagnostic.py": "4b4c73d86bb8e9c80e346def735d33aac19a50688dff98a0500e4debd6ba9fee",
+    "diagnostic_row.jl": "422749c34e765ded467ddd4d4e9e07decf2bf53b343540efe049cffbbfeb2402",
+    "fullsky_test.jl": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+    "spherical_truncation_profiles.jl": "00316f3fbcce4e218fe4282426d322573d960b8be8b787b5bab8d935e49f1cff",
+    "design_tests.py": "a788da1b70d951afcf74e9203be0dfb9f434ca18654f7121c4d407184fc3337f"
+  }
+}

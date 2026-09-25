@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "design_rows": 256,
+  "unique_split_seeds": 512,
+  "checks": [
+    "source identities",
+    "unchanged saved design",
+    "raw8192 argument",
+    "lean allocation flag",
+    "noise seed routing",
+    "disjoint four-worker partitions",
+    "exclusive claims",
+    "completed-row reuse",
+    "incomplete-dataset rejection",
+    "LF PBS and shell syntax"
+  ],
+  "scope": "Launcher and artifact checks with a mocked subprocess; no new catalogue row or SBI training executed"
+}

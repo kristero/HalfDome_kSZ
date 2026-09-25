@@ -1,0 +1,8 @@
+{
+  "bytes_by_directory": {
+    "/lustre/work/kristero10/flamingo_prior_pilot_20260914": 2370712064,
+    "/lustre/work/kristero10/flamingo_tsz_comparison_20260914": 12215644160
+  },
+  "total_GiB": 13.58460283279419,
+  "scope": "Allocated disk blocks before making the small transfer archive; catalogue and shared runtime external to these roots excluded"
+}

@@ -1,0 +1,378 @@
+{
+  "rows": [
+    {
+      "task": {
+        "id": 0,
+        "label": "smooth_exterior_0",
+        "mode": "fused",
+        "nodes": [
+          512,
+          256,
+          128
+        ],
+        "cases": [
+          {
+            "label": "Battaglia12",
+            "theta": [
+              18.1,
+              0.497,
+              4.35,
+              0.154,
+              -0.00865,
+              0.0393,
+              -0.758,
+              0.731,
+              0.415
+            ],
+            "reference_id": 0
+          },
+          {
+            "label": "FL_L1_m9",
+            "theta": [
+              27.895767029523494,
+              1.3742797203838153,
+              8.096506971978265,
+              0.24068706895722208,
+              -0.3708722120914735,
+              -0.027131779826878644,
+              -3.2950451155410274,
+              1.3212811497156247,
+              0.7123048539608454
+            ],
+            "reference_id": 1
+          },
+          {
+            "label": "compact",
+            "theta": [
+              18.1,
+              0.025,
+              16,
+              0.154,
+              -0.00865,
+              0.0393,
+              -0.758,
+              0.731,
+              0.415
+            ],
+            "reference_id": 2
+          },
+          {
+            "label": "extended_shallow",
+            "theta": [
+              18.1,
+              4,
+              2.8,
+              0.154,
+              -0.00865,
+              0,
+              -0.758,
+              0.731,
+              0
+            ],
+            "reference_id": 4
+          }
+        ],
+        "nside": 8192,
+        "threads": 26,
+        "pixel_targets": []
+      },
+      "status": {
+        "returncode": 0,
+        "seconds": 1782.9357628151774,
+        "job": "598573.idark"
+      },
+      "comparisons_to_doubled_smooth_cache": [
+        {
+          "label": "Battaglia12",
+          "relative_Dell_l2": 1.6428379444638188e-08,
+          "moped": {
+            "Battaglia12_rcond0.001": 6.7082016178324215e-06,
+            "Battaglia12_rcond1e-06": 6.8134185435777534e-06,
+            "FL_L1_m9_rcond0.001": 6.291938039763067e-06,
+            "FL_L1_m9_rcond1e-06": 6.426613355213334e-06
+          }
+        },
+        {
+          "label": "FL_L1_m9",
+          "relative_Dell_l2": 1.4165855395556147e-08,
+          "moped": {
+            "Battaglia12_rcond0.001": 1.1953370501352541e-05,
+            "Battaglia12_rcond1e-06": 1.2200544604134957e-05,
+            "FL_L1_m9_rcond0.001": 1.1757411467672005e-05,
+            "FL_L1_m9_rcond1e-06": 1.2213023045967935e-05
+          }
+        },
+        {
+          "label": "compact",
+          "relative_Dell_l2": 4.6174539282159774e-08,
+          "moped": {
+            "Battaglia12_rcond0.001": 8.933888740513781e-14,
+            "Battaglia12_rcond1e-06": 9.401466621874776e-14,
+            "FL_L1_m9_rcond0.001": 8.890843122108418e-14,
+            "FL_L1_m9_rcond1e-06": 8.967381936329001e-14
+          }
+        },
+        {
+          "label": "extended_shallow",
+          "relative_Dell_l2": 4.047858849963237e-09,
+          "moped": {
+            "Battaglia12_rcond0.001": 0.0003795770279673014,
+            "Battaglia12_rcond1e-06": 0.00041423130434586805,
+            "FL_L1_m9_rcond0.001": 0.00038270680887818564,
+            "FL_L1_m9_rcond1e-06": 0.0003874123288298952
+          }
+        }
+      ]
+    },
+    {
+      "task": {
+        "id": 1,
+        "label": "smooth_exterior_1",
+        "mode": "fused",
+        "nodes": [
+          256,
+          128,
+          64
+        ],
+        "cases": [
+          {
+            "label": "Battaglia12",
+            "theta": [
+              18.1,
+              0.497,
+              4.35,
+              0.154,
+              -0.00865,
+              0.0393,
+              -0.758,
+              0.731,
+              0.415
+            ],
+            "reference_id": 0
+          },
+          {
+            "label": "FL_L1_m9",
+            "theta": [
+              27.895767029523494,
+              1.3742797203838153,
+              8.096506971978265,
+              0.24068706895722208,
+              -0.3708722120914735,
+              -0.027131779826878644,
+              -3.2950451155410274,
+              1.3212811497156247,
+              0.7123048539608454
+            ],
+            "reference_id": 1
+          },
+          {
+            "label": "compact",
+            "theta": [
+              18.1,
+              0.025,
+              16,
+              0.154,
+              -0.00865,
+              0.0393,
+              -0.758,
+              0.731,
+              0.415
+            ],
+            "reference_id": 2
+          },
+          {
+            "label": "extended_shallow",
+            "theta": [
+              18.1,
+              4,
+              2.8,
+              0.154,
+              -0.00865,
+              0,
+              -0.758,
+              0.731,
+              0
+            ],
+            "reference_id": 4
+          }
+        ],
+        "nside": 8192,
+        "threads": 26,
+        "pixel_targets": []
+      },
+      "status": {
+        "returncode": 0,
+        "seconds": 1767.8653522357345,
+        "job": "598573.idark"
+      },
+      "comparisons_to_doubled_smooth_cache": [
+        {
+          "label": "Battaglia12",
+          "relative_Dell_l2": 2.9249978495117693e-07,
+          "moped": {
+            "Battaglia12_rcond0.001": 0.00011925832408073209,
+            "Battaglia12_rcond1e-06": 0.0001210760411041541,
+            "FL_L1_m9_rcond0.001": 0.00011157673289797618,
+            "FL_L1_m9_rcond1e-06": 0.00011397821970026326
+          }
+        },
+        {
+          "label": "FL_L1_m9",
+          "relative_Dell_l2": 2.4535790709159756e-07,
+          "moped": {
+            "Battaglia12_rcond0.001": 0.0002077864505211436,
+            "Battaglia12_rcond1e-06": 0.00021210430814096537,
+            "FL_L1_m9_rcond0.001": 0.00020415342801375779,
+            "FL_L1_m9_rcond1e-06": 0.00021224779650859892
+          }
+        },
+        {
+          "label": "compact",
+          "relative_Dell_l2": 8.771937558560543e-07,
+          "moped": {
+            "Battaglia12_rcond0.001": 1.6973030694036082e-12,
+            "Battaglia12_rcond1e-06": 1.785953252372234e-12,
+            "FL_L1_m9_rcond0.001": 1.6891057860059348e-12,
+            "FL_L1_m9_rcond1e-06": 1.7036568558021215e-12
+          }
+        },
+        {
+          "label": "extended_shallow",
+          "relative_Dell_l2": 7.45960730257892e-08,
+          "moped": {
+            "Battaglia12_rcond0.001": 0.00692858354937873,
+            "Battaglia12_rcond1e-06": 0.007487850839121508,
+            "FL_L1_m9_rcond0.001": 0.006964371928742268,
+            "FL_L1_m9_rcond1e-06": 0.007050589527973727
+          }
+        }
+      ]
+    },
+    {
+      "task": {
+        "id": 2,
+        "label": "smooth_exterior_2",
+        "mode": "fused",
+        "nodes": [
+          1024,
+          512,
+          256
+        ],
+        "cases": [
+          {
+            "label": "Battaglia12",
+            "theta": [
+              18.1,
+              0.497,
+              4.35,
+              0.154,
+              -0.00865,
+              0.0393,
+              -0.758,
+              0.731,
+              0.415
+            ],
+            "reference_id": 0
+          },
+          {
+            "label": "FL_L1_m9",
+            "theta": [
+              27.895767029523494,
+              1.3742797203838153,
+              8.096506971978265,
+              0.24068706895722208,
+              -0.3708722120914735,
+              -0.027131779826878644,
+              -3.2950451155410274,
+              1.3212811497156247,
+              0.7123048539608454
+            ],
+            "reference_id": 1
+          },
+          {
+            "label": "compact",
+            "theta": [
+              18.1,
+              0.025,
+              16,
+              0.154,
+              -0.00865,
+              0.0393,
+              -0.758,
+              0.731,
+              0.415
+            ],
+            "reference_id": 2
+          },
+          {
+            "label": "extended_shallow",
+            "theta": [
+              18.1,
+              4,
+              2.8,
+              0.154,
+              -0.00865,
+              0,
+              -0.758,
+              0.731,
+              0
+            ],
+            "reference_id": 4
+          }
+        ],
+        "nside": 8192,
+        "threads": 26,
+        "pixel_targets": []
+      },
+      "status": {
+        "returncode": 0,
+        "seconds": 2096.3694733045995,
+        "job": "598573.idark"
+      },
+      "comparisons_to_doubled_smooth_cache": [
+        {
+          "label": "Battaglia12",
+          "relative_Dell_l2": 0.0,
+          "moped": {
+            "Battaglia12_rcond0.001": 0.0,
+            "Battaglia12_rcond1e-06": 0.0,
+            "FL_L1_m9_rcond0.001": 0.0,
+            "FL_L1_m9_rcond1e-06": 0.0
+          }
+        },
+        {
+          "label": "FL_L1_m9",
+          "relative_Dell_l2": 0.0,
+          "moped": {
+            "Battaglia12_rcond0.001": 0.0,
+            "Battaglia12_rcond1e-06": 0.0,
+            "FL_L1_m9_rcond0.001": 0.0,
+            "FL_L1_m9_rcond1e-06": 0.0
+          }
+        },
+        {
+          "label": "compact",
+          "relative_Dell_l2": 0.0,
+          "moped": {
+            "Battaglia12_rcond0.001": 0.0,
+            "Battaglia12_rcond1e-06": 0.0,
+            "FL_L1_m9_rcond0.001": 0.0,
+            "FL_L1_m9_rcond1e-06": 0.0
+          }
+        },
+        {
+          "label": "extended_shallow",
+          "relative_Dell_l2": 0.0,
+          "moped": {
+            "Battaglia12_rcond0.001": 0.0,
+            "Battaglia12_rcond1e-06": 0.0,
+            "FL_L1_m9_rcond0.001": 0.0,
+            "FL_L1_m9_rcond1e-06": 0.0
+          }
+        }
+      ]
+    }
+  ],
+  "ell_max": 7979,
+  "scope": "Exterior cache continuation; physical pressure support unchanged"
+}

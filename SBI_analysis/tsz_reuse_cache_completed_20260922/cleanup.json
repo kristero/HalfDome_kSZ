@@ -1,0 +1,100 @@
+{
+  "utc": "2026-09-22T12:48:05.593434+00:00",
+  "cluster": {
+    "removed": [
+      {
+        "path": "/lustre/work/kristero10/tsz_reuse_cache_20260921/evidence.tar.gz",
+        "bytes": 11015890,
+        "sha256": "e249685aa4bf50ed4945420e46112405fd0dfef5a3e1b00971b9d4d4e4e54de8",
+        "compared_members": 313,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "/lustre/work/kristero10/tsz_reuse_cache_20260921/reports.tar.gz",
+        "bytes": 354405,
+        "sha256": "33299adf14bf96a73acb5ba6f2e33e43b84e43d7be84775c855487400461ad3a",
+        "compared_members": 18,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "/lustre/work/kristero10/tsz_reuse_cache_20260921/source.tar.gz",
+        "bytes": 256824,
+        "sha256": "f03d0d14d3487f631e5b9edd44dacd5debbcae7c6a4c8a30121e3b73b1a6507f",
+        "compared_members": 19,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "/lustre/work/kristero10/tsz_reuse_cache_20260921/followup/source.tar.gz",
+        "bytes": 6807,
+        "sha256": "7803121079500b7c09545d8695121bfdfe6656bc2526bd2666f88b9bc67d92aa",
+        "compared_members": 8,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "/lustre/work/kristero10/tsz_reuse_cache_20260921/edge_extension/source.tar.gz",
+        "bytes": 6236,
+        "sha256": "c01fa1d8b2cae18bc54f1e4c8e58f870cb397f853064b9aefd1cd5c97785c786",
+        "compared_members": 11,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "/lustre/work/kristero10/tsz_reuse_cache_20260921/work_balance/source.tar.gz",
+        "bytes": 5839,
+        "sha256": "37b41a5e70462639e15c8add0a00b6ef5996a023d53583c931de199acc4ba937",
+        "compared_members": 10,
+        "reason": "Every archived file has an identical extracted copy"
+      }
+    ],
+    "retained": [],
+    "reclaimed_bytes": 11646001
+  },
+  "local": {
+    "removed": [
+      {
+        "path": "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\tsz_reuse_cache_20260921\\evidence.tar.gz",
+        "bytes": 11015890,
+        "sha256": "e249685aa4bf50ed4945420e46112405fd0dfef5a3e1b00971b9d4d4e4e54de8",
+        "compared_members": 313,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\tsz_reuse_cache_20260921\\reports.tar.gz",
+        "bytes": 354405,
+        "sha256": "33299adf14bf96a73acb5ba6f2e33e43b84e43d7be84775c855487400461ad3a",
+        "compared_members": 18,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\tsz_reuse_cache_20260921\\source.tar.gz",
+        "bytes": 256824,
+        "sha256": "f03d0d14d3487f631e5b9edd44dacd5debbcae7c6a4c8a30121e3b73b1a6507f",
+        "compared_members": 19,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\tsz_reuse_cache_20260921\\followup\\source.tar.gz",
+        "bytes": 6807,
+        "sha256": "7803121079500b7c09545d8695121bfdfe6656bc2526bd2666f88b9bc67d92aa",
+        "compared_members": 8,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\tsz_reuse_cache_20260921\\edge_extension\\source.tar.gz",
+        "bytes": 6236,
+        "sha256": "c01fa1d8b2cae18bc54f1e4c8e58f870cb397f853064b9aefd1cd5c97785c786",
+        "compared_members": 11,
+        "reason": "Every archived file has an identical extracted copy"
+      },
+      {
+        "path": "\\\\wsl.localhost\\myrootfs\\home\\cbllover\\HalfDome\\SBI_analysis\\tsz_reuse_cache_20260921\\work_balance\\source.tar.gz",
+        "bytes": 5839,
+        "sha256": "37b41a5e70462639e15c8add0a00b6ef5996a023d53583c931de199acc4ba937",
+        "compared_members": 10,
+        "reason": "Every archived file has an identical extracted copy"
+      }
+    ],
+    "retained": [],
+    "reclaimed_bytes": 11646001
+  },
+  "science_products_deleted": false
+}

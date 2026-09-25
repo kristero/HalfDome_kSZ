@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N guard_maps
+#PBS -q mini2
+#PBS -l select=1:ncpus=8:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+set -euo pipefail
+STUDY_ROOT="${STUDY_ROOT:-/lustre/work/kristero10/tsz_guardrail_study_20260915}"
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=8 HDF5_USE_FILE_LOCKING=FALSE
+read -r -a study_cases <<< "${STUDY_CASES:-Battaglia12}"
+/home/anaconda3/bin/python3 "$STUDY_ROOT/code/run_maps.py" --root "$STUDY_ROOT" \
+  --cases "${study_cases[@]}" --grids "${STUDY_GRIDS:-historical1,logz1,logz2}"

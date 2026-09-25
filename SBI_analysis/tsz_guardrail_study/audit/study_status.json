@@ -1,0 +1,221 @@
+{
+  "updated_utc": "2026-09-20T10:13:18.001807+00:00",
+  "planned_maps": 36,
+  "completed_maps": [
+    [
+      "Battaglia12",
+      "historical1"
+    ],
+    [
+      "Battaglia12",
+      "logz1"
+    ],
+    [
+      "Battaglia12",
+      "logz2"
+    ],
+    [
+      "FL_L1_m9",
+      "historical1"
+    ],
+    [
+      "FL_L1_m9",
+      "logz1"
+    ],
+    [
+      "FL_L1_m9",
+      "logz2"
+    ],
+    [
+      "xc_low_1",
+      "historical1"
+    ],
+    [
+      "xc_low_1",
+      "logz1"
+    ],
+    [
+      "xc_low_1",
+      "logz2"
+    ],
+    [
+      "combined_tails",
+      "historical1"
+    ],
+    [
+      "combined_tails",
+      "logz1"
+    ],
+    [
+      "combined_tails",
+      "logz2"
+    ],
+    [
+      "amP0_low_2",
+      "historical1"
+    ],
+    [
+      "amP0_low_2",
+      "logz1"
+    ],
+    [
+      "amP0_low_2",
+      "logz2"
+    ],
+    [
+      "amxc_low_2",
+      "historical1"
+    ],
+    [
+      "amxc_low_2",
+      "logz1"
+    ],
+    [
+      "amxc_low_2",
+      "logz2"
+    ],
+    [
+      "azP0_low_2",
+      "historical1"
+    ],
+    [
+      "azP0_low_2",
+      "logz1"
+    ],
+    [
+      "azP0_low_2",
+      "logz2"
+    ],
+    [
+      "azxc_high_2",
+      "historical1"
+    ],
+    [
+      "azxc_high_2",
+      "logz1"
+    ],
+    [
+      "azxc_high_2",
+      "logz2"
+    ],
+    [
+      "azbeta_high_2",
+      "historical1"
+    ],
+    [
+      "azbeta_high_2",
+      "logz1"
+    ],
+    [
+      "azbeta_high_2",
+      "logz2"
+    ],
+    [
+      "beta_steep",
+      "historical1"
+    ],
+    [
+      "beta_steep",
+      "logz1"
+    ],
+    [
+      "beta_steep",
+      "logz2"
+    ],
+    [
+      "Battaglia12",
+      "pixel8192_2"
+    ],
+    [
+      "xc_low_1",
+      "pixel8192_2"
+    ],
+    [
+      "combined_tails",
+      "pixel8192_2"
+    ],
+    [
+      "FL_L1_m9",
+      "pixel8192_2"
+    ],
+    [
+      "Battaglia12",
+      "pixel16384_2"
+    ],
+    [
+      "FL_L1_m9",
+      "pixel16384_2"
+    ]
+  ],
+  "failed_maps": [],
+  "pending_maps": [],
+  "planned_map_experiments_complete": true,
+  "extended_prior_numerically_certified": false,
+  "missing_for_production_certification": [
+    "Converged full-observable pixel reference across admitted regimes",
+    "Full-observable finite-LOS error budget across broad joint tails",
+    "Covariance and inference calibration appropriate to the new observations and prior"
+  ],
+  "metadata_corrections": [
+    {
+      "path": "maps\\xc_low_1\\historical1\\status.json",
+      "case": "xc_low_1",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\xc_low_1\\logz1\\status.json",
+      "case": "xc_low_1",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\xc_low_1\\logz2\\status.json",
+      "case": "xc_low_1",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\combined_tails\\historical1\\status.json",
+      "case": "combined_tails",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\combined_tails\\logz1\\status.json",
+      "case": "combined_tails",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\combined_tails\\logz2\\status.json",
+      "case": "combined_tails",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\amP0_low_2\\historical1\\status.json",
+      "case": "amP0_low_2",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\amP0_low_2\\logz1\\status.json",
+      "case": "amP0_low_2",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\Battaglia12\\pixel8192_2\\status.json",
+      "case": "Battaglia12",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\xc_low_1\\pixel8192_2\\status.json",
+      "case": "xc_low_1",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\combined_tails\\pixel8192_2\\status.json",
+      "case": "combined_tails",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    },
+    {
+      "path": "maps\\FL_L1_m9\\pixel8192_2\\status.json",
+      "case": "FL_L1_m9",
+      "explanation": "Early source-copy loop shadowed the display-name variable. Directory and theta retained the correct case; exact theta consistency checked. Raw record preserved."
+    }
+  ]
+}

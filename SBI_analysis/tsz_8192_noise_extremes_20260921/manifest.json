@@ -1,0 +1,13 @@
+{
+  "source_sha256": {
+    "control.jl": "62de98e5f604f42f80149a10761f6d25c43ddf757324da460cc9219f5e07e690",
+    "row.py": "485e0c4da8c74f2d3aa5084182d13324cedf4125869db93d269fc162879a76dd",
+    "row.pbs": "a82f1aa7f92cfcf9b09687c934b4cf539a1412714da5fbe5d3cd4e7e267d163b",
+    "spherical_truncation_profiles.jl": "d76ddb2bcbb90e1335ef1f80593b9a9a4a1f2892277bd30d91eb05850e8bd487",
+    "fullsky_test.jl": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+    "worker.py": "d4b727e91f23e4523b64789c776ac5ddfe405d3b6d3c5c14e9575903fd315304",
+    "external_dependencies.json": "c9733a62e98339a4a85fd5ad2f0a293926a947ffefc5354d7cb5b6934d606d56",
+    "plan.json": "9e171e11ca8946a01d539c37ec8b1d8bee97adb49490c24af26246aa7f987cb9",
+    "inputs/frozen_unbinned_moped_transform.npz": "db1d2c42ea3f37403672d8b63de1cf0e9986391f7a8dfe31a4122dc479c0439e"
+  }
+}

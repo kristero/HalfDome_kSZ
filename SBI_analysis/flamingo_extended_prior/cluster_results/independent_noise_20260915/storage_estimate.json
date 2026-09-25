@@ -1,0 +1,10 @@
+{
+  "compact_bytes_per_row_measured_two_rows": 13764.5,
+  "estimated_compact_GiB_8192": 0.10501480102539062,
+  "estimated_compact_GiB_524288": 6.720947265625,
+  "numpy_export_bytes_per_row": 1048,
+  "median_seconds_without_extra_replay": 267.27820369787514,
+  "normal_preflight_peak_GiB": 11.538684844970703,
+  "replay_preflight_peak_GiB": 13.015071868896484,
+  "estimate_scope": "Five 26-thread independent-noise preflight maps, excluding extra replay; size from two compact HDF5 rows. Other profiles, hardware, queueing and retries can differ."
+}

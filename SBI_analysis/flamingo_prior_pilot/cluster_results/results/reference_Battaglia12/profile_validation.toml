@@ -1,0 +1,10 @@
+interpolator_theta_min_rad = 1.0181517217181793e-11
+max_significant_relative_error = 4.193704137319219
+note = "Significant means direct y exceeds 1e-8 of the central sampled value for its mass/redshift"
+status = "needs_interpolation_refinement"
+max_relative_error = 4.193704137319219
+grid_nonfinite = 0
+checked_points = 240
+grid_entries = 16777216
+grid_nonpositive = 0
+p95_significant_relative_error = 0.7724458019153131

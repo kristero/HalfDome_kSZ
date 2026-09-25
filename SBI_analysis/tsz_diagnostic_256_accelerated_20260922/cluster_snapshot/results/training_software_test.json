@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "split_preserved": true,
+  "samples": 32,
+  "proposals": 38912,
+  "best_validation_log_prob": -7.287563323974609,
+  "validation_summary_keys": [
+    "epochs_trained",
+    "best_validation_log_prob",
+    "validation_log_probs",
+    "training_log_probs",
+    "epoch_durations_sec"
+  ],
+  "fixed_unbinned_features": 7900,
+  "scope": "Software-only smoke test; no posterior accuracy claim"
+}

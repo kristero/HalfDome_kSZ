@@ -1,0 +1,29 @@
+{
+  "count": 256,
+  "heldout": 64,
+  "training_pool": 192,
+  "negative_cross_bins": 786,
+  "negative_cross_multipoles": 258447,
+  "moped_input": {
+    "features": 7900,
+    "ell_min": 80,
+    "ell_max": 7979,
+    "binned": false
+  },
+  "prior_mean_rmse_over_width": [
+    0.28868194844201017,
+    0.28867504463777993,
+    0.2903353781532605,
+    0.2895196155363448,
+    0.2886749283214186,
+    0.2886783357259962,
+    0.28865022629458176,
+    0.2886767863992572,
+    0.28867513298053343
+  ],
+  "clean_dl_range": [
+    5.370699973909839e-21,
+    1.257140457703968e-05
+  ],
+  "scope": "Numerically gated spherical point painter; 256-row inference diagnostic"
+}

@@ -1,0 +1,9 @@
+accepted = true
+
+[[attempts]]
+max_absolute_over_central = 7.390195570216634e-5
+points = 2496
+nodes = [256, 128, 64]
+max_relative_visible = 0.0007813906612103017
+relative_l2 = 1.3136066971802017e-5
+seconds = 1.3273289203643799

@@ -1,0 +1,1186 @@
+{
+  "count": 256,
+  "gate_passed": true,
+  "all_inference_runs_complete": true,
+  "sampling_failures": [],
+  "primary_rmse_relative_to_prior": [
+    0.9617604722121582,
+    0.8090336054080499,
+    0.9485540551719064,
+    0.9907787581266413,
+    0.9305667747041984,
+    0.9953026230141895,
+    0.9124574532945441,
+    0.8112997505668035,
+    0.9977892641287515
+  ],
+  "actual_posterior_forward_checks": {
+    "completed": 8,
+    "cases": [
+      {
+        "label": "Battaglia12_draw0",
+        "observation": "Battaglia12",
+        "theta": [
+          24.547870635986328,
+          2.059638023376465,
+          4.762575149536133,
+          0.9803617000579834,
+          -0.5588659644126892,
+          0.38084545731544495,
+          -3.7720611095428467,
+          -0.05438415706157684,
+          1.8807225227355957
+        ],
+        "posterior_seed": 20260920,
+        "posterior_index": 365,
+        "clean_spectrum_relative_l2": 2.6269775722467488,
+        "trained_feature_distance": 0.2850184142589569,
+        "nodes": [
+          512,
+          256,
+          128
+        ]
+      },
+      {
+        "label": "Battaglia12_draw1",
+        "observation": "Battaglia12",
+        "theta": [
+          2.469949960708618,
+          3.7692675590515137,
+          13.308769226074219,
+          -0.5236866474151611,
+          -0.8264212012290955,
+          0.2584242522716522,
+          -5.413376808166504,
+          0.32293397188186646,
+          1.0628212690353394
+        ],
+        "posterior_seed": 20260921,
+        "posterior_index": 445,
+        "clean_spectrum_relative_l2": 2.0503364747464574,
+        "trained_feature_distance": 0.1914294809103012,
+        "nodes": [
+          512,
+          256,
+          128
+        ]
+      },
+      {
+        "label": "L1_m9_draw0",
+        "observation": "L1_m9",
+        "theta": [
+          20.492095947265625,
+          2.1169662475585938,
+          13.976585388183594,
+          0.8575040698051453,
+          -0.4217739701271057,
+          0.24367699027061462,
+          -4.886160850524902,
+          0.49953651428222656,
+          0.92560875415802
+        ],
+        "posterior_seed": 20260920,
+        "posterior_index": 295,
+        "clean_spectrum_relative_l2": 0.9148549661499769,
+        "trained_feature_distance": 0.02055053971707821,
+        "nodes": [
+          256,
+          128,
+          64
+        ]
+      },
+      {
+        "label": "L1_m9_draw1",
+        "observation": "L1_m9",
+        "theta": [
+          45.598384857177734,
+          1.5684417486190796,
+          14.270243644714355,
+          0.4089463949203491,
+          -0.567999541759491,
+          -0.10044410824775696,
+          -4.968177795410156,
+          1.0107142925262451,
+          0.8596950769424438
+        ],
+        "posterior_seed": 20260921,
+        "posterior_index": 320,
+        "clean_spectrum_relative_l2": 0.8527420410237005,
+        "trained_feature_distance": 0.01906582899391651,
+        "nodes": [
+          256,
+          128,
+          64
+        ]
+      },
+      {
+        "label": "fgas-8sigma_draw0",
+        "observation": "fgas-8sigma",
+        "theta": [
+          50.86256408691406,
+          0.6635882258415222,
+          5.8022894859313965,
+          0.5025265216827393,
+          -0.35549360513687134,
+          -0.15973247587680817,
+          -1.7743816375732422,
+          1.1795951128005981,
+          0.4392974376678467
+        ],
+        "posterior_seed": 20260920,
+        "posterior_index": 151,
+        "clean_spectrum_relative_l2": 7.761468762352469,
+        "trained_feature_distance": 0.12953034043312073,
+        "nodes": [
+          256,
+          128,
+          64
+        ]
+      },
+      {
+        "label": "fgas-8sigma_draw1",
+        "observation": "fgas-8sigma",
+        "theta": [
+          19.885435104370117,
+          1.7110710144042969,
+          7.072365760803223,
+          0.5906916260719299,
+          -0.36665210127830505,
+          0.16443580389022827,
+          -2.1389005184173584,
+          -0.6667150259017944,
+          1.931564450263977
+        ],
+        "posterior_seed": 20260921,
+        "posterior_index": 241,
+        "clean_spectrum_relative_l2": 0.6655575234285519,
+        "trained_feature_distance": 0.01750290021300316,
+        "nodes": [
+          256,
+          128,
+          64
+        ]
+      },
+      {
+        "label": "Mstar-1sigma_draw0",
+        "observation": "Mstar-1sigma",
+        "theta": [
+          26.679716110229492,
+          1.2031147480010986,
+          15.624950408935547,
+          0.9453921318054199,
+          -0.5219488739967346,
+          0.07568687945604324,
+          -2.901444911956787,
+          2.624577283859253,
+          1.4612185955047607
+        ],
+        "posterior_seed": 20260920,
+        "posterior_index": 103,
+        "clean_spectrum_relative_l2": 0.8651321235662152,
+        "trained_feature_distance": 0.02112773060798645,
+        "nodes": [
+          256,
+          128,
+          64
+        ]
+      },
+      {
+        "label": "Mstar-1sigma_draw1",
+        "observation": "Mstar-1sigma",
+        "theta": [
+          18.777605056762695,
+          1.219150185585022,
+          6.917420387268066,
+          -0.1971224546432495,
+          0.1475622057914734,
+          0.02620680257678032,
+          -1.7145057916641235,
+          0.8966240286827087,
+          1.5335050821304321
+        ],
+        "posterior_seed": 20260921,
+        "posterior_index": 423,
+        "clean_spectrum_relative_l2": 0.47701756373736437,
+        "trained_feature_distance": 0.0342719592154026,
+        "nodes": [
+          256,
+          128,
+          64
+        ]
+      }
+    ],
+    "skipped": [],
+    "limitation": "Two actual posterior-draw forward checks per observation; not a credible band or a calibrated PPC p-value"
+  },
+  "batch_timings": [
+    {
+      "batch": "000",
+      "seconds": 1164.9779254086316,
+      "stages": {
+        "selection": 1.3793323040008545,
+        "cache": 11.647715091705322,
+        "read_positions": 9.414050340652466,
+        "painting": 758.8360815048218,
+        "raw_map2alm": 37.39500308036804,
+        "read_mass_redshift": 6.6994547843933105,
+        "signal_alm2map": 20.978599071502686
+      },
+      "peak_RSS_GiB": 37.895965576171875,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "001",
+      "seconds": 1191.0725267603993,
+      "stages": {
+        "selection": 1.6785292625427246,
+        "cache": 23.92856502532959,
+        "read_positions": 4.346992492675781,
+        "painting": 796.8575296401978,
+        "raw_map2alm": 39.56929421424866,
+        "read_mass_redshift": 2.5158965587615967,
+        "signal_alm2map": 21.486666917800903
+      },
+      "peak_RSS_GiB": 37.856266021728516,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "002",
+      "seconds": 1124.4381030965596,
+      "stages": {
+        "selection": 1.6557905673980713,
+        "cache": 32.8054780960083,
+        "read_positions": 5.195025444030762,
+        "painting": 756.5898368358612,
+        "raw_map2alm": 37.76696801185608,
+        "read_mass_redshift": 1.9697566032409668,
+        "signal_alm2map": 20.67523717880249
+      },
+      "peak_RSS_GiB": 38.62437438964844,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "003",
+      "seconds": 1126.2441089004278,
+      "stages": {
+        "selection": 1.5159595012664795,
+        "cache": 31.81387495994568,
+        "read_positions": 5.330300807952881,
+        "painting": 757.7969205379486,
+        "raw_map2alm": 37.8946418762207,
+        "read_mass_redshift": 2.7491202354431152,
+        "signal_alm2map": 20.529847145080566
+      },
+      "peak_RSS_GiB": 38.63893127441406,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "004",
+      "seconds": 1166.160109039396,
+      "stages": {
+        "selection": 1.5575456619262695,
+        "cache": 10.676149129867554,
+        "read_positions": 4.412630796432495,
+        "painting": 816.5204792022705,
+        "raw_map2alm": 36.920559883117676,
+        "read_mass_redshift": 1.1288173198699951,
+        "signal_alm2map": 22.23256492614746
+      },
+      "peak_RSS_GiB": 37.72706985473633,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "005",
+      "seconds": 1172.9432762414217,
+      "stages": {
+        "selection": 1.621896505355835,
+        "cache": 10.729743003845215,
+        "read_positions": 3.8127529621124268,
+        "painting": 819.5803995132446,
+        "raw_map2alm": 40.738723278045654,
+        "read_mass_redshift": 1.1711091995239258,
+        "signal_alm2map": 19.781383991241455
+      },
+      "peak_RSS_GiB": 38.422027587890625,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "006",
+      "seconds": 1093.1851805187762,
+      "stages": {
+        "selection": 1.6839423179626465,
+        "cache": 9.734825849533081,
+        "read_positions": 3.6774349212646484,
+        "painting": 753.8359365463257,
+        "raw_map2alm": 37.735727071762085,
+        "read_mass_redshift": 1.3808934688568115,
+        "signal_alm2map": 20.77697515487671
+      },
+      "peak_RSS_GiB": 37.725013732910156,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "007",
+      "seconds": 1130.384027492255,
+      "stages": {
+        "selection": 1.4432716369628906,
+        "cache": 10.466835975646973,
+        "read_positions": 4.062162637710571,
+        "painting": 786.112847328186,
+        "raw_map2alm": 40.008633852005005,
+        "read_mass_redshift": 2.1526336669921875,
+        "signal_alm2map": 21.513649702072144
+      },
+      "peak_RSS_GiB": 38.43598937988281,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "008",
+      "seconds": 1101.2004430294037,
+      "stages": {
+        "selection": 1.4159953594207764,
+        "cache": 21.0794620513916,
+        "read_positions": 3.5241873264312744,
+        "painting": 752.572936296463,
+        "raw_map2alm": 37.88776612281799,
+        "read_mass_redshift": 1.8313798904418945,
+        "signal_alm2map": 20.579424381256104
+      },
+      "peak_RSS_GiB": 38.52408218383789,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "009",
+      "seconds": 1110.927617147565,
+      "stages": {
+        "selection": 2.1873438358306885,
+        "cache": 31.947434902191162,
+        "read_positions": 4.7487030029296875,
+        "painting": 748.0856304168701,
+        "raw_map2alm": 37.83227777481079,
+        "read_mass_redshift": 1.1576824188232422,
+        "signal_alm2map": 20.45196533203125
+      },
+      "peak_RSS_GiB": 38.64380645751953,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "010",
+      "seconds": 1175.6266328506172,
+      "stages": {
+        "selection": 1.7394912242889404,
+        "cache": 19.703392028808594,
+        "read_positions": 4.4583704471588135,
+        "painting": 818.9277899265289,
+        "raw_map2alm": 34.91362500190735,
+        "read_mass_redshift": 1.563157320022583,
+        "signal_alm2map": 22.94047713279724
+      },
+      "peak_RSS_GiB": 37.87397003173828,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "011",
+      "seconds": 1177.569800440222,
+      "stages": {
+        "selection": 1.7928154468536377,
+        "cache": 18.902182817459106,
+        "read_positions": 4.082927942276001,
+        "painting": 820.0236756801605,
+        "raw_map2alm": 39.482199907302856,
+        "read_mass_redshift": 1.6405582427978516,
+        "signal_alm2map": 19.321383953094482
+      },
+      "peak_RSS_GiB": 37.8526725769043,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "012",
+      "seconds": 1101.079869080335,
+      "stages": {
+        "selection": 2.1048309803009033,
+        "cache": 10.626970052719116,
+        "read_positions": 6.440373420715332,
+        "painting": 751.7691004276276,
+        "raw_map2alm": 37.83896780014038,
+        "read_mass_redshift": 3.8610403537750244,
+        "signal_alm2map": 20.958277225494385
+      },
+      "peak_RSS_GiB": 37.85511779785156,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "013",
+      "seconds": 1133.7569359652698,
+      "stages": {
+        "selection": 1.6762018203735352,
+        "cache": 10.113348007202148,
+        "read_positions": 4.8256001472473145,
+        "painting": 785.680536031723,
+        "raw_map2alm": 39.726869106292725,
+        "read_mass_redshift": 1.6277544498443604,
+        "signal_alm2map": 21.387511730194092
+      },
+      "peak_RSS_GiB": 37.782859802246094,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "014",
+      "seconds": 1098.3764771092683,
+      "stages": {
+        "selection": 1.3896193504333496,
+        "cache": 20.461822032928467,
+        "read_positions": 3.4721150398254395,
+        "painting": 751.5327339172363,
+        "raw_map2alm": 37.73373484611511,
+        "read_mass_redshift": 1.5656344890594482,
+        "signal_alm2map": 20.61995267868042
+      },
+      "peak_RSS_GiB": 38.566776275634766,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "015",
+      "seconds": 1095.366101546213,
+      "stages": {
+        "selection": 1.8629341125488281,
+        "cache": 19.233564853668213,
+        "read_positions": 4.560453176498413,
+        "painting": 740.5375294685364,
+        "raw_map2alm": 37.78253746032715,
+        "read_mass_redshift": 2.095341205596924,
+        "signal_alm2map": 20.536355018615723
+      },
+      "peak_RSS_GiB": 37.93059158325195,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "016",
+      "seconds": 1190.4385532028973,
+      "stages": {
+        "selection": 2.6325595378875732,
+        "cache": 20.866466999053955,
+        "read_positions": 4.482491493225098,
+        "painting": 822.4476888179779,
+        "raw_map2alm": 40.403834104537964,
+        "read_mass_redshift": 1.4013910293579102,
+        "signal_alm2map": 22.120178937911987
+      },
+      "peak_RSS_GiB": 37.87065887451172,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "017",
+      "seconds": 1179.1142656169832,
+      "stages": {
+        "selection": 1.8717141151428223,
+        "cache": 20.73602795600891,
+        "read_positions": 3.964061737060547,
+        "painting": 815.0944657325745,
+        "raw_map2alm": 41.04118299484253,
+        "read_mass_redshift": 1.4321560859680176,
+        "signal_alm2map": 22.442952871322632
+      },
+      "peak_RSS_GiB": 38.60914993286133,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "018",
+      "seconds": 1091.1389847490937,
+      "stages": {
+        "selection": 1.4165384769439697,
+        "cache": 10.427340030670166,
+        "read_positions": 4.859363555908203,
+        "painting": 747.381756067276,
+        "raw_map2alm": 37.879018783569336,
+        "read_mass_redshift": 1.5745344161987305,
+        "signal_alm2map": 20.890939235687256
+      },
+      "peak_RSS_GiB": 37.81850814819336,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "019",
+      "seconds": 1135.393009159714,
+      "stages": {
+        "selection": 1.8733253479003906,
+        "cache": 10.325987100601196,
+        "read_positions": 4.029223442077637,
+        "painting": 789.2877185344696,
+        "raw_map2alm": 39.808517932891846,
+        "read_mass_redshift": 1.1419389247894287,
+        "signal_alm2map": 21.53516387939453
+      },
+      "peak_RSS_GiB": 37.790836334228516,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "020",
+      "seconds": 1089.1129814516753,
+      "stages": {
+        "selection": 1.452152967453003,
+        "cache": 10.464380979537964,
+        "read_positions": 4.052792072296143,
+        "painting": 745.3899531364441,
+        "raw_map2alm": 37.755712032318115,
+        "read_mass_redshift": 1.342820644378662,
+        "signal_alm2map": 20.732195377349854
+      },
+      "peak_RSS_GiB": 38.40422439575195,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "021",
+      "seconds": 1079.8280406482518,
+      "stages": {
+        "selection": 1.4608509540557861,
+        "cache": 10.251734972000122,
+        "read_positions": 4.137816905975342,
+        "painting": 742.2800469398499,
+        "raw_map2alm": 37.32719302177429,
+        "read_mass_redshift": 1.638634443283081,
+        "signal_alm2map": 20.58000659942627
+      },
+      "peak_RSS_GiB": 38.57313537597656,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "022",
+      "seconds": 1182.3087655492127,
+      "stages": {
+        "selection": 1.7925753593444824,
+        "cache": 27.211933135986328,
+        "read_positions": 4.086008548736572,
+        "painting": 818.4075090885162,
+        "raw_map2alm": 40.70509886741638,
+        "read_mass_redshift": 1.1459615230560303,
+        "signal_alm2map": 20.916812896728516
+      },
+      "peak_RSS_GiB": 38.633731842041016,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "023",
+      "seconds": 1182.3166275694966,
+      "stages": {
+        "selection": 1.9281792640686035,
+        "cache": 29.71088218688965,
+        "read_positions": 3.803342342376709,
+        "painting": 813.4148755073547,
+        "raw_map2alm": 38.400044202804565,
+        "read_mass_redshift": 1.7981784343719482,
+        "signal_alm2map": 22.576173305511475
+      },
+      "peak_RSS_GiB": 37.95762634277344,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "024",
+      "seconds": 1092.8795897811651,
+      "stages": {
+        "selection": 1.9128730297088623,
+        "cache": 10.266369104385376,
+        "read_positions": 3.7439041137695312,
+        "painting": 751.0159614086151,
+        "raw_map2alm": 37.57540535926819,
+        "read_mass_redshift": 1.8595893383026123,
+        "signal_alm2map": 20.819934368133545
+      },
+      "peak_RSS_GiB": 38.58097457885742,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "025",
+      "seconds": 1132.3362070694566,
+      "stages": {
+        "selection": 1.22580885887146,
+        "cache": 10.576632976531982,
+        "read_positions": 4.2111053466796875,
+        "painting": 786.2367856502533,
+        "raw_map2alm": 39.90873599052429,
+        "read_mass_redshift": 1.603485107421875,
+        "signal_alm2map": 21.471111297607422
+      },
+      "peak_RSS_GiB": 37.758426666259766,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "026",
+      "seconds": 1084.3744220603257,
+      "stages": {
+        "selection": 1.64886474609375,
+        "cache": 10.174930095672607,
+        "read_positions": 4.300940990447998,
+        "painting": 745.4304738044739,
+        "raw_map2alm": 37.760814905166626,
+        "read_mass_redshift": 1.65036940574646,
+        "signal_alm2map": 20.79782485961914
+      },
+      "peak_RSS_GiB": 37.74714279174805,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "027",
+      "seconds": 1094.4136929921806,
+      "stages": {
+        "selection": 1.4514310359954834,
+        "cache": 20.218332052230835,
+        "read_positions": 3.888270854949951,
+        "painting": 742.0607933998108,
+        "raw_map2alm": 37.76506733894348,
+        "read_mass_redshift": 1.3966293334960938,
+        "signal_alm2map": 20.558957815170288
+      },
+      "peak_RSS_GiB": 38.000404357910156,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "028",
+      "seconds": 1184.0332212001085,
+      "stages": {
+        "selection": 1.5344088077545166,
+        "cache": 21.622565984725952,
+        "read_positions": 3.79000186920166,
+        "painting": 827.86510181427,
+        "raw_map2alm": 34.96956992149353,
+        "read_mass_redshift": 1.693805456161499,
+        "signal_alm2map": 19.26198410987854
+      },
+      "peak_RSS_GiB": 38.464664459228516,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "029",
+      "seconds": 1174.2245039977133,
+      "stages": {
+        "selection": 2.1588423252105713,
+        "cache": 10.358505010604858,
+        "read_positions": 4.362057447433472,
+        "painting": 821.2658751010895,
+        "raw_map2alm": 37.5759379863739,
+        "read_mass_redshift": 1.7165536880493164,
+        "signal_alm2map": 19.701007843017578
+      },
+      "peak_RSS_GiB": 37.778560638427734,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "030",
+      "seconds": 1087.2233279794455,
+      "stages": {
+        "selection": 1.8956241607666016,
+        "cache": 10.144659996032715,
+        "read_positions": 4.686443567276001,
+        "painting": 744.8246555328369,
+        "raw_map2alm": 37.35588550567627,
+        "read_mass_redshift": 1.5871026515960693,
+        "signal_alm2map": 20.923415660858154
+      },
+      "peak_RSS_GiB": 37.726993560791016,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "031",
+      "seconds": 1138.6383782662451,
+      "stages": {
+        "selection": 1.4671523571014404,
+        "cache": 20.241619110107422,
+        "read_positions": 4.611087322235107,
+        "painting": 785.182980298996,
+        "raw_map2alm": 39.98244881629944,
+        "read_mass_redshift": 1.1239817142486572,
+        "signal_alm2map": 21.439214944839478
+      },
+      "peak_RSS_GiB": 38.50583267211914,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "032",
+      "seconds": 1090.2086191605777,
+      "stages": {
+        "selection": 1.8898966312408447,
+        "cache": 10.205425024032593,
+        "read_positions": 4.277050256729126,
+        "painting": 752.306227684021,
+        "raw_map2alm": 37.62270927429199,
+        "read_mass_redshift": 1.597304105758667,
+        "signal_alm2map": 20.8829128742218
+      },
+      "peak_RSS_GiB": 38.56013870239258,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "033",
+      "seconds": 1090.1761813126504,
+      "stages": {
+        "selection": 1.2215285301208496,
+        "cache": 19.05283212661743,
+        "read_positions": 4.0763466358184814,
+        "painting": 742.4399967193604,
+        "raw_map2alm": 37.90985989570618,
+        "read_mass_redshift": 1.3137211799621582,
+        "signal_alm2map": 20.826696157455444
+      },
+      "peak_RSS_GiB": 37.876895904541016,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "034",
+      "seconds": 1183.3365872725844,
+      "stages": {
+        "selection": 1.5557379722595215,
+        "cache": 21.631656885147095,
+        "read_positions": 4.486760377883911,
+        "painting": 827.5161421298981,
+        "raw_map2alm": 34.41537880897522,
+        "read_mass_redshift": 1.7504899501800537,
+        "signal_alm2map": 18.937357902526855
+      },
+      "peak_RSS_GiB": 37.865203857421875,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "035",
+      "seconds": 1183.3666299544275,
+      "stages": {
+        "selection": 1.67315673828125,
+        "cache": 20.510751962661743,
+        "read_positions": 4.963723182678223,
+        "painting": 825.10205245018,
+        "raw_map2alm": 36.71858286857605,
+        "read_mass_redshift": 1.6258845329284668,
+        "signal_alm2map": 19.159422874450684
+      },
+      "peak_RSS_GiB": 37.86301040649414,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "036",
+      "seconds": 1106.9611216392368,
+      "stages": {
+        "selection": 2.1344685554504395,
+        "cache": 10.566977977752686,
+        "read_positions": 4.726259469985962,
+        "painting": 764.7815673351288,
+        "raw_map2alm": 37.62540364265442,
+        "read_mass_redshift": 1.1264376640319824,
+        "signal_alm2map": 20.932563066482544
+      },
+      "peak_RSS_GiB": 37.81465530395508,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "037",
+      "seconds": 1132.1815716847777,
+      "stages": {
+        "selection": 1.6139869689941406,
+        "cache": 10.116679191589355,
+        "read_positions": 4.790375471115112,
+        "painting": 785.7038588523865,
+        "raw_map2alm": 39.61770725250244,
+        "read_mass_redshift": 1.3574512004852295,
+        "signal_alm2map": 21.379109859466553
+      },
+      "peak_RSS_GiB": 37.74658966064453,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "038",
+      "seconds": 1093.0562985762954,
+      "stages": {
+        "selection": 1.704324722290039,
+        "cache": 9.982737064361572,
+        "read_positions": 5.971684455871582,
+        "painting": 746.15958070755,
+        "raw_map2alm": 37.98294115066528,
+        "read_mass_redshift": 3.9761903285980225,
+        "signal_alm2map": 20.77493405342102
+      },
+      "peak_RSS_GiB": 38.494014739990234,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "039",
+      "seconds": 1083.955378625542,
+      "stages": {
+        "selection": 1.1582670211791992,
+        "cache": 10.042808055877686,
+        "read_positions": 5.3511810302734375,
+        "painting": 742.7146034240723,
+        "raw_map2alm": 37.94209384918213,
+        "read_mass_redshift": 2.153132438659668,
+        "signal_alm2map": 20.662110090255737
+      },
+      "peak_RSS_GiB": 37.76719284057617,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "040",
+      "seconds": 1197.1226730421185,
+      "stages": {
+        "selection": 1.5241105556488037,
+        "cache": 30.241074085235596,
+        "read_positions": 4.429296970367432,
+        "painting": 825.4459946155548,
+        "raw_map2alm": 38.16919803619385,
+        "read_mass_redshift": 1.202505111694336,
+        "signal_alm2map": 21.05380082130432
+      },
+      "peak_RSS_GiB": 37.97037124633789,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "041",
+      "seconds": 1175.328069087118,
+      "stages": {
+        "selection": 1.8496534824371338,
+        "cache": 19.899806022644043,
+        "read_positions": 4.625819206237793,
+        "painting": 818.3975520133972,
+        "raw_map2alm": 35.134817123413086,
+        "read_mass_redshift": 1.4460110664367676,
+        "signal_alm2map": 19.483734846115112
+      },
+      "peak_RSS_GiB": 37.860267639160156,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "042",
+      "seconds": 1085.5485304128379,
+      "stages": {
+        "selection": 1.4393210411071777,
+        "cache": 10.364344120025635,
+        "read_positions": 5.23805046081543,
+        "painting": 742.9012529850006,
+        "raw_map2alm": 37.89033389091492,
+        "read_mass_redshift": 2.5069479942321777,
+        "signal_alm2map": 20.97613215446472
+      },
+      "peak_RSS_GiB": 37.8077392578125,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "043",
+      "seconds": 1144.751677069813,
+      "stages": {
+        "selection": 1.3485770225524902,
+        "cache": 20.88145899772644,
+        "read_positions": 4.3392181396484375,
+        "painting": 787.305924654007,
+        "raw_map2alm": 39.97337889671326,
+        "read_mass_redshift": 1.7768266201019287,
+        "signal_alm2map": 21.526942253112793
+      },
+      "peak_RSS_GiB": 38.221065521240234,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "044",
+      "seconds": 1118.095393596217,
+      "stages": {
+        "selection": 2.5179951190948486,
+        "cache": 10.26067304611206,
+        "read_positions": 3.708285331726074,
+        "painting": 773.9891822338104,
+        "raw_map2alm": 37.907716274261475,
+        "read_mass_redshift": 2.0746445655822754,
+        "signal_alm2map": 20.716995000839233
+      },
+      "peak_RSS_GiB": 38.421844482421875,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "045",
+      "seconds": 1128.659220309928,
+      "stages": {
+        "selection": 1.419935941696167,
+        "cache": 10.387166976928711,
+        "read_positions": 4.401938199996948,
+        "painting": 785.9629917144775,
+        "raw_map2alm": 37.59066414833069,
+        "read_mass_redshift": 1.5718684196472168,
+        "signal_alm2map": 20.54258680343628
+      },
+      "peak_RSS_GiB": 37.82107925415039,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "046",
+      "seconds": 1182.5748133026063,
+      "stages": {
+        "selection": 1.952878713607788,
+        "cache": 28.022653818130493,
+        "read_positions": 3.892615556716919,
+        "painting": 816.5365915298462,
+        "raw_map2alm": 37.95207071304321,
+        "read_mass_redshift": 1.834458351135254,
+        "signal_alm2map": 19.051902055740356
+      },
+      "peak_RSS_GiB": 38.66551208496094,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "047",
+      "seconds": 1180.1694016456604,
+      "stages": {
+        "selection": 1.831078052520752,
+        "cache": 21.509456157684326,
+        "read_positions": 4.789957523345947,
+        "painting": 818.561826467514,
+        "raw_map2alm": 37.50057792663574,
+        "read_mass_redshift": 1.1406280994415283,
+        "signal_alm2map": 19.425666093826294
+      },
+      "peak_RSS_GiB": 37.93633270263672,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "048",
+      "seconds": 1096.3651228714734,
+      "stages": {
+        "selection": 1.4453771114349365,
+        "cache": 20.716663122177124,
+        "read_positions": 5.233565330505371,
+        "painting": 738.6257877349854,
+        "raw_map2alm": 37.789833068847656,
+        "read_mass_redshift": 3.331632375717163,
+        "signal_alm2map": 20.903069019317627
+      },
+      "peak_RSS_GiB": 37.88299560546875,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "049",
+      "seconds": 1143.3688612096012,
+      "stages": {
+        "selection": 1.4388859272003174,
+        "cache": 21.114300966262817,
+        "read_positions": 3.7780394554138184,
+        "painting": 784.5462129116058,
+        "raw_map2alm": 39.78972578048706,
+        "read_mass_redshift": 1.454385757446289,
+        "signal_alm2map": 21.406493186950684
+      },
+      "peak_RSS_GiB": 38.01962661743164,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "050",
+      "seconds": 1129.4435171689838,
+      "stages": {
+        "selection": 2.1569936275482178,
+        "cache": 9.848510980606079,
+        "read_positions": 4.864099740982056,
+        "painting": 786.4045510292053,
+        "raw_map2alm": 37.69966959953308,
+        "read_mass_redshift": 2.5020158290863037,
+        "signal_alm2map": 20.842023849487305
+      },
+      "peak_RSS_GiB": 38.45710372924805,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "051",
+      "seconds": 1083.628133514896,
+      "stages": {
+        "selection": 1.873286485671997,
+        "cache": 10.607599020004272,
+        "read_positions": 3.9236702919006348,
+        "painting": 740.4544978141785,
+        "raw_map2alm": 37.88145422935486,
+        "read_mass_redshift": 1.9487743377685547,
+        "signal_alm2map": 20.434652090072632
+      },
+      "peak_RSS_GiB": 37.746665954589844,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "052",
+      "seconds": 1173.5002984888852,
+      "stages": {
+        "selection": 1.508845329284668,
+        "cache": 19.2030029296875,
+        "read_positions": 4.288092136383057,
+        "painting": 815.3973894119263,
+        "raw_map2alm": 36.73918628692627,
+        "read_mass_redshift": 1.4371006488800049,
+        "signal_alm2map": 19.02638006210327
+      },
+      "peak_RSS_GiB": 38.541847229003906,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "053",
+      "seconds": 1171.8291140161455,
+      "stages": {
+        "selection": 1.8688056468963623,
+        "cache": 10.858617067337036,
+        "read_positions": 4.648981094360352,
+        "painting": 818.7761337757111,
+        "raw_map2alm": 37.92523527145386,
+        "read_mass_redshift": 1.3773152828216553,
+        "signal_alm2map": 20.262558937072754
+      },
+      "peak_RSS_GiB": 38.39302062988281,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "054",
+      "seconds": 1099.5332889407873,
+      "stages": {
+        "selection": 2.0511646270751953,
+        "cache": 21.365803003311157,
+        "read_positions": 5.001461982727051,
+        "painting": 747.4298160076141,
+        "raw_map2alm": 37.746013164520264,
+        "read_mass_redshift": 2.277423143386841,
+        "signal_alm2map": 20.93403387069702
+      },
+      "peak_RSS_GiB": 38.692352294921875,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "055",
+      "seconds": 1151.8443860933185,
+      "stages": {
+        "selection": 1.6435811519622803,
+        "cache": 30.694123029708862,
+        "read_positions": 4.924907445907593,
+        "painting": 786.614006280899,
+        "raw_map2alm": 39.57936763763428,
+        "read_mass_redshift": 2.661630868911743,
+        "signal_alm2map": 21.54013466835022
+      },
+      "peak_RSS_GiB": 38.624046325683594,
+      "job": "599157.idark"
+    },
+    {
+      "batch": "056",
+      "seconds": 1092.2596546504647,
+      "stages": {
+        "selection": 1.4340946674346924,
+        "cache": 10.540136098861694,
+        "read_positions": 4.451384782791138,
+        "painting": 753.9208478927612,
+        "raw_map2alm": 37.81017279624939,
+        "read_mass_redshift": 1.3247487545013428,
+        "signal_alm2map": 20.722970962524414
+      },
+      "peak_RSS_GiB": 37.83011245727539,
+      "job": "599158.idark"
+    },
+    {
+      "batch": "057",
+      "seconds": 1078.6686046440154,
+      "stages": {
+        "selection": 1.9396584033966064,
+        "cache": 9.939049005508423,
+        "read_positions": 4.217674493789673,
+        "painting": 740.3115653991699,
+        "raw_map2alm": 37.61185598373413,
+        "read_mass_redshift": 1.5898127555847168,
+        "signal_alm2map": 20.467515230178833
+      },
+      "peak_RSS_GiB": 37.82261276245117,
+      "job": "599159.idark"
+    },
+    {
+      "batch": "058",
+      "seconds": 1176.1925272904336,
+      "stages": {
+        "selection": 1.2449839115142822,
+        "cache": 19.432605981826782,
+        "read_positions": 3.6959738731384277,
+        "painting": 814.6855998039246,
+        "raw_map2alm": 39.41766095161438,
+        "read_mass_redshift": 1.7096099853515625,
+        "signal_alm2map": 21.411505460739136
+      },
+      "peak_RSS_GiB": 38.014076232910156,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "059",
+      "seconds": 1183.9805260300636,
+      "stages": {
+        "selection": 2.2952873706817627,
+        "cache": 22.0700740814209,
+        "read_positions": 4.104957580566406,
+        "painting": 819.4589040279388,
+        "raw_map2alm": 34.57081580162048,
+        "read_mass_redshift": 1.6846904754638672,
+        "signal_alm2map": 19.23672580718994
+      },
+      "peak_RSS_GiB": 37.81874084472656,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "060",
+      "seconds": 1177.1204271763563,
+      "stages": {
+        "selection": 1.8974766731262207,
+        "cache": 20.111083984375,
+        "read_positions": 3.9428229331970215,
+        "painting": 822.8363604545593,
+        "raw_map2alm": 37.385897159576416,
+        "read_mass_redshift": 1.2090115547180176,
+        "signal_alm2map": 19.325874090194702
+      },
+      "peak_RSS_GiB": 38.06326675415039,
+      "job": "599161.idark"
+    },
+    {
+      "batch": "061",
+      "seconds": 1174.8738426975906,
+      "stages": {
+        "selection": 2.2578375339508057,
+        "cache": 19.877103805541992,
+        "read_positions": 3.8375000953674316,
+        "painting": 818.6196048259735,
+        "raw_map2alm": 34.55636811256409,
+        "read_mass_redshift": 1.7445216178894043,
+        "signal_alm2map": 19.02562427520752
+      },
+      "peak_RSS_GiB": 37.849544525146484,
+      "job": "599160.idark"
+    },
+    {
+      "batch": "062",
+      "seconds": 1088.981789002195,
+      "stages": {
+        "selection": 1.8662428855895996,
+        "cache": 10.705229043960571,
+        "read_positions": 5.036080837249756,
+        "painting": 745.5601160526276,
+        "raw_map2alm": 37.543195962905884,
+        "read_mass_redshift": 2.452116012573242,
+        "signal_alm2map": 20.861573934555054
+      },
+      "peak_RSS_GiB": 38.415218353271484,
+      "job": "599156.idark"
+    },
+    {
+      "batch": "063",
+      "seconds": 1078.440451407805,
+      "stages": {
+        "selection": 1.8411476612091064,
+        "cache": 9.85174012184143,
+        "read_positions": 4.477323532104492,
+        "painting": 739.4863758087158,
+        "raw_map2alm": 37.509212017059326,
+        "read_mass_redshift": 2.2666172981262207,
+        "signal_alm2map": 20.468980073928833
+      },
+      "peak_RSS_GiB": 38.05830383300781,
+      "job": "599159.idark"
+    }
+  ],
+  "utc": "2026-09-22T22:04:21.934724+00:00",
+  "decision": "Numerical pilot complete; inspect recovery and calibration before authorizing a larger run",
+  "limitations": [
+    "Conditional SO noise on one fixed catalogue, not a full observational covariance",
+    "64 held-out Sobol rows provide a coarse coverage diagnostic, not a precise SBC certificate",
+    "The NSIDE8192 point painter retains measured resolution systematics",
+    "FLAMINGO posteriors are effective parameters at unmatched cosmology and gas physics"
+  ]
+}

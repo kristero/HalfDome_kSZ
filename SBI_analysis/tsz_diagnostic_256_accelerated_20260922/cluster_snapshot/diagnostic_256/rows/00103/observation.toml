@@ -1,0 +1,8 @@
+signal_beam_fwhm_arcmin = 2.0
+ell_max = 7979
+noise_sha256 = ["06ee0cd7918b7ade85e0fe12e79a1a9ab877680cd0961d8db96ab7532011856c", "9c8627468b7c6978475e10c18ed32e51003da67703530de524194d22979bdc4d"]
+split_seeds = [6386025971672573610, 87324899903817232]
+noise_beam_applied = false
+split_Nell_multiplier = 1.0
+output_nside = 4096
+mask_sha256 = "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689"

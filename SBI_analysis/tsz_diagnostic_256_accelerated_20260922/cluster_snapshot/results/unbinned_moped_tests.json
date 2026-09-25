@@ -1,0 +1,29 @@
+{
+  "dense_covariance_comparisons": [
+    {
+      "rows": 70,
+      "features": 32,
+      "scale": 1.0,
+      "relative_inverse_error": 4.899350919802823e-16
+    },
+    {
+      "rows": 30,
+      "features": 80,
+      "scale": 1.0,
+      "relative_inverse_error": 2.5969737670834504e-16
+    },
+    {
+      "rows": 30,
+      "features": 80,
+      "scale": 1e-12,
+      "relative_inverse_error": 2.3751862661582484e-16
+    }
+  ],
+  "unbinned_input_features": 7900,
+  "retained_directions": 9,
+  "within_bin_shape_test": "Nine modes invisible to 40 bins remain in unbinned MOPED",
+  "covariance_identity_error": 2.657081399158173e-15,
+  "fisher_relative_error": 7.894574485802786e-16,
+  "seconds": 0.3571963906288147,
+  "scope": "Software and linear algebra, not physical SBI validation"
+}

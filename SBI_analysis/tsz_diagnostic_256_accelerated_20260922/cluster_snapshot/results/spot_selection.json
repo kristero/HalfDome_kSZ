@@ -1,0 +1,9 @@
+{
+  "rows": [
+    148,
+    218,
+    90,
+    253
+  ],
+  "rule": "Two largest post-refinement probe errors plus low/high direct-column norm"
+}

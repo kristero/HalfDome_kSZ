@@ -1,0 +1,11 @@
+# Large or regenerable artefacts of the 256-row diagnostic (kept on idark under
+# /lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922 and in cluster_snapshot.tar.gz locally).
+cluster_snapshot.tar.gz
+stage.tar.gz
+tmp/
+__pycache__/
+cluster_snapshot/tests/
+cluster_snapshot/sbi-logs/
+cluster_snapshot/output/
+*.pt
+*.svg

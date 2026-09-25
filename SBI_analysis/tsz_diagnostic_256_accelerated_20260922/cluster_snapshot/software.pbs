@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -q mini
+#PBS -N tsz256_api
+#PBS -l select=1:ncpus=2:mem=8gb
+#PBS -l walltime=00:20:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=2 MKL_NUM_THREADS=1
+mkdir -p results
+/home/anaconda3/bin/python3 test_unbinned_moped.py
+/home/anaconda3/bin/python3 test_training.py

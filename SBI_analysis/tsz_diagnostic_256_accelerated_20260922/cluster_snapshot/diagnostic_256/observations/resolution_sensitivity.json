@@ -1,0 +1,5 @@
+{
+  "construction": "Add the measured clean raw-resolution difference to the same B12 noisy observation",
+  "qualification": "Noise residual held fixed; not an exact matched-noise map comparison",
+  "source_sha256": "528a1cde2c7702174696338666518117dd0582a7c69314bfda2ae08c7b322de8"
+}

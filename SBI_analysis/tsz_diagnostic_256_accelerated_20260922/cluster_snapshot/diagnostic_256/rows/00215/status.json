@@ -1,0 +1,39 @@
+{
+  "row": 215,
+  "returncode": 0,
+  "batch": 53,
+  "theta": [
+    57.55497517157346,
+    2.251002574968152,
+    6.1430895291268826,
+    -0.06297129420563574,
+    -0.26233044546097517,
+    0.35022178366780293,
+    -3.7269465061835945,
+    -0.6739069651812315,
+    1.858216242864728
+  ],
+  "nodes": [
+    256,
+    128,
+    64
+  ],
+  "split_seeds": [
+    8798137302283152675,
+    7029838748686897384
+  ],
+  "selected_halos": 85224251,
+  "batch_status": {
+    "returncode": 0,
+    "seconds": 1171.8291140161455,
+    "identity_sha256": "36554b4db02204bd5537990cc62321680dbf2c42888eb90acb1e40f3b11e8ada",
+    "utc": "2026-09-22T20:36:30.467042+00:00",
+    "job": "599161.idark"
+  },
+  "sha256": {
+    "masked_clean_cl.npy": "3d73684e9c23b441f8f64f432acb35352a14e619ee924f4db4b7e5db7a575f60",
+    "masked_noisy_cross_cl.npy": "2160894cc9e8b4e23ac8fb0eac2f073ea29b8914a3e06083f799033a54c07cb9",
+    "unmasked_clean_cl.npy": "eb2f97d2772af102bb602d4765bfd7c3936ef55d3e089c9bd4a2580583180b2c",
+    "observation.toml": "50f5b549cb551c5fbe526b1e536e9d34ccdb2fd800646b15af39e4eeedbcc9d8"
+  }
+}

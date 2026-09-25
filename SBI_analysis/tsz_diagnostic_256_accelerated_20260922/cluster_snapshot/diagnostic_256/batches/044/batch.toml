@@ -1,0 +1,14 @@
+threads = 26
+selected_halos = 85224251
+cases = 4
+scheduler = "greedy blocks of 256"
+raw_nside = 8192
+
+[timings]
+selection = 2.5179951190948486
+cache = 10.26067304611206
+read_positions = 3.708285331726074
+painting = 773.9891822338104
+raw_map2alm = 37.907716274261475
+read_mass_redshift = 2.0746445655822754
+signal_alm2map = 20.716995000839233

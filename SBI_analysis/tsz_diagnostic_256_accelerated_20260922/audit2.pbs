@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -q mini
+#PBS -N tsz256_audit2
+#PBS -l select=1:ncpus=6:mem=12gb
+#PBS -l walltime=08:00:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/tsz_diagnostic_256_accelerated_20260922
+export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=6 MKL_NUM_THREADS=1
+/home/anaconda3/bin/python3 launch.py tasks/audit2.json --out tests/audit2 --threads 6

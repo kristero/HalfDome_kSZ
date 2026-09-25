@@ -1,0 +1,4 @@
+passed = true
+seed_repeatability = true
+painting_relative_l2 = [1.5129060903110534e-16, 1.4725321854664208e-16, 2.0266786898175318e-23, 1.7308185778087445e-16]
+geometry_identical = true

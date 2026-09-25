@@ -1,0 +1,13 @@
+{
+  "sha256": {
+    "engine.jl": "cbf56717a12c04432470f30a2c08d372d460bbd210ffcbe5370f9b4395976999",
+    "launch.py": "323412f5441c578a00f6cbfcd265c6a22d83cf4b0458c51bfb75b2be38107423",
+    "benchmark.jl": "8731925142bc7436b314a1a57f303200f985dfeeecd25ee0db91d23c59b5b287",
+    "fullsky_test.jl": "1b5df7fdf61363eef58bea0ca9b47a5f8cbc10c633a5c726642feed8fc283fd9",
+    "spherical_truncation_profiles.jl": "d76ddb2bcbb90e1335ef1f80593b9a9a4a1f2892277bd30d91eb05850e8bd487",
+    "smooth_exterior.jl": "3fbea72cce31c64523d0f76eec165b4476c75b31bee567167f171d22ae2e7a4e",
+    "legendre16.csv": "0b18841f9593a94062abcece049cc4b2194fc88f200c5bea66fb718e5ec8a8db",
+    "balanced_painter.jl": "f00a343e5238847bab38a66c607136ccf8fea65432ce3abac379a5ae8b991e7e",
+    "reference/base_command.json": "fe5e8b32c1d8f5d7102a2ae80dff521bef948b9ba8298630424ffccfb37c5b57"
+  }
+}

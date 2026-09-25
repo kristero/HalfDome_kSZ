@@ -1,0 +1,23 @@
+{
+  "display_name": "Julia 1.12.2 tSZ64k (20 threads)",
+  "argv": [
+    "/home/kn18001/.julia/juliaup/julia-1.12.2+0.x64.linux.gnu/bin/julia",
+    "-i",
+    "--startup-file=no",
+    "--color=yes",
+    "--project=/home/cbllover/HalfDome/SBI_analysis/tsz_local_profile_tests/julia_env",
+    "--threads=20",
+    "-e",
+    "import IJulia; IJulia.run_kernel()",
+    "{connection_file}"
+  ],
+  "language": "julia",
+  "interrupt_mode": "signal",
+  "env": {
+    "JULIA_DEPOT_PATH": "/home/kn18001/.julia",
+    "JULIAUP_DEPOT_PATH": "/home/kn18001/.julia",
+    "OPENBLAS_NUM_THREADS": "1",
+    "HDF5_USE_FILE_LOCKING": "FALSE",
+    "GKSwstype": "100"
+  }
+}

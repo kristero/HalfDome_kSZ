@@ -1,0 +1,20 @@
+{
+  "status": "complete",
+  "scope": "Figure 5 model-definition audit; no recreation of original hydro stack",
+  "reference_version": "arXiv 2205.01710v1",
+  "pdf_rendered_and_visually_checked": true,
+  "cluster_used": false,
+  "julia_peak_rss_kib": 749572,
+  "production_profile_unchanged": true,
+  "previous_pdf_products_unchanged": true,
+  "source_sha256": {
+    "frb_map_generation/lee22_fig5_audit/export_profiles.jl": "355eca0afc634d87f0d992ad2305a4e576e64f3ae5b3d1ac470bb71434d45adb",
+    "frb_map_generation/lee22_fig5_audit/compare_fig5.py": "d7cdc48260ff532c39271ffa498e41c8fb433d17493d8c1b4d3849b0bc59d74d",
+    "frb_map_generation/lee22_fig5_audit/README.md": "7857439d5b8f373b5236f4cd9121d74d003ee641a3c66d57d899ac890fc0196d",
+    "frb_map_generation/LEE22_NORMALIZATION_EQ7_EQ9_NOTE_20260917.md": "4030961e06c12ef07433279915020ecfcc65d442a5964d94e7125bed59701b51",
+    "frb_map_generation/WHAT_CHANGED_FOR_TNG_AGREEMENT_20260917.md": "21d0b7417fcfd1ea70a3359b25f1b33a5b31b01d34a142b041548d51082ff4c5",
+    "frb_map_generation/lee2022_frb_dm_profile.jl": "1fe10765ba8e38ae42c0cf1d20630babff0b8b10aa2a41e1a617bdbc50ae8806",
+    "frb_map_generation/generate_halfdome_z1_dm_mass_windows.jl": "8ec99d6b3db7cc64e4adfc1f43445581b8bc1e5a2c2497156a8c1b62d815f93c"
+  },
+  "validation": "Independent formula, density wrapper, 48 finite chords, vector axes and independent middle-panel residual check passed."
+}

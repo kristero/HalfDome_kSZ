@@ -3,6 +3,15 @@
 Date: 2026-09-17. Branch `cluster`; commits 346895d .. 7b2692c plus the publication figure commit.
 Publication figure: `frb_map_generation/outputs/publication_comparison_20260917_final/plots/halo_pdf_publication_b16_lee22_tng.{pdf,png,svg}`.
 
+> **Scientific qualification, 2026-09-22:** The successful `xgpaint_ne2d`
+> normalization below is an empirical variant, lower than the paper-defined
+> Lee22 electron density by a factor 0.60163166. The claim that the unusual
+> reference `n200` proves an equation-9 error is withdrawn. The independently
+> extracted Figure 5 agrees with the paper-normalized no-c implementation to
+> 2-3%, while this PDF-matching variant is about 38% low. See the
+> [Figure 5 audit](outputs/lee22_fig5_audit_20260922/REPORT.md). Historical values,
+> production code, and all previous PDF outputs remain unchanged.
+
 ## 1. The result being explained
 
 Mean halo DM of rays with DM > 0, rays to z_s = 1, M200c window 10^13 - 10^14 Msun (the only window in which the

@@ -30,24 +30,71 @@ function ChordMeanProfile(inner::XGPaint.AbstractGNFW{T}, sphere::Real) where {T
     return ChordMeanProfile{T,typeof(inner.cosmo),typeof(inner)}(inner.cosmo, inner, Float64(sphere))
 end
 
-"""Dimensionless chord integral 2 * int_0^L gnfw(sqrt(x^2 + l^2)) dl."""
+@inline log1pexp_stable(v) = max(v, 0.0) + log1p(exp(-abs(v)))
+
+"""Log of r times the gNFW shape, including the LOS-transform Jacobian."""
+@inline function log_radial_integrand(logr, xc, α, β, γ)
+    # XGPaint's internal beta is the asymptotic outer slope. For tSZ its
+    # get_params converts beta_raw to alpha*beta_raw-gamma.
+    exponent = (β + γ) / α
+    return (1 + γ) * logr - γ * log(xc) -
+           exponent * log1pexp_stable(α * (logr - log(xc)))
+end
+
+"""Peak log amplitude over the finite radial interval; no outer-slope cut."""
+function log_integrand_peak(loglo, loghi, xc, α, β, γ)
+    peak = log_radial_integrand(loghi, xc, α, β, γ)
+    isfinite(loglo) && (peak = max(peak, log_radial_integrand(loglo, xc, α, β, γ)))
+    if 1 + γ > 0 && β > 1
+        stationary = log(xc) + log((1 + γ) / (β - 1)) / α
+        at = clamp(stationary, loglo, loghi)
+        peak = max(peak, log_radial_integrand(at, xc, α, β, γ))
+    end
+    return peak
+end
+
+"""Finite chord integral with normalized positive quadrature.
+
+For x>0 use l=x*sinh(u), r=x*cosh(u), dl=r*du. At x=0 integrate
+in log(r), which handles the integrable central cusp without evaluating it.
+The peak is only a numerical scale; its factor is restored in the result.
+"""
 function chord_quadrature(x, xc, α, β, γ, L; rtol=1.0e-10)
     L <= 0 && return 0.0
-    scale = 1.0e9
-    I, _ = quadgk(l -> scale * XGPaint.generalized_nfw(sqrt(l^2 + x^2), xc, α, β, γ), 0.0, L;
-                  rtol=rtol, order=9)
-    return 2I / scale
+    x >= 0 && xc > 0 && α > 0 || error("invalid gNFW geometry/scale")
+    γ > -1 || x > 0 || error("central LOS is divergent for gamma <= -1")
+    loghi = log(hypot(x, L))
+    loglo = x == 0 ? -Inf : log(x)
+    peak = log_integrand_peak(loglo, loghi, xc, α, β, γ)
+    if x == 0
+        central = logr -> exp(log_radial_integrand(logr, xc, α, β, γ) - peak)
+        I, _ = quadgk(central, -Inf, loghi; rtol=rtol, order=9)
+    else
+        offset = u -> exp(log_radial_integrand(log(x) + log(cosh(u)), xc, α, β, γ) - peak)
+        I, _ = quadgk(offset, 0.0, asinh(L/x); rtol=rtol, order=9)
+    end
+    return exp(log(2I) + peak)
 end
 
 """Chord-mean h(x) = chord integral / (2L) inside the sphere; the 3-D profile value
 outside (continuous at x = X, never used by the painter there)."""
 function chord_mean(x, xc, α, β, γ, X)
     if x < X
-        L = sqrt(X^2 - x^2)
-        L < 1.0e-6 && return XGPaint.generalized_nfw(X, xc, α, β, γ)
+        L = sqrt((X - x) * (X + x))
         return chord_quadrature(x, xc, α, β, γ, L) / (2L)
     end
     return XGPaint.generalized_nfw(x, xc, α, β, γ)
+end
+
+# Generic fallback preserves the existing tau/DM wrappers. The tSZ methods
+# below deliberately avoid evaluating any old LOS integral for normalization.
+function projection_amplitude(inner, mass, z, θ200, xc, α, β, γ)
+    return Float64(inner(θ200, mass, z)) /
+           XGPaint._nfw_profile_los_quadrature(1.0, xc, α, β, γ)
+end
+function projection_amplitude(inner::Union{XGPaint.Battaglia16ThermalSZProfile,
+                                          XGPaint.BreakModel}, mass, z, args...)
+    return Float64(XGPaint.prepare_profile_slice(inner, mass, z).amplitude)
 end
 
 """Angular radius of R200c (radians) for a halo of mass `mass` [Msun] at redshift z."""
@@ -71,9 +118,7 @@ function XGPaint.prepare_profile_slice(m::ChordMeanProfile, mass, z)
     par = XGPaint.get_params(inner, Mu, z)
     θ200 = theta_r200c(inner, mass, z)
     xc, α, β, γ = Float64(par.xc), Float64(par.α), Float64(par.β), Float64(par.γ)
-    # Amplitude such that inner(theta) = A * infinite-LOS quadrature(x): evaluate the
-    # ratio once at x = 1 (any x works; the two are exactly proportional).
-    A = Float64(inner(θ200, mass, z)) / XGPaint._nfw_profile_los_quadrature(1.0, xc, α, β, γ)
+    A = projection_amplitude(inner, mass, z, θ200, xc, α, β, γ)
     return (; θ200, xc, α, β, γ, A, X=m.sphere)
 end
 
@@ -93,7 +138,7 @@ function spherical_value_direct(m::ChordMeanProfile, theta, mass, z)
     p = XGPaint.prepare_profile_slice(m, mass, z)
     x = Float64(theta) / p.θ200
     x >= p.X && return 0.0
-    return p.A * chord_quadrature(x, p.xc, p.α, p.β, p.γ, sqrt(p.X^2 - x^2))
+    return p.A * chord_quadrature(x, p.xc, p.α, p.β, p.γ, sqrt((p.X-x)*(p.X+x)))
 end
 
 end # module

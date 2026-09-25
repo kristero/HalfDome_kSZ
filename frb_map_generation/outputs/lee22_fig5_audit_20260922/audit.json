@@ -1,0 +1,95 @@
+{
+  "reference_url": "https://arxiv.org/src/2205.01710v1",
+  "reference_figure_sha256": "ccf5f46ba2e96df400b7b045cc9068f20b3adeb6684f4b45573d6191357878f8",
+  "reference_version": "arXiv v1; publisher text was access-blocked",
+  "profile_sha256": "1fe10765ba8e38ae42c0cf1d20630babff0b8b10aa2a41e1a617bdbc50ae8806",
+  "native_over_paper": 0.6016316602183194,
+  "native_normalization_change_percent": -39.83683397816806,
+  "paper_over_native": 1.6621465692764925,
+  "max_independent_formula_relative_error": 4.440892098500626e-15,
+  "max_vector_top_vs_residual_panel_absolute_fraction_error": 1.1086101200270815e-06,
+  "comparison": "3-D x^3 n_e/n_200 at z=0; bin centres, no concentration and BPL",
+  "statistical_limitation": "No raw Lee22 halo weights, quartile membership or covariance; not a chi-square test.",
+  "panels": [
+    {
+      "log10_mass_hinv_centre": 13.3,
+      "physical_mass_bin_HalfDome_msun": [
+        23307252830310.547,
+        36939506345729.15
+      ],
+      "n_comparison_points": 100,
+      "paper_convention_over_figure_no_c": {
+        "mean_signed_percent": 3.209578315831625,
+        "mean_absolute_percent": 3.209578315831625,
+        "min_percent": 2.9756202438738333,
+        "max_percent": 3.6360862705748342
+      },
+      "native_over_figure_no_c": {
+        "mean_signed_percent": -37.905850047413566,
+        "mean_absolute_percent": 37.905850047413566,
+        "min_percent": -38.046606630667,
+        "max_percent": -37.64924935850509
+      },
+      "paper_convention_over_low_c_simulation": {
+        "mean_signed_percent": 3.403930347461971,
+        "mean_absolute_percent": 7.460949599409606,
+        "min_percent": -11.193993179536587,
+        "max_percent": 15.115397739051438
+      },
+      "native_over_low_c_simulation": {
+        "mean_signed_percent": -37.78892171195699,
+        "mean_absolute_percent": 37.78892171195699,
+        "min_percent": -46.5714946792452,
+        "max_percent": -30.742932141562317
+      },
+      "max_export_interpolation_error": 9.071810737548702e-05,
+      "shape_diagnostic_only": {
+        "effective_logmass": 13.304690657131642,
+        "amplitude": 0.962315031655623,
+        "max_absolute_percent": 0.12716558409084922
+      },
+      "native_bin_envelope_over_figure_min_percent": -48.48099987181941,
+      "native_bin_envelope_over_figure_max_percent": -25.517392620599445
+    },
+    {
+      "log10_mass_hinv_centre": 13.9,
+      "physical_mass_bin_HalfDome_msun": [
+        92787844776499.16,
+        147058823529411.75
+      ],
+      "n_comparison_points": 100,
+      "paper_convention_over_figure_no_c": {
+        "mean_signed_percent": 2.0171968314534636,
+        "mean_absolute_percent": 2.0171968314534636,
+        "min_percent": 1.9504640050412636,
+        "max_percent": 2.2865244671196994
+      },
+      "native_over_figure_no_c": {
+        "mean_signed_percent": -38.62322449947358,
+        "mean_absolute_percent": 38.62322449947358,
+        "min_percent": -38.663373080619024,
+        "max_percent": -38.461188466885034
+      },
+      "paper_convention_over_low_c_simulation": {
+        "mean_signed_percent": 1.6123136471419477,
+        "mean_absolute_percent": 2.373023853539264,
+        "min_percent": -6.805632999350597,
+        "max_percent": 9.932926190403556
+      },
+      "native_over_low_c_simulation": {
+        "mean_signed_percent": -38.8668150418454,
+        "mean_absolute_percent": 38.8668150418454,
+        "min_percent": -43.93131825840394,
+        "max_percent": -33.860871103409536
+      },
+      "max_export_interpolation_error": 0.0001296753549864249,
+      "shape_diagnostic_only": {
+        "effective_logmass": 13.90165924918117,
+        "amplitude": 0.9791328914293371,
+        "max_absolute_percent": 0.061689151936028544
+      },
+      "native_bin_envelope_over_figure_min_percent": -45.48949869706536,
+      "native_bin_envelope_over_figure_max_percent": -31.01453825367041
+    }
+  ]
+}

@@ -1,5 +1,15 @@
 # The electron-density normalization of Lee et al. (2022): why equations 7 and 9 do not fit together, and what the codes do
 
+> **Correction, 2026-09-22:** The claim below that equation 9 cannot be correct
+> is not established. `n200` is a reference normalization; it need not equal the
+> electron count of gas at `200 f_b rho_crit`. Changing it requires a compensating
+> change in the fitted `n0`. The PDF-matching XGPaint option reduces the published
+> electron-density model by 0.60163166. A direct vector-Figure-5 audit finds a
+> 38% deficit for that option and 2-3% agreement using the paper normalization.
+> See [the audit and corrected interpretation](outputs/lee22_fig5_audit_20260922/REPORT.md).
+> The historical calculations below are retained; their claimed proof of a
+> paper typo is withdrawn. Production models and PDF products are unchanged.
+
 Date: 2026-09-17. Repository commit at the time of writing: see `git log` (branch `cluster`).
 Companion documents: `LEE22_IMPLEMENTATION_CHECK_20260916.md` (transcription check of the fits) and
 `LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md` (comparison with TNG inside the R200c sphere).

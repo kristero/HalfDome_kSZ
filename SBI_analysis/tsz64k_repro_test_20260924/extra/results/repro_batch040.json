@@ -1,0 +1,98 @@
+{
+  "passed": true,
+  "tolerance": 1e-06,
+  "checks": {
+    "selected_halos": 85224251,
+    "operator_probe_exact": {
+      "julia_version": true,
+      "healpix_version": true,
+      "hdf5_version": true,
+      "xgpaint_sha256": true,
+      "operator_sha256": true,
+      "adapter_sha256": true,
+      "beam_source_sha256": true,
+      "rng_uniform": true,
+      "rng_normal": true,
+      "mask_pixel_sha256": true
+    },
+    "operator_probe_bitwise_informational": {
+      "noise_pixel_sha256": true,
+      "beam_pixel_sha256": true
+    }
+  },
+  "rows": {
+    "00160": {
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "split_seeds": [
+        3834938162656839847,
+        6981027898481913127
+      ],
+      "split_seeds_equal": true,
+      "mask_sha256_equal": true,
+      "noise_maps_bitwise_equal": true,
+      "masked_clean_cl.npy": 4.382600849961171e-14,
+      "unmasked_clean_cl.npy": 5.335241324285921e-14,
+      "masked_noisy_cross_cl.npy": 3.2170359944577735e-12,
+      "passed": true
+    },
+    "00161": {
+      "nodes": [
+        512,
+        256,
+        128
+      ],
+      "split_seeds": [
+        7406323482071882395,
+        6839911968518173688
+      ],
+      "split_seeds_equal": true,
+      "mask_sha256_equal": true,
+      "noise_maps_bitwise_equal": true,
+      "masked_clean_cl.npy": 1.3007276259146244e-14,
+      "unmasked_clean_cl.npy": 1.31326834295661e-14,
+      "masked_noisy_cross_cl.npy": 2.347706773727062e-13,
+      "passed": true
+    },
+    "00162": {
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "split_seeds": [
+        6151137454683781479,
+        4984113073743863092
+      ],
+      "split_seeds_equal": true,
+      "mask_sha256_equal": true,
+      "noise_maps_bitwise_equal": true,
+      "masked_clean_cl.npy": 2.881645421283681e-14,
+      "unmasked_clean_cl.npy": 2.150152575732569e-14,
+      "masked_noisy_cross_cl.npy": 1.102294557191237e-12,
+      "passed": true
+    },
+    "00163": {
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "split_seeds": [
+        624279887719096394,
+        9172116021588757380
+      ],
+      "split_seeds_equal": true,
+      "mask_sha256_equal": true,
+      "noise_maps_bitwise_equal": true,
+      "masked_clean_cl.npy": 1.9862027358919214e-14,
+      "unmasked_clean_cl.npy": 2.7796613352564332e-14,
+      "masked_noisy_cross_cl.npy": 4.7063411893104003e-14,
+      "passed": true
+    }
+  },
+  "utc": "2026-09-24T14:10:18.468841+00:00"
+}

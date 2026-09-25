@@ -1,0 +1,338 @@
+stage=precompile host=ansys08 threads=8 index=0 start=2026-09-24T13:34:03+0000
+┌ Warning: The project dependencies or compat requirements have changed since the manifest was last resolved.
+│ It is recommended to `Pkg.resolve()` or consider `Pkg.update()` if necessary.
+└ @ Pkg.API /lustre/work/kristero10/tsz64k_repro_test_20260924/julia_tsz64k/julia-1.12.2/share/julia/stdlib/v1.12/Pkg/src/API.jl:1255
+Precompiling packages...
+    634.3 ms  ✓ Future
+    665.1 ms  ✓ ConcreteStructs
+    648.3 ms  ✓ IteratorInterfaceExtensions
+    657.4 ms  ✓ LaTeXStrings
+    613.7 ms  ✓ UnPack
+    671.6 ms  ✓ TensorCore
+    689.6 ms  ✓ StatsAPI
+    703.2 ms  ✓ ExprTools
+    800.2 ms  ✓ AbstractFFTs
+    931.1 ms  ✓ Calculus
+    964.6 ms  ✓ ADTypes
+   1257.5 ms  ✓ FillArrays
+    621.1 ms  ✓ ArgCheck
+   1314.8 ms  ✓ OffsetArrays
+    782.3 ms  ✓ TableTraits
+    822.5 ms  ✓ OpenLibm_jll
+   1495.3 ms  ✓ InitialValues
+    903.4 ms  ✓ InverseFunctions
+    923.0 ms  ✓ SuiteSparse_jll
+    974.4 ms  ✓ Statistics
+   1017.1 ms  ✓ IterTools
+   1106.4 ms  ✓ Serialization
+    567.3 ms  ✓ DataValueInterfaces
+    566.4 ms  ✓ Reexport
+    610.0 ms  ✓ EnumX
+   1006.8 ms  ✓ Requires
+    841.6 ms  ✓ DocStringExtensions
+    591.9 ms  ✓ CompositionsBase
+    731.7 ms  ✓ SimpleBufferStream
+    679.8 ms  ✓ Mmap
+    772.1 ms  ✓ GMP_jll
+   2505.8 ms  ✓ FunctionWrappers
+    581.8 ms  ✓ PtrArrays
+    894.5 ms  ✓ URIs
+    649.4 ms  ✓ HashArrayMappedTries
+    881.1 ms  ✓ TranscodingStreams
+    818.0 ms  ✓ DefineSingletons
+   1349.0 ms  ✓ InlineStrings
+    628.3 ms  ✓ FastClosures
+    636.6 ms  ✓ BitFlags
+    681.9 ms  ✓ Nullables
+    859.8 ms  ✓ InvertedIndices
+    662.7 ms  ✓ ChunkSplitters
+    855.9 ms  ✓ DataAPI
+   2424.2 ms  ✓ OrderedCollections
+   1193.1 ms  ✓ EnzymeCore
+    921.1 ms  ✓ StaticArraysCore
+    970.5 ms  ✓ SciMLPublic
+   3800.3 ms  ✓ ExproniconLite
+   1104.6 ms  ✓ GenericLinearAlgebra
+    982.8 ms  ✓ LoggingExtras
+    914.4 ms  ✓ Preferences
+    541.0 ms  ✓ CommonSolve
+   2153.8 ms  ✓ ConstructionBase
+   1579.2 ms  ✓ Baselet
+   3138.5 ms  ✓ IrrationalConstants
+   1205.2 ms  ✓ LazyArtifacts
+    842.8 ms  ✓ InverseFunctions → InverseFunctionsDatesExt
+   2417.0 ms  ✓ FindFirstFunctions
+   1204.2 ms  ✓ Measurements
+   4720.1 ms  ✓ MacroTools
+    966.2 ms  ✓ FillArrays → FillArraysStatisticsExt
+   1123.8 ms  ✓ ConcurrentUtilities
+   2691.6 ms  ✓ SentinelArrays
+   3511.9 ms  ✓ Crayons
+    582.3 ms  ✓ Ratios
+    642.2 ms  ✓ Adapt
+   2769.3 ms  ✓ Compat
+    580.1 ms  ✓ CompositionsBase → CompositionsBaseInverseFunctionsExt
+    658.9 ms  ✓ DelimitedFiles
+    578.1 ms  ✓ MPFR_jll
+    543.9 ms  ✓ FunctionWrappersWrappers
+   3550.7 ms  ✓ InteractiveUtils
+    605.7 ms  ✓ ScopedValues
+   1901.0 ms  ✓ RuntimeGeneratedFunctions
+   2957.7 ms  ✓ NaNMath
+    637.8 ms  ✓ CodecZlib
+    955.2 ms  ✓ AliasTables
+    695.5 ms  ✓ PooledArrays
+   3287.9 ms  ✓ DifferentiationInterface
+    669.4 ms  ✓ Parameters
+    626.1 ms  ✓ DiffResults
+    909.4 ms  ✓ ADTypes → ADTypesEnzymeCoreExt
+    744.7 ms  ✓ JLLWrappers
+    831.1 ms  ✓ MPIPreferences
+   4723.3 ms  ✓ TimerOutputs
+    898.9 ms  ✓ PrecompileTools
+    814.5 ms  ✓ SciMLLogging
+    601.4 ms  ✓ ConstructionBase → ConstructionBaseLinearAlgebraExt
+   4525.6 ms  ✓ FixedPointNumbers
+   4181.8 ms  ✓ Distributed
+    880.4 ms  ✓ ADTypes → ADTypesConstructionBaseExt
+   2486.1 ms  ✓ OpenSSL
+    902.2 ms  ✓ LogExpFunctions
+    658.6 ms  ✓ Referenceables
+    782.0 ms  ✓ CommonSubexpressions
+   2196.5 ms  ✓ Jieko
+    622.1 ms  ✓ OffsetArrays → OffsetArraysAdaptExt
+    586.0 ms  ✓ EnzymeCore → AdaptExt
+   4309.7 ms  ✓ DataValues
+   3156.9 ms  ✓ Missings
+   1253.4 ms  ✓ GPUArraysCore
+   2909.5 ms  ✓ Tables
+    884.1 ms  ✓ WCS_jll
+    883.0 ms  ✓ LLVMOpenMP_jll
+   1372.7 ms  ✓ SharedArrays
+    908.4 ms  ✓ Xorg_libpciaccess_jll
+    885.9 ms  ✓ Rmath_jll
+   1186.9 ms  ✓ Bzip2_jll
+    985.9 ms  ✓ libaec_jll
+   2272.7 ms  ✓ ArrayInterface
+   5205.7 ms  ✓ FileIO
+    778.5 ms  ✓ MicrosoftMPI_jll
+   1038.0 ms  ✓ MbedTLS_jll
+    974.4 ms  ✓ Libiconv_jll
+    952.9 ms  ✓ OpenSpecFun_jll
+   6490.3 ms  ✓ SparseArrays
+   1268.5 ms  ✓ FFTW_jll
+   2023.2 ms  ✓ IntelOpenMP_jll
+    584.7 ms  ✓ Ratios → RatiosFixedPointNumbersExt
+   1532.9 ms  ✓ MPItrampoline_jll
+    617.7 ms  ✓ Compat → CompatLinearAlgebraExt
+    565.6 ms  ✓ LogExpFunctions → LogExpFunctionsInverseFunctionsExt
+   2534.6 ms  ✓ oneTBB_jll
+    567.3 ms  ✓ DifferentiationInterface → DifferentiationInterfaceGPUArraysCoreExt
+    826.4 ms  ✓ TableTraitsUtils
+    740.9 ms  ✓ WCS
+   2242.4 ms  ✓ StringManipulation
+    918.9 ms  ✓ libsharp2_jll
+   2787.5 ms  ✓ RecipesBase
+    998.7 ms  ✓ Rmath
+    583.5 ms  ✓ ArrayInterface → ArrayInterfaceGPUArraysCoreExt
+    836.2 ms  ✓ MaybeInplace
+   1083.8 ms  ✓ CFITSIO_jll
+    887.3 ms  ✓ ArrayInterface → ArrayInterfaceStaticArraysCoreExt
+   3107.1 ms  ✓ ColorTypes
+   5401.0 ms  ✓ Test
+   1225.4 ms  ✓ PreallocationTools
+   1026.4 ms  ✓ XML2_jll
+   3964.4 ms  ✓ Accessors
+   1556.3 ms  ✓ Setfield
+   1324.9 ms  ✓ WoodburyMatrices
+   2085.0 ms  ✓ SciMLStructures
+    841.0 ms  ✓ Statistics → SparseArraysExt
+    934.9 ms  ✓ FillArrays → FillArraysSparseArraysExt
+   1998.4 ms  ✓ MbedTLS
+    738.4 ms  ✓ Accessors → LinearAlgebraExt
+    826.6 ms  ✓ Adapt → AdaptSparseArraysExt
+   1234.0 ms  ✓ SuiteSparse
+   1190.8 ms  ✓ ArrayInterface → ArrayInterfaceSparseArraysExt
+    647.2 ms  ✓ Libsharp
+    829.8 ms  ✓ IterableTables
+   1431.4 ms  ✓ FastTransforms_jll
+   3318.6 ms  ✓ SpecialFunctions
+   1032.2 ms  ✓ Measurements → MeasurementsRecipesBaseExt
+   2331.5 ms  ✓ DataStructures
+   1265.1 ms  ✓ MaybeInplace → MaybeInplaceSparseArraysExt
+   2674.6 ms  ✓ Quadmath
+    793.5 ms  ✓ ExceptionUnwrapping
+   2914.8 ms  ✓ ChainRulesCore
+    842.9 ms  ✓ InverseFunctions → InverseFunctionsTestExt
+    862.9 ms  ✓ Accessors → TestExt
+    815.1 ms  ✓ DifferentiationInterface → DifferentiationInterfaceSparseArraysExt
+   1165.1 ms  ✓ Hwloc_jll
+    956.8 ms  ✓ FiniteDiff
+   1468.5 ms  ✓ SplittablesBase
+    903.1 ms  ✓ AxisAlgorithms
+   9713.2 ms  ✓ StaticArrays
+   2561.2 ms  ✓ AbstractFFTs → AbstractFFTsTestExt
+   3954.4 ms  ✓ CFITSIO
+   1065.5 ms  ✓ BangBang
+   5205.4 ms  ✓ ColorVectorSpace
+   1310.3 ms  ✓ HypergeometricFunctions
+   1936.5 ms  ✓ PDMats
+   8338.4 ms  ✓ Krylov
+   1294.1 ms  ✓ Measurements → MeasurementsSpecialFunctionsExt
+   1023.5 ms  ✓ DiffRules
+  12196.8 ms  ✓ Parsers
+   6226.1 ms  ✓ Colors
+   1526.9 ms  ✓ SortingAlgorithms
+   3143.9 ms  ✓ SymbolicIndexingInterface
+    694.1 ms  ✓ ADTypes → ADTypesChainRulesCoreExt
+    698.4 ms  ✓ DifferentiationInterface → DifferentiationInterfaceChainRulesCoreExt
+   1067.5 ms  ✓ AbstractFFTs → AbstractFFTsChainRulesCoreExt
+  12123.4 ms  ✓ Moshi
+   8568.1 ms  ✓ MKL_jll
+   4700.5 ms  ✓ SciMLOperators
+   1149.6 ms  ✓ FiniteDiff → FiniteDiffSparseArraysExt
+   2609.3 ms  ✓ ChainRulesCore → ChainRulesCoreSparseArraysExt
+   1905.2 ms  ✓ LogExpFunctions → LogExpFunctionsChainRulesCoreExt
+   1288.6 ms  ✓ DifferentiationInterface → DifferentiationInterfaceFiniteDiffExt
+   1661.2 ms  ✓ OpenMPI_jll
+   3342.2 ms  ✓ QuadGK
+  22849.1 ms  ✓ Unitful
+    869.9 ms  ✓ StaticArrays → StaticArraysStatisticsExt
+   2300.3 ms  ✓ SpecialFunctions → SpecialFunctionsChainRulesCoreExt
+   6026.8 ms  ✓ Roots
+    860.5 ms  ✓ ConstructionBase → ConstructionBaseStaticArraysExt
+    830.6 ms  ✓ Adapt → AdaptStaticArraysExt
+    826.5 ms  ✓ DifferentiationInterface → DifferentiationInterfaceStaticArraysExt
+   2491.2 ms  ✓ MPICH_jll
+    901.3 ms  ✓ Accessors → StaticArraysExt
+    809.9 ms  ✓ FiniteDiff → FiniteDiffStaticArraysExt
+    769.0 ms  ✓ BangBang → BangBangChainRulesCoreExt
+    750.3 ms  ✓ BangBang → BangBangTablesExt
+   1231.2 ms  ✓ FITSIO
+    775.1 ms  ✓ ColorVectorSpace → SpecialFunctionsExt
+    919.2 ms  ✓ MicroCollections
+   1454.1 ms  ✓ BangBang → BangBangStaticArraysExt
+   3015.4 ms  ✓ StaticArrays → StaticArraysChainRulesCoreExt
+    659.8 ms  ✓ InlineStrings → ParsersExt
+   4689.6 ms  ✓ StatsBase
+   2301.0 ms  ✓ FastGaussQuadrature
+   1461.1 ms  ✓ FillArrays → FillArraysPDMatsExt
+   1047.6 ms  ✓ ArrayInterface → ArrayInterfaceChainRulesCoreExt
+   3097.0 ms  ✓ Healpix
+    982.0 ms  ✓ SciMLOperators → SciMLOperatorsSparseArraysExt
+   1971.3 ms  ✓ JSON
+   1234.6 ms  ✓ SciMLOperators → SciMLOperatorsStaticArraysCoreExt
+    787.4 ms  ✓ Unitful → InverseFunctionsUnitfulExt
+   1174.6 ms  ✓ Unitful → ConstructionBaseUnitfulExt
+    804.4 ms  ✓ Measurements → MeasurementsUnitfulExt
+    867.0 ms  ✓ Unitful → PrintfExt
+    763.6 ms  ✓ Roots → RootsChainRulesCoreExt
+    864.8 ms  ✓ Accessors → UnitfulExt
+   3373.7 ms  ✓ StatsFuns
+    885.6 ms  ✓ Roots → RootsUnitfulExt
+    933.6 ms  ✓ TableShowUtils
+   1181.2 ms  ✓ WeakRefStrings
+   1148.8 ms  ✓ PDMats → StatsBaseExt
+   3649.3 ms  ✓ RecursiveArrayTools
+    676.5 ms  ✓ StatsFuns → StatsFunsInverseFunctionsExt
+   1923.0 ms  ✓ UnitfulAngles
+   4949.1 ms  ✓ ColorSchemes
+   5457.0 ms  ✓ ForwardDiff
+   2886.3 ms  ✓ HDF5_jll
+   1047.4 ms  ✓ RecursiveArrayTools → RecursiveArrayToolsSparseArraysExt
+    790.0 ms  ✓ RecursiveArrayTools → RecursiveArrayToolsTablesExt
+    760.1 ms  ✓ RecursiveArrayTools → RecursiveArrayToolsMeasurementsExt
+   2152.5 ms  ✓ StatsFuns → StatsFunsChainRulesCoreExt
+    742.3 ms  ✓ PreallocationTools → PreallocationToolsForwardDiffExt
+    985.5 ms  ✓ ForwardDiff → ForwardDiffStaticArraysExt
+    971.4 ms  ✓ Unitful → ForwardDiffExt
+   4387.3 ms  ✓ Interpolations
+    841.6 ms  ✓ RecursiveArrayTools → RecursiveArrayToolsForwardDiffExt
+    887.2 ms  ✓ Roots → RootsForwardDiffExt
+   4770.9 ms  ✓ Transducers
+   2510.1 ms  ✓ DifferentiationInterface → DifferentiationInterfaceForwardDiffExt
+   7808.6 ms  ✓ FFTW
+   1147.9 ms  ✓ Transducers → TransducersAdaptExt
+   1217.3 ms  ✓ Transducers → TransducersReferenceablesExt
+   1679.0 ms  ✓ Interpolations → InterpolationsForwardDiffExt
+   1833.4 ms  ✓ Interpolations → InterpolationsUnitfulExt
+   4030.4 ms  ✓ UnitfulAstro
+   1222.7 ms  ✓ GenericFFT
+   6329.4 ms  ✓ Distributions
+   1969.7 ms  ✓ Cosmology
+   1835.4 ms  ✓ Distributions → DistributionsTestExt
+   3934.4 ms  ✓ ThreadsX
+   8888.8 ms  ✓ PhysicalConstants
+  15242.1 ms  ✓ ArrayLayouts
+   3580.2 ms  ✓ Distributions → DistributionsChainRulesCoreExt
+   2534.7 ms  ✓ ArrayLayouts → ArrayLayoutsSparseArraysExt
+  20483.6 ms  ✓ HTTP
+  10600.0 ms  ✓ HDF5
+   2271.9 ms  ✓ FileIO → HTTPExt
+  26266.5 ms  ✓ Polynomials
+  13690.0 ms  ✓ SciMLBase
+  37770.5 ms  ✓ REPL
+   1407.6 ms  ✓ Polynomials → PolynomialsChainRulesCoreExt
+   1407.7 ms  ✓ Polynomials → PolynomialsFFTWExt
+   4367.8 ms  ✓ LazyArrays
+   1287.7 ms  ✓ SciMLBase → SciMLBaseChainRulesCoreExt
+   1576.0 ms  ✓ SciMLBase → SciMLBaseMeasurementsExt
+   1735.7 ms  ✓ SciMLBase → SciMLBaseDifferentiationInterfaceExt
+   2282.9 ms  ✓ SciMLBase → SciMLBaseDistributionsExt
+   2839.4 ms  ✓ SciMLBase → SciMLBaseForwardDiffExt
+   2522.6 ms  ✓ Transducers → TransducersLazyArraysExt
+   3232.0 ms  ✓ DSP
+   2922.2 ms  ✓ LazyArrays → LazyArraysStaticArraysExt
+   4907.3 ms  ✓ DoubleFloats
+   5593.2 ms  ✓ SciMLJacobianOperators
+  43163.6 ms  ✓ JLD2
+   4355.6 ms  ✓ ToeplitzMatrices
+   8214.6 ms  ✓ Pkg → REPLExt
+   1728.0 ms  ✓ JLD2 → UnPackExt
+   1920.0 ms  ✓ ToeplitzMatrices → ToeplitzMatricesStatsBaseExt
+   6734.7 ms  ✓ TextParse
+   4783.5 ms  ✓ LineSearch
+   5287.6 ms  ✓ FastTransforms
+   2802.4 ms  ✓ CSVFiles
+   8209.6 ms  ✓ NonlinearSolveBase
+   1242.2 ms  ✓ NonlinearSolveBase → NonlinearSolveBaseLineSearchExt
+   1255.2 ms  ✓ NonlinearSolveBase → NonlinearSolveBaseChainRulesCoreExt
+   1733.2 ms  ✓ NonlinearSolveBase → NonlinearSolveBaseSparseArraysExt
+   2199.3 ms  ✓ NonlinearSolveBase → NonlinearSolveBaseForwardDiffExt
+   4670.2 ms  ✓ Pixell
+   5637.7 ms  ✓ BracketingNonlinearSolve
+  22250.2 ms  ✓ PrettyTables
+   1598.6 ms  ✓ BracketingNonlinearSolve → BracketingNonlinearSolveForwardDiffExt
+   1090.9 ms  ✓ SymbolicIndexingInterface → SymbolicIndexingInterfacePrettyTablesExt
+   1960.8 ms  ✓ BracketingNonlinearSolve → BracketingNonlinearSolveChainRulesCoreExt
+  21280.0 ms  ✓ LinearSolve
+   3700.6 ms  ✓ DataInterpolations
+   1252.8 ms  ✓ DataInterpolations → DataInterpolationsChainRulesCoreExt
+   3290.6 ms  ✓ LinearSolve → LinearSolveEnzymeExt
+  12559.2 ms  ✓ NonlinearSolveSpectralMethods
+   4392.3 ms  ✓ NonlinearSolveBase → NonlinearSolveBaseLinearSolveExt
+   5050.5 ms  ✓ LinearSolve → LinearSolveForwardDiffExt
+   1687.6 ms  ✓ NonlinearSolveSpectralMethods → NonlinearSolveSpectralMethodsForwardDiffExt
+   6605.0 ms  ✓ LinearSolve → LinearSolveSparseArraysExt
+   9520.4 ms  ✓ SimpleNonlinearSolve
+   2111.1 ms  ✓ SimpleNonlinearSolve → SimpleNonlinearSolveChainRulesCoreExt
+  17303.4 ms  ✓ NonlinearSolveQuasiNewton
+   3907.4 ms  ✓ NonlinearSolveQuasiNewton → NonlinearSolveQuasiNewtonForwardDiffExt
+  25582.9 ms  ✓ NonlinearSolveFirstOrder
+  47709.4 ms  ✓ DataFrames
+  14532.2 ms  ✓ NonlinearSolve
+   2107.6 ms  ✓ Transducers → TransducersDataFramesExt
+   2448.3 ms  ✓ BangBang → BangBangDataFramesExt
+  10289.5 ms  ✓ XGPaint
+  321 dependencies successfully precompiled in 130 seconds. 26 already precompiled.
+  2 dependencies had output during precompilation:
+┌ MKL_jll
+│  Downloading artifact: IntelOpenMP
+│   Downloading artifact: oneTBB
+└  
+┌ LinearSolve
+│  Downloading artifact: MKL
+└  
+XGPaint 0.4.0 from https://github.com/kristero/XGPaint.jl.git, tree 3b57cacb5f824269f1cae22e7fd2085788d14eee, installed at /lustre/work/kristero10/tsz64k_repro_test_20260924/julia_tsz64k/depot/packages/XGPaint/U6YjI
+verify_env: OK - Julia 1.12.2, 12 package versions and 17 XGPaint files match the validated 256-row test
+stage=precompile finished=2026-09-24T13:36:21+0000

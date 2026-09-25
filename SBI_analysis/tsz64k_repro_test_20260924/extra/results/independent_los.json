@@ -1,0 +1,28 @@
+{
+  "scope": "Normalized spherical column shapes; independent SciPy direct-distance integration (independent_los.py of the 256-row test)",
+  "test_selection_rows_0_255": {
+    "points": 4096,
+    "rows": 256,
+    "max_relative_visible": 1.113997782908882e-12,
+    "max_absolute_ratio_error": 2.9976021664879227e-14
+  },
+  "test_selection_new_rows": {
+    "points": 12288,
+    "rows": 768,
+    "max_relative_visible": 1.1157741397482823e-12,
+    "max_absolute_ratio_error": 1.0691447727140257e-13
+  },
+  "all_64_halos_new_rows": {
+    "points": 150528,
+    "rows": 768,
+    "max_relative_visible": 1.1191048088221578e-12,
+    "max_absolute_ratio_error": 1.0691447727140257e-13
+  },
+  "all_64_halos_rows_0_255": {
+    "points": 50176,
+    "rows": 256,
+    "max_relative_visible": 1.1186607196123077e-12,
+    "max_absolute_ratio_error": 2.9976021664879227e-14
+  },
+  "passed": true
+}

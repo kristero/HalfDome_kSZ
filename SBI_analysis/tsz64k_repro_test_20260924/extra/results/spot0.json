@@ -1,0 +1,50 @@
+{
+  "target": "< 1% per-ell clean D_ell, l = 80..7979",
+  "passed": true,
+  "rows": [
+    {
+      "row": 65370,
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "reference_nodes": [
+        512,
+        256,
+        128
+      ],
+      "masked_clean_cl.npy": {
+        "max_fractional_Dell": 7.392519181248502e-07,
+        "relative_Dell_l2": 5.708034940988784e-07
+      },
+      "unmasked_clean_cl.npy": {
+        "max_fractional_Dell": 7.106529906764081e-07,
+        "relative_Dell_l2": 5.96240638447252e-07
+      },
+      "passed": true
+    },
+    {
+      "row": 379,
+      "nodes": [
+        256,
+        128,
+        64
+      ],
+      "reference_nodes": [
+        512,
+        256,
+        128
+      ],
+      "masked_clean_cl.npy": {
+        "max_fractional_Dell": 1.5471627601293392e-07,
+        "relative_Dell_l2": 1.2243511542145283e-07
+      },
+      "unmasked_clean_cl.npy": {
+        "max_fractional_Dell": 1.582234210317779e-07,
+        "relative_Dell_l2": 1.229688749579215e-07
+      },
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+stage=repro host=ansys08 threads=26 index=0 start=2026-09-24T13:36:23+0000
+{
+  "passed": true,
+  "tolerance": 1e-06,
+  "checks": {
+    "selected_halos": 85224251,
+    "operator_probe_exact": {
+      "julia_version": true,
+      "healpix_version": true,
+      "hdf5_version": true,
+      "xgpaint_sha256": true,
+      "operator_sha256": true,
+      "adapter_sha256": true,
+      "beam_source_sha256": true,
+      "rng_uniform": true,
+      "rng_normal": true,
+      "mask_pixel_sha256": true
+    },
+    "operator_probe_bitwise_informational": {
+      "noise_pixel_sha256": true,
+      "beam_pixel_sha256": true
+    }
+  },
+  "rows": {
+    "00000": {
+      "mask_sha256_equal": true,
+      "split_seeds_equal": true,
+      "noise_sha256_bitwise_equal_informational": true,
+      "masked_clean_cl.npy": 1.2664293185446988e-15,
+      "unmasked_clean_cl.npy": 1.4541828360215121e-15,
+      "masked_noisy_cross_cl.npy": 1.243297473934691e-10,
+      "passed": true
+    },
+    "00001": {
+      "mask_sha256_equal": true,
+      "split_seeds_equal": true,
+      "noise_sha256_bitwise_equal_informational": true,
+      "masked_clean_cl.npy": 4.963375973669403e-14,
+      "unmasked_clean_cl.npy": 7.123446803386861e-14,
+      "masked_noisy_cross_cl.npy": 1.0000084169670935e-13,
+      "passed": true
+    },
+    "00002": {
+      "mask_sha256_equal": true,
+      "split_seeds_equal": true,
+      "noise_sha256_bitwise_equal_informational": true,
+      "masked_clean_cl.npy": 3.33557891073323e-14,
+      "unmasked_clean_cl.npy": 3.2792766833515045e-14,
+      "masked_noisy_cross_cl.npy": 9.710814451917418e-13,
+      "passed": true
+    },
+    "00003": {
+      "mask_sha256_equal": true,
+      "split_seeds_equal": true,
+      "noise_sha256_bitwise_equal_informational": true,
+      "masked_clean_cl.npy": 2.3372883078061614e-13,
+      "unmasked_clean_cl.npy": 2.4519335503786456e-13,
+      "masked_noisy_cross_cl.npy": 6.390417563679584e-13,
+      "passed": true
+    }
+  },
+  "utc": "2026-09-24T13:58:08.956799+00:00",
+  "metric": "max over ell=80..7979 of |new-ref| / (|ref| + masked clean ref)",
+  "note": "Differences at the 1e-14 level are expected from threaded summation order."
+}
+stage=repro finished=2026-09-24T13:58:09+0000

@@ -1,0 +1,3 @@
+stage=audit host=db05 threads=26 index=255 start=2026-09-24T13:36:23+0000
+audit task 255: ran
+stage=audit finished=2026-09-24T13:49:47+0000

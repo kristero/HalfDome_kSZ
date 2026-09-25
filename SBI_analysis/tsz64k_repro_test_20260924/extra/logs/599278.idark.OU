@@ -1,0 +1,132 @@
+extra=profile-checks arg= host=ansys33 ncpus=26 start=2026-09-24T14:10:20+0000
+{
+ "scope": "Normalized spherical column shapes; independent SciPy direct-distance integration (independent_los.py of the 256-row test)",
+ "test_selection_rows_0_255": {
+  "points": 4096,
+  "rows": 256,
+  "max_relative_visible": 1.113997782908882e-12,
+  "max_absolute_ratio_error": 2.9976021664879227e-14
+ },
+ "test_selection_new_rows": {
+  "points": 12288,
+  "rows": 768,
+  "max_relative_visible": 1.1157741397482823e-12,
+  "max_absolute_ratio_error": 1.0691447727140257e-13
+ },
+ "all_64_halos_new_rows": {
+  "points": 150528,
+  "rows": 768,
+  "max_relative_visible": 1.1191048088221578e-12,
+  "max_absolute_ratio_error": 1.0691447727140257e-13
+ },
+ "all_64_halos_rows_0_255": {
+  "points": 50176,
+  "rows": 256,
+  "max_relative_visible": 1.1186607196123077e-12,
+  "max_absolute_ratio_error": 2.9976021664879227e-14
+ },
+ "passed": true
+}
+ran
+{
+ "target": "< 1% per-ell clean D_ell, l = 80..7979",
+ "passed": true,
+ "rows": [
+  {
+   "row": 65370,
+   "nodes": [
+    256,
+    128,
+    64
+   ],
+   "reference_nodes": [
+    512,
+    256,
+    128
+   ],
+   "masked_clean_cl.npy": {
+    "max_fractional_Dell": 7.392519181248502e-07,
+    "relative_Dell_l2": 5.708034940988784e-07
+   },
+   "unmasked_clean_cl.npy": {
+    "max_fractional_Dell": 7.106529906764081e-07,
+    "relative_Dell_l2": 5.96240638447252e-07
+   },
+   "passed": true
+  },
+  {
+   "row": 379,
+   "nodes": [
+    256,
+    128,
+    64
+   ],
+   "reference_nodes": [
+    512,
+    256,
+    128
+   ],
+   "masked_clean_cl.npy": {
+    "max_fractional_Dell": 1.5471627601293392e-07,
+    "relative_Dell_l2": 1.2243511542145283e-07
+   },
+   "unmasked_clean_cl.npy": {
+    "max_fractional_Dell": 1.582234210317779e-07,
+    "relative_Dell_l2": 1.229688749579215e-07
+   },
+   "passed": true
+  }
+ ]
+}
+ran
+{
+ "target": "< 1% per-ell clean D_ell, l = 80..7979",
+ "passed": true,
+ "rows": [
+  {
+   "row": 32850,
+   "nodes": [
+    512,
+    256,
+    128
+   ],
+   "reference_nodes": [
+    1024,
+    512,
+    256
+   ],
+   "masked_clean_cl.npy": {
+    "max_fractional_Dell": 5.580710138453071e-08,
+    "relative_Dell_l2": 3.6114107755494354e-08
+   },
+   "unmasked_clean_cl.npy": {
+    "max_fractional_Dell": 5.579100514907509e-08,
+    "relative_Dell_l2": 3.604333505449246e-08
+   },
+   "passed": true
+  },
+  {
+   "row": 32912,
+   "nodes": [
+    256,
+    128,
+    64
+   ],
+   "reference_nodes": [
+    512,
+    256,
+    128
+   ],
+   "masked_clean_cl.npy": {
+    "max_fractional_Dell": 9.412690944454738e-07,
+    "relative_Dell_l2": 4.919465332909327e-07
+   },
+   "unmasked_clean_cl.npy": {
+    "max_fractional_Dell": 9.324405985111639e-07,
+    "relative_Dell_l2": 5.015765478017953e-07
+   },
+   "passed": true
+  }
+ ]
+}
+finished=2026-09-24T14:55:32+0000

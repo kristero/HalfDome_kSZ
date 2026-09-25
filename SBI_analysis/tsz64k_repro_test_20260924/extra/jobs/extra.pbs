@@ -1,0 +1,17 @@
+#!/bin/bash
+#PBS -N tsz64k_extra
+# Generic wrapper for run_extra.py; resources are given on the qsub command line.
+# EXTRA_CMD=manage-run runs the bundle's own `manage.py run --batches` for the
+# colon-separated batch list in EXTRA_ARG (qsub -v cannot carry commas).
+set -euo pipefail
+cd "${EXTRA:?submit with -v EXTRA=...}"
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=1
+PY=/home/anaconda3/bin/python3
+echo "extra=${EXTRA_CMD:?} arg=${EXTRA_ARG:-} host=$(hostname) ncpus=${NCPUS:-1} start=$(date -Is)"
+if [[ "${EXTRA_CMD}" == manage-run ]]; then
+  "${PY}" ../HalfDome_kSZ/tSZ_64k_flat_prior_SO_baseline_deproj0/pipeline/manage.py run \
+    --batches "${EXTRA_ARG//:/,}" --threads "${NCPUS:-1}" --stop-after-hours 3.3
+else
+  "${PY}" run_extra.py "${EXTRA_CMD}" ${EXTRA_ARG:+--arg "${EXTRA_ARG}"} --threads "${NCPUS:-1}"
+fi
+echo "finished=$(date -Is)"

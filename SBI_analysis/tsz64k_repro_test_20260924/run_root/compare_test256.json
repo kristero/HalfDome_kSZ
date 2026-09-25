@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "tolerance": 1e-06,
+  "audits": {
+    "compared": 256,
+    "node_mismatches": [],
+    "worst_metric_relative_difference": 0.0,
+    "not_available": 0
+  },
+  "clean_spectra_bins40": {
+    "compared": 16,
+    "worst_masked": 1.021405182655144e-14,
+    "worst_unmasked": 2.708944180085382e-14,
+    "not_available": 240
+  },
+  "utc": "2026-09-24T19:57:35.484376+00:00"
+}

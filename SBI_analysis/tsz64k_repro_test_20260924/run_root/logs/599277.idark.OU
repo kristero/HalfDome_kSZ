@@ -1,0 +1,6 @@
+stage=production host=ansys08 threads=26 index=0 start=2026-09-24T13:58:10+0000
+batch 0: ran (1285 s elapsed)
+batch 1: ran (2572 s elapsed)
+batch 2: ran (3880 s elapsed)
+batch 3: ran (5189 s elapsed)
+stage=production finished=2026-09-24T15:24:39+0000

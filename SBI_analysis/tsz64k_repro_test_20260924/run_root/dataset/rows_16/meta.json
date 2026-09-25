@@ -1,0 +1,57 @@
+{
+  "rows": 16,
+  "requested_prefix": 16,
+  "missing_rows": [],
+  "parameter_order": [
+    "P0",
+    "xc",
+    "beta",
+    "alpha_m_P0",
+    "alpha_m_xc",
+    "alpha_m_beta",
+    "alpha_z_P0",
+    "alpha_z_xc",
+    "alpha_z_beta"
+  ],
+  "lower": [
+    1.0,
+    0.025,
+    2.8,
+    -0.6,
+    -1.0,
+    -0.2,
+    -6.0,
+    -1.5,
+    -0.5
+  ],
+  "upper": [
+    60.0,
+    4.0,
+    16.0,
+    1.5,
+    0.4,
+    0.4,
+    0.5,
+    3.0,
+    2.0
+  ],
+  "units": "D_ell = ell(ell+1)C_ell/2pi of Compton-y, dimensionless; ell = 80..7979 unbinned",
+  "binning": "40 bins of 200 multipoles (last to 7979), weights 2l+1",
+  "spectra": {
+    "clean_dl_unbinned": "masked clean signal (fsky=0.4 cap, 2 arcmin beam)",
+    "noisy_dl_unbinned": "signed cross spectrum of two masked signal+noise splits, SO baseline Deproj-0, two seeds per row",
+    "unmasked_clean_dl_unbinned": "full-sky clean signal (only with --include-unmasked)"
+  },
+  "mask_sha256": "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689",
+  "independent_noise_realizations": 32,
+  "design_sha256": {
+    "theta_design_65536.npy": "c6cb4e8af8d8fa33033fa183a513554028ba9704b7e85d74e0c98da13bafe05b",
+    "noise_seeds_65536.npy": "70b5d836d07b28cb425bb6cd1b70fc9a8eb08a93c5db83327ab7eb6422239a40",
+    "battaglia_flat_sobol_65536.csv": "004b1c24dfb6353e656d6b35ccd86e1e201701c105216df1b28b5085f81d42c5"
+  },
+  "created_utc": "2026-09-24T19:57:36.988830+00:00",
+  "bundle_git": {
+    "commit": "b46ab65f5d39a16a83a1132e3dcb8c86cac59985",
+    "uncommitted_changes": false
+  }
+}

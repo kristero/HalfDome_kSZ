@@ -1,0 +1,27 @@
+#!/bin/bash
+#PBS -N camelsDm
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mem=48gb
+#PBS -l walltime=06:00:00
+#PBS -j oe
+# One PBS job processing a list of box:snapshot pairs in $JOBS: download raw snapshot + groups (compute nodes
+# have internet), run camels_direct_profiles.py, delete the raw snapshot (groups files are kept, 16-20 MB each).
+set -u
+W=/lustre/work/kristero10/lee22_tsz_verification_20260929_D
+PY=/home/anaconda3/bin/python3.8
+OUT=$W/direct
+mkdir -p $OUT
+echo "host $(hostname) start $(date)"
+for js in $JOBS; do
+  BOX=${js%%:*}; s=${js##*:}
+  RAW=$W/raw/CV_$BOX; mkdir -p $RAW
+  URL=https://users.flatironinstitute.org/~camels/Sims/IllustrisTNG/CV/CV_$BOX
+  if [ -s $OUT/direct_CV_${BOX}_$s.npz ]; then echo "skip CV_$BOX $s"; continue; fi
+  [ -s $RAW/groups_$s.hdf5 ] || curl -s -S --retry 3 -o $RAW/groups_$s.hdf5 $URL/groups_$s.hdf5
+  [ -s $RAW/snapshot_$s.hdf5 ] || curl -s -S --retry 3 -o $RAW/snapshot_$s.hdf5 $URL/snapshot_$s.hdf5
+  echo "== CV_$BOX snap $s $(date) size $(stat -c %s $RAW/snapshot_$s.hdf5)"
+  $PY $W/code/camels_direct_profiles.py $RAW/snapshot_$s.hdf5 $RAW/groups_$s.hdf5 $OUT/direct_CV_${BOX}_$s.npz 2>&1 | grep -v "^halo "
+  if [ -s $OUT/direct_CV_${BOX}_$s.npz ]; then rm -f $RAW/snapshot_$s.hdf5; echo "deleted snapshot_$s of CV_$BOX"; fi
+  echo "downloaded so far (GB, cumulative log): $(du -sh $RAW | cut -f1) in CV_$BOX"
+done
+echo "end $(date)"

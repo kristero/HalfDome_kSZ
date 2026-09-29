@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -N C_fl_density
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mpiprocs=1:mem=16gb
+#PBS -l walltime=06:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+ROOT=/lustre/work/kristero10/lee22_tsz_verification_20260929_C_flamingo
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=1 PYTHONUNBUFFERED=1 HDF5_USE_FILE_LOCKING=FALSE
+PYTHON=/lustre/work/kristero10/flamingo_pressure_20260921/venv/bin/python
+cd "$ROOT"
+mkdir -p logs
+exec > "$ROOT/logs/run_density.log" 2>&1
+trap 'status=$?; printf "%s\n" "$status" > "$ROOT/logs/run_density.exit_code"' EXIT
+hostname; date
+# heaviest snapshot (z=0, ~18M particles) first so that it overlaps with the others
+"$PYTHON" density_products.py --root "$ROOT" --snapshots 78 68 58 48 38 18 14 --workers 4 --cap-gb 6
+date

@@ -1,0 +1,34 @@
+#!/bin/bash
+#PBS -N camelsD
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mem=48gb
+#PBS -l walltime=04:00:00
+#PBS -j oe
+# Direct CAMELS profiles for the snapshots listed in $SNAPS of box $BOX (qsub -v BOX=0,SNAPS="090 060 044").
+# Optional DOWNLOAD=1: download each snapshot here first (only if the compute node has internet) and
+# DELETE=1: delete the raw snapshot after processing.
+set -u
+W=/lustre/work/kristero10/lee22_tsz_verification_20260929_D
+PY=/home/anaconda3/bin/python3.8
+BOX=${BOX:-0}
+SNAPS=${SNAPS:-"090 060 044"}
+DOWNLOAD=${DOWNLOAD:-0}
+DELETE=${DELETE:-0}
+RAW=$W/raw/CV_$BOX
+OUT=$W/direct
+mkdir -p $RAW $OUT
+cd $W
+echo "host $(hostname) start $(date)"
+curl -s -m 20 -I https://users.flatironinstitute.org/~camels/ | head -1 && echo "internet: yes" || echo "internet: no"
+export OMP_NUM_THREADS=8
+for s in $SNAPS; do
+  URL=https://users.flatironinstitute.org/~camels/Sims/IllustrisTNG/CV/CV_$BOX
+  if [ "$DOWNLOAD" = "1" ]; then
+    [ -s $RAW/groups_$s.hdf5 ] || curl -s -S -o $RAW/groups_$s.hdf5 $URL/groups_$s.hdf5
+    [ -s $RAW/snapshot_$s.hdf5 ] || curl -s -S -o $RAW/snapshot_$s.hdf5 $URL/snapshot_$s.hdf5
+  fi
+  echo "== CV_$BOX snap $s $(date)"
+  $PY $W/code/camels_direct_profiles.py $RAW/snapshot_$s.hdf5 $RAW/groups_$s.hdf5 $OUT/direct_CV_${BOX}_$s.npz
+  if [ "$DELETE" = "1" ] && [ -s $OUT/direct_CV_${BOX}_$s.npz ]; then rm -f $RAW/snapshot_$s.hdf5; echo "deleted snapshot_$s"; fi
+done
+echo "end $(date)"

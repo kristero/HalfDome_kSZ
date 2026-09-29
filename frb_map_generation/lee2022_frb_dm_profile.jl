@@ -58,7 +58,14 @@ abstract type AbstractLee2022DMProfile{T} <: XGPaint.AbstractGNFW{T} end
 #                                        critical density; this reproduces the fitted alpha_z of n0 and
 #                                        is a hypothesis about the paper's bookkeeping, not a documented fact
 const LEE2022_NORMALIZATIONS = (:literal, :baryon_fraction, :electron_count, :hydrogen_count, :xgpaint_ne2d)
-const LEE2022_REDSHIFT_SCALINGS = (:physical, :comoving_hypothesis)
+const LEE2022_REDSHIFT_SCALINGS = (:physical, :comoving_hypothesis, :tng_calibrated)
+# TNG-calibrated correction of the literal (eq. 9) Lee22 density, n_e = C(z) n0 g(x) n200(z) with
+# C(z) = C0 (1+z)^k: fitted to Konietzka's TNG300 within-R200 halo DM of 1e13-1e14 Msun at source
+# redshifts 0.1-2 (rms 0.8 %), see LEE22_NORMALIZATION_FORENSICS_20260929.md. C is held at z = 2 above
+# the fitted range. Defined relative to normalization=:literal only.
+const LEE2022_TNG_CALIBRATION_C0 = 0.2841790493880425
+const LEE2022_TNG_CALIBRATION_K = 2.483190184608004
+const LEE2022_TNG_CALIBRATION_ZMAX = 2.0
 const LEE2022_N0_PIVOTS = (:legacy_1e14, :mcut)
 const LEE2022_CONCENTRATION_SOURCES = (:duffy2008, :tng_mean)
 const LEE2022_FIT_MASS_MAX_MSUN_AT_H068 = LEE2022_FIT_MASS_MAX_HINV_MSUN / 0.68
@@ -110,6 +117,8 @@ function Lee2022ConcentrationDMProfile(;
 )
     normalization in LEE2022_NORMALIZATIONS || error("Unknown Lee22 normalization $(normalization)")
     redshift_scaling in LEE2022_REDSHIFT_SCALINGS || error("Unknown Lee22 redshift scaling $(redshift_scaling)")
+    redshift_scaling == :tng_calibrated && normalization != :literal && error(
+        "redshift_scaling=:tng_calibrated is a correction of the literal eq. 9 density; use normalization=:literal")
     concentration_source in LEE2022_CONCENTRATION_SOURCES ||
         error("Unknown Lee22 concentration source $(concentration_source)")
     shape_clip_mass_msun > 0 || error("Lee22 shape clip mass must be positive (or Inf)")
@@ -210,9 +219,13 @@ function lee2022_normalization_factor(model::AbstractLee2022DMProfile)
 end
 
 """Redshift-dependent factor: 1 for the literal physical reading, (1+z)^3/E^2(z) for the
-comoving-bookkeeping hypothesis (E^2 = rho_crit(z)/rho_crit(0))."""
+comoving-bookkeeping hypothesis (E^2 = rho_crit(z)/rho_crit(0); ruled out by the 2026-09-28 TNG test), and
+C0 (1+min(z, 2))^k for the TNG-calibrated correction of the literal density."""
 function lee2022_redshift_scaling_factor(model::AbstractLee2022DMProfile, z::Real)
     model.redshift_scaling == :physical && return 1.0
+    if model.redshift_scaling == :tng_calibrated
+        return LEE2022_TNG_CALIBRATION_C0 * (1 + min(Float64(z), LEE2022_TNG_CALIBRATION_ZMAX))^LEE2022_TNG_CALIBRATION_K
+    end
     rho = getfield(XGPaint, Symbol(Char(0x03c1), "_crit"))
     e2 = Float64(ustrip(rho(model, z) / rho(model, zero(z))))
     return (1 + Float64(z))^3 / e2
@@ -234,6 +247,8 @@ function lee2022_variant_tokens(model::AbstractLee2022DMProfile)
         push!(tokens, "shapeclip=1e$(round(log10(model.shape_clip_mass_msun), digits=4))Msun")
     end
     model.redshift_scaling == :comoving_hypothesis && push!(tokens, "zscale=comoving_hyp")
+    model.redshift_scaling == :tng_calibrated && push!(tokens,
+        "zscale=tngcal_C0$(round(LEE2022_TNG_CALIBRATION_C0, digits=6))_k$(round(LEE2022_TNG_CALIBRATION_K, digits=6))_zmax2")
     return tokens
 end
 
@@ -281,6 +296,8 @@ function Lee2022NoConcentrationDMProfile(
 ) where {T<:Real}
     normalization in LEE2022_NORMALIZATIONS || error("Unknown Lee22 normalization $(normalization)")
     redshift_scaling in LEE2022_REDSHIFT_SCALINGS || error("Unknown Lee22 redshift scaling $(redshift_scaling)")
+    redshift_scaling == :tng_calibrated && normalization != :literal && error(
+        "redshift_scaling=:tng_calibrated is a correction of the literal eq. 9 density; use normalization=:literal")
     n0_pivot in LEE2022_N0_PIVOTS || error("Unknown Lee22 n0 pivot $(n0_pivot)")
     shape_clip_mass_msun > 0 || error("Lee22 shape clip mass must be positive (or Inf)")
     omega_m = Omega_b + Omega_c

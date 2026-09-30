@@ -70,9 +70,10 @@ painting HalfDome FRB dispersion measures, kSZ and tSZ maps. Status 2026-09-30.<
   <p><b>What HalfDome uses.</b> Pressure: Lee22 × (1+z)<sup>2</sup>. Density: Lee22 × [0.6774 (1+z)]<sup>3</sup> X<sub>H</sub><sup>2</sup>. The empirical
   corrections used on the way (C(z) = 0.284 (1+z)<sup>2.48</sup> from a TNG DM catalogue whose "10<sup>13</sup>–10<sup>14</sup>" window likely
   contains clusters, and F<sub>n</sub> = 5.4 from the CAMELS gas) are not final products.</p>
-  <p id="summary-results"><b>Consequences.</b> FRB halo DM: the previous ×0.6016 density gave twice TNG's mean halo DM per hit at z<sub>s</sub> = 0.1 and matched only at
-  z<sub>s</sub> = 1. With (1+z)<sup>3</sup>/F<sub>n</sub> the HalfDome rays and the analytic halo model agree to 1–3 % and sit 22–31 % below the TNG
-  catalogue's cluster-contaminated window. <span id="tsz-summary">tSZ: the Lee22 × (1+z)<sup>2</sup> maps are being painted on idark; results follow in Section 5.</span></p>
+  <p id="summary-results"><b>Consequences.</b> FRB halo DM: the previous ×0.6016 density was right only near z = 0.35; the derived density
+  reproduces TNG's halo DM to 3 % in 10<sup>13</sup>–10<sup>14.95</sup> M<sub>☉</sub> (analytic halo model, once the TNG catalogue's mass window is read
+  correctly). tSZ: Lee22 × (1+z)<sup>2</sup> is 2.3–3× FLAMINGO's y power, mostly from its extrapolation above 10<sup>14.8</sup> h<sup>-1</sup>M<sub>☉</sub>; with
+  Battaglia12 there it is 1.15–1.5×. Against Takahashi+25 every corrected pair is now acceptable (χ² 20–24 / 10–23 vs 58.8 / 119.4 before).</p>
 </div>
 
 <h2>1. The Lee22 fits as printed</h2>
@@ -318,37 +319,91 @@ own <code>fill_profile_slice!</code> (the function that fills the table nodes). 
 <div class="col">
 <p>120,000 rays, gas inside each halo's R<sub>200c</sub> sphere. The analytic curves are the Torkamani et al. (2026) compound-Poisson
 halo model with clustering, evaluated with exactly the same densities. With the HalfDome halo abundance it reproduces the rays to 1–3 %
-for every model and source redshift, so the rays and the analytic model are interchangeable; in the TNG cosmology with a Tinker08
-mass function down to 10<sup>9</sup> M<sub>☉</sub> it is the analytic prediction for TNG.</p>
+for every model and source redshift, so rays and analytic model are interchangeable; in the TNG cosmology with a Tinker08 mass
+function down to 10<sup>9</sup> M<sub>☉</sub> it is the analytic prediction for TNG.</p>
 </div>
 <div class="tablewrap"><table>
-<tr><th>z<sub>s</sub></th><th>TNG catalogue</th><th>Lee22 × 0.6016 (previous)</th><th>Lee22 × C(z)</th><th>Lee22 × (1+z)<sup>3</sup>/5.4</th><th>Battaglia16</th></tr>
-<tr><td>0.1</td><td class="num">110</td><td class="num">221 / 215</td><td class="num">117 / 114</td><td class="num">78 / 76</td><td class="num">79 / 73</td></tr>
-<tr><td>0.5</td><td class="num">123</td><td class="num">163 / 163</td><td class="num">124 / 125</td><td class="num">90 / 91</td><td class="num">82 / 82</td></tr>
-<tr><td>1.0</td><td class="num">139</td><td class="num">139 / 140</td><td class="num">138 / 139</td><td class="num">108 / 109</td><td class="num">93 / 94</td></tr>
+<tr><th>z<sub>s</sub></th><th>TNG catalogue</th><th>Lee22 × 0.6016 (previous)</th><th>Lee22 × C(z) (empirical)</th><th>Lee22 × [h(1+z)]<sup>3</sup>X<sub>H</sub><sup>2</sup> (final)</th><th>Battaglia16</th></tr>
+<tr><td>0.1</td><td class="num">110</td><td class="num">221 / 215</td><td class="num">117 / 114</td><td class="num">76 / 74</td><td class="num">79 / 73</td></tr>
+<tr><td>0.5</td><td class="num">123</td><td class="num">163 / 163</td><td class="num">124 / 125</td><td class="num">88 / 88</td><td class="num">82 / 82</td></tr>
+<tr><td>1.0</td><td class="num">139</td><td class="num">139 / 140</td><td class="num">138 / 139</td><td class="num">104 / 105</td><td class="num">93 / 94</td></tr>
 </table></div>
-<p class="sub" style="margin-top:-.6rem">Mean DM per hit [pc cm<sup>−3</sup>], window "10<sup>13</sup>–10<sup>14</sup> M<sub>☉</sub>": HalfDome rays / analytic in the TNG cosmology.</p>
+<p class="sub" style="margin-top:-.6rem">Mean DM per hit [pc cm<sup>−3</sup>] in the catalogue's "10<sup>13</sup>–10<sup>14</sup> M<sub>☉</sub>" window: HalfDome rays / analytic in the TNG cosmology.
+Taken at face value this window is not like-for-like (next subsection).</p>
 <figure><img src="halo_pdf_corrected_lee22_rays_analytic_tng.png" alt="Halo DM PDFs, HalfDome rays and analytic model against TNG">
 <figcaption><b>Fig. 4.</b> Halo-DM PDFs at z<sub>s</sub> = 0.1, 0.5, 1. Solid: HalfDome rays; dashed: analytic model (TNG cosmology); black: TNG
-catalogue. The previous ×0.6016 density matched TNG only at z<sub>s</sub> = 1 (it is right near halo redshift 0.35). With (1+z)<sup>3</sup>/F<sub>n</sub>
-the model follows TNG's low-DM side and peak but not its high-DM tail, which is what the clusters in TNG's window add. In the right
-panel HalfDome misses halos below its catalogue floor of 7.3 × 10<sup>12</sup> M<sub>☉</sub> (60 % of rays hit, against 91 % in TNG and 93 % in
-the analytic model).</figcaption></figure>
-<h3>tSZ maps and tSZ × FRB DM</h3>
-<p class="col" id="tsz-pending">The five corrected y maps (Battaglia12 and Lee22 with the low-z fix, Lee22 × (1+z)<sup>2</sup>, the hybrid and the
-calibrated-range map) are being painted on idark. Their power spectra against FLAMINGO and CLASS-SZ and the tSZ × FRB DM correlation
-against Takahashi+25 will be added here.</p>
+catalogue. The previous ×0.6016 density matched TNG only at z<sub>s</sub> = 1 (it is right near halo redshift 0.35). The derived density
+follows TNG's low-DM side and peak but not its high-DM tail, which is what the clusters in TNG's window add. In the right panel
+HalfDome misses halos below its catalogue floor of 7.3 × 10<sup>12</sup> M<sub>☉</sub> (60 % of rays hit, against 91 % in TNG).</figcaption></figure>
+
+<h3>Analytic reproduction of TNG (as in Torkamani+26 and Medlock+24)</h3>
+<div class="col">
+<p><b>What the papers compared.</b> Torkamani et al. (2026) test only the <i>total</i> TNG300 DM distribution (IGM + halos, gas to
+5 R<sub>200c</sub>, halos 10<sup>8</sup>–10<sup>16</sup> h<sup>-1</sup>M<sub>☉</sub>, mean taken from the Macquart relation), at z = 0.7–5. Medlock et al. (2024) use no halo model;
+they fit the Macquart form (F = 0.182) to CAMELS boxes. Neither tests halo-only DM or mass windows.</p>
+<p><b>Their test reproduces.</b> Our engine with Torkamani's BFC parameters matches the TNG total-DM distribution to KS distance 0.03–0.05
+(z<sub>s</sub> = 0.3–1), 10–14 % narrower; the Macquart form with F = 0.182 does not (KS ≈ 0.10; TNG300's own F is 0.245). This test says
+little about halo interiors: BFC puts 83 % of its halo DM outside R<sub>200c</sub>.</p>
+<p><b>Halo-only.</b> With the "10<sup>13</sup>–10<sup>14</sup>" array read as [10<sup>13</sup>, 9 × 10<sup>14</sup>] M<sub>☉</sub> and TNG300's hydro halo abundance
+(0.81 of Tinker08 there, measured from the ray hit fractions), the derived Lee22 density gives <b>0.96 / 0.97 / 0.97 of the TNG mean</b> at
+z<sub>s</sub> = 0.1 / 0.5 / 1, KS 0.02–0.025, flat in z<sub>s</sub>; Battaglia16 and BFC give ≈ 0.8 and the previous ×0.6016 falls from 2.8 to 1.4.
+For the window-free "all halos" array every smooth profile fails (derived Lee22 0.70 / 0.63 / 0.55): 58 % of TNG's DM at z<sub>s</sub> = 1 comes
+from halos below 10<sup>13</sup> M<sub>☉</sub>, where TNG holds 0.3–0.5 f<sub>b</sub> of electrons inside R<sub>200c</sub> and the extrapolated Lee22 fit 0.01–0.2.</p>
+<p><b>Not the finite box.</b> TNG300 (205 Mpc/h) holds 278 / 152 / 49 halos of 10<sup>14</sup>–10<sup>15</sup> M<sub>☉</sub> at z = 0 / 0.5 / 1. The ray hit fraction
+depends on their number density, not on the box volume, so a lightcone built from these snapshots should see such a halo on
+2.0 / 8.3 / 11.6 % of rays (lowest of 20,000 simulated boxes 0.95 / 3.6 / 5.2 %). The catalogue shows 0.065 / 0.23 / 0.26 %, 30–40×
+fewer; the ×9 window reading predicts 0.066 / 0.20 / 0.22 %.</p>
+</div>
+<figure><img src="fig_analytic_tng_repro.png" alt="Analytic halo-model reproduction of the TNG300 DM catalogue">
+<figcaption><b>Fig. 5.</b> (a) Total DM at z<sub>s</sub> = 0.7, Torkamani's test. (b) Halo-only DM, all halos. (c) The "10<sup>13</sup>–10<sup>14</sup>" array read as
+[10<sup>13</sup>, 9 × 10<sup>14</sup>] M<sub>☉</sub> with TNG300's abundance. (d) Mean DM per mass window at z<sub>s</sub> = 1 (black: TNG). (h) Model / TNG mean in the
+reinterpreted window versus z<sub>s</sub>; the derived density (green dashed) is flat at 0.97.</figcaption></figure>
+
+<h3>tSZ: y power and tSZ × FRB DM</h3>
+<div class="col">
+<p>Five NSIDE 4096 y maps were painted in one catalogue pass on idark: Battaglia12 and Lee22 as printed (both with exact per-halo
+profiles below z = 0.1), Lee22 × (1+z)<sup>2</sup>, the hybrid (Battaglia12 above 10<sup>14.8</sup> h<sup>-1</sup>M<sub>☉</sub>) and the calibrated-range map. Every
+map matches the exact per-halo sum over its own catalogue to 1–4 % at ℓ = 100–3000. The low-z fix changes the Battaglia12 power by
+−19 / −8 / −4 / −1 / −0.1 % at ℓ = 10 / 20 / 30 / 50 / 100 and nothing above ℓ = 300, exactly as predicted (to 10<sup>−4</sup>).</p>
+</div>
+<div class="tablewrap"><table>
+<tr><th>HalfDome / FLAMINGO</th><th>ℓ = 300</th><th>1000</th><th>3000</th><th>5000</th></tr>
+<tr><td>Battaglia12</td><td class="num">0.80</td><td class="num">0.72</td><td class="num">0.70</td><td class="num">0.72</td></tr>
+<tr><td>Lee22 as printed</td><td class="num">2.14</td><td class="num">1.16</td><td class="num">0.60</td><td class="num">0.40</td></tr>
+<tr><td>Lee22 × (1+z)<sup>2</sup></td><td class="num bad">3.03</td><td class="num bad">2.42</td><td class="num bad">2.30</td><td class="num bad">2.29</td></tr>
+<tr><td>hybrid (Battaglia12 above 10<sup>14.8</sup> h<sup>-1</sup>M<sub>☉</sub>)</td><td class="num">1.15</td><td class="num">1.20</td><td class="num">1.52</td><td class="num">1.79</td></tr>
+<tr><td>Lee22 × (1+z)<sup>2</sup>, calibrated range only</td><td class="num">0.80</td><td class="num">0.98</td><td class="num">1.41</td><td class="num">1.70</td></tr>
+</table></div>
+<div class="col">
+<p>The (1+z)<sup>2</sup> correction fixes Lee22's ℓ shape but the full map is 2.3–3× FLAMINGO: most of the excess comes from the pressure
+amplitude extrapolated above the fit's upper mass limit. Replacing that range with Battaglia12 (hybrid) brings it to 1.15–1.5× FLAMINGO at
+ℓ ≤ 3000.</p>
+</div>
+<figure><img src="yy_power_corrected_lee22.png" alt="Compton-y power of the corrected Lee22 maps against FLAMINGO and CLASS-SZ">
+<figcaption><b>Fig. 6.</b> D<sub>ℓ</sub><sup>yy</sup> of the new maps against FLAMINGO L2p8_m9 (black) and CLASS-SZ with the same profiles (dashed); map / analytic
+(exact catalogue sum solid, CLASS-SZ dashed); HalfDome / FLAMINGO; and the low-z fix, repainted / production, with the verifier's
+prediction (circles).</figcaption></figure>
+<div class="tablewrap"><table>
+<tr><th>tSZ × FRB DM χ² vs Takahashi+25 (Planck / ACT)</th><th>× Battaglia16 DM</th><th>× Lee22 × 0.6016 DM</th><th>× Lee22 derived DM</th></tr>
+<tr><td>Battaglia12 y</td><td class="num">20.1 / 9.0</td><td class="num">28.9 / 52.1</td><td class="num good">20.2 / 11.5</td></tr>
+<tr><td>Lee22 y as printed</td><td class="num">20.8 / 10.9</td><td class="num bad">58.8 / 119.4</td><td class="num">23.1 / 18.4</td></tr>
+<tr><td>Lee22 × (1+z)<sup>2</sup> y</td><td class="num">21.0 / 12.4</td><td class="num bad">68.3 / 155.7</td><td class="num">24.0 / 23.0</td></tr>
+<tr><td>hybrid y</td><td class="num">20.4 / 10.0</td><td class="num bad">36.9 / 78.0</td><td class="num good">21.0 / 14.2</td></tr>
+<tr><td>calibrated ranges only (y and DM)</td><td class="num">–</td><td class="num">25.4 / 38.6</td><td class="num good">20.6 / 10.1</td></tr>
+</table></div>
+<p class="sub" style="margin-top:-.6rem">w = 0 gives 21.9 / 9.7 (8 / 11 bins above the paper's angular cut, real jackknife covariance).</p>
+<figure><img src="tsz_x_frbdm_corrected_lee22_takahashi.png" alt="tSZ x FRB DM correlation with the corrected Lee22 against Takahashi+25">
+<figcaption><b>Fig. 7.</b> w<sub>yDM</sub>(θ) against Takahashi+25. With the derived density every y map is statistically acceptable; the previous
+Lee22 pair (orange) was excluded. The data do not yet separate Battaglia from the corrected Lee22.</figcaption></figure>
 
 <h2>6. Open items</h2>
 <ul class="col">
-<li><b>Konietzka windows.</b> Confirm with R. Konietzka which halos the "10<sup>13</sup>–10<sup>14</sup>" array holds, then compare with a
-matched HalfDome window (and allow for HalfDome being dark-matter-only).</li>
-<li><b>Origin of F<sub>n</sub>.</b> Lee22's n<sub>e</sub>/n<sub>200</sub> conversion is not public; B. K. K. Lee or L. Thiele could settle it.</li>
-<li><b>High masses.</b> Above 10<sup>14.8</sup> h<sup>-1</sup>M<sub>☉</sub> the Lee22 amplitudes are extrapolated, and CAMELS has no halo above
-1.8 × 10<sup>14</sup> M<sub>☉</sub>; only FLAMINGO tests that range. The hybrid map uses Battaglia12 there.</li>
-<li><b>Low-mass groups.</b> Below 10<sup>13.5</sup> M<sub>☉</sub>, F<sub>n</sub> and F<sub>P</sub> drift with z (5.2 → 3.6 and 0.86 → 0.67 at 10<sup>13</sup>–10<sup>13.5</sup>).</li>
-<li><b>Other maps.</b> The kSZ maps and the tSZ_64k dataset still use the previous density and the coarse low-z lookup tables
-(the latter affects only ℓ &lt; 50).</li>
+<li><b>Konietzka windows.</b> Confirm with R. Konietzka that the "10<sup>13</sup>–10<sup>14</sup>" array extends to ~9 × 10<sup>14</sup> M<sub>☉</sub>.</li>
+<li><b>Lee22's n<sub>200</sub> code.</b> The derivation of F<sub>n</sub> rests on the public extraction code plus the printed n<sub>200</sub>; B. K. K. Lee or
+L. Thiele could confirm the hydrogen normalisation.</li>
+<li><b>Mass range.</b> Below 10<sup>13</sup> M<sub>☉</sub> the Lee22 fit is extrapolated and far below TNG's gas; above 10<sup>14.8</sup> h<sup>-1</sup>M<sub>☉</sub> its pressure
+is extrapolated (only FLAMINGO tests it; the hybrid uses Battaglia12 there).</li>
+<li><b>Other maps.</b> The kSZ maps and the tSZ_64k dataset still use the previous density and the coarse low-z lookup tables.</li>
 </ul>
 <p class="sub" style="margin-top:2rem">Code: <code>frb_map_generation/lee2022_frb_dm_profile.jl</code>, <code>lee2022_tsz_pressure_profile.jl</code>,
 <code>lee22_tsz_corrected/</code>. Reports: <code>LEE22_NORMALIZATION_FORENSICS_20260929.md</code>, <code>LEE22_TSZ_VERIFICATION_20260929.md</code>.

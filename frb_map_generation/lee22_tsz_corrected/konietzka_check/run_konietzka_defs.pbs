@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -N konDefs
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mem=48gb
+#PBS -l walltime=04:00:00
+#PBS -j oe
+# One job per CAMELS CV box: for each snapshot in $SNAPS download the raw snapshot (2.3-4.3 GB), run
+# camels_konietzka_defs.py, delete the raw snapshot.  qsub -v BOX=0,SNAPS="090 080 074 060 052" run_konietzka_defs.pbs
+set -u
+W=/lustre/work/kristero10/lee22_konietzka_check_20260930
+PY=/home/anaconda3/bin/python3.8
+export OMP_NUM_THREADS=8
+mkdir -p $W/out $W/raw/CV_$BOX
+echo "host $(hostname) start $(date) BOX=$BOX SNAPS=$SNAPS"
+for s in $SNAPS; do
+  OUTF=$W/out/konietzka_defs_CV_${BOX}_$s.npz
+  if [ -s $OUTF ]; then echo "skip CV_$BOX $s"; continue; fi
+  SF=$W/raw/CV_$BOX/snapshot_$s.hdf5
+  URL=https://users.flatironinstitute.org/~camels/Sims/IllustrisTNG/CV/CV_$BOX/snapshot_$s.hdf5
+  [ -s $SF ] || curl -s -S --retry 5 -o $SF.part $URL && mv -f $SF.part $SF 2>/dev/null
+  echo "== CV_$BOX snap $s downloaded $(date) size $(stat -c %s $SF)"
+  $PY $W/code/camels_konietzka_defs.py $BOX $s $W/out $SF 2>&1 | grep -v "^halo [0-9]*/[0-9]* logM=1[23]\."
+  if [ -s $OUTF ]; then rm -f $SF; echo "deleted snapshot_$s of CV_$BOX"; fi
+done
+echo "end $(date)"

@@ -1,0 +1,109 @@
+#!/bin/bash
+#PBS -N lee22_corr
+#PBS -q mini
+#PBS -l select=1:ncpus=8:mpiprocs=1:mem=48gb
+#PBS -l walltime=12:00:00
+#PBS -S /bin/bash
+#PBS -j oe
+
+# Corrected Lee22 on idark (2026-09-30), from LEE22_TSZ_VERIFICATION_20260929.md:
+#   STAGE=selftest  painter self-test (exact low-z tables, bit-for-bit production path, (1+z)^2 weight) at NSIDE 512
+#   STAGE=y         five NSIDE 4096 Compton-y maps in one catalogue pass (paint_tsz_variants.jl): b12, lee22p (both with
+#                   exact per-halo profiles below z = 0.1), lee22p_m1 = Lee22 x (1+z)^2, lee22p_m1_b12hi (B12 above
+#                   10^14.8 h^-1 Msun), lee22p_m1_calib (Lee22 calibration ranges only)
+#   STAGE=rays      120k-ray R200c-sphere halo-DM histograms at z_s = 1, 0.5, 0.1 for the density n_e = literal x (1+z)^3/F_n
+#   STAGE=dm        kernel-weighted full-sky DM maps (Planck/ACT observed-redshift kernels) for the same density
+#   STAGE=spectra   map2alm of the new y and DM maps; y x DM spectra against every DM model (corrected_spectra.py)
+#   STAGE=analytic  sphere-profile tables of b16 / Lee22 x0.6016 / x C(z) / x (1+z)^3/F_n and the analytic (Torkamani+26)
+#                   halo-model DM PDFs at z_s = 0.1, 0.5, 1 (HalfDome catalogue abundance and TNG cosmology + Tinker08)
+# ROOT holds a frb_map_generation/ code snapshot; outputs/ symlinks the earlier full-sky products and the two tSZ caches.
+set -euo pipefail
+: "${STAGE:?Set STAGE=selftest|y|rays|dm|spectra|analytic}"
+: "${ROOT:?Set ROOT}"
+: "${HALFDOME_PATH:=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5}"
+: "${JULIA:=/usr/local/bin/julia}"
+: "${PYTHON:=/home/anaconda3/bin/python3.8}"
+: "${SZPYTHON:=/home/kristero10/.conda/envs/SZ/bin/python}"
+: "${LEE2022_BOOKKEEPING_FN:=5.4}"
+: "${DENSITY:=phys}"   # phys: (0.6774 (1+z))^3 X_H^2 (derived, final); a3fn: (1+z)^3 / LEE2022_BOOKKEEPING_FN (empirical)
+NCPU="${PBS_NCPUS:-8}"
+export JULIA_NUM_THREADS="$NCPU" OMP_NUM_THREADS="$NCPU" OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export HDF5_USE_FILE_LOCKING=FALSE MPLBACKEND=Agg GKSwstype=100 PYTHONNOUSERSITE=1 LEE2022_BOOKKEEPING_FN
+cd "$ROOT"
+OUT=frb_map_generation/outputs/lee22_corrected_20260930
+FULLSKY=frb_map_generation/outputs/tsz_dm_fullsky_20260918
+INPUTS=frb_map_generation/outputs/halfdome_frb_inputs
+B12_CACHE=$INPUTS/cached_tSZ_HalfDome_cosmo_base_cosmo_fid.jld2
+LEE_CACHE=$INPUTS/lee22_noconc_pressure_m200c_logm15p7_tsz_interpolator.jld2
+mkdir -p "$OUT/logs" "$OUT/ymaps" "$OUT/rays" "$OUT/fullsky" "$OUT/spectra"
+JOB="${PBS_JOBID:-manual}"
+exec > >(tee -a "$OUT/logs/${STAGE}_${JOB}.log") 2>&1
+trap 'status=$?; printf "%s\n" "$status" > "$OUT/logs/${STAGE}_exit_status.txt"; printf "Finished %s stage=%s exit=%s\n" "$(date -Is)" "$STAGE" "$status"' EXIT
+printf 'Started %s host=%s job=%s stage=%s ncpus=%s F_n=%s\n' "$(date -Is)" "$(hostname)" "$JOB" "$STAGE" "$NCPU" "$LEE2022_BOOKKEEPING_FN"
+sha256sum frb_map_generation/*.jl frb_map_generation/*.py frb_map_generation/lee22_tsz_corrected/*.* frb_map_generation/lee22_tsz_corrected/analytic/*.* > "$OUT/logs/${STAGE}_source_sha256.txt"
+if [[ "$STAGE" == selftest || "$STAGE" == y ]]; then sha256sum "$B12_CACHE" "$LEE_CACHE" >> "$OUT/logs/${STAGE}_source_sha256.txt"; fi
+PAINT=(frb_map_generation/lee22_tsz_corrected/paint_tsz_variants.jl --halfdome-path="$HALFDOME_PATH"
+       --b12-cache="$B12_CACHE" --lee22-cache="$LEE_CACHE")
+
+case "$STAGE" in
+selftest)
+    "$JULIA" --threads="$NCPU" "${PAINT[@]}" --painter-self-test=true --painter-self-test-only=true \
+        --painter-self-test-rows=60000001:60050000
+    ;;
+y)
+    "$JULIA" --threads="$NCPU" "${PAINT[@]}" --painter-self-test=true --painter-self-test-rows=60000001:60050000 \
+        --nside=4096 --output-dir="$OUT/ymaps" --exact-below-z=0.1 --chunk-size=100000
+    sha256sum "$OUT"/ymaps/*.fits > "$OUT/ymaps/SHA256SUMS"
+    ;;
+rays)
+    export PROJECT_DIR="$ROOT" JULIA PYTHON HALFDOME_PATH THREADS_PER_TASK="$NCPU" CLUSTER_USER=kristero10 OVERWRITE=false
+    export NFRB=120000 SEED=42 NSIDE=4096 MAX_CATALOG_HALOS=0 HALO_EXTENSION_R200_MULTIPLIER=1.0 HALO_BOUNDARY=spherical
+    export XGPAINT_PROFILE_MASS_DEFINITION=m200c OUTPUT_BASE="$ROOT/$OUT/rays"
+    export MASS_WINDOWS="m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16"
+    export LEE2022_CONCENTRATION_MODE=none LEE2022_N0_PIVOT=mcut LEE2022_CONCENTRATION_SOURCE=duffy2008 LEE2022_SHAPE_MASS_CLIP=fit
+    if [[ "$DENSITY" == phys ]]; then
+        export DM_PROFILE=lee2022_xgpaint LEE2022_NORMALIZATION=literal LEE2022_REDSHIFT_SCALING=bookkeeping_physical
+        FNTAG=phys; VTAG=lee22_phys
+    else
+        export DM_PROFILE=lee2022_xgpaint LEE2022_NORMALIZATION=literal LEE2022_REDSHIFT_SCALING=bookkeeping_a3
+        FNTAG=a3fn${LEE2022_BOOKKEEPING_FN//./p}; VTAG=lee22_$FNTAG
+    fi
+    export DM_CACHE="$ROOT/$INPUTS/lee2022_noconc_literal_${FNTAG}_mcutpivot_shapeclip_xgpaintpipeline_sphere1p0_chordmean_dm_cache.jld2"
+    for ZSOURCE in ${ZSOURCES:-1.0 0.5 0.1}; do
+        export ZSOURCE
+        export RUN_TAG="zsrc${ZSOURCE//./p}_nside4096_nrays120000_allhalos_sphere1p0_m200c_${VTAG}_seed42"
+        if [[ -f "$DM_CACHE" && -f "$DM_CACHE.profile_signature.txt" ]]; then export DM_CACHE_OVERWRITE=false; else export DM_CACHE_OVERWRITE=true; fi
+        if [[ -f "$OUTPUT_BASE/$RUN_TAG/halfdome_uniform_fixedz_foreground_mass_histograms.h5" ]]; then
+            echo "exists, skipping: $RUN_TAG"; continue
+        fi
+        echo "######## $VTAG z_s=$ZSOURCE -> $RUN_TAG (cache build=$DM_CACHE_OVERWRITE) ########"
+        /bin/bash frb_map_generation/run_halfdome_z1_mass_histograms_120k.pbs
+    done
+    ;;
+dm)
+    DTAG=$([[ "$DENSITY" == phys ]] && echo phys || echo a3fn)
+    MODELS=lee22_noconc_${DTAG}_sphere1,lee22_noconc_${DTAG}_sphere1_calib
+    if [[ ! -f "$OUT/fullsky/maps/lee22_noconc_${DTAG}_sphere1_calib_act.fits" ]]; then
+        "$JULIA" --threads="$NCPU" frb_map_generation/paint_halfdome_kernel_weighted_dm_maps.jl \
+            --output-dir="$OUT/fullsky" --kernel-dir="$FULLSKY/kernels" --cache-dir="$OUT/fullsky/cache" \
+            --halfdome-path="$HALFDOME_PATH" --nside=4096 --models="$MODELS" \
+            --rows=85000001:85012000 --self-test-pixels=400 --map-tag=_selftest
+        rm -f "$OUT"/fullsky/maps/*_selftest.fits
+        "$JULIA" --threads="$NCPU" frb_map_generation/paint_halfdome_kernel_weighted_dm_maps.jl \
+            --output-dir="$OUT/fullsky" --kernel-dir="$FULLSKY/kernels" --cache-dir="$OUT/fullsky/cache" \
+            --halfdome-path="$HALFDOME_PATH" --nside=4096 --models="$MODELS" --chunk-size=100000
+    fi
+    ;;
+spectra)
+    "$SZPYTHON" frb_map_generation/lee22_tsz_corrected/corrected_spectra.py --lmax 8192 --iter 3
+    ;;
+analytic)
+    TAB="$OUT/analytic/tables/corrected_sphere_profiles_v2.h5"   # v2 adds lee22_noconc_phys
+    mkdir -p "$(dirname "$TAB")"
+    [[ -f "$TAB" ]] || "$JULIA" --threads="$NCPU" frb_map_generation/lee22_tsz_corrected/analytic/tabulate_corrected_sphere_profiles.jl "$TAB"
+    "$PYTHON" frb_map_generation/lee22_tsz_corrected/analytic/run_corrected_analytic_pdfs.py --table "$TAB" \
+        --catalog "$HALFDOME_PATH" --out "$OUT/analytic/analysis" --workers "${ANALYTIC_WORKERS:-6}"
+    ;;
+*)
+    echo "Unknown STAGE=$STAGE" >&2; exit 2 ;;
+esac

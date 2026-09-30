@@ -45,6 +45,8 @@ function updated_model_specs()
                            lee2022_n0_pivot="mcut", lee2022_shape_mass_clip_msun=clip_fit))
     lee_pref = merge(lee_new, (lee2022_concentration_mode="duffy2008", lee2022_concentration_source="tng_mean"))
     lee_tngcal = merge(lee_new, (lee2022_normalization="literal", lee2022_redshift_scaling="tng_calibrated"))
+    lee_a3 = merge(lee_new, (lee2022_normalization="literal", lee2022_redshift_scaling="bookkeeping_a3"))
+    lee_phys = merge(lee_new, (lee2022_normalization="literal", lee2022_redshift_scaling="bookkeeping_physical"))
     lee_legacy = merge(base, (dm_profile="lee2022",))
     # Lee22 calibration: masses 1e13-10^14.8 h^-1 Msun (Lee et al. 2022, fit range), 20 TNG300 snapshots to z = 2
     calib_mass = (1.0e13 / H_VALUE, 10.0^14.8 / H_VALUE)
@@ -73,6 +75,16 @@ function updated_model_specs()
         spec("lee22_noconc_tngcal_sphere1_calib", lee_tngcal, 1.0, 1.0,
             "same TNG-calibrated Lee22, only halos inside the calibration ranges: 1e13-10^14.8 h^-1 Msun, z <= 2";
             cache_label="lee22_noconc_tngcal_sphere1", mass_min=calib_mass[1], mass_max=calib_mass[2], z_max=calib_zmax),
+        spec("lee22_noconc_phys_sphere1", lee_phys, 1.0, 1.0,
+            "Lee22 no-c fit, literal eq. 9 x (0.6774 (1+z))^3 X_H^2 (derived bookkeeping correction); R200c sphere"),
+        spec("lee22_noconc_phys_sphere1_calib", lee_phys, 1.0, 1.0,
+            "same physically corrected Lee22, only halos inside the calibration ranges: 1e13-10^14.8 h^-1 Msun, z <= 2";
+            cache_label="lee22_noconc_phys_sphere1", mass_min=calib_mass[1], mass_max=calib_mass[2], z_max=calib_zmax),
+        spec("lee22_noconc_a3fn_sphere1", lee_a3, 1.0, 1.0,
+            "Lee22 no-c fit, literal eq. 9 x (1+z)^3 / F_n (bookkeeping correction, F_n = $(get(ENV, "LEE2022_BOOKKEEPING_FN", "5.4"))); R200c sphere"),
+        spec("lee22_noconc_a3fn_sphere1_calib", lee_a3, 1.0, 1.0,
+            "same bookkeeping-corrected Lee22, only halos inside the calibration ranges: 1e13-10^14.8 h^-1 Msun, z <= 2";
+            cache_label="lee22_noconc_a3fn_sphere1", mass_min=calib_mass[1], mass_max=calib_mass[2], z_max=calib_zmax),
         spec("lee22_pref_sphere1", lee_pref, 1.0, 1.0,
             "Lee22 Table-3 fit + TNG-mean concentration, same reading; R200c sphere (diagnostic)"),
         spec("lee22_legacy_sphere3", lee_legacy, 3.0, 3.0,

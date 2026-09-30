@@ -57,8 +57,17 @@ abstract type AbstractLee2022DMProfile{T} <: XGPaint.AbstractGNFW{T} end
 #                                        the fitted n_e were comoving densities normalized by the z=0
 #                                        critical density; this reproduces the fitted alpha_z of n0 and
 #                                        is a hypothesis about the paper's bookkeeping, not a documented fact
+#                      :tng_calibrated   literal x C0 (1+min(z,2))^k, fitted to Konietzka's TNG300 halo DM
+#                      :bookkeeping_a3   literal x (1+z)^3 / F_n: undoes the group_particles comoving-volume
+#                                        bookkeeping (a^3, reproduced exactly on CAMELS cells) and removes the
+#                                        constant density excess F_n (LEE22_TSZ_VERIFICATION_20260929.md)
+#                      :bookkeeping_physical  literal x (h_TNG (1+z))^3 X_H^2, derived, no fitted constant: Lee22's
+#                                        ne_prof.cpp counts electrons per (ckpc/h)^3 (comoving AND h-scaled); read as
+#                                        physical kpc^-3 this leaves (a/h)^3, and the printed n200 = 200 rho_cr f_b/(X_H m_p)
+#                                        differs by X_H^2 from the hydrogen normalisation 200 rho_cr f_b X_H/m_p that
+#                                        matches the paper's electron count V n_e = x m X_H/m_p. 1/(h^3 X_H^2) = 5.57.
 const LEE2022_NORMALIZATIONS = (:literal, :baryon_fraction, :electron_count, :hydrogen_count, :xgpaint_ne2d)
-const LEE2022_REDSHIFT_SCALINGS = (:physical, :comoving_hypothesis, :tng_calibrated)
+const LEE2022_REDSHIFT_SCALINGS = (:physical, :comoving_hypothesis, :tng_calibrated, :bookkeeping_a3, :bookkeeping_physical)
 # TNG-calibrated correction of the literal (eq. 9) Lee22 density, n_e = C(z) n0 g(x) n200(z) with
 # C(z) = C0 (1+z)^k: fitted to Konietzka's TNG300 within-R200 halo DM of 1e13-1e14 Msun at source
 # redshifts 0.1-2 (rms 0.8 %), see LEE22_NORMALIZATION_FORENSICS_20260929.md. C is held at z = 2 above
@@ -66,6 +75,12 @@ const LEE2022_REDSHIFT_SCALINGS = (:physical, :comoving_hypothesis, :tng_calibra
 const LEE2022_TNG_CALIBRATION_C0 = 0.2841790493880425
 const LEE2022_TNG_CALIBRATION_K = 2.483190184608004
 const LEE2022_TNG_CALIBRATION_ZMAX = 2.0
+# Bookkeeping correction n_e = (1+z)^3 / F_n x literal eq. 9 density, valid at every z (the a^3 is an identity of the
+# extraction code). F_n: CAMELS-TNG gas inside R200c gives 5.1 (10^13.2 Msun) and 5.7 (10^13.7), FLAMINGO 7.2-7.4.
+# The value can be overridden through the environment variable LEE2022_BOOKKEEPING_FN; it enters the cache signature.
+const LEE2022_BOOKKEEPING_FN = parse(Float64, get(ENV, "LEE2022_BOOKKEEPING_FN", "5.4"))
+# h of TNG300 (Planck15), hard-coded in group_particles' proton mass (examples/ne_prof.cpp: mprot = 0.6774*...):
+const LEE2022_TNG_LITTLE_H = 0.6774
 const LEE2022_N0_PIVOTS = (:legacy_1e14, :mcut)
 const LEE2022_CONCENTRATION_SOURCES = (:duffy2008, :tng_mean)
 const LEE2022_FIT_MASS_MAX_MSUN_AT_H068 = LEE2022_FIT_MASS_MAX_HINV_MSUN / 0.68
@@ -117,8 +132,8 @@ function Lee2022ConcentrationDMProfile(;
 )
     normalization in LEE2022_NORMALIZATIONS || error("Unknown Lee22 normalization $(normalization)")
     redshift_scaling in LEE2022_REDSHIFT_SCALINGS || error("Unknown Lee22 redshift scaling $(redshift_scaling)")
-    redshift_scaling == :tng_calibrated && normalization != :literal && error(
-        "redshift_scaling=:tng_calibrated is a correction of the literal eq. 9 density; use normalization=:literal")
+    redshift_scaling in (:tng_calibrated, :bookkeeping_a3, :bookkeeping_physical) && normalization != :literal && error(
+        "redshift_scaling=$(redshift_scaling) is a correction of the literal eq. 9 density; use normalization=:literal")
     concentration_source in LEE2022_CONCENTRATION_SOURCES ||
         error("Unknown Lee22 concentration source $(concentration_source)")
     shape_clip_mass_msun > 0 || error("Lee22 shape clip mass must be positive (or Inf)")
@@ -220,9 +235,13 @@ end
 
 """Redshift-dependent factor: 1 for the literal physical reading, (1+z)^3/E^2(z) for the
 comoving-bookkeeping hypothesis (E^2 = rho_crit(z)/rho_crit(0); ruled out by the 2026-09-28 TNG test), and
-C0 (1+min(z, 2))^k for the TNG-calibrated correction of the literal density."""
+C0 (1+min(z, 2))^k for the TNG-calibrated correction of the literal density, and (1+z)^3/F_n for the
+bookkeeping correction."""
 function lee2022_redshift_scaling_factor(model::AbstractLee2022DMProfile, z::Real)
     model.redshift_scaling == :physical && return 1.0
+    model.redshift_scaling == :bookkeeping_a3 && return (1 + Float64(z))^3 / LEE2022_BOOKKEEPING_FN
+    model.redshift_scaling == :bookkeeping_physical &&
+        return (LEE2022_TNG_LITTLE_H * (1 + Float64(z)))^3 * Float64(model.hydrogen_mass_fraction)^2
     if model.redshift_scaling == :tng_calibrated
         return LEE2022_TNG_CALIBRATION_C0 * (1 + min(Float64(z), LEE2022_TNG_CALIBRATION_ZMAX))^LEE2022_TNG_CALIBRATION_K
     end
@@ -249,6 +268,8 @@ function lee2022_variant_tokens(model::AbstractLee2022DMProfile)
     model.redshift_scaling == :comoving_hypothesis && push!(tokens, "zscale=comoving_hyp")
     model.redshift_scaling == :tng_calibrated && push!(tokens,
         "zscale=tngcal_C0$(round(LEE2022_TNG_CALIBRATION_C0, digits=6))_k$(round(LEE2022_TNG_CALIBRATION_K, digits=6))_zmax2")
+    model.redshift_scaling == :bookkeeping_a3 && push!(tokens, "zscale=a3_Fn$(round(LEE2022_BOOKKEEPING_FN, digits=4))")
+    model.redshift_scaling == :bookkeeping_physical && push!(tokens, "zscale=bookkeeping_hTNG$(LEE2022_TNG_LITTLE_H)_a3_XH2")
     return tokens
 end
 
@@ -278,6 +299,7 @@ function lee2022_option_provenance(model::AbstractLee2022DMProfile)
         "lee2022_cache_signature" => lee2022_cache_signature(model),
         "lee2022_model_family" => lee2022_model_family(model),
     )
+    model.redshift_scaling == :bookkeeping_a3 && (entries["lee2022_bookkeeping_fn"] = LEE2022_BOOKKEEPING_FN)
     if model isa Lee2022NoConcentrationDMProfile
         entries["lee2022_n0_pivot"] = String(model.n0_pivot)
     else
@@ -296,8 +318,8 @@ function Lee2022NoConcentrationDMProfile(
 ) where {T<:Real}
     normalization in LEE2022_NORMALIZATIONS || error("Unknown Lee22 normalization $(normalization)")
     redshift_scaling in LEE2022_REDSHIFT_SCALINGS || error("Unknown Lee22 redshift scaling $(redshift_scaling)")
-    redshift_scaling == :tng_calibrated && normalization != :literal && error(
-        "redshift_scaling=:tng_calibrated is a correction of the literal eq. 9 density; use normalization=:literal")
+    redshift_scaling in (:tng_calibrated, :bookkeeping_a3, :bookkeeping_physical) && normalization != :literal && error(
+        "redshift_scaling=$(redshift_scaling) is a correction of the literal eq. 9 density; use normalization=:literal")
     n0_pivot in LEE2022_N0_PIVOTS || error("Unknown Lee22 n0 pivot $(n0_pivot)")
     shape_clip_mass_msun > 0 || error("Lee22 shape clip mass must be positive (or Inf)")
     omega_m = Omega_b + Omega_c

@@ -1,0 +1,357 @@
+<title>Lee22 Calibration in HalfDome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,650&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column (~70ch) with full-width figures; formula and code blocks set off, everything else plain. */
+:root {
+  --bg: #fbfbf8; --fg: #1c1f22; --muted: #5b6168; --rule: #dcdfe2; --panel: #f1f3f4;
+  --accent: #0b6e59; --warn: #a3470c; --code-bg: #f4f5f2; --code-fg: #22262a; --kw: #0b6e59; --cm: #7a7f86;
+  --display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --body: "Source Sans 3", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15181b; --fg: #e4e6e8; --muted: #9aa1a8; --rule: #33383d; --panel: #1d2125;
+  --accent: #4fc3a1; --warn: #f0995a; --code-bg: #1b1f23; --code-fg: #dde1e4; --kw: #6fd3b3; --cm: #8a9098; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15181b; --fg: #e4e6e8; --muted: #9aa1a8; --rule: #33383d; --panel: #1d2125;
+  --accent: #4fc3a1; --warn: #f0995a; --code-bg: #1b1f23; --code-fg: #dde1e4; --kw: #6fd3b3; --cm: #8a9098; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 17px; line-height: 1.6; }
+main { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 36px 80px; }
+.col { max-width: 72ch; }
+h1, h2, h3 { font-family: var(--display); font-weight: 650; text-wrap: balance; line-height: 1.2; }
+h1 { font-size: 2.3rem; margin: 0 0 .3rem; }
+h2 { font-size: 1.55rem; margin: 3rem 0 .8rem; padding-top: 1.2rem; border-top: 1px solid var(--rule); }
+h3 { font-size: 1.15rem; margin: 1.8rem 0 .5rem; }
+.sub { color: var(--muted); margin: 0 0 1.6rem; }
+p { margin: .6rem 0; }
+.label { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.summary { display: grid; gap: .55rem; padding: 1.1rem 1.3rem; background: var(--panel); border-radius: 6px; max-width: 80ch; }
+.summary p { margin: 0; }
+.eq { font-family: var(--display); font-size: 1.12rem; padding: .7rem 1rem; margin: .8rem 0; border-left: 3px solid var(--accent);
+      background: var(--panel); overflow-x: auto; max-width: 72ch; }
+.eq .note { display: block; font-family: var(--body); font-size: .9rem; color: var(--muted); margin-top: .25rem; }
+code { font-family: var(--mono); font-size: .86em; }
+figure { margin: 1.4rem 0 1.8rem; }
+figure img { width: 100%; height: auto; border: 1px solid var(--rule); border-radius: 4px; background: #fff; }
+figcaption { font-size: .93rem; color: var(--muted); max-width: 80ch; margin-top: .5rem; }
+.code { margin: .8rem 0 1.2rem; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; min-width: 0; }
+.code .file { font-family: var(--mono); font-size: .76rem; color: var(--muted); padding: .35rem .8rem; border-bottom: 1px solid var(--rule); background: var(--panel); }
+.code pre { margin: 0; padding: .75rem .9rem; background: var(--code-bg); color: var(--code-fg); font-family: var(--mono); font-size: .8rem;
+            line-height: 1.5; overflow-x: auto; }
+.code .c { color: var(--cm); } .code .k { color: var(--kw); font-weight: 600; } .code .w { color: var(--warn); font-weight: 600; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 14px; }
+.pair > * { min-width: 0; }
+.tablewrap { overflow-x: auto; margin: .8rem 0 1.2rem; }
+table { border-collapse: collapse; font-size: .92rem; font-variant-numeric: tabular-nums; min-width: 520px; }
+th, td { text-align: left; padding: .4rem .7rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: .8rem; letter-spacing: .04em; text-transform: uppercase; }
+td.num { text-align: right; }
+.good { color: var(--accent); font-weight: 600; } .bad { color: var(--warn); font-weight: 600; }
+ul { padding-left: 1.2rem; } li { margin: .25rem 0; }
+a { color: var(--accent); }
+</style>
+
+<main>
+<h1>Lee22 calibration in HalfDome</h1>
+<p class="sub">How the Lee et al. (2022, MNRAS 517, 5303) IllustrisTNG electron density and pressure fits are corrected before
+painting HalfDome FRB dispersion measures, kSZ and tSZ maps. Status 2026-09-30.</p>
+
+<div class="summary">
+  <p class="label">In short</p>
+  <p><b>M1, the bookkeeping error.</b> Lee22's extraction code divides particle sums by <i>comoving</i> shell volumes but normalises by
+  the <i>physical</i> critical density. The printed fits are therefore low by a<sup>3</sup> (density) and a<sup>2</sup> (pressure),
+  with a = 1/(1+z). Undoing it multiplies the density by (1+z)<sup>3</sup> and the pressure by (1+z)<sup>2</sup>.</p>
+  <p><b>F<sub>n</sub> and F<sub>P</sub>, what remains.</b> After undoing M1 the printed density is still 5.1–5.9 times the TNG gas, the
+  pressure is right (F<sub>P</sub> = 1.00 ± 0.05). Both follow from the code units: the density was counted per (ckpc/h)<sup>3</sup> and
+  normalised outside the code, leaving 1/h<sup>3</sup> next to the a<sup>3</sup>, plus 1/X<sub>H</sub><sup>2</sup> from the printed n<sub>200</sub>; the pressure was
+  normalised inside the code, where h cancels. F<sub>n</sub> = 1/(h<sup>3</sup>X<sub>H</sub><sup>2</sup>) = 5.57, no fitted constant.</p>
+  <p><b>What HalfDome uses.</b> Pressure: Lee22 × (1+z)<sup>2</sup>. Density: Lee22 × [0.6774 (1+z)]<sup>3</sup> X<sub>H</sub><sup>2</sup>. The empirical
+  corrections used on the way (C(z) = 0.284 (1+z)<sup>2.48</sup> from a TNG DM catalogue whose "10<sup>13</sup>–10<sup>14</sup>" window likely
+  contains clusters, and F<sub>n</sub> = 5.4 from the CAMELS gas) are not final products.</p>
+  <p id="summary-results"><b>Consequences.</b> FRB halo DM: the previous ×0.6016 density gave twice TNG's mean halo DM per hit at z<sub>s</sub> = 0.1 and matched only at
+  z<sub>s</sub> = 1. With (1+z)<sup>3</sup>/F<sub>n</sub> the HalfDome rays and the analytic halo model agree to 1–3 % and sit 22–31 % below the TNG
+  catalogue's cluster-contaminated window. <span id="tsz-summary">tSZ: the Lee22 × (1+z)<sup>2</sup> maps are being painted on idark; results follow in Section 5.</span></p>
+</div>
+
+<h2>1. The Lee22 fits as printed</h2>
+<div class="col">
+<p>Lee22 fit the mean electron density and electron pressure of TNG300 halos (10<sup>13</sup>–10<sup>14.8</sup> h<sup>-1</sup>M<sub>☉</sub>,
+0.04–1.34 R<sub>200c</sub>, 20 snapshots to z = 2) with one generalised NFW shape. We use the fits without concentration (Tables 7 and 8):</p>
+<div class="eq">n<sub>e</sub>(x) / n<sub>200</sub> = n<sub>0</sub> (x/x<sub>c</sub>)<sup>γ</sup> [1 + (x/x<sub>c</sub>)<sup>α</sup>]<sup>−β′</sup>,
+&nbsp; P<sub>e</sub>(x) / P<sub>200</sub> = P<sub>0</sub> (x/x<sub>c</sub>)<sup>γ</sup> [1 + (x/x<sub>c</sub>)<sup>α</sup>]<sup>−β</sup>
+<span class="note">x = r/R<sub>200c</sub>, α = 1, γ = −0.3; each amplitude A = A<sub>0</sub> (M/M<sub>cut</sub>)<sup>α<sub>m</sub></sup> (1+z)<sup>α<sub>z</sub></sup>,
+broken at M<sub>cut</sub> = 10<sup>13.61</sup> h<sup>-1</sup>M<sub>☉</sub>; e.g. n<sub>0</sub> = 6.8 (M/M<sub>cut</sub>)<sup>0.68</sup>(1+z)<sup>−2.11</sup>, P<sub>0</sub> = 2.8 (M/M<sub>cut</sub>)<sup>0.80…1.08</sup>(1+z)<sup>−1.89</sup></span></div>
+<div class="eq">n<sub>200</sub> = 200 ρ<sub>cr</sub>(z) f<sub>b</sub> / (X<sub>H</sub> m<sub>p</sub>),
+&nbsp; P<sub>200</sub> = 200 G M<sub>200</sub> ρ<sub>cr</sub>(z) f<sub>b</sub> / (2 R<sub>200</sub>)
+<span class="note">physical ρ<sub>cr</sub>(z) and physical R<sub>200c</sub>, as stated in the paper (eq. 9–10)</span></div>
+<p>Our transcription is exact: it reproduces the paper's own fit curves (vector paths extracted from the arXiv source figures) to 2–3 %
+(Fig. 1, orange solid over orange dashed).</p>
+<p><b>Exponent convention.</b> The printed fits write the outer factor as [1 + (x/x<sub>c</sub>)<sup>α</sup>]<sup>−β′</sup>. XGPaint's
+<code>generalized_nfw</code> uses the exponent −(β+γ)/α, so we pass β<sub>XG</sub> = αβ′ − γ, the same mapping XGPaint applies to
+Battaglia12. Against the paper's own drawn fit curves, this reading reproduces the shape to 0.3–3 % (max/min of model/paper over
+0.04–1.34 R<sub>200c</sub>, with a constant 2–3 % offset); reading β′ as an asymptotic slope, −(β′ ∓ γ)/α, tilts the curves by 6–19 %
+(<code>doc/check_beta_convention.py</code>). An old XGPaint sign bug in the Battaglia12 exponent ((1+x)<sup>+β</sup>, commit b924ab1,
+March–April 2026) is in none of the maps used here.</p>
+</div>
+<figure><img src="doc_fig_paper_profiles_z0.png" alt="Lee22 paper figures 2 and 5 against our implementation and CAMELS TNG at z = 0">
+<figcaption><b>Fig. 1.</b> Lee22 Fig. 2 (pressure) and Fig. 5 (density) at z = 0, the paper's two mass bins. Grey: Lee22's TNG measurement
+(lowest-concentration quartile); orange dashed: their no-c fit; orange solid: our production transcription; circles: CAMELS-TNG
+(all halos of the bin, box-jackknife errors); blue: Battaglia12 P<sub>e</sub> / Battaglia16 n<sub>e</sub>. Pressure: fit, paper TNG and
+CAMELS agree (ratios 0.88–1.01). Density: the paper's TNG curve and its fit are 5.9× CAMELS; the derived factor h<sup>3</sup>X<sub>H</sub><sup>2</sup>
+= 1/5.57 (purple) recovers the TNG gas, the empirical C(0) = 0.284 (green) leaves it 2× high.</figcaption></figure>
+
+<h2>2. M1: why (1+z)<sup>3</sup> and (1+z)<sup>2</sup></h2>
+<div class="col">
+<p>The profiles were extracted with the public <code>group_particles</code> code (examples <code>ne_prof.cpp</code>, <code>y_prof.cpp</code>).
+TNG snapshots store lengths in comoving kpc/h. The shell volumes are built from the comoving <code>Group_R_Crit200</code>, but the
+normalisation uses the physical critical density at the snapshot time:</p>
+</div>
+<div class="pair">
+<div class="code"><div class="file">group_particles/examples/y_prof.cpp (Lee22 extraction)</div><pre><span class="c">// shells between logRmin..logRmax, from Group_R_Crit200 (ckpc/h)</span>
+<span class="k">return</span> 4.0*M_PI/3.0*( std::exp(3.0*logR2) - std::exp(3.0*logR1) );
+<span class="c">// per particle: electron pressure x particle volume</span>
+<span class="k">auto</span> Y = 4.0*x*XH/(1.0+3.0*XH+4.0*XH*x) * (gamma-1.0) * m * e;
+pressure[ii] <span class="w">/= shell_vol(ii);</span>       <span class="c">// divided by a COMOVING volume</span>
+
+grp_P_t rho_crit () <span class="k">const</span> {
+    grp_P_t a3 = Time*Time*Time;
+    <span class="k">return</span> rho_crit_0*(Omega0/a3 + OmegaLambda); <span class="c">// PHYSICAL</span>
+}
+<span class="c">// P200 with the comoving r = Group_R_Crit200</span>
+<span class="k">return</span> 100.0*GNewton*m*rho_crit()*OmegaBaryon/Omega0<span class="w">/r</span>;</pre></div>
+<div class="code"><div class="file">group_particles/examples/ne_prof.cpp</div><pre><span class="k">auto</span> ne = x * XH * m / mprot;       <span class="c">// electrons in the cell</span>
+e_density[idx] += ne;
+...
+e_density[ii] <span class="w">/= shell_vol(ii);</span>      <span class="c">// COMOVING (ckpc/h)^3</span>
+<span class="c">// normalised later by n200 = 200 rho_crit(z) f_b /(X_H m_p),
+// rho_crit(z) PHYSICAL (same helper as above)</span></pre></div>
+</div>
+<div class="col">
+<p>Counting powers of a = 1/(1+z), with V<sub>com</sub> = V<sub>phys</sub>/a<sup>3</sup> and R<sub>com</sub> = R<sub>phys</sub>/a:</p>
+<div class="eq">n<sub>printed</sub> / n<sub>200</sub> = (N / V<sub>com</sub>) / n<sub>200</sub> = a<sup>3</sup> · n<sub>true</sub>/n<sub>200</sub>
+<span class="note">density: only the volume carries a</span></div>
+<div class="eq">P<sub>printed</sub> / P<sub>200,code</sub> = (a<sup>3</sup> P<sub>true</sub>) / (a P<sub>200</sub>) = a<sup>2</sup> · P<sub>true</sub>/P<sub>200</sub>
+<span class="note">pressure: a<sup>3</sup> from the volume, a<sup>−1</sup> from the comoving R<sub>200</sub> in the denominator of P<sub>200</sub></span></div>
+<p>So the true profiles are the printed ones times (1+z)<sup>3</sup> and (1+z)<sup>2</sup>. This is an identity of the extraction code,
+valid at every redshift and equal to 1 at z = 0. Three independent checks:</p>
+<ul>
+<li><b>Emulation.</b> Applying the same bookkeeping to CAMELS-TNG gas cells gives emulated/true = a<sup>3</sup> and a<sup>2</sup> to better
+than 1 % at z = 0–2 (e.g. 0.1165 vs a<sup>3</sup> = 0.1164 and 0.2380 vs a<sup>2</sup> = 0.2384 at z = 1.05).</li>
+<li><b>TNG model (CAMELS, 27 boxes).</b> TNG / printed = 1.02 (1+z)<sup>1.84 ± 0.06</sup> for the pressure and (1+z)<sup>3.1</sup> for the
+density (10<sup>13.5</sup>–10<sup>14</sup> M<sub>☉</sub>).</li>
+<li><b>FLAMINGO</b> (a different code and feedback model): the redshift slope of the printed fit is lower by 1.97–2.07 (pressure)
+and 2.9–3.1 (density) above 10<sup>13.6</sup> M<sub>☉</sub>.</li>
+</ul>
+</div>
+<div class="tablewrap"><table>
+<tr><th>reference data</th><th>source</th><th>how it enters</th></tr>
+<tr><td>CAMELS IllustrisTNG CV: 27 boxes of 25 Mpc/h, 256<sup>3</sup>, fiducial TNG model (gas cell 1.3 × 10<sup>7</sup> h<sup>-1</sup>M<sub>☉</sub>, close to TNG300-1)</td>
+<td>public, <code>users.flatironinstitute.org/~camels</code> (Villaescusa-Navarro et al. 2021)</td>
+<td>(a) the CAMELS team's precomputed 3D gas profiles (illstack, Moser et al. 2022) for all 27 boxes at 24 snapshots, z = 0–2;
+(b) raw snapshots and SUBFIND catalogues of 4 boxes at z = 0, 0.47, 1.05, 1.48, 2.0, downloaded and processed on idark with our
+<code>camels_direct_profiles.py</code>: gas cells around GroupPos, n<sub>e</sub> = x<sub>e</sub>X<sub>H</sub>ρ/m<sub>p</sub>, P<sub>e</sub> = n<sub>e</sub>k<sub>B</sub>T, physical shells
+in r/R<sub>200c</sub>. (b) reproduces (a) to &lt; 10<sup>−3</sup> and supplies the electron fraction; it also emulates Lee22's bookkeeping.</td></tr>
+<tr><td>FLAMINGO L2p8_m9</td><td>COSMA data service</td><td>stacked P<sub>e</sub> and gas profiles of the reduced snapshots, z = 0–4; lightcone y maps</td></tr>
+<tr><td>TNG300 halo-DM catalogue (R. Konietzka)</td><td>pre-release arrays</td><td>FRB halo-DM PDFs per mass window, z<sub>s</sub> = 0.1–2</td></tr>
+</table></div>
+<figure><img src="fig_tsz2_redshift_trend.png" alt="Redshift trend of the pressure and density normalisation, simulations divided by printed Lee22">
+<figcaption><b>Fig. 2.</b> Normalisation relative to the printed fit, at fixed mass, versus redshift. Top: Y(&lt;R<sub>200c</sub>) (pressure);
+bottom: electron fraction inside R<sub>200c</sub> (density). The printed fit is the flat orange line. TNG (black) and FLAMINGO (squares)
+rise as (1+z)<sup>2</sup> and (1+z)<sup>3</sup> (green dashed). Diamonds: Lee22's bookkeeping applied to TNG cells reproduces the flat printed
+trend.</figcaption></figure>
+
+<h2>3. What is left after M1: F<sub>n</sub> from the code units, F<sub>P</sub> = 1</h2>
+<div class="col">
+<p>After undoing M1, any constant offset between the fit and the TNG gas is a measured ratio. Both are defined the same way:</p>
+<div class="eq">F<sub>n</sub> = n<sub>printed</sub>(1+z)<sup>3</sup> / n<sub>sim</sub>, &nbsp; F<sub>P</sub> = P<sub>printed</sub>(1+z)<sup>2</sup> / P<sub>sim</sub>
+<span class="note">mean over 0.04–1.34 R<sub>200c</sub>; measured values in the table below</span></div>
+<p>The measurements are F<sub>P</sub> ≈ 1 and F<sub>n</sub> ≈ 5.5. Neither is used as a fitted constant: both follow from the units of
+Lee22's extraction code. The difference comes from <i>where</i> each profile is normalised.</p>
+</div>
+<div class="pair">
+<div class="code"><div class="file">group_particles/examples/ne_prof.cpp — density: counted in code units, normalised elsewhere</div><pre><span class="c">// proton mass is in 1e10 Msun/h -- note that h is hardcoded here, but ok</span>
+mprot = <span class="w">0.6774</span>*1.6726219/1.98847 * 1e-67;
+<span class="k">auto</span> ne = x * XH * m / mprot;        <span class="c">// electron COUNT (mass units cancel)</span>
+e_density[ii] /= shell_vol(ii);       <span class="c">// per (ckpc/h)^3: comoving AND h-scaled</span>
+<span class="c">// only e_density, M200 and R200 are written; n200 is applied later,
+// outside this code (not public)</span></pre></div>
+<div class="code"><div class="file">group_particles/examples/y_prof.cpp — pressure: normalised inside, same code units</div><pre><span class="c">// GNewton [kpc (km/s)^2 / 1e10 Msun], rho_crit_0 [1e10 Msun/h / (kpc/h)^3]</span>
+<span class="k">auto</span> Y = ... * (gamma-1.0) * m * e;  <span class="c">// [1e10 Msun/h (km/s)^2]</span>
+pressure[ii] /= shell_vol(ii);        <span class="c">// / (ckpc/h)^3        → ∝ h^2</span>
+<span class="k">return</span> 100.0*GNewton*m*rho_crit()*OmegaBaryon/Omega0/r;
+                                      <span class="c">// P200 in the same units → ∝ h^2</span></pre></div>
+</div>
+<div class="col">
+<div class="eq">density: electrons per (ckpc/h)<sup>3</sup> read as per physical kpc<sup>3</sup> → n<sub>stored</sub> = n<sub>true</sub> (a/h)<sup>3</sup>: the printed fit is low by a<sup>3</sup> and high by 1/h<sup>3</sup>
+<span class="note">V<sub>phys</sub> = (a/h)<sup>3</sup> V<sub>code</sub>: the a<sup>3</sup> is M1, the 1/h<sup>3</sup> = 3.22 is part of the same unit mistake</span></div>
+<div class="eq">pressure: P<sub>e</sub> and P<sub>200</sub> both ∝ h<sup>2</sup> in code units → h cancels; only a<sup>3</sup>/a = a<sup>2</sup> survives
+<span class="note">this is why the pressure needs no constant (F<sub>P</sub> = 1) while the density does</span></div>
+<p>The rest of F<sub>n</sub> is the hydrogen convention. The paper counts electrons as V<sub>i</sub>n<sub>e,i</sub> = x<sub>i</sub>m<sub>i</sub>X<sub>H</sub>/m<sub>p</sub>
+(x = ElectronAbundance = n<sub>e</sub>/n<sub>H</sub>), whose natural normalisation is the hydrogen density
+n<sub>H,200</sub> = 200 ρ<sub>cr</sub>f<sub>b</sub>X<sub>H</sub>/m<sub>p</sub>. The paper prints n<sub>200</sub> = 200 ρ<sub>cr</sub>f<sub>b</sub>/(X<sub>H</sub>m<sub>p</sub>),
+which is neither the hydrogen nor the electron density. Reading the printed form literally overestimates n<sub>e</sub> by 1/X<sub>H</sub><sup>2</sup> = 1.73.</p>
+<div class="eq">n<sub>e,true</sub> = n<sub>e,printed</sub> · [h<sub>TNG</sub>(1+z)]<sup>3</sup> · X<sub>H</sub><sup>2</sup>, &nbsp; F<sub>n</sub> = 1/(h<sub>TNG</sub><sup>3</sup>X<sub>H</sub><sup>2</sup>) = 5.57
+<span class="note">h<sub>TNG</sub> = 0.6774 (the value hard-coded in mprot), X<sub>H</sub> = 0.76; code option <code>redshift_scaling = :bookkeeping_physical</code></span></div>
+</div>
+<div class="tablewrap"><table>
+<tr><th>candidate for F<sub>n</sub></th><th>origin</th><th>value</th><th>vs measured 5.1–5.9</th></tr>
+<tr><td>1/h<sup>3</sup></td><td>(ckpc/h)<sup>3</sup> volume only</td><td class="num">3.22</td><td class="bad">too low</td></tr>
+<tr><td>μ<sub>e</sub>/(X<sub>H</sub>h<sup>3</sup>)</td><td>volume + electron-density n<sub>200</sub></td><td class="num">4.81</td><td class="bad">low</td></tr>
+<tr><td><b>1/(h<sup>3</sup>X<sub>H</sub><sup>2</sup>)</b></td><td><b>volume + hydrogen-density n<sub>200</sub></b></td><td class="num"><b>5.57</b></td><td class="good">matches</td></tr>
+<tr><td>Ω<sub>m</sub>/Ω<sub>b</sub></td><td>f<sub>b</sub> applied twice (no code path)</td><td class="num">6.36</td><td class="bad">15–20 % high</td></tr>
+<tr><td>1/(h<sup>3</sup>X<sub>H</sub><sup>3</sup>)</td><td>—</td><td class="num">7.33</td><td class="bad">too high</td></tr>
+</table></div>
+<div class="tablewrap"><table>
+<tr><th>measured</th><th>simulation</th><th>mass [M<sub>☉</sub>]</th><th>z = 0</th><th>0.47</th><th>1.05</th><th>1.48</th><th>2.0</th></tr>
+<tr><td>F<sub>P</sub></td><td>TNG (CAMELS)</td><td>10<sup>13.5</sup>–10<sup>14</sup></td><td class="num good">0.99</td><td class="num good">1.07</td><td class="num good">1.05</td><td class="num good">1.01</td><td class="num">–</td></tr>
+<tr><td>F<sub>P</sub></td><td>TNG (CAMELS)</td><td>10<sup>13</sup>–10<sup>13.5</sup></td><td class="num">0.86</td><td class="num">0.82</td><td class="num">0.77</td><td class="num">0.67</td><td class="num">0.74</td></tr>
+<tr><td>F<sub>P</sub></td><td>FLAMINGO</td><td>≥ 10<sup>13.6</sup> (Y<sub>200</sub>)</td><td class="num">1.25</td><td class="num">1.21</td><td class="num">1.21</td><td class="num">1.22</td><td class="num">1.24</td></tr>
+<tr><td>F<sub>n</sub></td><td>TNG (CAMELS)</td><td>10<sup>13.5</sup>–10<sup>14</sup></td><td class="num good">5.4</td><td class="num good">5.6</td><td class="num good">5.5</td><td class="num good">5.1</td><td class="num">–</td></tr>
+<tr><td>F<sub>n</sub></td><td>TNG (CAMELS), Fig. 1</td><td>paper bins, z = 0</td><td class="num good">5.9</td><td class="num" colspan="4"></td></tr>
+<tr><td>F<sub>n</sub></td><td>TNG (CAMELS)</td><td>10<sup>13</sup>–10<sup>13.5</sup></td><td class="num">5.2</td><td class="num">4.7</td><td class="num">3.9</td><td class="num">3.6</td><td class="num">4.2</td></tr>
+<tr><td>F<sub>n</sub></td><td>FLAMINGO</td><td>≥ 10<sup>13.6</sup></td><td class="num" colspan="5">7.2–7.4 (a different simulation: less gas in groups)</td></tr>
+</table></div>
+<div class="col">
+<p>F<sub>P</sub> = 1 within 5–7 % in TNG, the simulation Lee22 fitted, exactly as the h-cancellation predicts; FLAMINGO's 20 % lower
+group pressure is a real difference between the simulations. Below 10<sup>13.5</sup> M<sub>☉</sub> both ratios drift because the fit is at its
+lower mass limit (1.5 × 10<sup>13</sup> M<sub>☉</sub>). At z = 0, where M1 vanishes, Fig. 1 shows the factor directly: Lee22's own TNG density
+curve matches their fit, and both are 5.9× the TNG gas; the pressure curves agree. The constant is therefore in Lee22's
+conversion of the counts, not in the fitting.</p>
+<h3>The earlier empirical corrections</h3>
+<p>Two empirical corrections were used on the way to this result and are no longer final products. <b>C(z) = 0.284 (1+z)<sup>2.48</sup></b>
+was fitted to the TNG300 FRB halo-DM catalogue of Konietzka et al. ("10<sup>13</sup>–10<sup>14</sup> M<sub>☉</sub>"), and <b>F<sub>n</sub> = 5.4</b> to the
+CAMELS gas. F<sub>n</sub> = 5.4 agrees with the derived 5.57 to 3 %. C(z) does not, because the catalogue window most likely contains
+clusters: its "10<sup>13</sup>–10<sup>14</sup>" array behaves as if it held halos up to ~9 × 10<sup>14</sup> M<sub>☉</sub>. The 10<sup>14</sup>–10<sup>15</sup> window
+adds DM to only 0.07 / 0.23 / 0.26 % of rays at z<sub>s</sub> = 0.1 / 0.5 / 1, whereas 2.1 / 8.8 / 12.1 % of HalfDome rays cross such
+halos, and the windows are not disjoint. No boundary or electron convention (R<sub>200m</sub>, FoF cells, 57 ρ<sub>cr</sub> cells, star-forming
+gas) reproduces both the extra electrons and the equal hit fractions; counting the clusters does, and then the catalogue needs
+F<sub>n</sub> = 5.4 (1+z)<sup>−0.1</sup>, as the TNG gas does. The window reading is inferred from the arrays and should be confirmed with
+R. Konietzka.</p>
+</div>
+<figure><img src="fig_konietzka_check.png" alt="Konietzka catalogue window test against CAMELS">
+<figcaption><b>Fig. 3.</b> Why the TNG DM catalogue implies more gas than the TNG gas itself. (a) Electron fraction implied by the
+catalogue's "10<sup>13</sup>–10<sup>14</sup>" array (points) against CAMELS R<sub>200c</sub> spheres for the nominal window (blue) and for a window
+extended to 9 × 10<sup>14</sup> M<sub>☉</sub> (red); dashed: with TNG300's hydro halo abundance. (b) The same for the ray hit fraction. (c) Every
+candidate definition at z = 0: only the extended window adds electrons without adding hit area.</figcaption></figure>
+
+<h2>4. Implementation, next to XGPaint and Battaglia</h2>
+<h3>Density (FRB DM, kSZ)</h3>
+<div class="pair">
+<div class="code"><div class="file">XGPaint src/profiles_tau.jl — Battaglia16 gas density (reference)</div><pre><span class="c"># rho_gas = P0 GNFW(x) f_b rho_crit(z)   (P0 = 4e3 (M/1e14)^0.29 (1+z)^-0.66 ...)</span>
+rho_fit = par.P₀ * _nfw_profile_los_quadrature(X, par.xc, par.α, par.β, par.γ)
+<span class="k">return</span> rho_fit * model.f_b * rho_crit * r200c
+
+<span class="k">function</span> ne2d(model, r, m200c, z)
+    factor = me + nH_ne*mH + nHe_ne*mHe      <span class="c"># mass per electron, 1.137 m_p</span>
+    <span class="k">return</span> <span class="w">0.9</span> * rho_2d(model, r, m200c, z) / factor
+<span class="k">end</span></pre></div>
+<div class="code"><div class="file">lee2022_frb_dm_profile.jl — Lee22 through XGPaint's machinery</div><pre>beta = pars.alpha * pars.beta_prime - pars.gamma   <span class="c"># Lee22 β′ → XGPaint outer slope</span>
+zfac = lee2022_redshift_scaling_factor(model.lee, z)
+<span class="k">if</span> model.lee.normalization == :xgpaint_ne2d
+    <span class="c"># OLD production: n0 treated as a gas density; XGPaint's ne2d then
+    # multiplies by 0.9 X_H m_p / m_per_e = 0.6016 relative to eq. 9</span>
+    p0 = 200 * pars.n0 * zfac
+<span class="k">else</span>   <span class="c"># :literal, eq. 9 exactly: undo ne2d's 0.9/m_per_e, apply 1/(X_H m_p)</span>
+    p0 = zfac * pars.n0 * 200 * m_per_e / (0.9 * X_H * m_p)
+<span class="k">end</span></pre></div>
+</div>
+<div class="code"><div class="file">lee2022_frb_dm_profile.jl — the redshift corrections (new options, 2026-09-29/30)</div><pre><span class="k">const</span> LEE2022_TNG_CALIBRATION_C0 = 0.2841790493880425      <span class="c"># C(z) fitted to Konietzka TNG300 halo DM</span>
+<span class="k">const</span> LEE2022_TNG_CALIBRATION_K  = 2.483190184608004
+<span class="k">const</span> LEE2022_BOOKKEEPING_FN = parse(Float64, get(ENV, "LEE2022_BOOKKEEPING_FN", "5.4"))
+<span class="k">const</span> LEE2022_TNG_LITTLE_H = 0.6774                         <span class="c"># h hard-coded in Lee22's mprot</span>
+
+<span class="k">function</span> lee2022_redshift_scaling_factor(model, z)
+    model.redshift_scaling == :physical && <span class="k">return</span> 1.0            <span class="c"># eq. 9 as printed</span>
+    model.redshift_scaling == :bookkeeping_physical &&                <span class="c"># final: derived, no fit</span>
+        <span class="k">return</span> <span class="w">(LEE2022_TNG_LITTLE_H * (1 + z))^3 * model.hydrogen_mass_fraction^2</span>
+    model.redshift_scaling == :bookkeeping_a3 && <span class="k">return</span> (1 + z)^3 / LEE2022_BOOKKEEPING_FN   <span class="c"># empirical check</span>
+    model.redshift_scaling == :tng_calibrated &&
+        <span class="k">return</span> <span class="w">LEE2022_TNG_CALIBRATION_C0 * (1 + min(z, 2.0))^LEE2022_TNG_CALIBRATION_K</span>
+    ...
+<span class="k">end</span></pre></div>
+<h3>Pressure (tSZ)</h3>
+<div class="pair">
+<div class="code"><div class="file">XGPaint src/profiles_y.jl — Battaglia12 (type Battaglia16ThermalSZProfile)</div><pre><span class="c"># P_th/P200 = P0 GNFW(x); P0 = 18.1 (M/1e14)^0.154 (1+z)^-0.758, ...</span>
+β_raw = powerlaw_value(model.beta, m, z₁)
+β = α * β_raw - γ           <span class="c"># outer slope for generalized_nfw</span>
+<span class="k">return</span> (xc=xc, α=α, β=β, γ=γ, P₀=P₀)
+<span class="c"># y = σT/(m_e c²) ∫ P_e dl with P_e = 0.5176 P_th (P_e_factor)</span></pre></div>
+<div class="code"><div class="file">lee2022_tsz_pressure_profile.jl — Lee22 Table 7 through the same path</div><pre>p0 = 2.8 * (ratio &lt; 1 ? ratio^1.08 : ratio^0.80) * z1^(-1.89)
+x_c = 2.10 * shape_ratio^(-0.35) * z1^0.53
+beta = 9.4 * shape_ratio^(-0.06) * z1^0.60
+<span class="c"># Lee22 fits P_e/P200; XGPaint multiplies P_th by 0.5176 → divide here</span>
+<span class="k">return</span> (xc=x_c, α=1, β=alpha*beta - gamma, γ=-0.3,
+        P₀=<span class="w">p0 / 0.5176</span>)</pre></div>
+</div>
+<div class="code"><div class="file">XGPaint src/profiles_y.jl — the shared shape function (why β<sub>XG</sub> = αβ′ − γ)</div><pre><span class="k">function</span> generalized_nfw(x, xc, α, β, γ)
+    x̄ = x / xc
+    <span class="k">return</span> x̄^γ * (1 + x̄^α)^(<span class="w">-(β + γ) / α</span>)   <span class="c"># with β = αβ′ − γ: exponent −β′, as printed</span>
+<span class="k">end</span></pre></div>
+<div class="code"><div class="file">lee22_tsz_corrected/paint_tsz_variants.jl — the (1+z)² correction and the hybrid map (per-halo weights)</div><pre><span class="k">function</span> map_weights(name, m, z)                <span class="c"># returns (w_B12, w_Lee22) for one halo</span>
+    name == "b12"             && <span class="k">return</span> (1.0, 0.0)
+    name == "lee22p"          && <span class="k">return</span> (0.0, 1.0)                  <span class="c"># as printed</span>
+    name == "lee22p_m1"       && <span class="k">return</span> (0.0, <span class="w">(1 + z)^2</span>)             <span class="c"># M1 undone, F_P = 1</span>
+    name == "lee22p_m1_b12hi" && <span class="k">return</span> m &lt; 10^14.8/h ? (0.0, (1 + z)^2) : (1.0, 0.0)
+    ...
+<span class="k">end</span>
+<span class="c"># the pressure shape is unchanged, so (1+z)^2 multiplies each halo's painted y profile</span></pre></div>
+<div class="col">
+<p><b>Low-z painting fix.</b> The production y lookup tables interpolate linearly in z with Δz = 0.0196, too coarse where θ<sub>200</sub> ∝ 1/d<sub>A</sub>.
+For the ~80,000 halos at z &lt; 0.1 the new painter builds each halo's radial profile at its exact mass and redshift with XGPaint's
+own <code>fill_profile_slice!</code> (the function that fills the table nodes). Halos at z ≥ 0.1 are painted bit for bit as before.</p>
+</div>
+<div class="tablewrap"><table>
+<tr><th>name in code</th><th>quantity</th><th>definition</th><th>status</th></tr>
+<tr><td><code>normalization=:xgpaint_ne2d</code></td><td>n<sub>e</sub></td><td>0.6016 × printed eq. 9</td><td>previous production</td></tr>
+<tr><td><code>:literal</code> + <code>:tng_calibrated</code></td><td>n<sub>e</sub></td><td>printed × 0.284 (1+min(z,2))<sup>2.48</sup></td><td>superseded (empirical)</td></tr>
+<tr><td><code>:literal</code> + <code>:bookkeeping_a3</code></td><td>n<sub>e</sub></td><td>printed × (1+z)<sup>3</sup>/5.4</td><td>empirical check</td></tr>
+<tr><td><code>:literal</code> + <code>:bookkeeping_physical</code></td><td>n<sub>e</sub></td><td>printed × (0.6774 (1+z))<sup>3</sup> X<sub>H</sub><sup>2</sup></td><td><b>final</b></td></tr>
+<tr><td><code>lee22p</code></td><td>P<sub>e</sub></td><td>Table 7 as printed</td><td>previous production</td></tr>
+<tr><td><code>lee22p_m1</code></td><td>P<sub>e</sub></td><td>Table 7 × (1+z)<sup>2</sup></td><td>new</td></tr>
+<tr><td><code>lee22p_m1_b12hi</code></td><td>P<sub>e</sub></td><td>Table 7 × (1+z)<sup>2</sup> below 10<sup>14.8</sup> h<sup>-1</sup>M<sub>☉</sub>, Battaglia12 above</td><td>new</td></tr>
+</table></div>
+
+<h2>5. Results</h2>
+<h3>FRB halo DM: HalfDome rays, analytic halo model and TNG</h3>
+<div class="col">
+<p>120,000 rays, gas inside each halo's R<sub>200c</sub> sphere. The analytic curves are the Torkamani et al. (2026) compound-Poisson
+halo model with clustering, evaluated with exactly the same densities. With the HalfDome halo abundance it reproduces the rays to 1–3 %
+for every model and source redshift, so the rays and the analytic model are interchangeable; in the TNG cosmology with a Tinker08
+mass function down to 10<sup>9</sup> M<sub>☉</sub> it is the analytic prediction for TNG.</p>
+</div>
+<div class="tablewrap"><table>
+<tr><th>z<sub>s</sub></th><th>TNG catalogue</th><th>Lee22 × 0.6016 (previous)</th><th>Lee22 × C(z)</th><th>Lee22 × (1+z)<sup>3</sup>/5.4</th><th>Battaglia16</th></tr>
+<tr><td>0.1</td><td class="num">110</td><td class="num">221 / 215</td><td class="num">117 / 114</td><td class="num">78 / 76</td><td class="num">79 / 73</td></tr>
+<tr><td>0.5</td><td class="num">123</td><td class="num">163 / 163</td><td class="num">124 / 125</td><td class="num">90 / 91</td><td class="num">82 / 82</td></tr>
+<tr><td>1.0</td><td class="num">139</td><td class="num">139 / 140</td><td class="num">138 / 139</td><td class="num">108 / 109</td><td class="num">93 / 94</td></tr>
+</table></div>
+<p class="sub" style="margin-top:-.6rem">Mean DM per hit [pc cm<sup>−3</sup>], window "10<sup>13</sup>–10<sup>14</sup> M<sub>☉</sub>": HalfDome rays / analytic in the TNG cosmology.</p>
+<figure><img src="halo_pdf_corrected_lee22_rays_analytic_tng.png" alt="Halo DM PDFs, HalfDome rays and analytic model against TNG">
+<figcaption><b>Fig. 4.</b> Halo-DM PDFs at z<sub>s</sub> = 0.1, 0.5, 1. Solid: HalfDome rays; dashed: analytic model (TNG cosmology); black: TNG
+catalogue. The previous ×0.6016 density matched TNG only at z<sub>s</sub> = 1 (it is right near halo redshift 0.35). With (1+z)<sup>3</sup>/F<sub>n</sub>
+the model follows TNG's low-DM side and peak but not its high-DM tail, which is what the clusters in TNG's window add. In the right
+panel HalfDome misses halos below its catalogue floor of 7.3 × 10<sup>12</sup> M<sub>☉</sub> (60 % of rays hit, against 91 % in TNG and 93 % in
+the analytic model).</figcaption></figure>
+<h3>tSZ maps and tSZ × FRB DM</h3>
+<p class="col" id="tsz-pending">The five corrected y maps (Battaglia12 and Lee22 with the low-z fix, Lee22 × (1+z)<sup>2</sup>, the hybrid and the
+calibrated-range map) are being painted on idark. Their power spectra against FLAMINGO and CLASS-SZ and the tSZ × FRB DM correlation
+against Takahashi+25 will be added here.</p>
+
+<h2>6. Open items</h2>
+<ul class="col">
+<li><b>Konietzka windows.</b> Confirm with R. Konietzka which halos the "10<sup>13</sup>–10<sup>14</sup>" array holds, then compare with a
+matched HalfDome window (and allow for HalfDome being dark-matter-only).</li>
+<li><b>Origin of F<sub>n</sub>.</b> Lee22's n<sub>e</sub>/n<sub>200</sub> conversion is not public; B. K. K. Lee or L. Thiele could settle it.</li>
+<li><b>High masses.</b> Above 10<sup>14.8</sup> h<sup>-1</sup>M<sub>☉</sub> the Lee22 amplitudes are extrapolated, and CAMELS has no halo above
+1.8 × 10<sup>14</sup> M<sub>☉</sub>; only FLAMINGO tests that range. The hybrid map uses Battaglia12 there.</li>
+<li><b>Low-mass groups.</b> Below 10<sup>13.5</sup> M<sub>☉</sub>, F<sub>n</sub> and F<sub>P</sub> drift with z (5.2 → 3.6 and 0.86 → 0.67 at 10<sup>13</sup>–10<sup>13.5</sup>).</li>
+<li><b>Other maps.</b> The kSZ maps and the tSZ_64k dataset still use the previous density and the coarse low-z lookup tables
+(the latter affects only ℓ &lt; 50).</li>
+</ul>
+<p class="sub" style="margin-top:2rem">Code: <code>frb_map_generation/lee2022_frb_dm_profile.jl</code>, <code>lee2022_tsz_pressure_profile.jl</code>,
+<code>lee22_tsz_corrected/</code>. Reports: <code>LEE22_NORMALIZATION_FORENSICS_20260929.md</code>, <code>LEE22_TSZ_VERIFICATION_20260929.md</code>.
+Simulations: CAMELS IllustrisTNG CV (27 × 25 Mpc/h boxes, TNG model at TNG300-like resolution; TNG300 itself was not accessible),
+FLAMINGO L2p8_m9, Konietzka et al. TNG300 halo-DM catalogue.</p>
+</main>

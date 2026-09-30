@@ -175,7 +175,9 @@ function normalize_lee2022_redshift_scaling(value::AbstractString)
     normalized in ("physical", "") && return "physical"
     normalized in ("comoving_hypothesis", "comoving", "comoving_hyp") && return "comoving_hypothesis"
     normalized in ("tng_calibrated", "tngcal", "tng") && return "tng_calibrated"
-    error("lee2022_redshift_scaling must be physical, comoving_hypothesis or tng_calibrated; got $(repr(value)).")
+    normalized in ("bookkeeping_a3", "a3", "bookkeeping") && return "bookkeeping_a3"
+    normalized in ("bookkeeping_physical", "physical_bookkeeping", "phys") && return "bookkeeping_physical"
+    error("lee2022_redshift_scaling must be physical, comoving_hypothesis, tng_calibrated, bookkeeping_a3 or bookkeeping_physical; got $(repr(value)).")
 end
 
 """Return Inf (no clipping), the fit-range upper mass, or an explicit physical mass in Msun."""
@@ -468,6 +470,8 @@ Core options (both --key=value and key=value are accepted):
                                       spherical: only gas inside the X R200c sphere (chord LOS -> DM=0 at the edge)
   --lee2022-redshift-scaling=physical  physical (eq. 9 with rho_crit(z)) or comoving_hypothesis
                                       or tng_calibrated (literal x 0.2842 (1+z)^2.483, TNG-calibrated; needs --lee2022-normalization=literal)
+                                      or bookkeeping_a3 (literal x (1+z)^3/F_n, F_n = ENV LEE2022_BOOKKEEPING_FN or 5.4; needs literal)
+                                      or bookkeeping_physical (literal x (0.6774 (1+z))^3 X_H^2, derived; needs literal)
                                       (extra (1+z)^3/E^2(z); bookkeeping hypothesis, see docs)
   --lee2022-concentration-mode=none  Preserved no-concentration baseline
                                       duffy2008 selects the preferred density fit (arXiv Table 3)

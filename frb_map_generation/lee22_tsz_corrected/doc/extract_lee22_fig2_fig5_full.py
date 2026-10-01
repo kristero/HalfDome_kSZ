@@ -3,8 +3,8 @@
 Fig. 5 (electron density, figures/fig_4.pdf), read from the vector paths (2026-10-01). Extends
 lee22_normalization_forensics/C_pressure_consistency/extract_lee22_fig2_fig5.py (top-panel model curves, same calibration)
 with what the replicas of the two figures need:
-  * the TNG measurement at its 52 radial bins: the errorbar data line (red, width 1.5), the red bars (+-sigma, error of the
-    mean) and the translucent blue bars (+-halo-to-halo scatter);
+  * the TNG measurement: thick line at 103 log-spaced radii (x = 0.0425-1.48); errorbar data line (red, width 1.5), red bars (+-sigma, error of the
+    mean) and the translucent blue bars (+-halo-to-halo scatter) at every second radius (52 points);
   * the two residual rows of each panel, Delta A/A and Delta A/sigma, for the four fits (linear axes calibrated on the
     drawn ticks 0.5/0/-0.5 (Fig. 2), 0.25/0/-0.25 (Fig. 5) and 10/0/-10).
 Writes outputs/lee22_corrected_20260930/doc/lee22_fig2_fig5_full_digitization.npz and checks the residual definition:

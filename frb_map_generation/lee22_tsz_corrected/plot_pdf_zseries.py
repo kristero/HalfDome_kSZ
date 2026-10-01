@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Halo-DM PDFs in the '10^13-10^14 Msun' window at six source redshifts (2026-10-01): IllustrisTNG (Konietzka within-R200
-catalogue) against HalfDome rays with Battaglia16, Lee22 x 0.6016 (unedited XGPaint ne2d, previous production) and Lee22
+"""Halo-DM PDFs of halos with 10^13 <= M200c < 10^14 Msun at six source redshifts (2026-10-01): IllustrisTNG (Konietzka within-R200
+catalogue, true decade DM(10to13) - DM(10to12) per ray, tng_windows.py; the catalogue's '13to14' array is [1e13, 1e15) and is
+drawn faintly for reference) against HalfDome rays with Battaglia16, Lee22 x 0.6016 (unedited XGPaint ne2d, previous production) and Lee22
 corrected (x [h_TNG (1+z)]^3 X_H^2, derived, no empirical factor). HalfDome: 120,000 NSIDE-4096 rays per z_s, gas inside each
 halo's R200c sphere, seed 42, the same rays for the three models at a given z_s: z_s <= 1 from idark (Julia 1.6.2;
 lee22_tngcal_20260929 and lee22_corrected_20260930), z_s >= 1.5 from run_pdf_zseries_local.sh (Julia 1.12.2, whose RNG draws
@@ -23,6 +24,8 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from frb_map_generation.compare_tng_halfdome_direct import DirectComparison  # noqa: E402
 from frb_map_generation.make_publication_comparisons import percent_difference_extended, ROBUST_BIN_COUNT  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from tng_windows import identity_residual, tng_exact  # noqa: E402
 
 OUT = ROOT / "frb_map_generation/outputs/lee22_pdf_zseries_20261001"
 IDARK = {"b16": ROOT / "frb_map_generation/outputs/lee22_tngcal_20260929/rays",
@@ -33,7 +36,7 @@ WIN = "m1e13_to_1e14"
 NRAY = 120000
 MODELS = (  # ray tag, colour, line style, width, label, short
     ("b16", "#17becf", "-.", 2.4, "Battaglia16 (XGPaint)", "B16"),
-    ("lee22_xgpnative", "#ff7f0e", (0, (5, 3)), 2.4, "Lee22 via unedited XGPaint (×0.6016, previous)", "×0.6016"),
+    ("lee22_xgpnative", "#ff7f0e", (0, (5, 3)), 2.4, "Lee22 XGPaint pipeline", "pipeline"),
     ("lee22_phys", "#9467bd", "-", 2.8, "Lee22 corrected, ×$[h(1+z)]^3X_H^2$ (derived)", "corrected"),
 )
 RC = {"font.family": "DejaVu Sans", "font.size": 13, "axes.labelsize": 14.5, "axes.titlesize": 14.5, "xtick.labelsize": 11.5,
@@ -77,11 +80,19 @@ def main():
             src = (lambda tag: IDARK[tag]) if zs <= 1.0 else (lambda tag: OUT / "rays")
             ref = rays(src(MODELS[0][0]), MODELS[0][0], zs)
             edges = ref["edges"]; cen = np.sqrt(edges[1:] * edges[:-1])
-            tpdf, tcnt, tzero = direct.histogram_from_values(direct.tng_values(WIN, zs), edges)
+            assert identity_residual(direct, zs) < 1e-10, zs
+            tpdf, tcnt, tzero = direct.histogram_from_values(tng_exact(direct, WIN, zs), edges)
+            npdf, ncnt, nzero = direct.histogram_from_values(direct.tng_values(WIN, zs), edges)
+            k = npdf > 0
+            top.plot(cen[k], npdf[k], color=".62", lw=1.6, ls=(0, (1.2, 1.4)), zorder=3)
             k = tpdf > 0
             top.plot(cen[k], tpdf[k], color=".08", lw=3.4, zorder=6)
             tst = stats(tcnt, edges); tst["hit_percent"] = 100 * (1 - tzero)
-            rows.append(dict(z_s=zs, model="IllustrisTNG (Konietzka)", source="TNG300 catalogue", **tst, mean_over_tng=1.0))
+            nst = stats(ncnt, edges); nst["hit_percent"] = 100 * (1 - nzero)
+            rows.append(dict(z_s=zs, model="IllustrisTNG (Konietzka), 1e13-1e14", source="TNG300 catalogue, 10to13 - 10to12", **tst,
+                             mean_over_tng=1.0))
+            rows.append(dict(z_s=zs, model="IllustrisTNG (Konietzka), '13to14' array = 1e13-1e15", source="TNG300 catalogue",
+                             **nst, mean_over_tng=nst["mean_per_hit"] / tst["mean_per_hit"]))
             lines = ["mean DM per hit [pc cm$^{-3}$]", "TNG {:.0f}".format(tst["mean_per_hit"])]
             for tag, col, ls, lw, lab, short in MODELS:
                 p = rays(src(tag), tag, zs)
@@ -113,12 +124,13 @@ def main():
                 top.set_ylabel(r"$p(\mathrm{DM}\mid\mathrm{DM}>0)$"); bot.set_ylabel("vs TNG [%]")
             else:
                 top.tick_params(labelleft=False); bot.tick_params(labelleft=False)
-        h = [Line2D([], [], color=".08", lw=3.4, label="IllustrisTNG300 (Konietzka catalogue, within $R_{200}$)")]
+        h = [Line2D([], [], color=".08", lw=3.4, label="IllustrisTNG300 (Konietzka, within $R_{200}$), $10^{13}$–$10^{14}\\,M_\\odot$"),
+             Line2D([], [], color=".62", lw=1.6, ls=(0, (1.2, 1.4)), label="TNG '13to14' array = $10^{13}$–$10^{15}\\,M_\\odot$ (reference)")]
         h += [Line2D([], [], color=c, ls=ls, lw=lw, label=lab) for _, c, ls, lw, lab, _ in MODELS]
-        fig.legend(handles=h, loc="upper center", ncol=2, frameon=False, bbox_to_anchor=(.5, 1.0), handlelength=3.2, columnspacing=2.5)
-        fig.text(.5, .918, "Halo DM from halos of $10^{13}$–$10^{14}\\,M_\\odot$ only; HalfDome: 120,000 rays per $z_s$, gas inside each halo's "
-                 "$R_{200c}$ sphere.\nCaveat: the TNG window behaves as if it held halos up to $\\sim9\\times10^{14}M_\\odot$ "
-                 "(its $10^{14}$–$10^{15}$ window is nearly empty), so its high-DM tail is not like-for-like",
+        fig.legend(handles=h, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(.5, 1.0), handlelength=3.2, columnspacing=2.0)
+        fig.text(.5, .918, "Halo DM from halos of $10^{13}$–$10^{14}\\,M_\\odot$ only, gas inside each halo's $R_{200c}$ sphere; HalfDome: 120,000 rays per $z_s$.\n"
+                 "TNG: each 'AtoB' array holds $10^A$–$10^{B+1}M_\\odot$ (DM(10to14) = DM(10to12) + DM(13to14) on every ray), "
+                 "so the $10^{13}$–$10^{14}$ decade is DM(10to13) $-$ DM(10to12)",
                  ha="center", va="center", fontsize=11.3, color=".3")
         (OUT / "plots").mkdir(parents=True, exist_ok=True)
         for ext in ("png", "pdf"):

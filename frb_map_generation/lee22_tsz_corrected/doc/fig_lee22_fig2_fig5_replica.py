@@ -5,7 +5,7 @@ Delta A/sigma, with Delta = (A_sim - A_model)/A_sim and sigma the paper's error 
 are reproduced exactly by extract_lee22_fig2_fig5_full.py.
 
 z = 0 (fig_lee22_fig{2,5}_replica_z0): the simulation is the paper's own TNG profile, digitized from the vector figure
-(lowest-concentration quartile, 52 radial bins with +-sigma and +-scatter bars). Units are physical, n200 = 200 rho_cr f_b
+(lowest-concentration quartile, 177 and 65 halos; drawn at 103 radii, +-sigma and +-scatter bars at every second one). Units are physical, n200 = 200 rho_cr f_b
 /(X_H m_p) and P200 = 200 G M200 rho_cr f_b/(2 R200) evaluated physically; the density figure's TNG curve is converted from
 Lee22's code units with the derived h^3 X_H^2 (= 0.1795 at z = 0, the (1+z)^3 factor is 1), the pressure needs no
 conversion (F_P = 1, the (1+z)^2 factor is 1). Models at the bin-centre mass, like the paper's fit curves:
@@ -144,7 +144,7 @@ def figure_z0(q):
     conv = 1.0 if q == "P" else H_TNG ** 3 * X_H ** 2
     lims = {"P": ((-1.0, 1.0), (-30, 30)), "n": ((-1.0, 1.0), (-30, 30))}[q]
     ticks = ((-0.5, 0, 0.5), (-20, 0, 20))
-    short = dict(bat="B12" if q == "P" else "B16", xgp="unedited" if q == "P" else "\u00d70.6016", cor="corrected")
+    short = dict(bat="B12" if q == "P" else "B16", xgp="pipeline", cor="corrected")
     report = []
     with plt.rc_context(RC):
         fig = plt.figure(figsize=(17.5, 9.8))
@@ -207,7 +207,7 @@ def figure_z0(q):
             h = [Line2D([], [], color=C["sim"], lw=5, label="Simulation (TNG300, Lee22 Fig. 2, digitized)"),
                  Line2D([], [], color=C["bat"], lw=2.2, ls="-.", label="Battaglia et al. (2012), XGPaint $P_e$ (HalfDome)"),
                  Line2D([], [], color=C["bat"], lw=1.6, ls=(0, (1.2, 1.6)), label="Battaglia (2012) as drawn in Lee22 ($P_{th}$)"),
-                 Line2D([], [], color=C["xgp"], lw=2.4, ls=(0, (5, 3)), label="Lee22 via unedited XGPaint (as printed)"),
+                 Line2D([], [], color=C["xgp"], lw=2.4, ls=(0, (5, 3)), label="Lee22 XGPaint pipeline"),
                  Line2D([], [], color=C["cor"], lw=2.6, label=r"Lee22 corrected, $\times(1+z)^2$ (= 1 at z = 0)"),
                  Line2D([], [], color=C["cam"], marker="o", mfc="white", ls="none", label="CAMELS-TNG (all halos, independent)")]
         else:
@@ -215,7 +215,7 @@ def figure_z0(q):
                  Line2D([], [], color=C["sim"], lw=1.6, ls=(0, (1.2, 1.6)), label="Simulation as drawn in Lee22 (code units)"),
                  Line2D([], [], color=C["bat"], lw=2.2, ls="-.", label="Battaglia (2016), XGPaint $n_e$ (HalfDome)"),
                  Line2D([], [], color=C["bat"], lw=1.6, ls=(0, (1.2, 1.6)), label="Battaglia (2016) as drawn in Lee22"),
-                 Line2D([], [], color=C["xgp"], lw=2.4, ls=(0, (5, 3)), label=r"Lee22 via unedited XGPaint ($\times$0.6016)"),
+                 Line2D([], [], color=C["xgp"], lw=2.4, ls=(0, (5, 3)), label="Lee22 XGPaint pipeline"),
                  Line2D([], [], color=C["cor"], lw=2.6, label=r"Lee22 corrected, $\times[h(1+z)]^3X_H^2$ (= 0.1795 at z = 0)"),
                  Line2D([], [], color=C["cam"], marker="o", mfc="white", ls="none", label="CAMELS-TNG (all halos, independent)")]
         fig.legend(handles=h, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(.5, 1.0),
@@ -233,7 +233,7 @@ def figure_camels(q, zs=(0.465, 1.048), mbin=BINS[0]):
            "n": (r"n$_e$/n$_{200}$ (r/R$_{200}$)$^3$", r"$\Delta$ n$_e$/n$_e$", r"$\Delta$ n$_e$/$\sigma$")}[q]
     lims = ((-1.0, 1.0), (-15, 15))
     ticks = ((-0.5, 0, 0.5), (-10, 0, 10))
-    short = dict(bat="B12" if q == "P" else "B16", xgp="unedited" if q == "P" else "\u00d70.6016", cor="corrected",
+    short = dict(bat="B12" if q == "P" else "B16", xgp="pipeline", cor="corrected",
                  noz="no (1+z)\u00b3")
     lo, hi = mbin
     report = []
@@ -280,12 +280,12 @@ def figure_camels(q, zs=(0.465, 1.048), mbin=BINS[0]):
         if q == "P":
             h = [Line2D([], [], color=C["sim"], lw=5, label="Simulation: CAMELS-TNG (27 CV boxes)"),
                  Line2D([], [], color=C["bat"], lw=2.2, ls="-.", label="Battaglia et al. (2012), XGPaint $P_e$ (HalfDome)"),
-                 Line2D([], [], color=C["xgp"], lw=2.4, ls=(0, (5, 3)), label="Lee22 via unedited XGPaint (as printed)"),
+                 Line2D([], [], color=C["xgp"], lw=2.4, ls=(0, (5, 3)), label="Lee22 XGPaint pipeline"),
                  Line2D([], [], color=C["cor"], lw=2.6, label=r"Lee22 corrected, $\times(1+z)^2$")]
         else:
             h = [Line2D([], [], color=C["sim"], lw=5, label="Simulation: CAMELS-TNG (27 CV boxes)"),
                  Line2D([], [], color=C["bat"], lw=2.2, ls="-.", label="Battaglia (2016), XGPaint $n_e$ (HalfDome)"),
-                 Line2D([], [], color=C["xgp"], lw=2.4, ls=(0, (5, 3)), label=r"Lee22 via unedited XGPaint ($\times$0.6016)"),
+                 Line2D([], [], color=C["xgp"], lw=2.4, ls=(0, (5, 3)), label="Lee22 XGPaint pipeline"),
                  Line2D([], [], color=C["cor"], lw=2.6, label=r"Lee22 corrected, $\times[h(1+z)]^3X_H^2$"),
                  Line2D([], [], color=C["noz"], lw=1.8, ls=(0, (1.2, 1.6)), label=r"$\times h^3X_H^2$ only (without $(1+z)^3$)")]
         fig.legend(handles=h, loc="upper center", ncol=3, frameon=False, bbox_to_anchor=(.5, 1.0), handlelength=3.2,

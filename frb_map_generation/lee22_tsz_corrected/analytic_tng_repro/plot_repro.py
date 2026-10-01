@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Figure of the analytic TNG300 reproduction (fig_analytic_tng_repro.{png,pdf}).
 Top: (a) total LSS DM at z_s = 0.7 (Torkamani+26's validation case), (b) halo-only 'all' at z_s = 1, (c) 1e13-1e14
-array under the reinterpreted window [1e13, 9e14] at z_s = 1, (d) mean DM per ray by mass decade at z_s = 1.
-Bottom: percent differences to TNG300 for (a)-(c), and (h) model/TNG mean of the reinterpreted window vs z_s.
+array, which spans [1e13, 1e15) (decades A..B inclusive; computed with 9e14, < 1 % difference) at z_s = 1, (d) mean DM per ray by mass decade at z_s = 1.
+Bottom: percent differences to TNG300 for (a)-(c), and (e) model/TNG mean of that window vs z_s.
 Black = TNG300 (Konietzka); Okabe-Ito: #0072B2 Battaglia16, #009E73 corrected Lee22 (solid F_n = 5.4, dashed 5.57),
 #CC79A7 BFC / Torkamani, #E69F00 previous Lee22 (x0.6016)."""
 import csv
 import json
+from pathlib import Path
+import sys
 
 import matplotlib
 matplotlib.use("Agg")
@@ -78,7 +80,7 @@ def main():
 
     # (b), (c): halo-only
     panels = ((1, "all", "all", "tng300_full", "(b) halo-only, all halos, $z_s$ = 1"),
-              (2, "reinterp", "m1e13_to_1e14", "tng300", "(c) '1e13-1e14' read as [1e13, 9e14], $z_s$ = 1"))
+              (2, "reinterp", "m1e13_to_1e14", "tng300", "(c) '13to14' array = [1e13, 1e15), $z_s$ = 1"))
     for j, target, label, ab, title in panels:
         ax, bx = axT[j], axB[j]
         tv = R.tng(label, 1.0)
@@ -110,13 +112,21 @@ def main():
 
     # (d) mean DM per ray by mass decade, z_s = 1
     md = json.loads((R.OUT / "analysis" / "mass_decomposition.json").read_text())["decades"]
+    # cluster decades: models from their own [lo, hi) windows (15-16 computed as [9e14, 9e15)); TNG from the exact decades of the
+    # catalogue arrays ('AtoB' = [10^A, 10^(B+1)), tng_windows.py). The low-mass TNG decades are window differences valid under both readings.
     keys = [("1e9-1e10", "9-10"), ("1e10-1e11", "10-11"), ("1e11-1e12", "11-12"), ("1e12-1e13", "12-13"),
-            ("1e13-9e14 reinterpreted", "13-\n14.95"), ("1e14-1e15 nominal", "14-15"), ("9e14-9e15 reinterpreted", "14.95-\n15.95")]
+            ("1e13-1e14 nominal", "13-14"), ("1e14-1e15 nominal", "14-15"), ("9e14-9e15 reinterpreted", "15-16")]
+    exact = {"1e13-1e14 nominal": "m1e13_to_1e14", "1e14-1e15 nominal": "m1e14_to_1e15", "9e14-9e15 reinterpreted": "m1e15_to_1e16"}
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1])); sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
+    from tng_windows import tng_exact
+    from frb_map_generation.compare_tng_halfdome_direct import DirectComparison
+    direct = DirectComparison(Path(__file__).resolve().parents[3])
     ax = axT[3]
     A = R.low_mass_abundance()
     xs = np.arange(len(keys))
     for i, (k, _) in enumerate(keys):
-        ax.plot(i, md[k]["tng"]["1.0"]["mean_all"], marker="_", ms=22, mew=3, color="k", zorder=5)
+        tv = float(np.mean(tng_exact(direct, exact[k], 1.0))) if k in exact else md[k]["tng"]["1.0"]["mean_all"]
+        ax.plot(i, tv, marker="_", ms=22, mew=3, color="k", zorder=5)
     for jm, m in enumerate(ORDER):
         ys = []
         for i, (k, _) in enumerate(keys):
@@ -133,15 +143,15 @@ def main():
     ax.set_yscale("log"); ax.set_ylim(0.02, 300)
     ax.set_xticks(xs); ax.set_xticklabels([k[1] for k in keys], fontsize=9)
     ax.set_xlim(-0.5, len(keys) - 0.5)
-    ax.axvspan(4.5, 6.5, color="0.94", zorder=0)
-    ax.text(5.5, 0.03, "cluster window:\nnominal | x9", ha="center", va="bottom", fontsize=9, color="0.3")
+    ax.axvspan(3.5, 6.5, color="0.94", zorder=0)
+    ax.text(5.0, 0.03, "TNG: exact decades\n(AtoB = 10^A-10^(B+1))", ha="center", va="bottom", fontsize=8.5, color="0.3")
     ax.set_ylabel("mean DM over all rays [pc cm$^{-3}$]")
     ax.set_title("(d) mean DM by mass window, $z_s$ = 1", loc="left")
     ax.set_xlabel(r"$\log_{10} M_{200c}$ [$M_\odot$] window", fontsize=10.5, labelpad=1)
     ax.grid(axis="y", color="0.9", lw=0.6)
-    ax.text(0.02, 0.97, "black bars: TNG300 (window differences)\nmodels: TNG300 abundance", transform=ax.transAxes, fontsize=9, color="0.25", va="top")
+    ax.text(0.02, 0.97, "black bars: TNG300 (array differences)\nmodels: TNG300 abundance", transform=ax.transAxes, fontsize=9, color="0.25", va="top")
 
-    # (h) redshift dependence of the mean, reinterpreted window
+    # (e) redshift dependence of the mean, '13to14' window
     rows = list(csv.DictReader(open(R.OUT / "analysis" / "redshift_means.csv")))
     zz = np.array([float(r["z_s"]) for r in rows])
     bx = axB[3]
@@ -152,7 +162,7 @@ def main():
     bx.set_yscale("log"); bx.set_ylim(0.6, 3.5)
     bx.set_yticks([0.7, 1, 1.5, 2, 3]); bx.set_yticklabels(["0.7", "1", "1.5", "2", "3"]); bx.yaxis.set_minor_formatter(matplotlib.ticker.NullFormatter())
     bx.set_xlabel("source redshift $z_s$"); bx.set_ylabel("model / TNG300 mean")
-    bx.set_title("(h) [1e13, 9e14] window: mean vs $z_s$", loc="left", fontsize=10.5, pad=3)
+    bx.set_title("(e) '13to14' = [1e13, 1e15): mean vs $z_s$", loc="left", fontsize=10.5, pad=3)
     bx.grid(color="0.9", lw=0.6)
 
     handles = [Line2D([], [], color="k", lw=2.0, label="IllustrisTNG300 (Konietzka+25 rays)")]

@@ -69,22 +69,24 @@ def mean_per_hit(counts, edges):
     return float((counts * np.sqrt(edges[1:] * edges[:-1])).sum() / counts.sum())
 
 
-def decorate_pdf(top, bot, first_col, last_row):
+def decorate_pdf(top, bot, first_col, last_row, tcnt, edges):
+    """Axes fitted to the TNG PDF (bins with >= MIN_COUNT rays), so every panel is filled; tick labels on every panel."""
+    cen = np.sqrt(edges[1:] * edges[:-1]); pt = pdf(tcnt, edges); ok = np.isfinite(pt) & (pt > 0)
+    xlo, xhi = cen[ok].min() / 1.12, cen[ok].max() * 1.12
+    ylo, yhi = pt[ok].min() / 1.6, pt[ok].max() * 1.8
     for ax in (top, bot):
-        ax.set_xscale("log"); ax.set_xlim(1, 4000)
+        ax.set_xscale("log"); ax.set_xlim(xlo, xhi)
         ax.xaxis.set_minor_formatter(NullFormatter())
-    top.set_yscale("log"); top.set_ylim(2e-7, 3e-2); top.yaxis.set_major_locator(LogLocator(numticks=7))
+    top.set_yscale("log"); top.set_ylim(ylo, yhi); top.yaxis.set_major_locator(LogLocator(numticks=8))
     top.yaxis.set_minor_formatter(NullFormatter())
     top.tick_params(labelbottom=False)
     bot.axhline(0, color="0.5", lw=0.6, zorder=1); bot.set_ylim(-80, 80); bot.set_yticks([-50, 0, 50])
     if first_col:
         top.set_ylabel(r"$p(\mathrm{DM}\,|\,\mathrm{DM}>0)$  [pc$^{-1}$ cm$^{3}$]"); bot.set_ylabel(r"$\Delta$ [%]")
     else:
-        top.tick_params(labelleft=False); bot.tick_params(labelleft=False)
+        bot.tick_params(labelleft=False)
     if last_row:
         bot.set_xlabel(r"DM  [pc cm$^{-3}$]")
-    else:
-        bot.tick_params(labelbottom=False)
 
 
 def residual(model_counts, tng_counts, edges):
@@ -96,8 +98,8 @@ def residual(model_counts, tng_counts, edges):
 def fig_zseries(direct, captions):
     zss = (0.1, 0.5, 1.0, 1.5, 2.0, 3.0)
     with plt.rc_context(RC):
-        fig = plt.figure(figsize=(7.1, 4.9))
-        outer = fig.add_gridspec(2, 3, wspace=0.05, hspace=0.12, left=0.08, right=0.995, bottom=0.08, top=0.93)
+        fig = plt.figure(figsize=(7.1, 5.2))
+        outer = fig.add_gridspec(2, 3, wspace=0.2, hspace=0.2, left=0.085, right=0.995, bottom=0.075, top=0.885)
         captions.append("pub_halo_pdf_zseries: mean DM per hit / TNG (z_s = " + ", ".join("%g" % z for z in zss) + ")")
         ratios = {m[2]: [] for m in MOD}
         for j, zs in enumerate(zss):
@@ -117,11 +119,12 @@ def fig_zseries(direct, captions):
                 ratios[lab].append(mean_per_hit(c, edges) / mean_per_hit(tcnt, edges))
             top.plot(cen, pdf(tcnt, edges), zorder=5, **TNG_KW)
             top.text(0.05, 0.06, r"$z_s = %g$" % zs, transform=top.transAxes, va="bottom")
-            decorate_pdf(top, bot, j % 3 == 0, j // 3 == 1)
+            decorate_pdf(top, bot, j % 3 == 0, j // 3 == 1, tcnt, edges)
         for lab, r in ratios.items():
             captions.append("  %-24s %s" % (lab, "  ".join("%.2f" % x for x in r)))
         h = [Line2D([], [], label="TNG300", **TNG_KW)] + [Line2D([], [], color=c, ls=ls, lw=1.2, label=l) for _, _, l, c, ls in MOD]
-        fig.legend(handles=h, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.53, 1.0), handlelength=2.6, columnspacing=1.6)
+        fig.suptitle(r"Halos with $10^{13} \leq M_{200c} < 10^{14}\,M_\odot$", y=0.995, fontsize=10)
+        fig.legend(handles=h, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.54, 0.965), handlelength=2.6, columnspacing=1.6)
         save(fig, "pub_halo_pdf_zseries")
 
 
@@ -134,8 +137,8 @@ def fig_analytic(direct, captions):
     zss = (0.1, 0.5, 1.0)
     use = [m for m in MOD if m[0] != "lee22_xgpnative"]
     with plt.rc_context(RC):
-        fig = plt.figure(figsize=(7.1, 2.75))
-        outer = fig.add_gridspec(1, 3, wspace=0.05, left=0.08, right=0.995, bottom=0.15, top=0.86)
+        fig = plt.figure(figsize=(7.1, 3.05))
+        outer = fig.add_gridspec(1, 3, wspace=0.2, left=0.085, right=0.995, bottom=0.14, top=0.8)
         captions.append("pub_halo_pdf_analytic: mean DM per hit / TNG, rays | analytic (z_s = 0.1, 0.5, 1)")
         txt = {m[2]: [] for m in use}
         for j, zs in enumerate(zss):
@@ -159,12 +162,13 @@ def fig_analytic(direct, captions):
                 txt[lab].append("%.2f | %.2f" % (mean_per_hit(c, edges) / mean_per_hit(tcnt, edges), am / mean_per_hit(tcnt, edges)))
             top.plot(cen, pdf(tcnt, edges), zorder=5, **TNG_KW)
             top.text(0.05, 0.06, r"$z_s = %g$" % zs, transform=top.transAxes, va="bottom")
-            decorate_pdf(top, bot, j == 0, True)
+            decorate_pdf(top, bot, j == 0, True, tcnt, edges)
         for lab, r in txt.items():
             captions.append("  %-24s %s" % (lab, "   ".join(r)))
         h = [Line2D([], [], label="TNG300", **TNG_KW)] + [Line2D([], [], color=c, lw=1.2, label=l) for _, _, l, c, _ in use]
         h += [Line2D([], [], color="0.4", lw=1.2, label="HalfDome rays"), Line2D([], [], color="0.4", lw=1.0, ls=(0, (3, 1.5)), label="halo model")]
-        fig.legend(handles=h, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.53, 1.02), handlelength=2.6, columnspacing=1.4)
+        fig.suptitle(r"Halos with $10^{13} \leq M_{200c} < 10^{14}\,M_\odot$", y=0.995, fontsize=10)
+        fig.legend(handles=h, loc="upper center", ncol=5, frameon=False, bbox_to_anchor=(0.54, 0.935), handlelength=2.6, columnspacing=1.4)
         save(fig, "pub_halo_pdf_analytic")
 
 

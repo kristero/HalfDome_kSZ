@@ -87,21 +87,33 @@ broken at M<sub>cut</sub> = 10<sup>13.61</sup> h<sup>-1</sup>M<sub>☉</sub>; e.
 <div class="eq">n<sub>200</sub> = 200 ρ<sub>cr</sub>(z) f<sub>b</sub> / (X<sub>H</sub> m<sub>p</sub>),
 &nbsp; P<sub>200</sub> = 200 G M<sub>200</sub> ρ<sub>cr</sub>(z) f<sub>b</sub> / (2 R<sub>200</sub>)
 <span class="note">physical ρ<sub>cr</sub>(z) and physical R<sub>200c</sub>, as stated in the paper (eq. 9–10)</span></div>
-<p>Our transcription is exact: it reproduces the paper's own fit curves (vector paths extracted from the arXiv source figures) to 2–3 %
-(Fig. 1, orange solid over orange dashed).</p>
+<p>Our transcription is exact: it reproduces the paper's own fit curves (vector paths extracted from the arXiv source figures) to 2–3 %.
+Fig. 1 replicates the paper's Fig. 2 and Fig. 5 with the paper's own TNG profile, digitized from the vector figures together with its
+error bars. The residual rows use the paper's definitions, which the digitization reproduces exactly: Δ = (A<sub>sim</sub> − A<sub>model</sub>)/A<sub>sim</sub>,
+with σ the error of the mean (red bars; the blue bars are the halo scatter, ≈ 180 and ≈ 65 halos per bin).</p>
 <p><b>Exponent convention.</b> The printed fits write the outer factor as [1 + (x/x<sub>c</sub>)<sup>α</sup>]<sup>−β′</sup>. XGPaint's
 <code>generalized_nfw</code> uses the exponent −(β+γ)/α, so we pass β<sub>XG</sub> = αβ′ − γ, the same mapping XGPaint applies to
 Battaglia12. Against the paper's own drawn fit curves, this reading reproduces the shape to 0.3–3 % (max/min of model/paper over
 0.04–1.34 R<sub>200c</sub>, with a constant 2–3 % offset); reading β′ as an asymptotic slope, −(β′ ∓ γ)/α, tilts the curves by 6–19 %
 (<code>doc/check_beta_convention.py</code>). An old XGPaint sign bug in the Battaglia12 exponent ((1+x)<sup>+β</sup>, commit b924ab1,
 March–April 2026) is in none of the maps used here.</p>
+<p><b>The Battaglia curves drawn in Lee22 are not what HalfDome paints.</b> Read from the vector figures, their Battaglia12 curve is the
+<i>thermal</i> pressure with the h<sup>-1</sup>M<sub>☉</sub> mass used as M<sub>☉</sub> (matches to 0.2 %), so it sits 1.93× above the electron
+pressure of the simulation curve. Their Battaglia16 curve is ρ<sub>fit</sub>/(200 f<sub>b</sub>) with the exponent −(β−γ)/α instead of
+Battaglia's −(β+γ)/α, again with h<sup>-1</sup>M<sub>☉</sub> as M<sub>☉</sub> (matches to 0.1 %): f<sub>b</sub> is missing from ρ<sub>gas</sub> (×6.4) and the
+outer slope is tilted. The Battaglia profiles as painted by XGPaint lie within 4–5 % of TNG at 0.3 &lt; x &lt; 1 in the lower bin and
+24–28 % below it in the upper bin.</p>
 </div>
-<figure><img src="doc_fig_paper_profiles_z0.png" alt="Lee22 paper figures 2 and 5 against our implementation and CAMELS TNG at z = 0">
-<figcaption><b>Fig. 1.</b> Lee22 Fig. 2 (pressure) and Fig. 5 (density) at z = 0, the paper's two mass bins. Grey: Lee22's TNG measurement
-(lowest-concentration quartile); orange dashed: their no-c fit; orange solid: our production transcription; circles: CAMELS-TNG
-(all halos of the bin, box-jackknife errors); blue: Battaglia12 P<sub>e</sub> / Battaglia16 n<sub>e</sub>. Pressure: fit, paper TNG and
-CAMELS agree (ratios 0.88–1.01). Density: the paper's TNG curve and its fit are 5.9× CAMELS; the derived factor h<sup>3</sup>X<sub>H</sub><sup>2</sup>
-= 1/5.57 (purple) recovers the TNG gas, the empirical C(0) = 0.284 (green) leaves it 2× high.</figcaption></figure>
+<figure><img src="fig_lee22_fig2_replica_z0.png" alt="Replica of Lee22 Fig. 2, electron pressure at z = 0">
+<figcaption><b>Fig. 1a.</b> Lee22 Fig. 2 (electron pressure, z = 0) redrawn. Red: the paper's TNG300 profile, digitized, with ±σ (red) and
+±scatter (blue). Cyan: Battaglia12 as painted by XGPaint (dash-dot) and as drawn in Lee22 (dotted, P<sub>th</sub>). Orange dashed: Lee22 through
+unedited XGPaint; purple: corrected, ×(1+z)<sup>2</sup>, identical at z = 0. Circles: CAMELS-TNG, all halos in the bin. Model / TNG at
+0.3 &lt; x &lt; 1: Lee22 0.99 and 1.04, CAMELS 0.97 and 0.92. Off-scale residuals are listed in each row with their extreme value.</figcaption></figure>
+<figure><img src="fig_lee22_fig5_replica_z0.png" alt="Replica of Lee22 Fig. 5, electron density at z = 0">
+<figcaption><b>Fig. 1b.</b> Lee22 Fig. 5 (electron density, z = 0) redrawn. The paper's TNG curve is in Lee22's code units (red dotted);
+converted with h<sup>3</sup>X<sub>H</sub><sup>2</sup> = 0.1795 (thick red), it agrees with the independent CAMELS-TNG gas to 6 % at 0.3 &lt; x &lt; 1.
+CAMELS is denser in the core because the paper's curve is the lowest-concentration quartile. Lee22 corrected matches the converted curve
+to 1–2 %; unedited XGPaint (×0.6016) is 3.4× high; Battaglia16 (XGPaint) is +5 % and −28 %.</figcaption></figure>
 
 <h2>2. M1: why (1+z)<sup>3</sup> and (1+z)<sup>2</sup></h2>
 <div class="col">
@@ -162,6 +174,14 @@ in r/R<sub>200c</sub>. (b) reproduces (a) to &lt; 10<sup>−3</sup> and supplies
 bottom: electron fraction inside R<sub>200c</sub> (density). The printed fit is the flat orange line. TNG (black) and FLAMINGO (squares)
 rise as (1+z)<sup>2</sup> and (1+z)<sup>3</sup> (green dashed). Diamonds: Lee22's bookkeeping applied to TNG cells reproduces the flat printed
 trend.</figcaption></figure>
+
+<figure><img src="fig_lee22_fig5_replica_camels_zgt0.png" alt="Lee22 Fig. 5 layout at z = 0.47 and 1.05 with CAMELS-TNG as the simulation">
+<figcaption><b>Fig. 2b.</b> The redshift factor itself, in the Fig. 5 layout. The paper shows no profiles at z &gt; 0, so the simulation is CAMELS-TNG
+(10<sup>13.2</sup>–10<sup>13.4</sup> h<sup>-1</sup>M<sub>☉</sub>, 30 and 13 halos; σ = box jackknife), with every model averaged over the same halos. Model / CAMELS at
+0.3 &lt; x &lt; 1: corrected 1.08 and 1.04, ×h<sup>3</sup>X<sub>H</sub><sup>2</sup> without (1+z)<sup>3</sup> 0.34 and 0.12, unedited ×0.6016 1.15 and 0.41
+(it is right only near z ≈ 0.35–0.5).</figcaption></figure>
+<figure><img src="fig_lee22_fig2_replica_camels_zgt0.png" alt="Lee22 Fig. 2 layout at z = 0.47 and 1.05 with CAMELS-TNG as the simulation">
+<figcaption><b>Fig. 2c.</b> The same for the pressure: corrected ×(1+z)<sup>2</sup> 1.04 and 1.04; as printed 0.48 and 0.25; Battaglia12 0.99 and 0.95.</figcaption></figure>
 
 <h2>3. What is left after M1: F<sub>n</sub> from the code units, F<sub>P</sub> = 1</h2>
 <div class="col">
@@ -335,6 +355,13 @@ Taken at face value this window is not like-for-like (next subsection).</p>
 catalogue. The previous ×0.6016 density matched TNG only at z<sub>s</sub> = 1 (it is right near halo redshift 0.35). The derived density
 follows TNG's low-DM side and peak but not its high-DM tail, which is what the clusters in TNG's window add. In the right panel
 HalfDome misses halos below its catalogue floor of 7.3 × 10<sup>12</sup> M<sub>☉</sub> (60 % of rays hit, against 91 % in TNG).</figcaption></figure>
+
+<figure><img src="halo_pdf_zseries_m1e13_1e14.png" alt="Halo DM PDFs in the 1e13-1e14 window at six source redshifts">
+<figcaption><b>Fig. 4b.</b> The "10<sup>13</sup>–10<sup>14</sup> M<sub>☉</sub>" window at six source redshifts (TNG has z<sub>s</sub> = 0.1–5.5; HalfDome's lightcone ends at
+z = 3.86). HalfDome rays only, the same rays for the three models at each z<sub>s</sub> (z<sub>s</sub> ≤ 1 idark, ≥ 1.5 local). Mean DM per hit relative to
+TNG: corrected −31, −29, −25, −23, −22, −22 %; ×0.6016 +100, +32, 0, −13, −17, −20 %; Battaglia16 −29 to −33 %. The corrected density is the
+only one with a z<sub>s</sub>-independent offset, the expected signature of the clusters inside TNG's window rather than of a redshift error;
+×0.6016 crosses TNG at z<sub>s</sub> = 1.</figcaption></figure>
 
 <h3>Analytic reproduction of TNG (as in Torkamani+26 and Medlock+24)</h3>
 <div class="col">

@@ -5,6 +5,7 @@
 # (seed 42, NSIDE 4096, complete lightcone, spherical 1 R200c boundary, same mass windows). z_s = 0.1, 0.5, 1 exist
 # from idark; VALIDATE=1 also reruns Lee22-physical at z_s = 1 locally to check the local runs reproduce idark.
 # Usage: bash frb_map_generation/lee22_tsz_corrected/run_pdf_zseries_local.sh   (from the repository root)
+# Overrides: OUT (output root), MASS_WINDOWS, VARIANTS, ZSOURCES, VALIDATE=0|1.
 set -euo pipefail
 
 export PROJECT_DIR=/home/cbllover/HalfDome
@@ -15,9 +16,9 @@ export HALFDOME_PATH=${PROJECT_DIR}/lightcone_100.hdf5
 export THREADS_PER_TASK=${THREADS_PER_TASK:-20} CLUSTER_USER=local OVERWRITE=false HDF5_USE_FILE_LOCKING=FALSE MPLBACKEND=Agg
 export NFRB=120000 SEED=42 NSIDE=4096 MAX_CATALOG_HALOS=0 HALO_EXTENSION_R200_MULTIPLIER=1.0 HALO_BOUNDARY=spherical
 export XGPAINT_PROFILE_MASS_DEFINITION=m200c
-export MASS_WINDOWS="m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16"
+export MASS_WINDOWS="${MASS_WINDOWS:-m1e10_to_1e12:1e10:1e12,m1e10_to_1e13:1e10:1e13,m1e10_to_1e14:1e10:1e14,m1e10_to_1e15:1e10:1e15,m1e10_to_1e16:1e10:1e16,m1e11_to_1e14:1e11:1e14,m1e12_to_1e14:1e12:1e14,m1e13_to_1e14:1e13:1e14,m1e12_to_1e16:1e12:1e16,m1e13_to_1e16:1e13:1e16,m1e14_to_1e16:1e14:1e16,m1e15_to_1e16:1e15:1e16}"
 export LEE2022_CONCENTRATION_MODE=none LEE2022_N0_PIVOT=mcut LEE2022_CONCENTRATION_SOURCE=duffy2008 LEE2022_SHAPE_MASS_CLIP=fit
-OUT=${PROJECT_DIR}/frb_map_generation/outputs/lee22_pdf_zseries_20261001
+OUT=${OUT:-${PROJECT_DIR}/frb_map_generation/outputs/lee22_pdf_zseries_20261001}
 INPUTS=${PROJECT_DIR}/frb_map_generation/outputs/halfdome_frb_inputs
 cd "$PROJECT_DIR"
 

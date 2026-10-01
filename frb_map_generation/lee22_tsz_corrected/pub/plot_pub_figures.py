@@ -4,6 +4,8 @@
   pub_halo_pdf_zseries      halo-DM PDFs of 10^13-10^14 Msun halos at z_s = 0.1-3: TNG300 (Konietzka; true decade
                             DM(10to13) - DM(10to12), tng_windows.py) against HalfDome rays with Battaglia16, the Lee22 XGPaint
                             pipeline (density x 0.6016) and the corrected Lee22 density (x [h(1+z)]^3 X_H^2)
+  pub_halo_pdf_zseries_m1e14_1e15  the same for 10^14-10^15 Msun halos (TNG: DM(10to14) - DM(10to13); HalfDome: all six z_s
+                            from the local runs with a 10^14-10^15 window, outputs/lee22_pdf_w14_20261001)
   pub_halo_pdf_analytic     z_s = 0.1, 0.5, 1: HalfDome rays (solid) and the analytic halo model in the TNG cosmology (dashed)
   pub_takahashi             w_yDM(theta) against Takahashi+25 (Planck MILCA, ACT) for three y x DM pairs
 
@@ -33,6 +35,7 @@ FMG = ROOT / "frb_map_generation/outputs"
 RAYS = {("b16", "idark"): FMG / "lee22_tngcal_20260929/rays", ("lee22_xgpnative", "idark"): FMG / "lee22_tngcal_20260929/rays",
         ("lee22_phys", "idark"): FMG / "lee22_corrected_20260930/rays"}
 LOCAL = FMG / "lee22_pdf_zseries_20261001/rays"
+W14 = FMG / "lee22_pdf_w14_20261001/rays"
 ANALYTIC = FMG / "lee22_corrected_20260930/analytic/analysis"
 WIN, NRAY, MIN_COUNT = "m1e13_to_1e14", 120000, 5
 # Okabe-Ito colours, distinct line styles as a second cue
@@ -47,8 +50,8 @@ RC = {"font.family": "serif", "font.serif": ["STIXGeneral", "DejaVu Serif"], "ma
       "savefig.dpi": 300, "pdf.fonttype": 42, "savefig.bbox": "tight", "savefig.pad_inches": 0.02}
 
 
-def rays(tag, zs):
-    folder = RAYS[(tag, "idark")] if zs <= 1.0 else LOCAL
+def rays(tag, zs, win=WIN, folder=None):
+    folder = folder or (RAYS[(tag, "idark")] if zs <= 1.0 else LOCAL)
     path = folder / "zsrc{}_nside4096_nrays120000_allhalos_sphere1p0_m200c_{}_seed42".format(("%.1f" % zs).replace(".", "p"), tag)
     with h5py.File(path / "halfdome_uniform_fixedz_foreground_mass_histograms.h5", "r") as h:
         labels = [v.decode() if isinstance(v, bytes) else str(v) for v in h["window_label"][:]]
@@ -56,7 +59,7 @@ def rays(tag, zs):
         cnt = np.asarray(h["pdf_count"][:], np.int64)
         assert abs(float(h.attrs["provenance_source_redshift"]) - zs) < 1e-9
     cnt = cnt if cnt.shape[0] == len(labels) else cnt.T
-    return edges, cnt[labels.index(WIN)].astype(float)
+    return edges, cnt[labels.index(win)].astype(float)
 
 
 def pdf(counts, edges):
@@ -95,24 +98,25 @@ def residual(model_counts, tng_counts, edges):
     return np.where(ok, 100 * (pm / np.where(pt > 0, pt, np.nan) - 1), np.nan)
 
 
-def fig_zseries(direct, captions):
+def fig_zseries(direct, captions, win=WIN, folder=None, name="pub_halo_pdf_zseries",
+                title=r"Halos with $10^{13} \leq M_{200c} < 10^{14}\,M_\odot$"):
     zss = (0.1, 0.5, 1.0, 1.5, 2.0, 3.0)
     with plt.rc_context(RC):
         fig = plt.figure(figsize=(7.1, 5.2))
         outer = fig.add_gridspec(2, 3, wspace=0.2, hspace=0.2, left=0.085, right=0.995, bottom=0.075, top=0.885)
-        captions.append("pub_halo_pdf_zseries: mean DM per hit / TNG (z_s = " + ", ".join("%g" % z for z in zss) + ")")
+        captions.append(name + ": mean DM per hit / TNG (z_s = " + ", ".join("%g" % z for z in zss) + ")")
         ratios = {m[2]: [] for m in MOD}
         for j, zs in enumerate(zss):
             g = outer[j // 3, j % 3].subgridspec(2, 1, height_ratios=(3, 1.1), hspace=0.0)
             top, bot = fig.add_subplot(g[0]), None
             bot = fig.add_subplot(g[1], sharex=top)
             assert identity_residual(direct, zs) < 1e-10
-            edges, _ = rays("b16", zs)
+            edges, _ = rays("b16", zs, win, folder)
             cen = np.sqrt(edges[1:] * edges[:-1])
-            _, tcnt, _ = direct.histogram_from_values(tng_exact(direct, WIN, zs), edges)
+            _, tcnt, _ = direct.histogram_from_values(tng_exact(direct, win, zs), edges)
             tcnt = np.asarray(tcnt, float)
             for tag, _, lab, col, ls in MOD:
-                e2, c = rays(tag, zs)
+                e2, c = rays(tag, zs, win, folder)
                 np.testing.assert_allclose(e2, edges, rtol=1e-12)
                 top.plot(cen, pdf(c, edges), color=col, ls=ls, lw=1.2, zorder=4)
                 bot.plot(cen, residual(c, tcnt, edges), color=col, ls=ls, lw=1.0, zorder=4)
@@ -123,9 +127,9 @@ def fig_zseries(direct, captions):
         for lab, r in ratios.items():
             captions.append("  %-24s %s" % (lab, "  ".join("%.2f" % x for x in r)))
         h = [Line2D([], [], label="TNG300", **TNG_KW)] + [Line2D([], [], color=c, ls=ls, lw=1.2, label=l) for _, _, l, c, ls in MOD]
-        fig.suptitle(r"Halos with $10^{13} \leq M_{200c} < 10^{14}\,M_\odot$", y=0.995, fontsize=10)
+        fig.suptitle(title, y=0.995, fontsize=10)
         fig.legend(handles=h, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.54, 0.965), handlelength=2.6, columnspacing=1.6)
-        save(fig, "pub_halo_pdf_zseries")
+        save(fig, name)
 
 
 def analytic_pdf(model, zs):
@@ -221,6 +225,9 @@ def main():
     direct = DirectComparison(ROOT)
     captions = []
     fig_zseries(direct, captions)
+    if (W14 / "zsrc3p0_nside4096_nrays120000_allhalos_sphere1p0_m200c_lee22_phys_seed42").exists():
+        fig_zseries(direct, captions, win="m1e14_to_1e15", folder=W14, name="pub_halo_pdf_zseries_m1e14_1e15",
+                    title=r"Halos with $10^{14} \leq M_{200c} < 10^{15}\,M_\odot$")
     fig_analytic(direct, captions)
     fig_takahashi(captions)
     (OUT / "captions.txt").write_text("\n".join(captions) + "\n")

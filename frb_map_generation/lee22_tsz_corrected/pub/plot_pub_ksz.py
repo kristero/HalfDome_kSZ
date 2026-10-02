@@ -27,7 +27,7 @@ from plot_pub_figures import MOD, RC, OUT, save  # noqa: E402
 
 KSZ = HERE.parents[1] / "outputs/lee22_ksz_20261002"
 DIGITIZED = Path("/tmp/claude-0/-home-cbllover-HalfDome/015746ae-94b7-42cb-8dc5-0e8c33dc8490/scratchpad/stein2020_fig6_digitized.pkl")
-WEBSKY_CSV = KSZ / "websky_halo_stein2020_fig6_digitized_binned.csv"
+WEBSKY_CSV = KSZ / "websky_halo_stein2020_fig6_vector_binned.csv"   # exact PDF vectors (ksz_debug/websky_def), ell 49-5764
 T2 = 2.7255e6 ** 2
 NAMES = (("b16", "Battaglia16", MOD[0][3], MOD[0][4]), ("lee22pipe", "Lee22 XGPaint pipeline", MOD[1][3], MOD[1][4]),
          ("lee22corr", "Lee22 corrected", MOD[2][3], MOD[2][4]))

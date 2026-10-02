@@ -1,0 +1,46 @@
+#!/bin/bash
+#PBS -N ksz_review
+#PBS -q mini_B
+#PBS -l select=1:ncpus=6:mem=24gb
+#PBS -l walltime=03:00:00
+#PBS -j oe
+# Review of paint_ksz_websky.jl on idark (2026-10-02, ksz_review/linecheck): Julia 1.6.2 runs of the production code on small
+# subsets at NSIDE 1024 (into this review dir only) + the independent numpy/healpy painter + comparison. At most 2 processes.
+set -uo pipefail   # no -e: every step reports its exit code and the comparison still runs
+RR=/lustre/work/kristero10/frb_data/lee22_ksz_review_20261002/linecheck
+CODE=$RR/code; OUT=$RR/out
+PROD=/lustre/work/kristero10/frb_data/lee22_ksz_websky_20261002
+KSZ=$PROD/frb_map_generation/lee22_tsz_corrected/ksz
+CAT=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5
+PY=/home/kristero10/.conda/envs/SZ/bin/python
+JL=/usr/local/bin/julia
+export HDF5_USE_FILE_LOCKING=FALSE PYTHONNOUSERSITE=1 OMP_NUM_THREADS=1 KSZ_SRC=$KSZ
+mkdir -p $OUT/logs $OUT/py $OUT/caches
+exec > >(tee -a "$OUT/logs/review_${PBS_JOBID:-manual}.log") 2>&1
+echo "started $(date -Is) host=$(hostname)"
+sha256sum $KSZ/paint_ksz_websky.jl $KSZ/ksz_models_halfdome.jl $PROD/truncation_comparison/spherical_truncation_profiles.jl \
+          $PROD/frb_map_generation/lee2022_frb_dm_profile.jl $CODE/* > $OUT/logs/source_sha256.txt
+for f in $PROD/frb_map_generation/outputs/lee22_ksz_websky_20261002/caches/*.jld2; do
+    [ -f $OUT/caches/$(basename $f) ] || cp $f $OUT/caches/
+done
+for run in julia_subset julia_subset_nocomp julia_first200k; do
+    mkdir -p $OUT/$run; [ -e $OUT/$run/caches ] || ln -s $OUT/caches $OUT/$run/caches
+done
+[ -f $OUT/subset_random.h5 ] || $PY $CODE/make_subsets.py --catalog $CAT --out $OUT/subset_random.h5
+
+(   # Julia 1.6.2, 4 threads, one run at a time
+    $JL --threads=4 $KSZ/paint_ksz_websky.jl --catalog=$OUT/subset_random.h5 --nside=1024 --output-dir=$OUT/julia_subset > $OUT/logs/julia_subset.log 2>&1
+    echo "julia_subset exit $? $(date -Is)"
+    $JL --threads=4 $CODE/paint_ksz_websky_review.jl --no-comp --catalog=$OUT/subset_random.h5 --nside=1024 --output-dir=$OUT/julia_subset_nocomp > $OUT/logs/julia_subset_nocomp.log 2>&1
+    echo "julia_subset_nocomp exit $? $(date -Is)"
+    $JL --threads=4 $KSZ/paint_ksz_websky.jl --catalog=$CAT --max-halos=200000 --nside=1024 --output-dir=$OUT/julia_first200k > $OUT/logs/julia_first200k.log 2>&1
+    echo "julia_first200k exit $? $(date -Is)"
+) &
+JPID=$!
+$PY $CODE/py_painter.py --catalog $OUT/subset_random.h5 --nside 1024 --tag subset --out $OUT/py > $OUT/logs/py_subset.log 2>&1; echo "py_subset exit $?"
+$PY $CODE/py_painter.py --catalog $OUT/subset_random.h5 --nside 1024 --no-comp --tag subset_nocomp --out $OUT/py > $OUT/logs/py_subset_nocomp.log 2>&1; echo "py_subset_nocomp exit $?"
+$PY $CODE/py_painter.py --catalog $CAT --max-rows 200000 --nside 1024 --tag first200k --out $OUT/py > $OUT/logs/py_first200k.log 2>&1; echo "py_first200k exit $?"
+wait $JPID
+$PY $CODE/compare.py --root $OUT --nside 1024 > $OUT/logs/compare.log 2>&1; echo "compare exit $?"
+cat $OUT/logs/compare.log
+echo "finished $(date -Is)"

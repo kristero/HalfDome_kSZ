@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N ksz_rev_hiz
+#PBS -q mini_B
+#PBS -l select=1:ncpus=1:mem=4gb
+#PBS -l walltime=01:00:00
+#PBS -j oe
+# Review of paint_ksz_websky.jl: z > 3.86 contribution in WebSky (ksz_review/websky_recipe/highz_check.py), 2026-10-02.
+set -euo pipefail
+D=/lustre/work/kristero10/frb_data/lee22_ksz_review_20261002/websky_recipe
+cd $D
+export OMP_NUM_THREADS=1
+/home/anaconda3/bin/python3 highz_check.py $D/websky_halo_hist.npz $D/stein2020_fig6_vector_halo.csv $D > $D/highz_check.log 2>&1

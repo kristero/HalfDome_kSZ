@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -N ksz_ws_split
+#PBS -q mini_B
+#PBS -l select=1:ncpus=16:mem=24gb
+#PBS -l walltime=02:00:00
+#PBS -j oe
+# One-halo mass split of the paint_ksz_websky.jl maps (poisson_mass_split_websky.jl) on idark (2026-10-02): HalfDome histogram
+# written by the painter (with the WebSky-velocity variants), then WebSky's own catalogue through the same engine.
+# Needs <OUT>/caches, <OUT>/maps/halo_mass_redshift_histogram.h5, and (copied from the workstation) <OUT>/velocity_ratio_fit.h5,
+# <OUT>/websky_cell_v2.h5, <OUT>/maps/websky_catalogue_histogram.h5.
+set -euo pipefail
+ROOT=${ROOT:-/lustre/work/kristero10/frb_data/lee22_ksz_websky_20261002b}
+OUT=$ROOT/frb_map_generation/outputs/lee22_ksz_websky_20261002
+NCPU=${PBS_NCPUS:-16}
+export JULIA_NUM_THREADS=$NCPU HDF5_USE_FILE_LOCKING=FALSE
+cd "$ROOT"; mkdir -p "$OUT/logs"
+exec > >(tee -a "$OUT/logs/split_${PBS_JOBID:-manual}.log") 2>&1
+trap 'echo "finished $(date -Is) stage=split exit=$?"' EXIT
+echo "started $(date -Is) host=$(hostname) stage=split ncpus=$NCPU"
+sha256sum frb_map_generation/lee22_tsz_corrected/ksz/* > "$OUT/logs/split_source_sha256.txt"
+S=frb_map_generation/lee22_tsz_corrected/ksz/poisson_mass_split_websky.jl
+MODE=${MODE:-both}                               # hd | wscat | both
+[ "$MODE" = wscat ] || /usr/local/bin/julia --threads="$NCPU" $S --output-dir="$OUT"
+[ "$MODE" = hd ] || /usr/local/bin/julia --threads="$NCPU" $S --output-dir="$OUT" --hist="$OUT/maps/websky_catalogue_histogram.h5" --out-name=ksz_websky_mass_split_wscat.h5

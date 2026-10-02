@@ -1,0 +1,25 @@
+#!/bin/bash
+#PBS -N ksz_websky
+#PBS -q mini_B
+#PBS -l select=1:ncpus=16:mem=48gb
+#PBS -l walltime=12:00:00
+#PBS -j oe
+# Halo kSZ maps for the like-for-like WebSky comparison (paint_ksz_websky.jl) and their spectra, on idark (2026-10-02).
+# STAGE=paint: self-tests + one catalogue pass, 5 NSIDE-4096 maps; STAGE=spectra: healpy anafast of the maps.
+set -euo pipefail
+: "${STAGE:?Set STAGE=paint|spectra}"
+ROOT=${ROOT:-/lustre/work/kristero10/frb_data/lee22_ksz_websky_20261002}
+OUT=$ROOT/frb_map_generation/outputs/lee22_ksz_websky_20261002
+CAT=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5
+NCPU=${PBS_NCPUS:-16}
+export JULIA_NUM_THREADS=$NCPU OMP_NUM_THREADS=$NCPU HDF5_USE_FILE_LOCKING=FALSE PYTHONNOUSERSITE=1
+cd "$ROOT"; mkdir -p "$OUT/logs"
+exec > >(tee -a "$OUT/logs/${STAGE}_${PBS_JOBID:-manual}.log") 2>&1
+trap 'echo "finished $(date -Is) stage=$STAGE exit=$?"' EXIT
+echo "started $(date -Is) host=$(hostname) stage=$STAGE ncpus=$NCPU"
+sha256sum frb_map_generation/lee2022_frb_dm_profile.jl frb_map_generation/lee22_tsz_corrected/ksz/* truncation_comparison/*.jl > "$OUT/logs/${STAGE}_source_sha256.txt"
+case "$STAGE" in
+paint)   /usr/local/bin/julia --threads="$NCPU" frb_map_generation/lee22_tsz_corrected/ksz/paint_ksz_websky.jl --catalog="$CAT" ;;
+spectra) /home/kristero10/.conda/envs/SZ/bin/python frb_map_generation/lee22_tsz_corrected/ksz/ksz_websky_spectra.py --out "$OUT" ;;
+*) echo "unknown STAGE $STAGE"; exit 2 ;;
+esac

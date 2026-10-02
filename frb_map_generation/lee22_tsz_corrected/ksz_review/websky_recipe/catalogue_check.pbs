@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N ksz_rev_cat
+#PBS -q mini_B
+#PBS -l select=1:ncpus=1:mem=12gb
+#PBS -l walltime=01:00:00
+#PBS -j oe
+# Review of paint_ksz_websky.jl: catalogue / c200m=7 checks (ksz_review/websky_recipe/catalogue_check.py), 2026-10-02.
+set -euo pipefail
+D=/lustre/work/kristero10/frb_data/lee22_ksz_review_20261002/websky_recipe
+cd $D
+export HDF5_USE_FILE_LOCKING=FALSE OMP_NUM_THREADS=1
+/home/anaconda3/bin/python3 catalogue_check.py /lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5 $D > $D/catalogue_check.log 2>&1

@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N wsky_hist
+#PBS -q mini_B
+#PBS -l select=1:ncpus=4:mem=24gb
+#PBS -l walltime=03:00:00
+#PBS -j oe
+#PBS -o /lustre/work/kristero10/frb_data/lee22_ksz_debug_20261002/websky_catalogue_test/websky_histogram.log
+cd /lustre/work/kristero10/frb_data/lee22_ksz_debug_20261002/websky_catalogue_test
+export OMP_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 MKL_NUM_THREADS=4
+echo "host $(hostname) start $(date)"
+/home/anaconda3/bin/python3.8 websky_histogram.py /home/kristero10/sims/halos.pksc full 10000000 0
+echo "end $(date)"

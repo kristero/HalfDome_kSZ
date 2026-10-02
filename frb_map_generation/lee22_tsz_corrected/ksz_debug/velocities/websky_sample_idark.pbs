@@ -1,0 +1,9 @@
+#!/bin/bash
+#PBS -N ws_vel_sample
+#PBS -q mini_B
+#PBS -l select=1:ncpus=1:mem=8gb
+#PBS -l walltime=01:00:00
+#PBS -j oe
+#PBS -o /lustre/work/kristero10/frb_data/lee22_ksz_debug_20261002/velocities/websky_sample.log
+cd /lustre/work/kristero10/frb_data/lee22_ksz_debug_20261002/velocities
+/home/anaconda3/bin/python3.8 websky_sample_idark.py /lustre/work/kristero10/frb_data/lee22_ksz_debug_20261002/velocities/websky_sample.npz

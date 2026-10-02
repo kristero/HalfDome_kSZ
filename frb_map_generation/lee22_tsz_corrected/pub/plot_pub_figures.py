@@ -8,6 +8,8 @@
                             from the local runs with a 10^14-10^15 window, outputs/lee22_pdf_w14_20261001)
   pub_halo_pdf_analytic     z_s = 0.1, 0.5, 1: HalfDome rays (solid) and the analytic halo model in the TNG cosmology (dashed)
   pub_takahashi             w_yDM(theta) against Takahashi+25 (Planck MILCA, ACT) for three y x DM pairs
+  pub_yy_power              Compton-y power of HalfDome (Battaglia12, Lee22 XGPaint pipeline, Lee22 corrected) against FLAMINGO
+                            L2p8_m9 lightcone 0 (fiducial; divided by pixwin^2; lightcone 1 as the grey band in the ratio panel)
 
 Histogram bins with fewer than MIN_COUNT rays are not drawn (they trace the one-count floor). Numbers for captions are written to
 captions.txt. Run from the repository root with the halfdome env (LD_LIBRARY_PATH=<env>/lib)."""
@@ -214,6 +216,45 @@ def fig_takahashi(captions):
         save(fig, "pub_takahashi")
 
 
+def fig_yy(captions):
+    N = np.load(str(FMG / "lee22_corrected_20260930/spectra/corrected_spectra.npz"))
+    S = np.load(str(FMG / "lee22_tsz_verification_20260929/synthesis/synthesis_inputs.npz"))
+    edges = np.unique(np.round(np.geomspace(100, 8000, 25)).astype(int)); cen = np.sqrt(edges[:-1] * edges[1:])
+
+    def band(cl, ell):
+        dl = ell * (ell + 1) * cl / (2 * np.pi)
+        return np.array([dl[(ell >= lo) & (ell < hi)].mean() for lo, hi in zip(edges[:-1], edges[1:])])
+    ell, es = N["ell"].astype(float), S["ell"].astype(float)
+    fl0, fl1 = band(S["cl_flamingo_lc0"], es), band(S["cl_flamingo_lc1"], es)
+    maps = (("b12", "Battaglia12", MOD[0][3], MOD[0][4]), ("lee22p", "Lee22 XGPaint pipeline", MOD[1][3], MOD[1][4]),
+            ("lee22p_m1", "Lee22 corrected", MOD[2][3], MOD[2][4]))
+    with plt.rc_context(RC):
+        fig = plt.figure(figsize=(3.45, 4.1))
+        gs = fig.add_gridspec(2, 1, height_ratios=(2.4, 1), hspace=0.0, left=0.17, right=0.97, bottom=0.11, top=0.98)
+        ax, rx = fig.add_subplot(gs[0]), None
+        rx = fig.add_subplot(gs[1], sharex=ax)
+        ax.plot(cen, 1e12 * fl0, color="k", lw=1.6, zorder=5, label="FLAMINGO")
+        rx.fill_between(cen, np.minimum(1, fl1 / fl0), np.maximum(1, fl1 / fl0), color="0.85", lw=0, zorder=1)
+        rx.axhline(1, color="k", lw=0.8, zorder=2)
+        pick = [int(np.argmin(np.abs(cen - l))) for l in (300, 1000, 3000, 5000)]
+        captions.append("pub_yy_power: HalfDome / FLAMINGO lc0 at ell = 300 / 1000 / 3000 / 5000 (band centres %s)"
+                        % " / ".join("%.0f" % cen[i] for i in pick))
+        for key, lab, col, ls in maps:
+            d = band(N["cl_y_" + key], ell)
+            ax.plot(cen, 1e12 * d, color=col, ls=ls, lw=1.2, zorder=4, label=lab)
+            rx.plot(cen, d / fl0, color=col, ls=ls, lw=1.2, zorder=4)
+            captions.append("  %-24s %s" % (lab, " / ".join("%.2f" % (d[i] / fl0[i]) for i in pick)))
+        ax.set_xscale("log"); ax.set_yscale("log"); ax.set_xlim(edges[0], edges[-1])
+        ax.set_ylabel(r"$10^{12}\,\ell(\ell+1)\,C_\ell^{yy}/2\pi$")
+        ax.tick_params(labelbottom=False); ax.set_ylim(0.12, 5)
+        ax.set_yticks([0.2, 0.5, 1, 2, 4]); ax.set_yticklabels(["0.2", "0.5", "1", "2", "4"]); ax.yaxis.set_minor_formatter(NullFormatter())
+        ax.legend(loc="lower right", frameon=False, handlelength=2.6, borderaxespad=0.6)
+        rx.set_yscale("log"); rx.set_ylim(0.3, 4.5); rx.set_yticks([0.5, 1, 2, 4]); rx.set_yticklabels(["0.5", "1", "2", "4"])
+        rx.yaxis.set_minor_formatter(NullFormatter())
+        rx.set_ylabel("/ FLAMINGO"); rx.set_xlabel(r"$\ell$")
+        save(fig, "pub_yy_power")
+
+
 def save(fig, name):
     OUT.mkdir(parents=True, exist_ok=True)
     for ext in ("pdf", "png"):
@@ -230,6 +271,7 @@ def main():
                     title=r"Halos with $10^{14} \leq M_{200c} < 10^{15}\,M_\odot$")
     fig_analytic(direct, captions)
     fig_takahashi(captions)
+    fig_yy(captions)
     (OUT / "captions.txt").write_text("\n".join(captions) + "\n")
     print("\n".join(captions))
 

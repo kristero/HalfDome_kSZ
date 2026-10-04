@@ -86,11 +86,12 @@ theta_min = maximum(exp(first(first(v.itp.itp.ranges))) for v in VARIANTS)
 logm_lo = maximum(first(v.itp.itp.ranges[3]) for v in VARIANTS); logm_hi = minimum(last(v.itp.itp.ranges[3]) for v in VARIANTS)
 
 """Exact per-halo table of the chord-mean value on a log theta grid (for z < Z_EXACT)."""
-function exact_table(v::Variant, M, z)
-    p = XGPaint.prepare_profile_slice(v.cm, M, z)
-    θhi = v.X * p.θ200 * (1 - 1e-9); θlo = max(theta_min, 1e-5 * p.θ200)
+exact_table(v::Variant, M, z) = _exact_table(v.cm, v.X, M, z, theta_min)     # function barrier: cm is concrete inside
+function _exact_table(cm, X, M, z, tmin)
+    p = XGPaint.prepare_profile_slice(cm, M, z)
+    θhi = X * p.θ200 * (1 - 1e-9); θlo = max(tmin, 1e-5 * p.θ200)
     lθ = collect(range(log(θlo), log(θhi); length=400))
-    lg = [log(max(XGPaint.evaluate_profile_slice(v.cm, p, exp(t), M, z), 1e-300)) for t in lθ]
+    lg = [log(max(XGPaint.evaluate_profile_slice(cm, p, exp(t), M, z), 1e-300)) for t in lθ]
     return lθ, lg
 end
 @inline function table_eval(tab, θ)
@@ -138,73 +139,135 @@ end
 self_test_only && (println("self-test only: done"); exit(0))
 
 # ---------------------------------------------------------------- painting
+# Threading as in the accelerated tSZ painter (SBI_analysis/tsz_diagnostic_256_accelerated_20260922/balanced_painter.jl):
+#   * greedy blocks: halos go out in blocks of HALO_BLOCK_SIZE (default 256) to whichever thread is free, so the large low-z discs
+#     at the end of the z-sorted catalogue cannot pile up on one thread (an atomic block counter: Threads.@threads :greedy needs
+#     Julia >= 1.11 and idark runs 1.6; same schedule)
+#   * a type-stable hot loop: one concrete vector of the raw log-space interpolators (value = exp(itp(log theta, z, log10 M)),
+#     exactly LogInterpolatorProfile's call), maps/workspace/locks passed as arguments instead of non-const globals, log10 M per
+#     halo and log theta per pixel shared by all variants, explicit lock/unlock instead of a do-closure that boxed its counters
+# Every pixel term is computed exactly as before; only the work allocation and the order of the floating-point sums change.
+const BLOCK = parse(Int, get(ENV, "HALO_BLOCK_SIZE", "256")); BLOCK > 0 || error("HALO_BLOCK_SIZE must be positive")
 resolution = Healpix.Resolution(nside)
 workspace = XGPaint.HealpixRingProfileWorkspace{Float64}(resolution)
-ring_locks = [ReentrantLock() for _ in eachindex(workspace.ring_thetas)]
 maps = [HealpixMap{Float64,RingOrder}(nside) for _ in VARIANTS]
 for m in maps; fill!(m.pixels, 0.0); end
-pix = [m.pixels for m in maps]
 const NV = length(VARIANTS)
 
-function paint_batch!(m200c, m200m, redshifts, positions, vlos_over_c, counters, sel, mws)
-    Threads.@threads :static for i in eachindex(m200c)
-        tid = Threads.threadid()
-        x, y, zc = positions[1, i], positions[2, i], positions[3, i]
-        d = sqrt(x^2 + y^2 + zc^2); ux, uy, uz = x / d, y / d, zc / d
-        θc, φc = Healpix.vec2ang(ux, uy, uz); θc = Float64(θc); φc = mod(Float64(φc), 2pi)
-        Mc = m200c[i]; Mm = m200m[i]; z = redshifts[i]; v = vlos_over_c[i]
-        Mws = Mm * ratio_c7(z); mws[i] = Mws
-        θ200 = theta_r200c(B16, Mc, z); θmax_p = X_PHYS * θ200
-        θ200w = theta_r200c(B16, Mws, z)
-        cut = (Mws > WS_MCUT) && (θ200w > WS_THETA_CUT) && (logm_lo <= log10(Mws) <= logm_hi)
-        θmax_w = 0.0; θcomp = 0.0; t0 = 0.0; Rc = 0.0; dA = 0.0
-        if cut
-            θcomp, t0, Rc, dA = compensation(Mm, z)
-            θmax_w = max(X_WS * θ200w, θcomp)
+struct PaintContext{W,I}
+    ws::W
+    locks::Vector{ReentrantLock}
+    pix::Vector{Vector{Float64}}
+    itps::Vector{I}
+    scale::Vector{Float64}
+    phys::Vector{Int}
+    wsv::Vector{Int}
+    theta_min::Float64
+    logm_lo::Float64
+    logm_hi::Float64
+end
+const Table = Tuple{Vector{Float64},Vector{Float64}}
+const NO_TABLE = (Float64[], Float64[])
+const EMPTY_TABS = Table[NO_TABLE for _ in 1:NV]
+ctx = let itps = [v.itp.itp for v in VARIANTS]
+    isconcretetype(eltype(itps)) || error("variant interpolators differ in type: the hot loop would not be type stable")
+    PaintContext(workspace, [ReentrantLock() for _ in eachindex(workspace.ring_thetas)], [m.pixels for m in maps], itps,
+                 [v.scale for v in VARIANTS], collect(PHYS), collect(WSV), Float64(theta_min), Float64(logm_lo), Float64(logm_hi))
+end
+
+"""Paint halo i into every map; returns (pixel updates, WebSky-selected, exact low-z table)."""
+function paint_halo!(c::PaintContext, i, m200c, m200m, redshifts, positions, vlos_over_c, sel, mws)
+    x, y, zc = positions[1, i], positions[2, i], positions[3, i]
+    d = sqrt(x^2 + y^2 + zc^2); ux, uy, uz = x / d, y / d, zc / d
+    θc, φc = Healpix.vec2ang(ux, uy, uz); θc = Float64(θc); φc = mod(Float64(φc), 2pi)
+    Mc = m200c[i]; Mm = m200m[i]; z = redshifts[i]; v = vlos_over_c[i]
+    Mws = Mm * ratio_c7(z); mws[i] = Mws
+    lMc = log10(Mc); lMw = log10(Mws)
+    θ200 = theta_r200c(B16, Mc, z); θmax_p = X_PHYS * θ200
+    θ200w = theta_r200c(B16, Mws, z); θw = X_WS * θ200w
+    cut = (Mws > WS_MCUT) && (θ200w > WS_THETA_CUT) && (c.logm_lo <= lMw <= c.logm_hi)
+    sel[i] = cut
+    θmax_w = 0.0; t0 = 0.0; Rc = 0.0; dA = 0.0
+    if cut
+        θcomp, t0, Rc, dA = compensation(Mm, z)
+        θmax_w = max(θw, θcomp)
+    end
+    θmax = min(max(θmax_p, θmax_w), pi)
+    exact = z < Z_EXACT
+    tabs = exact ? Table[NO_TABLE for _ in 1:NV] : EMPTY_TABS       # tables only for z < Z_EXACT (no allocation otherwise)
+    if exact
+        for k in 1:NV
+            VARIANTS[k].websky ? (cut && (tabs[k] = exact_table(VARIANTS[k], Mws, z))) : (tabs[k] = exact_table(VARIANTS[k], Mc, z))
         end
-        θmax = min(max(θmax_p, θmax_w), pi)
-        exact = z < Z_EXACT
-        tabs = exact ? [(VARIANTS[k].websky ? (cut ? exact_table(VARIANTS[k], Mws, z) : nothing) : exact_table(VARIANTS[k], Mc, z)) for k in 1:NV] : nothing
-        rs, re = XGPaint.get_relevant_rings(workspace.res, θc, θmax)
-        n = 0
-        for ring in rs:re
-            r1, r2 = XGPaint.get_ring_disc_ranges(workspace, ring, θc, φc, θmax)
-            first_pixel = workspace.ring_first_pixels[ring]
-            lock(ring_locks[ring]) do
-                for lp in Iterators.flatten((r1, r2))
-                    gp = first_pixel + lp - 1
-                    px, py, pz = Healpix.pix2vecRing(workspace.res, gp)
-                    θ = acos(clamp(ux * px + uy * py + uz * pz, -1.0, 1.0))
-                    θ < θmax || continue
-                    θe = max(θ, theta_min)
-                    if θ < θmax_p
-                        cf = chord_factor(θ, θmax_p, X_PHYS)
-                        for k in PHYS
-                            g = exact ? table_eval(tabs[k], θe) : VARIANTS[k].itp(θe, Mc, z)
-                            pix[k][gp] -= v * g * cf
-                        end
+    end
+    ws = c.ws; pix = c.pix; itps = c.itps
+    rs, re = XGPaint.get_relevant_rings(ws.res, θc, θmax)
+    n = 0
+    for ring in rs:re
+        r1, r2 = XGPaint.get_ring_disc_ranges(ws, ring, θc, φc, θmax)
+        first_pixel = ws.ring_first_pixels[ring]
+        l = c.locks[ring]
+        lock(l)
+        try
+            for lp in Iterators.flatten((r1, r2))
+                gp = first_pixel + lp - 1
+                px, py, pz = Healpix.pix2vecRing(ws.res, gp)
+                θ = acos(clamp(ux * px + uy * py + uz * pz, -1.0, 1.0))
+                θ < θmax || continue
+                θe = max(θ, c.theta_min); lθ = log(θe)
+                if θ < θmax_p
+                    cf = chord_factor(θ, θmax_p, X_PHYS)
+                    for k in c.phys
+                        g = exact ? table_eval(tabs[k], θe) : exp(itps[k](lθ, z, lMc))
+                        pix[k][gp] -= v * g * cf
                     end
-                    if cut
-                        θw = X_WS * θ200w
-                        if θ < θw
-                            cf = chord_factor(θ, θw, X_WS)
-                            for k in WSV
-                                g = exact ? table_eval(tabs[k], θe) : VARIANTS[k].itp(θe, Mws, z)
-                                pix[k][gp] -= v * VARIANTS[k].scale * g * cf
-                            end
-                        end
-                        tc = tau_comp(θ, t0, Rc, dA)
-                        if tc > 0
-                            for k in WSV
-                                pix[k][gp] += v * tc        # subtract the compensating sphere's kSZ (-tau_comp v/c)
-                            end
-                        end
-                    end
-                    n += 1
                 end
+                if cut
+                    if θ < θw
+                        cf = chord_factor(θ, θw, X_WS)
+                        for k in c.wsv
+                            g = exact ? table_eval(tabs[k], θe) : exp(itps[k](lθ, z, lMw))
+                            pix[k][gp] -= v * c.scale[k] * g * cf
+                        end
+                    end
+                    tc = tau_comp(θ, t0, Rc, dA)
+                    if tc > 0
+                        for k in c.wsv
+                            pix[k][gp] += v * tc        # subtract the compensating sphere's kSZ (-tau_comp v/c)
+                        end
+                    end
+                end
+                n += 1
             end
+        finally
+            unlock(l)
         end
-        counters[tid, 1] += n; counters[tid, 2] += cut; counters[tid, 3] += exact; sel[i] = cut
+        GC.safepoint()      # the ring loop does not allocate: let a GC requested by another thread proceed
+    end
+    return n, Int(cut), Int(exact)
+end
+
+"""Greedy block worker: claims the next block of BLOCK halos until none is left; returns its own counters."""
+function paint_worker(c::PaintContext, next::Threads.Atomic{Int}, nblk, m200c, m200m, redshifts, positions, vlos_over_c, sel, mws)
+    n = 0; ncut = 0; nexact = 0; N = length(m200c)
+    while true
+        b = Threads.atomic_add!(next, 1)            # returns the previous value
+        b > nblk && break
+        for i in (b - 1) * BLOCK + 1:min(b * BLOCK, N)
+            a, s, e = paint_halo!(c, i, m200c, m200m, redshifts, positions, vlos_over_c, sel, mws)
+            n += a; ncut += s; nexact += e
+        end
+    end
+    return (n, ncut, nexact)
+end
+
+function paint_batch!(c::PaintContext, m200c, m200m, redshifts, positions, vlos_over_c, counters, sel, mws)
+    nblk = cld(length(m200c), BLOCK); next = Threads.Atomic{Int}(1)
+    tasks = [Threads.@spawn paint_worker(c, next, nblk, m200c, m200m, redshifts, positions, vlos_over_c, sel, mws)
+             for _ in 1:Threads.nthreads()]
+    for t in tasks
+        n, s, e = fetch(t)::Tuple{Int,Int,Int}
+        counters[1] += n; counters[2] += s; counters[3] += e
     end
 end
 
@@ -212,7 +275,7 @@ const LOGM_EDGES = collect(12.0:0.025:15.7); const Z_EDGES = collect(0.0:0.025:4
 hist_n = zeros(Int, length(LOGM_EDGES) - 1, length(Z_EDGES) - 1); hist_v2 = zeros(Float64, size(hist_n))
 hist_v2lm = zeros(Float64, size(hist_n)); hist_v2z = zeros(Float64, size(hist_n))       # (v/c)^2-weighted log10 M and z sums
 ws_n = zeros(Int, size(hist_n)); ws_v2 = zeros(Float64, size(hist_n)); ws_v2lm = zeros(Float64, size(hist_n)); ws_v2z = zeros(Float64, size(hist_n))
-counters = zeros(Int, Threads.nthreads() + 8, 3)
+counters = zeros(Int, 3)          # pixel updates, WebSky-selected, exact low-z
 t0w = time(); nsel = 0; vrms_acc = 0.0
 h5open(catalog, "r") do f
     pos_ds = f["Position"]; mc_ds = f["halo_mass_m200c"]; mm_ds = f["halo_mass_m200m"]; vel_ds = f["Velocity"]; z_ds = f["redshift"]
@@ -226,11 +289,11 @@ h5open(catalog, "r") do f
         pos = pos[:, keep]; vel = vel[:, keep]; mc = mc[keep]; mm = mm[keep]; zs = zs[keep]
         r = sqrt.(vec(sum(pos .^ 2; dims=1))); vlos_c = vec(sum(pos .* vel; dims=1)) ./ r ./ C_KMS
         all(logm_lo .<= log10.(mc) .<= logm_hi) || error("catalogue M200c outside cache range in chunk $start")
-        # the catalogue is sorted by decreasing z: shuffle each chunk so the large low-z discs spread over all threads (:static)
+        # the catalogue is sorted by decreasing z: shuffle each chunk so the large low-z discs are spread over many blocks
         perm = randperm(MersenneTwister(start), length(mc))
         mc = mc[perm]; mm = mm[perm]; zs = zs[perm]; pos = pos[:, perm]; vlos_c = vlos_c[perm]
-        sel = falses(length(mc)); mws = zeros(length(mc))
-        paint_batch!(mc, mm, zs, pos, vlos_c, counters, sel, mws)
+        sel = zeros(Bool, length(mc)); mws = zeros(length(mc))      # Vector{Bool}: per-element writes from threads are safe
+        paint_batch!(ctx, mc, mm, zs, pos, vlos_c, counters, sel, mws)
         for j in eachindex(mc)
             w = vlos_c[j]^2; iz = searchsortedlast(Z_EDGES, zs[j])
             im = searchsortedlast(LOGM_EDGES, log10(mc[j]))
@@ -241,7 +304,7 @@ h5open(catalog, "r") do f
             end
         end
         global nsel += length(mc); global vrms_acc += sum(abs2, vlos_c .* C_KMS)
-        println("  rows $(first(idx)):$(last(idx))  halos=$nsel  pixel updates=$(sum(counters[:, 1]))  websky-selected=$(sum(counters[:, 2]))  exact-lowz=$(sum(counters[:, 3]))  elapsed=$(round(time() - t0w; digits=0)) s")
+        println("  rows $(first(idx)):$(last(idx))  halos=$nsel  pixel updates=$(counters[1])  websky-selected=$(counters[2])  exact-lowz=$(counters[3])  elapsed=$(round(time() - t0w; digits=0)) s")
         flush(stdout)
     end
 end
@@ -261,7 +324,8 @@ end
 open(joinpath(output_dir, "maps", "provenance.txt"), "w") do io
     for (k, val) in sort(collect(Dict{String,Any}(
         "created_utc" => Dates.format(now(UTC), dateformat"yyyy-mm-ddTHH:MM:SS"), "catalog" => catalog, "nside" => nside,
-        "halos_read" => nsel, "websky_selected_halos" => sum(counters[:, 2]), "exact_lowz_halos" => sum(counters[:, 3]),
+        "halos_read" => nsel, "websky_selected_halos" => counters[2], "exact_lowz_halos" => counters[3],
+        "pixel_updates" => counters[1], "websky_histogram_halos" => sum(ws_n), "scheduler" => "greedy blocks of $(BLOCK) halos",
         "elapsed_seconds" => round(time() - t0w; digits=1), "julia_version" => string(VERSION), "threads" => Threads.nthreads(),
         "cosmology" => "h=$(H) Omega_b=$(OMEGA_B) Omega_c=$(OMEGA_C) (HalfDome lightcone: Omega_m 0.3089)",
         "variants" => join(["$(v.name): X=$(v.X) R200c websky=$(v.websky) tau_scale=$(v.scale)" for v in VARIANTS], "; "),

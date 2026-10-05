@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -N ksz_speed112
+#PBS -q mini_B
+#PBS -l select=1:ncpus=16:mem=48gb
+#PBS -l walltime=02:00:00
+#PBS -j oe
+# NEW kSZ painter under the accelerated tSZ Julia 1.12.2 runtime (ksz_julia112_env), same test catalogues as
+# lee22_ksz_speedtest_20261002 (Julia 1.6); 2026-10-02.
+set -uo pipefail
+ROOT=/lustre/work/kristero10/frb_data/lee22_ksz_speedtest112_20261002; T1=/lustre/work/kristero10/frb_data/lee22_ksz_speedtest_20261002
+NCPU=16; RT=/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime; KE=/lustre/work/kristero10/frb_data/ksz_julia112_env
+export JULIA_NUM_THREADS=$NCPU OMP_NUM_THREADS=$NCPU HDF5_USE_FILE_LOCKING=FALSE PYTHONNOUSERSITE=1 HALO_BLOCK_SIZE=256
+export JULIA_PROJECT=$KE/env JULIA_DEPOT_PATH=$KE/depot:$RT/depot:/home/kristero10/.julia LD_LIBRARY_PATH=$RT/julia-1.12.2/lib/julia:${LD_LIBRARY_PATH:-}
+JULIA=$RT/julia-1.12.2/bin/julia
+cd "$ROOT"; mkdir -p logs caches
+exec > >(tee -a "logs/job_${PBS_JOBID:-manual}.log") 2>&1
+echo "started $(date -Is) host=$(hostname) julia=$($JULIA --version)"; uptime
+sha256sum frb_map_generation/lee2022_frb_dm_profile.jl frb_map_generation/lee22_tsz_corrected/ksz/*.jl truncation_comparison/*.jl > logs/source_sha256.txt
+echo "=== precompile $(date -Is)"; $JULIA -e 'using HDF5, Healpix, Interpolations, XGPaint, Unitful, UnitfulAstro; println("packages ok: ", pathof(XGPaint))'
+run() {   # run <tag> <julia> <catalog tag> <nside> <cache dir>
+    local tag=$1 jl=$2 c=$3 ns=$4 cache=$5 out=$ROOT/runs/$1; mkdir -p $out/maps $cache; ln -sfn $cache $out/caches
+    echo "=== $tag start $(date -Is) load $(cut -d' ' -f1-3 /proc/loadavg)"
+    /usr/bin/time -v -o logs/${tag}_time.txt $jl --threads=$NCPU frb_map_generation/lee22_tsz_corrected/ksz/paint_ksz_websky.jl \
+        --catalog=$T1/catalogs/cat_$c.h5 --nside=$ns --output-dir=$out > logs/$tag.log 2>&1
+    echo "=== $tag end $(date -Is) exit=$?"; grep -E "Elapsed \(wall|Maximum resident|Percent of CPU|User time" logs/${tag}_time.txt
+    grep -E "rows|done in|rror" logs/$tag.log | tail -3
+}
+run new112_lowz $JULIA lowz 1024 $ROOT/caches
+run new112_mid  $JULIA mid  4096 $ROOT/caches
+# the same painter under idark's Julia 1.6 on the same node (does the per-ring GC safepoint remove the low-z stall?)
+( unset JULIA_PROJECT; export JULIA_DEPOT_PATH=/home/kristero10/.julia; run new16_lowz /usr/local/bin/julia lowz 1024 $ROOT/caches16 )
+/home/kristero10/.conda/envs/SZ/bin/python compare112.py | tee logs/compare112.txt
+echo "finished $(date -Is)"

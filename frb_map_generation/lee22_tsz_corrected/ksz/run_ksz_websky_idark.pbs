@@ -14,9 +14,9 @@ CAT=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5
 NCPU=${PBS_NCPUS:-16}
 export JULIA_NUM_THREADS=$NCPU OMP_NUM_THREADS=$NCPU HDF5_USE_FILE_LOCKING=FALSE PYTHONNOUSERSITE=1
 export HALO_BLOCK_SIZE=${HALO_BLOCK_SIZE:-256}     # greedy block size of the painter (performance knob only)
-# JULIA_RT=1.6 (default, validated): /usr/local/bin/julia; 1.12: the accelerated tSZ runtime (Julia 1.12.2, same XGPaint 35f79ad)
-# with a kSZ project (/lustre/work/kristero10/frb_data/ksz_julia112_env; not yet tested on idark)
-JULIA_RT=${JULIA_RT:-1.6}
+# JULIA_RT=1.12 (default): the accelerated tSZ runtime (Julia 1.12.2, same XGPaint 35f79ad) with a kSZ project
+# (/lustre/work/kristero10/frb_data/ksz_julia112_env); full paint 527 s vs 5098 s on 1.6 (job 600626). 1.6: /usr/local/bin/julia
+JULIA_RT=${JULIA_RT:-1.12}
 if [ "$JULIA_RT" = 1.12 ]; then
     RT=/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime; KE=/lustre/work/kristero10/frb_data/ksz_julia112_env
     export JULIA_PROJECT=$KE/env JULIA_DEPOT_PATH=$KE/depot:$RT/depot:/home/kristero10/.julia

@@ -1,0 +1,38 @@
+#!/bin/bash
+#PBS -N ksz_speedtest
+#PBS -q mini_B
+#PBS -l select=1:ncpus=16:mem=48gb
+#PBS -l walltime=02:00:00
+#PBS -j oe
+# OLD (job 600487 painter) vs NEW (greedy-block, type-stable) kSZ painter under idark Julia 1.6.2, 2026-10-02.
+# Runs in ABBA order: OLD lowz, NEW lowz, NEW mid, OLD mid; then compares maps/histograms/counters.
+set -uo pipefail
+ROOT=/lustre/work/kristero10/frb_data/lee22_ksz_speedtest_20261002
+NCPU=16
+export JULIA_NUM_THREADS=$NCPU OMP_NUM_THREADS=$NCPU HDF5_USE_FILE_LOCKING=FALSE PYTHONNOUSERSITE=1
+cd "$ROOT"; mkdir -p logs
+exec > >(tee -a "logs/job_${PBS_JOBID:-manual}.log") 2>&1
+echo "started $(date -Is) host=$(hostname) ncpus=$NCPU julia=$(/usr/local/bin/julia --version)"
+lscpu | grep -E "Model name|^CPU\(s\)|Thread|Socket" || true
+uptime
+sha256sum frb_map_generation/lee2022_frb_dm_profile.jl frb_map_generation/lee22_tsz_corrected/ksz/*.jl \
+    truncation_comparison/spherical_truncation_profiles.jl catalogs/*.h5 > logs/source_sha256.txt
+cat logs/source_sha256.txt
+run() {   # run <tag> <script> <catalog> <nside>
+    local tag=$1 script=$2 cat=$3 nside=$4 out=$ROOT/runs/$1
+    echo "=== $tag start $(date -Is) load: $(cut -d' ' -f1-3 /proc/loadavg)"
+    /usr/bin/time -v -o "$ROOT/logs/${tag}_time.txt" /usr/local/bin/julia --threads=$NCPU \
+        "frb_map_generation/lee22_tsz_corrected/ksz/$script" --catalog="$ROOT/catalogs/$cat" --nside=$nside --output-dir="$out" \
+        > "$ROOT/logs/${tag}.log" 2>&1
+    local rc=$?
+    echo "=== $tag end $(date -Is) exit=$rc"
+    grep -E "Elapsed \(wall|Maximum resident|Exit status|Percent of CPU" "$ROOT/logs/${tag}_time.txt"
+    tail -8 "$ROOT/logs/${tag}.log"
+}
+run old_lowz paint_ksz_websky_old.jl cat_lowz.h5 1024
+run new_lowz paint_ksz_websky.jl     cat_lowz.h5 1024
+run new_mid  paint_ksz_websky.jl     cat_mid.h5  4096
+run old_mid  paint_ksz_websky_old.jl cat_mid.h5  4096
+echo "=== compare $(date -Is)"
+/home/kristero10/.conda/envs/SZ/bin/python compare_old_new.py --root "$ROOT" | tee logs/compare.txt
+echo "finished $(date -Is)"

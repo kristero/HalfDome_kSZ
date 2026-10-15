@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -N base_pearson
+#PBS -q mini2
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=12gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+SMOOTH_TARGET=relative_change
+ROOT=/lustre/work/kristero10/tsz_joint_report_20261005
+cd "$ROOT"
+exec > "logs/pearson_${PBS_JOBID%%.*}.log" 2>&1
+export MERLIN_PARAM_SPACE=linear MPLBACKEND=Agg
+export OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=26 MKL_NUM_THREADS=26
+echo "host=$(hostname) target=$SMOOTH_TARGET start=$(date -Is)"
+/usr/bin/time -v -o "logs/resources_${PBS_JOBID%%.*}.txt" \
+ /home/kristero10/envs/sbi27/bin/python baseline_pearson.py --root "$ROOT" --target "$SMOOTH_TARGET" --threads 26
+echo "finished=$(date -Is)"

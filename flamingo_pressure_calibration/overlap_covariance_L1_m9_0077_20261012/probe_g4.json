@@ -1,0 +1,4187 @@
+{
+ "probe": "G4",
+ "host": "maas.strw.leidenuniv.nl",
+ "load": [
+  25.12,
+  25.01,
+  24.7
+ ],
+ "versions": {
+  "numpy": "2.2.6",
+  "h5py": "3.11.0",
+  "scipy": "1.15.2",
+  "hdf5": "1.14.2",
+  "python": "3.11.13 (main, Jun  1 2026, 00:00:00) [GCC 11.5.0 20240719 (Red Hat 11.5.0-14)]"
+ },
+ "top_gas_datasets": [
+  "ComptonYParameters",
+  "Coordinates",
+  "Densities",
+  "ElectronNumberDensities",
+  "FOFGroupIDs",
+  "LastAGNFeedbackScaleFactors",
+  "Masses",
+  "MaximalTemperatureScaleFactors",
+  "MaximalTemperatures",
+  "MetalMassFractions",
+  "ParticleIDs",
+  "Pressures",
+  "SmoothedElementMassFractions",
+  "SmoothedMetalMassFractions",
+  "SmoothingLengths",
+  "StarFormationRates",
+  "Temperatures",
+  "Velocities",
+  "VelocityDivergences",
+  "XrayLuminosities",
+  "XrayPhotonLuminosities"
+ ],
+ "top_fields": {
+  "ParticleIDs": {
+   "dtype": "uint64",
+   "shape": [
+    5271821058
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     1.0
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     1.0
+    ],
+    "Description": "Unique IDs of the particles",
+    "Expression for physical CGS units": "[ - ] ",
+    "Lossy compression filter": "None",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/ParticleIDs"
+  },
+  "XrayLuminosities": {
+   "dtype": "float64",
+   "shape": [
+    5271821058,
+    3
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     6.443997950038577e+33
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     6.443997950038577e+33
+    ],
+    "Description": "Intrinsic X-ray luminosities in various bands. This is 0 for star-forming particles.",
+    "Expression for physical CGS units": "U_M U_L^2 U_t^-3  [ g cm^2 s^-3 ]",
+    "Lossy compression filter": "DMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     2.0
+    ],
+    "U_M exponent": [
+     1.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     -3.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/XrayLuminosities"
+  },
+  "XrayPhotonLuminosities": {
+   "dtype": "float64",
+   "shape": [
+    5271821058,
+    3
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     3.240779291010696e-20
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     3.240779291010696e-20
+    ],
+    "Description": "Intrinsic X-ray photon luminosities in various bands. This is 0 for star-forming particles.",
+    "Expression for physical CGS units": "U_t^-1  [ s^-1 ]",
+    "Lossy compression filter": "DMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     -1.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/XrayPhotonLuminosities"
+  },
+  "StarFormationRates": {
+   "dtype": "float32",
+   "shape": [
+    5271821058
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     6.443997950038578e+23
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     6.443997950038578e+23
+    ],
+    "Description": "If positive, star formation rates of the particles. If negative, stores the last time/scale-factor at which the gas particle was star-forming. If zero, the particle was never star-forming.",
+    "Expression for physical CGS units": "U_M U_t^-1  [ g s^-1 ]",
+    "Lossy compression filter": "FMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     1.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     -1.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/StarFormationRates"
+  },
+  "ComptonYParameters": {
+   "dtype": "float64",
+   "shape": [
+    5271821058
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     9.521406127714655e+48
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     9.521406127714655e+48
+    ],
+    "Description": "Compton y parameters in the physical frame computed based on the cooling tables. This is 0 for star-forming particles.",
+    "Expression for physical CGS units": "U_L^2  [ cm^2 ]",
+    "Lossy compression filter": "FMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     2.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/ComptonYParameters"
+  },
+  "ElectronNumberDensities": {
+   "dtype": "float64",
+   "shape": [
+    5271821058
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     3.403677195931725e-74
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     3.403677195931725e-74
+    ],
+    "Description": "Electron number densities in the physical frame computed based on the cooling tables. This is 0 for star-forming particles.",
+    "Expression for physical CGS units": "U_L^-3  [ cm^-3 ]",
+    "Lossy compression filter": "DMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     -3.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/ElectronNumberDensities"
+  },
+  "Temperatures": {
+   "dtype": "float32",
+   "shape": [
+    5271821058
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     1.0
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     1.0
+    ],
+    "Description": "Temperatures of the gas particles",
+    "Expression for physical CGS units": "U_T  [ K ]",
+    "Lossy compression filter": "FMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     1.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/Temperatures"
+  },
+  "Masses": {
+   "dtype": "float32",
+   "shape": [
+    5271821058
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     1.98841e+43
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     1.98841e+43
+    ],
+    "Description": "Masses of the particles",
+    "Expression for physical CGS units": "U_M  [ g ]",
+    "Lossy compression filter": "None",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     1.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/Masses"
+  },
+  "LastAGNFeedbackScaleFactors": {
+   "dtype": "float32",
+   "shape": [
+    5271821058
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     1.0
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     1.0
+    ],
+    "Description": "Scale-factors at which the particles were last hit by AGN feedback. -1 if a particle has never been hit by feedback",
+    "Expression for physical CGS units": "[ - ] ",
+    "Lossy compression filter": "HalfFloat",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/LastAGNFeedbackScaleFactors"
+  },
+  "Densities": {
+   "dtype": "float32",
+   "shape": [
+    5271821058
+   ],
+   "chunks": null,
+   "compression": null,
+   "is_virtual": true,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     6.767905773162602e-31
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     6.767905773162602e-31
+    ],
+    "Description": "Co-moving mass densities of the particles",
+    "Expression for physical CGS units": "a^-3 U_M U_L^-3  [ g cm^-3 ]",
+    "Lossy compression filter": "FMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     -3.0
+    ],
+    "U_M exponent": [
+     1.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     -3.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   },
+   "virtual_source_count": 64,
+   "virtual_source_files_first": [
+    "flamingo_0077.0.hdf5",
+    "flamingo_0077.1.hdf5",
+    "flamingo_0077.10.hdf5"
+   ],
+   "virtual_source_files_distinct": 64,
+   "virtual_source_dataset_first": "PartType0/Densities"
+  }
+ },
+ "top_named_columns": {
+  "ElementMassFractions": [
+   "Hydrogen",
+   "Helium",
+   "Carbon",
+   "Nitrogen",
+   "Oxygen",
+   "Neon",
+   "Magnesium",
+   "Silicon",
+   "Iron"
+  ],
+  "Luminosities": [
+   "GAMA_u",
+   "GAMA_g",
+   "GAMA_r",
+   "GAMA_i",
+   "GAMA_z",
+   "GAMA_Y",
+   "GAMA_J",
+   "GAMA_H",
+   "GAMA_K"
+  ],
+  "SmoothedElementMassFractions": [
+   "Hydrogen",
+   "Helium",
+   "Carbon",
+   "Nitrogen",
+   "Oxygen",
+   "Neon",
+   "Magnesium",
+   "Silicon",
+   "Iron"
+  ],
+  "SpeciesFractions": [
+   "HI",
+   "HII",
+   "H2"
+  ],
+  "XrayLuminosities": [
+   "erosita_low",
+   "erosita_high",
+   "ROSAT"
+  ],
+  "XrayPhotonLuminosities": [
+   "erosita_low",
+   "erosita_high",
+   "ROSAT"
+  ]
+ },
+ "top_header_NumFilesPerSnapshot": [
+  1
+ ],
+ "snapshot_describe": {
+  "top_level": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/snapshots/flamingo_0077/flamingo_0077.hdf5",
+  "source": "chunks",
+  "n_chunks": 64,
+  "chunk_template": "L1000N1800/HYDRO_FIDUCIAL/snapshots/flamingo_0077/flamingo_0077.{i}.hdf5",
+  "redshift": 0.0,
+  "scale_factor": 1.0,
+  "box_size_cmpc": 1000.0000004828763,
+  "n_cells": 32768,
+  "dimension": [
+   32,
+   32,
+   32
+  ],
+  "cell_size_cmpc": [
+   31.250000015089885,
+   31.250000015089885,
+   31.250000015089885
+  ],
+  "n_gas_total": 5271821058,
+  "softening_comoving_mpc": 0.0223,
+  "softening_max_physical_mpc": 0.0057,
+  "softening_source": "Parameters",
+  "auxiliary_fields": []
+ },
+ "auxiliary_pipeline_fields": [],
+ "auxiliary_probe_fields": [],
+ "chunk0_gas_datasets": [
+  "ComptonYParameters",
+  "Coordinates",
+  "Densities",
+  "ElectronNumberDensities",
+  "FOFGroupIDs",
+  "LastAGNFeedbackScaleFactors",
+  "Masses",
+  "MaximalTemperatureScaleFactors",
+  "MaximalTemperatures",
+  "MetalMassFractions",
+  "ParticleIDs",
+  "Pressures",
+  "SmoothedElementMassFractions",
+  "SmoothedMetalMassFractions",
+  "SmoothingLengths",
+  "StarFormationRates",
+  "Temperatures",
+  "Velocities",
+  "VelocityDivergences",
+  "XrayLuminosities",
+  "XrayPhotonLuminosities"
+ ],
+ "chunk0_fields": {
+  "ParticleIDs": {
+   "dtype": "uint64",
+   "shape": [
+    80335481
+   ],
+   "chunks": [
+    1048576
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     1.0
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     1.0
+    ],
+    "Description": "Unique IDs of the particles",
+    "Expression for physical CGS units": "[ - ] ",
+    "Lossy compression filter": "None",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  },
+  "XrayLuminosities": {
+   "dtype": "float64",
+   "shape": [
+    80335481,
+    3
+   ],
+   "chunks": [
+    1048576,
+    3
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     6.443997950038577e+33
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     6.443997950038577e+33
+    ],
+    "Description": "Intrinsic X-ray luminosities in various bands. This is 0 for star-forming particles.",
+    "Expression for physical CGS units": "U_M U_L^2 U_t^-3  [ g cm^2 s^-3 ]",
+    "Lossy compression filter": "DMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     2.0
+    ],
+    "U_M exponent": [
+     1.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     -3.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  },
+  "XrayPhotonLuminosities": {
+   "dtype": "float64",
+   "shape": [
+    80335481,
+    3
+   ],
+   "chunks": [
+    1048576,
+    3
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     3.240779291010696e-20
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     3.240779291010696e-20
+    ],
+    "Description": "Intrinsic X-ray photon luminosities in various bands. This is 0 for star-forming particles.",
+    "Expression for physical CGS units": "U_t^-1  [ s^-1 ]",
+    "Lossy compression filter": "DMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     -1.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  },
+  "StarFormationRates": {
+   "dtype": "float32",
+   "shape": [
+    80335481
+   ],
+   "chunks": [
+    1048576
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     6.443997950038578e+23
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     6.443997950038578e+23
+    ],
+    "Description": "If positive, star formation rates of the particles. If negative, stores the last time/scale-factor at which the gas particle was star-forming. If zero, the particle was never star-forming.",
+    "Expression for physical CGS units": "U_M U_t^-1  [ g s^-1 ]",
+    "Lossy compression filter": "FMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     1.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     -1.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  },
+  "ComptonYParameters": {
+   "dtype": "float32",
+   "shape": [
+    80335481
+   ],
+   "chunks": [
+    1048576
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     9.521406127714655e+48
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     9.521406127714655e+48
+    ],
+    "Description": "Compton y parameters in the physical frame computed based on the cooling tables. This is 0 for star-forming particles.",
+    "Expression for physical CGS units": "U_L^2  [ cm^2 ]",
+    "Lossy compression filter": "FMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     2.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  },
+  "ElectronNumberDensities": {
+   "dtype": "float64",
+   "shape": [
+    80335481
+   ],
+   "chunks": [
+    1048576
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     3.403677195931725e-74
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     3.403677195931725e-74
+    ],
+    "Description": "Electron number densities in the physical frame computed based on the cooling tables. This is 0 for star-forming particles.",
+    "Expression for physical CGS units": "U_L^-3  [ cm^-3 ]",
+    "Lossy compression filter": "DMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     -3.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  },
+  "Temperatures": {
+   "dtype": "float32",
+   "shape": [
+    80335481
+   ],
+   "chunks": [
+    1048576
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     1.0
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     1.0
+    ],
+    "Description": "Temperatures of the gas particles",
+    "Expression for physical CGS units": "U_T  [ K ]",
+    "Lossy compression filter": "FMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     1.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  },
+  "Masses": {
+   "dtype": "float32",
+   "shape": [
+    80335481
+   ],
+   "chunks": [
+    1048576
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     1.98841e+43
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     1.98841e+43
+    ],
+    "Description": "Masses of the particles",
+    "Expression for physical CGS units": "U_M  [ g ]",
+    "Lossy compression filter": "None",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     1.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  },
+  "LastAGNFeedbackScaleFactors": {
+   "dtype": "float32",
+   "shape": [
+    80335481
+   ],
+   "chunks": [
+    1048576
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     1.0
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     1.0
+    ],
+    "Description": "Scale-factors at which the particles were last hit by AGN feedback. -1 if a particle has never been hit by feedback",
+    "Expression for physical CGS units": "[ - ] ",
+    "Lossy compression filter": "HalfFloat",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     0.0
+    ],
+    "U_M exponent": [
+     0.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     0.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  },
+  "Densities": {
+   "dtype": "float32",
+   "shape": [
+    80335481
+   ],
+   "chunks": [
+    1048576
+   ],
+   "compression": "gzip",
+   "is_virtual": false,
+   "attrs": {
+    "Conversion factor to CGS (not including cosmological corrections)": [
+     6.767905773162602e-31
+    ],
+    "Conversion factor to physical CGS (including cosmological corrections)": [
+     6.767905773162602e-31
+    ],
+    "Description": "Co-moving mass densities of the particles",
+    "Expression for physical CGS units": "a^-3 U_M U_L^-3  [ g cm^-3 ]",
+    "Lossy compression filter": "FMantissa9",
+    "U_I exponent": [
+     0.0
+    ],
+    "U_L exponent": [
+     -3.0
+    ],
+    "U_M exponent": [
+     1.0
+    ],
+    "U_T exponent": [
+     0.0
+    ],
+    "U_t exponent": [
+     0.0
+    ],
+    "a-scale exponent": [
+     -3.0
+    ],
+    "h-scale exponent": [
+     0.0
+    ]
+   }
+  }
+ },
+ "chunk0_named_columns": {
+  "ElementMassFractions": [
+   "Hydrogen",
+   "Helium",
+   "Carbon",
+   "Nitrogen",
+   "Oxygen",
+   "Neon",
+   "Magnesium",
+   "Silicon",
+   "Iron"
+  ],
+  "Luminosities": [
+   "GAMA_u",
+   "GAMA_g",
+   "GAMA_r",
+   "GAMA_i",
+   "GAMA_z",
+   "GAMA_Y",
+   "GAMA_J",
+   "GAMA_H",
+   "GAMA_K"
+  ],
+  "SmoothedElementMassFractions": [
+   "Hydrogen",
+   "Helium",
+   "Carbon",
+   "Nitrogen",
+   "Oxygen",
+   "Neon",
+   "Magnesium",
+   "Silicon",
+   "Iron"
+  ],
+  "SpeciesFractions": [
+   "HI",
+   "HII",
+   "H2"
+  ],
+  "XrayLuminosities": [
+   "erosita_low",
+   "erosita_high",
+   "ROSAT"
+  ],
+  "XrayPhotonLuminosities": [
+   "erosita_low",
+   "erosita_high",
+   "ROSAT"
+  ]
+ },
+ "small_cell": {
+  "cell": 16162,
+  "count": 23463,
+  "file": 35,
+  "offset_in_file": 27444649,
+  "global_offset": 2906979328,
+  "fields": {
+   "ParticleIDs": {
+    "dtype_chunk": "uint64",
+    "dtype_top": "uint64",
+    "shape": [
+     23463
+    ],
+    "bytes_identical": true,
+    "values_identical": true,
+    "n_values": 23463,
+    "n_differ": 0
+   },
+   "XrayLuminosities": {
+    "dtype_chunk": "float64",
+    "dtype_top": "float64",
+    "shape": [
+     23463,
+     3
+    ],
+    "bytes_identical": true,
+    "values_identical": true,
+    "n_values": 70389,
+    "n_differ": 0
+   },
+   "XrayPhotonLuminosities": {
+    "dtype_chunk": "float64",
+    "dtype_top": "float64",
+    "shape": [
+     23463,
+     3
+    ],
+    "bytes_identical": true,
+    "values_identical": true,
+    "n_values": 70389,
+    "n_differ": 0
+   },
+   "StarFormationRates": {
+    "dtype_chunk": "float32",
+    "dtype_top": "float32",
+    "shape": [
+     23463
+    ],
+    "bytes_identical": true,
+    "values_identical": true,
+    "n_values": 23463,
+    "n_differ": 0
+   },
+   "ComptonYParameters": {
+    "dtype_chunk": "float32",
+    "dtype_top": "float64",
+    "shape": [
+     23463
+    ],
+    "bytes_identical": false,
+    "values_identical": true,
+    "n_values": 23463,
+    "n_differ": 0
+   },
+   "ElectronNumberDensities": {
+    "dtype_chunk": "float64",
+    "dtype_top": "float64",
+    "shape": [
+     23463
+    ],
+    "bytes_identical": true,
+    "values_identical": true,
+    "n_values": 23463,
+    "n_differ": 0
+   },
+   "Temperatures": {
+    "dtype_chunk": "float32",
+    "dtype_top": "float32",
+    "shape": [
+     23463
+    ],
+    "bytes_identical": true,
+    "values_identical": true,
+    "n_values": 23463,
+    "n_differ": 0
+   },
+   "Masses": {
+    "dtype_chunk": "float32",
+    "dtype_top": "float32",
+    "shape": [
+     23463
+    ],
+    "bytes_identical": true,
+    "values_identical": true,
+    "n_values": 23463,
+    "n_differ": 0
+   },
+   "LastAGNFeedbackScaleFactors": {
+    "dtype_chunk": "float32",
+    "dtype_top": "float32",
+    "shape": [
+     23463
+    ],
+    "bytes_identical": true,
+    "values_identical": true,
+    "n_values": 23463,
+    "n_differ": 0
+   },
+   "Densities": {
+    "dtype_chunk": "float32",
+    "dtype_top": "float32",
+    "shape": [
+     23463
+    ],
+    "bytes_identical": true,
+    "values_identical": true,
+    "n_values": 23463,
+    "n_differ": 0
+   }
+  }
+ },
+ "halo_cell_slice": {
+  "cell": 1798,
+  "cell_count": 573167,
+  "rows_read": 200000,
+  "file": 50,
+  "sfr_positive": 500,
+  "sfr_negative": 21157,
+  "sfr_zero": 178343,
+  "sfr_negative_range": [
+   -1.0,
+   -0.12158203125
+  ],
+  "sfr_positive_range": [
+   38.875,
+   299.5
+  ],
+  "y_zero_where_sfr_positive": true,
+  "y_zero_count_where_sfr_nonpositive": 0,
+  "ne_zero_where_sfr_positive": true,
+  "temperature_sfr_positive_16_50_84": [
+   9312.0,
+   12624.0,
+   20890.879999999976
+  ],
+  "temperature_below_1e5_and_sfr_nonpositive": 26992,
+  "xray_chunk_vs_top": {
+   "dtype_chunk": "float64",
+   "dtype_top": "float64",
+   "shape": [
+    200000,
+    3
+   ],
+   "bytes_identical": true,
+   "values_identical": true,
+   "n_values": 600000,
+   "n_differ": 0
+  },
+  "ids_chunk_vs_top_identical": true,
+  "sfr_chunk_vs_top": {
+   "dtype_chunk": "float32",
+   "dtype_top": "float32",
+   "shape": [
+    200000
+   ],
+   "bytes_identical": true,
+   "values_identical": true,
+   "n_values": 200000,
+   "n_differ": 0
+  },
+  "xray_column_sums_chunk": [
+   15919527605.339355,
+   8792485470.097168,
+   10863476152.590946
+  ],
+  "xray_column_sums_top": [
+   15919527605.339355,
+   8792485470.097168,
+   10863476152.590946
+  ],
+  "xray_zero_where_sfr_positive_chunk": true,
+  "xray_zero_where_sfr_positive_top": true
+ },
+ "membership0": {
+  "PartType0/FOFGroupIDs": {
+   "dtype": "int64",
+   "shape": [
+    80335481
+   ]
+  },
+  "PartType0/GroupNr_bound": {
+   "dtype": "int64",
+   "shape": [
+    80335481
+   ]
+  },
+  "PartType0/Rank_bound": {
+   "dtype": "int64",
+   "shape": [
+    80335481
+   ]
+  }
+ },
+ "membership0_rows_equal_chunk0": true,
+ "soap_dataset_count": 2113,
+ "soap_datasets": {
+  "BoundSubhalo/AngularMomentumBaryons": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of baryons (gas and stars), relative to the centre of potential and baryonic centre of mass velocity."
+  },
+  "BoundSubhalo/AngularMomentumDarkMatter": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the dark matter, relative to the centre of potential and DM centre of mass velocity."
+  },
+  "BoundSubhalo/AngularMomentumGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the gas, relative to the centre of potential and gas centre of mass velocity."
+  },
+  "BoundSubhalo/AngularMomentumStars": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the stars, relative to the centre of potential and stellar centre of mass velocity."
+  },
+  "BoundSubhalo/BlackHolesDynamicalMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total BH dynamical mass."
+  },
+  "BoundSubhalo/BlackHolesLastEventScalefactor": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Scale-factor of last AGN event."
+  },
+  "BoundSubhalo/BlackHolesSubgridMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total BH subgrid mass."
+  },
+  "BoundSubhalo/CentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass."
+  },
+  "BoundSubhalo/CentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity."
+  },
+  "BoundSubhalo/DarkMatterInertiaTensor": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed iteratively from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more than 20 part"
+  },
+  "BoundSubhalo/DarkMatterInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single interation from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more t"
+  },
+  "BoundSubhalo/DarkMatterInertiaTensorReduced": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed iteratively from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more than"
+  },
+  "BoundSubhalo/DarkMatterInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single interation from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we hav"
+  },
+  "BoundSubhalo/DarkMatterMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total DM mass."
+  },
+  "BoundSubhalo/DarkMatterVelocityDispersionMatrix": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Mass-weighted velocity dispersion of the dark matter. Measured relative to the DM centre of mass velocity. The order of the components of the dispersion tensor is XX YY ZZ XY XZ YZ."
+  },
+  "BoundSubhalo/DiscToTotalGasMassFraction": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of the total gas mass that is co-rotating."
+  },
+  "BoundSubhalo/DiscToTotalStellarMassFraction": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of the total stellar mass that is co-rotating."
+  },
+  "BoundSubhalo/EncloseRadius": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Radius of the particle furthest from the halo centre"
+  },
+  "BoundSubhalo/GasInertiaTensor": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed iteratively from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more than 20 par"
+  },
+  "BoundSubhalo/GasInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more t"
+  },
+  "BoundSubhalo/GasInertiaTensorReduced": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed iteratively from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more tha"
+  },
+  "BoundSubhalo/GasInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we hav"
+  },
+  "BoundSubhalo/GasMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass."
+  },
+  "BoundSubhalo/GasMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in metals."
+  },
+  "BoundSubhalo/GasTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature."
+  },
+  "BoundSubhalo/GasTemperatureWithoutCoolGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding cool gas with a temperature below 1e5 K."
+  },
+  "BoundSubhalo/GasTemperatureWithoutCoolGasAndRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding cool gas with a temperature below 1e5 K and gas that was recently heated by AGN."
+  },
+  "BoundSubhalo/GasTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding gas that was recently heated by AGN."
+  },
+  "BoundSubhalo/GasVelocityDispersionMatrix": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Mass-weighted velocity dispersion of the gas. Measured relative to the gas centre of mass velocity. The order of the components of the dispersion tensor is XX YY ZZ XY XZ YZ."
+  },
+  "BoundSubhalo/HalfMassRadiusBaryons": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Baryonic (gas and stars) half mass radius."
+  },
+  "BoundSubhalo/HalfMassRadiusDarkMatter": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Dark matter half mass radius."
+  },
+  "BoundSubhalo/HalfMassRadiusGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Gas half mass radius."
+  },
+  "BoundSubhalo/HalfMassRadiusStars": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Stellar half mass radius."
+  },
+  "BoundSubhalo/HalfMassRadiusTotal": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total half mass radius."
+  },
+  "BoundSubhalo/KappaCorotBaryons": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Kappa-corot for baryons (gas and stars), relative to the centre of potential and the centre of mass velocity of the baryons."
+  },
+  "BoundSubhalo/KappaCorotGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Kappa-corot for gas, relative to the centre of potential and the centre of mass velocity of the gas."
+  },
+  "BoundSubhalo/KappaCorotStars": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Kappa-corot for stars, relative to the centre of potential and the centre of mass velocity of the stars."
+  },
+  "BoundSubhalo/LuminosityWeightedMeanStellarAge": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Luminosity weighted mean stellar age. The weight is the r band luminosity."
+  },
+  "BoundSubhalo/MassWeightedMeanStellarAge": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass weighted mean stellar age."
+  },
+  "BoundSubhalo/MaximumCircularVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Maximum circular velocity when accounting for particle softening lengths."
+  },
+  "BoundSubhalo/MaximumCircularVelocityRadiusUnsoftened": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Radius at which MaximumCircularVelocityUnsoftened is reached."
+  },
+  "BoundSubhalo/MaximumCircularVelocityUnsoftened": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Maximum circular velocity when not accounting for particle softening lengths."
+  },
+  "BoundSubhalo/MaximumDarkMatterCircularVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Maximum circular velocity calculated using dark matter particles when accounting for particle softening lengths.."
+  },
+  "BoundSubhalo/MaximumDarkMatterCircularVelocityRadius": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Radius at which MaximumDarkMatterCircularVelocity is reached."
+  },
+  "BoundSubhalo/MostMassiveBlackHoleAccretionRate": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Gas accretion rate of most massive black hole."
+  },
+  "BoundSubhalo/MostMassiveBlackHoleID": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "ID of most massive black hole."
+  },
+  "BoundSubhalo/MostMassiveBlackHoleLastEventScalefactor": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Scale-factor of last AGN event for most massive black hole."
+  },
+  "BoundSubhalo/MostMassiveBlackHoleMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass of most massive black hole."
+  },
+  "BoundSubhalo/MostMassiveBlackHolePosition": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Position of most massive black hole."
+  },
+  "BoundSubhalo/MostMassiveBlackHoleVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Velocity of most massive black hole relative to the simulation volume."
+  },
+  "BoundSubhalo/NumberOfBlackHoleParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of black hole particles."
+  },
+  "BoundSubhalo/NumberOfDarkMatterParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of dark matter particles."
+  },
+  "BoundSubhalo/NumberOfGasParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of gas particles."
+  },
+  "BoundSubhalo/NumberOfStarParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of star particles."
+  },
+  "BoundSubhalo/SpinParameter": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Bullock et al. (2001) spin parameter."
+  },
+  "BoundSubhalo/StarFormationRate": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total star formation rate."
+  },
+  "BoundSubhalo/StarFormingGasMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total mass of star-forming gas."
+  },
+  "BoundSubhalo/StarFormingGasMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in metals for gas that is star-forming."
+  },
+  "BoundSubhalo/StellarInertiaTensor": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed iteratively from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more than 20"
+  },
+  "BoundSubhalo/StellarInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have mo"
+  },
+  "BoundSubhalo/StellarInertiaTensorReduced": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed iteratively from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more"
+  },
+  "BoundSubhalo/StellarInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we"
+  },
+  "BoundSubhalo/StellarInitialMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar initial mass."
+  },
+  "BoundSubhalo/StellarLuminosity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    9
+   ],
+   "description": "Total stellar luminosity in the 9 GAMA bands."
+  },
+  "BoundSubhalo/StellarMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass."
+  },
+  "BoundSubhalo/StellarMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in metals."
+  },
+  "BoundSubhalo/StellarVelocityDispersionMatrix": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Mass-weighted velocity dispersion of the stars. Measured relative to the stellar centre of mass velocity. The order of the components of the dispersion tensor is XX YY ZZ XY XZ YZ."
+  },
+  "BoundSubhalo/TotalInertiaTensor": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed iteratively from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more than 20 p"
+  },
+  "BoundSubhalo/TotalInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more"
+  },
+  "BoundSubhalo/TotalInertiaTensorReduced": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed iteratively from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more t"
+  },
+  "BoundSubhalo/TotalInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we h"
+  },
+  "BoundSubhalo/TotalMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total mass."
+  },
+  "InputHalos/FOF/Centres": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass of the host FOF halo of this subhalo. Zero for satellite and hostless subhalos."
+  },
+  "InputHalos/FOF/Masses": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass of the host FOF halo of this subhalo. Zero for satellite and hostless subhalos."
+  },
+  "InputHalos/FOF/Sizes": {
+   "dtype": "uint64",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of particles in the host FOF halo of this subhalo. Zero for satellite and hostless subhalos."
+  },
+  "InputHalos/HBTplus/Depth": {
+   "dtype": "uint64",
+   "shape": [
+    15329653
+   ],
+   "description": "Level of the subhalo in the merging hierarchy."
+  },
+  "InputHalos/HBTplus/DescendantTrackId": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "TrackId of the descendant of this subhalo."
+  },
+  "InputHalos/HBTplus/HostFOFId": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "ID of the host FOF halo of this subhalo. Hostless halos have HostFOFId == -1"
+  },
+  "InputHalos/HBTplus/LastMaxMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Maximum mass of this subhalo across its evolutionary history"
+  },
+  "InputHalos/HBTplus/LastMaxVmaxPhysical": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Largest value of maximum circular velocity of this subhalo across its evolutionary history"
+  },
+  "InputHalos/HBTplus/NestedParentTrackId": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "TrackId of the parent of this subhalo."
+  },
+  "InputHalos/HBTplus/SnapshotIndexOfBirth": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "Snapshot when this subhalo was formed."
+  },
+  "InputHalos/HBTplus/SnapshotIndexOfLastMaxMass": {
+   "dtype": "uint64",
+   "shape": [
+    15329653
+   ],
+   "description": "Latest snapshot when this subhalo had its maximum mass."
+  },
+  "InputHalos/HBTplus/SnapshotIndexOfLastMaxVmax": {
+   "dtype": "uint64",
+   "shape": [
+    15329653
+   ],
+   "description": "Latest snapshot when this subhalo had its largest maximum circular velocity."
+  },
+  "InputHalos/HBTplus/TrackId": {
+   "dtype": "uint64",
+   "shape": [
+    15329653
+   ],
+   "description": "Unique ID for this subhalo which is consistent across snapshots."
+  },
+  "InputHalos/HaloCatalogueIndex": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "Index of this halo in the original halo finder catalogue (first halo has index=0)."
+  },
+  "InputHalos/HaloCentre": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "The centre of the subhalo as given by the halo finder. Used as reference for all relative positions. For VR and HBTplus this is equal to the position of the most bound particle in the subhalo."
+  },
+  "InputHalos/IsCentral": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "Whether the halo finder flagged the halo as central (1) or satellite (0)."
+  },
+  "InputHalos/NumberOfBoundParticles": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total number of particles bound to the subhalo."
+  },
+  "SO/200_crit/AngularMomentumBaryons": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of baryons (gas and stars), relative to the centre of potential and baryonic centre of mass velocity."
+  },
+  "SO/200_crit/AngularMomentumDarkMatter": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the dark matter, relative to the centre of potential and DM centre of mass velocity."
+  },
+  "SO/200_crit/AngularMomentumGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the gas, relative to the centre of potential and gas centre of mass velocity."
+  },
+  "SO/200_crit/AngularMomentumStars": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the stars, relative to the centre of potential and stellar centre of mass velocity."
+  },
+  "SO/200_crit/BlackHolesDynamicalMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total BH dynamical mass."
+  },
+  "SO/200_crit/BlackHolesLastEventScalefactor": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Scale-factor of last AGN event."
+  },
+  "SO/200_crit/BlackHolesSubgridMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total BH subgrid mass."
+  },
+  "SO/200_crit/CentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass."
+  },
+  "SO/200_crit/CentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity."
+  },
+  "SO/200_crit/ComptonY": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total Compton y parameter."
+  },
+  "SO/200_crit/ComptonYWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total Compton y parameter. Excludes gas that was recently heated by AGN."
+  },
+  "SO/200_crit/Concentration": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Halo concentration assuming an NFW profile. Minimum particle radius set to softening length"
+  },
+  "SO/200_crit/ConcentrationUnsoftened": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Halo concentration assuming an NFW profile. No particle softening."
+  },
+  "SO/200_crit/DarkMatterConcentration": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Concentration of dark matter particles assuming an NFW profile. Minimum particle radius set to softening length"
+  },
+  "SO/200_crit/DarkMatterConcentrationUnsoftened": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Concentration of dark matter particles assuming an NFW profile. No particle softening"
+  },
+  "SO/200_crit/DarkMatterInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single interation from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more t"
+  },
+  "SO/200_crit/DarkMatterInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single interation from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we hav"
+  },
+  "SO/200_crit/DarkMatterMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total DM mass."
+  },
+  "SO/200_crit/DiscToTotalGasMassFraction": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of the total gas mass that is co-rotating."
+  },
+  "SO/200_crit/DiscToTotalStellarMassFraction": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of the total stellar mass that is co-rotating."
+  },
+  "SO/200_crit/DopplerB": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Kinetic Sunyaey-Zel'dovich effect, assuming a line of sight towards the position of the first lightcone observer."
+  },
+  "SO/200_crit/GasCentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass of gas."
+  },
+  "SO/200_crit/GasCentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity of gas."
+  },
+  "SO/200_crit/GasComptonYTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "ComptonY-weighted mean gas temperature."
+  },
+  "SO/200_crit/GasComptonYTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "ComptonY-weighted mean gas temperature, excluding gas that was recently heated by AGN."
+  },
+  "SO/200_crit/GasInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more t"
+  },
+  "SO/200_crit/GasInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we hav"
+  },
+  "SO/200_crit/GasMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass."
+  },
+  "SO/200_crit/GasMassFractionInIron": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in iron."
+  },
+  "SO/200_crit/GasMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in metals."
+  },
+  "SO/200_crit/GasMassFractionInOxygen": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass in oxygen."
+  },
+  "SO/200_crit/GasTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature."
+  },
+  "SO/200_crit/GasTemperatureWithoutCoolGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding cool gas with a temperature below 1e5 K."
+  },
+  "SO/200_crit/GasTemperatureWithoutCoolGasAndRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding cool gas with a temperature below 1e5 K and gas that was recently heated by AGN."
+  },
+  "SO/200_crit/GasTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding gas that was recently heated by AGN."
+  },
+  "SO/200_crit/HotGasMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total mass of gas with a temperature above 1e5 K."
+  },
+  "SO/200_crit/KineticEnergyGas": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total kinetic energy of the gas, relative to the gas centre of mass velocity."
+  },
+  "SO/200_crit/KineticEnergyStars": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total kinetic energy of the stars, relative to the stellar centre of mass velocity."
+  },
+  "SO/200_crit/MassFractionExternal": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of mass that is bound to a satellite outside this FOF group."
+  },
+  "SO/200_crit/MassFractionSatellites": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of mass that is bound to a satellite in the same FOF group."
+  },
+  "SO/200_crit/MostMassiveBlackHoleAccretionRate": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Gas accretion rate of most massive black hole."
+  },
+  "SO/200_crit/MostMassiveBlackHoleID": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "ID of most massive black hole."
+  },
+  "SO/200_crit/MostMassiveBlackHoleLastEventScalefactor": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Scale-factor of last AGN event for most massive black hole."
+  },
+  "SO/200_crit/MostMassiveBlackHoleMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass of most massive black hole."
+  },
+  "SO/200_crit/MostMassiveBlackHolePosition": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Position of most massive black hole."
+  },
+  "SO/200_crit/MostMassiveBlackHoleVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Velocity of most massive black hole relative to the simulation volume."
+  },
+  "SO/200_crit/NoiseSuppressedNeutrinoMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Noise suppressed total neutrino mass."
+  },
+  "SO/200_crit/NumberOfBlackHoleParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of black hole particles."
+  },
+  "SO/200_crit/NumberOfDarkMatterParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of dark matter particles."
+  },
+  "SO/200_crit/NumberOfGasParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of gas particles."
+  },
+  "SO/200_crit/NumberOfNeutrinoParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of neutrino particles."
+  },
+  "SO/200_crit/NumberOfStarParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of star particles."
+  },
+  "SO/200_crit/RawNeutrinoMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total neutrino particle mass."
+  },
+  "SO/200_crit/SORadius": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Radius of a sphere within which the density is 200 times the critical value"
+  },
+  "SO/200_crit/SpectroscopicLikeTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Spectroscopic-like gas temperature."
+  },
+  "SO/200_crit/SpectroscopicLikeTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Spectroscopic-like gas temperature. Exclude gas that was recently heated by AGN"
+  },
+  "SO/200_crit/SpinParameter": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Bullock et al. (2001) spin parameter."
+  },
+  "SO/200_crit/StarFormationRate": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total star formation rate."
+  },
+  "SO/200_crit/StarFormingGasMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in metals for gas that is star-forming."
+  },
+  "SO/200_crit/StellarCentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass of stars."
+  },
+  "SO/200_crit/StellarCentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity of stars."
+  },
+  "SO/200_crit/StellarInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have mo"
+  },
+  "SO/200_crit/StellarInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we"
+  },
+  "SO/200_crit/StellarInitialMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar initial mass."
+  },
+  "SO/200_crit/StellarLuminosity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    9
+   ],
+   "description": "Total stellar luminosity in the 9 GAMA bands."
+  },
+  "SO/200_crit/StellarMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass."
+  },
+  "SO/200_crit/StellarMassFractionInIron": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in iron."
+  },
+  "SO/200_crit/StellarMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in metals."
+  },
+  "SO/200_crit/StellarMassFractionInOxygen": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in oxygen."
+  },
+  "SO/200_crit/ThermalEnergyGas": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total thermal energy of the gas."
+  },
+  "SO/200_crit/TotalInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more"
+  },
+  "SO/200_crit/TotalInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we h"
+  },
+  "SO/200_crit/TotalMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total mass."
+  },
+  "SO/200_crit/XRayLuminosity": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray luminosity in three bands."
+  },
+  "SO/200_crit/XRayLuminosityInRestframe": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray luminosity in three bands."
+  },
+  "SO/200_crit/XRayLuminosityInRestframeWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray luminosity in three bands. Excludes gas that was recently heated by AGN."
+  },
+  "SO/200_crit/XRayLuminosityWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray luminosity in three bands. Excludes gas that was recently heated by AGN."
+  },
+  "SO/200_crit/XRayPhotonLuminosity": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray photon luminosity in three bands."
+  },
+  "SO/200_crit/XRayPhotonLuminosityInRestframe": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray photon luminosity in three bands."
+  },
+  "SO/200_crit/XRayPhotonLuminosityInRestframeWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray photon luminosity in three bands. Exclude gas that was recently heated by AGN."
+  },
+  "SO/200_crit/XRayPhotonLuminosityWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray photon luminosity in three bands. Exclude gas that was recently heated by AGN."
+  },
+  "SO/500_crit/AngularMomentumBaryons": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of baryons (gas and stars), relative to the centre of potential and baryonic centre of mass velocity."
+  },
+  "SO/500_crit/AngularMomentumDarkMatter": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the dark matter, relative to the centre of potential and DM centre of mass velocity."
+  },
+  "SO/500_crit/AngularMomentumGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the gas, relative to the centre of potential and gas centre of mass velocity."
+  },
+  "SO/500_crit/AngularMomentumStars": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the stars, relative to the centre of potential and stellar centre of mass velocity."
+  },
+  "SO/500_crit/BlackHolesDynamicalMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total BH dynamical mass."
+  },
+  "SO/500_crit/BlackHolesLastEventScalefactor": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Scale-factor of last AGN event."
+  },
+  "SO/500_crit/BlackHolesSubgridMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total BH subgrid mass."
+  },
+  "SO/500_crit/CentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass."
+  },
+  "SO/500_crit/CentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity."
+  },
+  "SO/500_crit/ComptonY": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total Compton y parameter."
+  },
+  "SO/500_crit/ComptonYWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total Compton y parameter. Excludes gas that was recently heated by AGN."
+  },
+  "SO/500_crit/Concentration": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Halo concentration assuming an NFW profile. Minimum particle radius set to softening length"
+  },
+  "SO/500_crit/ConcentrationUnsoftened": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Halo concentration assuming an NFW profile. No particle softening."
+  },
+  "SO/500_crit/DarkMatterConcentration": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Concentration of dark matter particles assuming an NFW profile. Minimum particle radius set to softening length"
+  },
+  "SO/500_crit/DarkMatterConcentrationUnsoftened": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Concentration of dark matter particles assuming an NFW profile. No particle softening"
+  },
+  "SO/500_crit/DarkMatterInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single interation from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more t"
+  },
+  "SO/500_crit/DarkMatterInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single interation from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we hav"
+  },
+  "SO/500_crit/DarkMatterMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total DM mass."
+  },
+  "SO/500_crit/DiscToTotalGasMassFraction": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of the total gas mass that is co-rotating."
+  },
+  "SO/500_crit/DiscToTotalStellarMassFraction": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of the total stellar mass that is co-rotating."
+  },
+  "SO/500_crit/DopplerB": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Kinetic Sunyaey-Zel'dovich effect, assuming a line of sight towards the position of the first lightcone observer."
+  },
+  "SO/500_crit/GasCentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass of gas."
+  },
+  "SO/500_crit/GasCentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity of gas."
+  },
+  "SO/500_crit/GasComptonYTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "ComptonY-weighted mean gas temperature."
+  },
+  "SO/500_crit/GasComptonYTemperatureCoreExcision": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "ComptonY-weighted mean gas temperature, excluding the inner 0.15*R500_crit."
+  },
+  "SO/500_crit/GasComptonYTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "ComptonY-weighted mean gas temperature, excluding gas that was recently heated by AGN."
+  },
+  "SO/500_crit/GasComptonYTemperatureWithoutRecentAGNHeatingCoreExcision": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "ComptonY-weighted mean gas temperature, excluding the inner 0.15*R500_crit and gas that was recently heated by AGN."
+  },
+  "SO/500_crit/GasInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more t"
+  },
+  "SO/500_crit/GasInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we hav"
+  },
+  "SO/500_crit/GasMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass."
+  },
+  "SO/500_crit/GasMassFractionInIron": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in iron."
+  },
+  "SO/500_crit/GasMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in metals."
+  },
+  "SO/500_crit/GasMassFractionInOxygen": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass in oxygen."
+  },
+  "SO/500_crit/GasTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature."
+  },
+  "SO/500_crit/GasTemperatureCoreExcision": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding the inner 0.15*R500_crit."
+  },
+  "SO/500_crit/GasTemperatureWithoutCoolGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding cool gas with a temperature below 1e5 K."
+  },
+  "SO/500_crit/GasTemperatureWithoutCoolGasAndRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding cool gas with a temperature below 1e5 K and gas that was recently heated by AGN."
+  },
+  "SO/500_crit/GasTemperatureWithoutCoolGasAndRecentAGNHeatingCoreExcision": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding the inner 0.15*R500_crit, gas below 1e5 K and gas that was recently heated by AGN."
+  },
+  "SO/500_crit/GasTemperatureWithoutCoolGasCoreExcision": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding the inner 0.15*R500_crit and gas below 1e5 K."
+  },
+  "SO/500_crit/GasTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding gas that was recently heated by AGN."
+  },
+  "SO/500_crit/GasTemperatureWithoutRecentAGNHeatingCoreExcision": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding the inner 0.15*R500_crit, and gas that was recently heated by AGN."
+  },
+  "SO/500_crit/HotGasMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total mass of gas with a temperature above 1e5 K."
+  },
+  "SO/500_crit/KineticEnergyGas": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total kinetic energy of the gas, relative to the gas centre of mass velocity."
+  },
+  "SO/500_crit/KineticEnergyStars": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total kinetic energy of the stars, relative to the stellar centre of mass velocity."
+  },
+  "SO/500_crit/MassFractionExternal": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of mass that is bound to a satellite outside this FOF group."
+  },
+  "SO/500_crit/MassFractionSatellites": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of mass that is bound to a satellite in the same FOF group."
+  },
+  "SO/500_crit/MostMassiveBlackHoleAccretionRate": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Gas accretion rate of most massive black hole."
+  },
+  "SO/500_crit/MostMassiveBlackHoleID": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "ID of most massive black hole."
+  },
+  "SO/500_crit/MostMassiveBlackHoleLastEventScalefactor": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Scale-factor of last AGN event for most massive black hole."
+  },
+  "SO/500_crit/MostMassiveBlackHoleMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass of most massive black hole."
+  },
+  "SO/500_crit/MostMassiveBlackHolePosition": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Position of most massive black hole."
+  },
+  "SO/500_crit/MostMassiveBlackHoleVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Velocity of most massive black hole relative to the simulation volume."
+  },
+  "SO/500_crit/NoiseSuppressedNeutrinoMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Noise suppressed total neutrino mass."
+  },
+  "SO/500_crit/NumberOfBlackHoleParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of black hole particles."
+  },
+  "SO/500_crit/NumberOfDarkMatterParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of dark matter particles."
+  },
+  "SO/500_crit/NumberOfGasParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of gas particles."
+  },
+  "SO/500_crit/NumberOfNeutrinoParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of neutrino particles."
+  },
+  "SO/500_crit/NumberOfStarParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of star particles."
+  },
+  "SO/500_crit/RawNeutrinoMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total neutrino particle mass."
+  },
+  "SO/500_crit/SORadius": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Radius of a sphere within which the density is 500 times the critical value"
+  },
+  "SO/500_crit/SpectroscopicLikeTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Spectroscopic-like gas temperature."
+  },
+  "SO/500_crit/SpectroscopicLikeTemperatureCoreExcision": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Spectroscopic-like gas temperature. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/500_crit/SpectroscopicLikeTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Spectroscopic-like gas temperature. Exclude gas that was recently heated by AGN"
+  },
+  "SO/500_crit/SpectroscopicLikeTemperatureWithoutRecentAGNHeatingCoreExcision": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Spectroscopic-like gas temperature. Exclude gas that was recently heated by AGN. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/500_crit/SpinParameter": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Bullock et al. (2001) spin parameter."
+  },
+  "SO/500_crit/StarFormationRate": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total star formation rate."
+  },
+  "SO/500_crit/StarFormingGasMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in metals for gas that is star-forming."
+  },
+  "SO/500_crit/StellarCentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass of stars."
+  },
+  "SO/500_crit/StellarCentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity of stars."
+  },
+  "SO/500_crit/StellarInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have mo"
+  },
+  "SO/500_crit/StellarInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we"
+  },
+  "SO/500_crit/StellarInitialMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar initial mass."
+  },
+  "SO/500_crit/StellarLuminosity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    9
+   ],
+   "description": "Total stellar luminosity in the 9 GAMA bands."
+  },
+  "SO/500_crit/StellarMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass."
+  },
+  "SO/500_crit/StellarMassFractionInIron": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in iron."
+  },
+  "SO/500_crit/StellarMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in metals."
+  },
+  "SO/500_crit/StellarMassFractionInOxygen": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in oxygen."
+  },
+  "SO/500_crit/ThermalEnergyGas": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total thermal energy of the gas."
+  },
+  "SO/500_crit/TotalInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more"
+  },
+  "SO/500_crit/TotalInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we h"
+  },
+  "SO/500_crit/TotalMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total mass."
+  },
+  "SO/500_crit/XRayLuminosity": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray luminosity in three bands."
+  },
+  "SO/500_crit/XRayLuminosityCoreExcision": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray luminosity in three bands. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/500_crit/XRayLuminosityInRestframe": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray luminosity in three bands."
+  },
+  "SO/500_crit/XRayLuminosityInRestframeCoreExcision": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray luminosity in three bands. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/500_crit/XRayLuminosityInRestframeWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray luminosity in three bands. Excludes gas that was recently heated by AGN."
+  },
+  "SO/500_crit/XRayLuminosityInRestframeWithoutRecentAGNHeatingCoreExcision": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray luminosity in three bands. Excludes gas that was recently heated by AGN. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/500_crit/XRayLuminosityWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray luminosity in three bands. Excludes gas that was recently heated by AGN."
+  },
+  "SO/500_crit/XRayLuminosityWithoutRecentAGNHeatingCoreExcision": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray luminosity in three bands. Excludes gas that was recently heated by AGN. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/500_crit/XRayPhotonLuminosity": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray photon luminosity in three bands."
+  },
+  "SO/500_crit/XRayPhotonLuminosityCoreExcision": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray photon luminosity in three bands. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/500_crit/XRayPhotonLuminosityInRestframe": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray photon luminosity in three bands."
+  },
+  "SO/500_crit/XRayPhotonLuminosityInRestframeCoreExcision": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray photon luminosity in three bands. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/500_crit/XRayPhotonLuminosityInRestframeWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray photon luminosity in three bands. Exclude gas that was recently heated by AGN."
+  },
+  "SO/500_crit/XRayPhotonLuminosityInRestframeWithoutRecentAGNHeatingCoreExcision": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray photon luminosity in three bands. Exclude gas that was recently heated by AGN. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/500_crit/XRayPhotonLuminosityWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray photon luminosity in three bands. Exclude gas that was recently heated by AGN."
+  },
+  "SO/500_crit/XRayPhotonLuminosityWithoutRecentAGNHeatingCoreExcision": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray photon luminosity in three bands. Exclude gas that was recently heated by AGN. Excludes gas in the inner 0.15*R500_crit"
+  },
+  "SO/5xR_500_crit/AngularMomentumBaryons": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of baryons (gas and stars), relative to the centre of potential and baryonic centre of mass velocity."
+  },
+  "SO/5xR_500_crit/AngularMomentumDarkMatter": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the dark matter, relative to the centre of potential and DM centre of mass velocity."
+  },
+  "SO/5xR_500_crit/AngularMomentumGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the gas, relative to the centre of potential and gas centre of mass velocity."
+  },
+  "SO/5xR_500_crit/AngularMomentumStars": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total angular momentum of the stars, relative to the centre of potential and stellar centre of mass velocity."
+  },
+  "SO/5xR_500_crit/BlackHolesDynamicalMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total BH dynamical mass."
+  },
+  "SO/5xR_500_crit/BlackHolesLastEventScalefactor": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Scale-factor of last AGN event."
+  },
+  "SO/5xR_500_crit/BlackHolesSubgridMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total BH subgrid mass."
+  },
+  "SO/5xR_500_crit/CentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass."
+  },
+  "SO/5xR_500_crit/CentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity."
+  },
+  "SO/5xR_500_crit/ComptonY": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total Compton y parameter."
+  },
+  "SO/5xR_500_crit/ComptonYWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total Compton y parameter. Excludes gas that was recently heated by AGN."
+  },
+  "SO/5xR_500_crit/Concentration": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Halo concentration assuming an NFW profile. Minimum particle radius set to softening length"
+  },
+  "SO/5xR_500_crit/ConcentrationUnsoftened": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Halo concentration assuming an NFW profile. No particle softening."
+  },
+  "SO/5xR_500_crit/DarkMatterConcentration": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Concentration of dark matter particles assuming an NFW profile. Minimum particle radius set to softening length"
+  },
+  "SO/5xR_500_crit/DarkMatterConcentrationUnsoftened": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Concentration of dark matter particles assuming an NFW profile. No particle softening"
+  },
+  "SO/5xR_500_crit/DarkMatterInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single interation from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more t"
+  },
+  "SO/5xR_500_crit/DarkMatterInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single interation from the DM mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we hav"
+  },
+  "SO/5xR_500_crit/DarkMatterMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total DM mass."
+  },
+  "SO/5xR_500_crit/DiscToTotalGasMassFraction": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of the total gas mass that is co-rotating."
+  },
+  "SO/5xR_500_crit/DiscToTotalStellarMassFraction": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of the total stellar mass that is co-rotating."
+  },
+  "SO/5xR_500_crit/DopplerB": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Kinetic Sunyaey-Zel'dovich effect, assuming a line of sight towards the position of the first lightcone observer."
+  },
+  "SO/5xR_500_crit/GasCentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass of gas."
+  },
+  "SO/5xR_500_crit/GasCentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity of gas."
+  },
+  "SO/5xR_500_crit/GasComptonYTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "ComptonY-weighted mean gas temperature."
+  },
+  "SO/5xR_500_crit/GasComptonYTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "ComptonY-weighted mean gas temperature, excluding gas that was recently heated by AGN."
+  },
+  "SO/5xR_500_crit/GasInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more t"
+  },
+  "SO/5xR_500_crit/GasInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the gas mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we hav"
+  },
+  "SO/5xR_500_crit/GasMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass."
+  },
+  "SO/5xR_500_crit/GasMassFractionInIron": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in iron."
+  },
+  "SO/5xR_500_crit/GasMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in metals."
+  },
+  "SO/5xR_500_crit/GasMassFractionInOxygen": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass in oxygen."
+  },
+  "SO/5xR_500_crit/GasTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature."
+  },
+  "SO/5xR_500_crit/GasTemperatureWithoutCoolGas": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding cool gas with a temperature below 1e5 K."
+  },
+  "SO/5xR_500_crit/GasTemperatureWithoutCoolGasAndRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding cool gas with a temperature below 1e5 K and gas that was recently heated by AGN."
+  },
+  "SO/5xR_500_crit/GasTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass-weighted mean gas temperature, excluding gas that was recently heated by AGN."
+  },
+  "SO/5xR_500_crit/HotGasMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total mass of gas with a temperature above 1e5 K."
+  },
+  "SO/5xR_500_crit/KineticEnergyGas": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total kinetic energy of the gas, relative to the gas centre of mass velocity."
+  },
+  "SO/5xR_500_crit/KineticEnergyStars": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total kinetic energy of the stars, relative to the stellar centre of mass velocity."
+  },
+  "SO/5xR_500_crit/MassFractionExternal": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of mass that is bound to a satellite outside this FOF group."
+  },
+  "SO/5xR_500_crit/MassFractionSatellites": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Fraction of mass that is bound to a satellite in the same FOF group."
+  },
+  "SO/5xR_500_crit/MostMassiveBlackHoleAccretionRate": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Gas accretion rate of most massive black hole."
+  },
+  "SO/5xR_500_crit/MostMassiveBlackHoleID": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "ID of most massive black hole."
+  },
+  "SO/5xR_500_crit/MostMassiveBlackHoleLastEventScalefactor": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Scale-factor of last AGN event for most massive black hole."
+  },
+  "SO/5xR_500_crit/MostMassiveBlackHoleMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Mass of most massive black hole."
+  },
+  "SO/5xR_500_crit/MostMassiveBlackHolePosition": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Position of most massive black hole."
+  },
+  "SO/5xR_500_crit/MostMassiveBlackHoleVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Velocity of most massive black hole relative to the simulation volume."
+  },
+  "SO/5xR_500_crit/NoiseSuppressedNeutrinoMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Noise suppressed total neutrino mass."
+  },
+  "SO/5xR_500_crit/NumberOfBlackHoleParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of black hole particles."
+  },
+  "SO/5xR_500_crit/NumberOfDarkMatterParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of dark matter particles."
+  },
+  "SO/5xR_500_crit/NumberOfGasParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of gas particles."
+  },
+  "SO/5xR_500_crit/NumberOfNeutrinoParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of neutrino particles."
+  },
+  "SO/5xR_500_crit/NumberOfStarParticles": {
+   "dtype": "uint32",
+   "shape": [
+    15329653
+   ],
+   "description": "Number of star particles."
+  },
+  "SO/5xR_500_crit/RawNeutrinoMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total neutrino particle mass."
+  },
+  "SO/5xR_500_crit/SORadius": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Radius of a sphere with a radius that is 5xR_500_crit"
+  },
+  "SO/5xR_500_crit/SpectroscopicLikeTemperature": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Spectroscopic-like gas temperature."
+  },
+  "SO/5xR_500_crit/SpectroscopicLikeTemperatureWithoutRecentAGNHeating": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Spectroscopic-like gas temperature. Exclude gas that was recently heated by AGN"
+  },
+  "SO/5xR_500_crit/SpinParameter": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Bullock et al. (2001) spin parameter."
+  },
+  "SO/5xR_500_crit/StarFormationRate": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total star formation rate."
+  },
+  "SO/5xR_500_crit/StarFormingGasMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total gas mass fraction in metals for gas that is star-forming."
+  },
+  "SO/5xR_500_crit/StellarCentreOfMass": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass of stars."
+  },
+  "SO/5xR_500_crit/StellarCentreOfMassVelocity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Centre of mass velocity of stars."
+  },
+  "SO/5xR_500_crit/StellarInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have mo"
+  },
+  "SO/5xR_500_crit/StellarInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the stellar mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we"
+  },
+  "SO/5xR_500_crit/StellarInitialMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar initial mass."
+  },
+  "SO/5xR_500_crit/StellarLuminosity": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    9
+   ],
+   "description": "Total stellar luminosity in the 9 GAMA bands."
+  },
+  "SO/5xR_500_crit/StellarMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass."
+  },
+  "SO/5xR_500_crit/StellarMassFractionInIron": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in iron."
+  },
+  "SO/5xR_500_crit/StellarMassFractionInMetals": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in metals."
+  },
+  "SO/5xR_500_crit/StellarMassFractionInOxygen": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total stellar mass fraction in oxygen."
+  },
+  "SO/5xR_500_crit/ThermalEnergyGas": {
+   "dtype": "float64",
+   "shape": [
+    15329653
+   ],
+   "description": "Total thermal energy of the gas."
+  },
+  "SO/5xR_500_crit/TotalInertiaTensorNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "3D inertia tensor computed in a single iteration from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we have more"
+  },
+  "SO/5xR_500_crit/TotalInertiaTensorReducedNoniterative": {
+   "dtype": "float32",
+   "shape": [
+    15329653,
+    6
+   ],
+   "description": "Reduced 3D inertia tensor computed in a single iteration from the total mass distribution, relative to the halo centre. Diagonal components and one off-diagonal triangle as (1,1), (2,2), (3,3), (1,2), (1,3), (2,3). Only calculated when we h"
+  },
+  "SO/5xR_500_crit/TotalMass": {
+   "dtype": "float32",
+   "shape": [
+    15329653
+   ],
+   "description": "Total mass."
+  },
+  "SO/5xR_500_crit/XRayLuminosity": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray luminosity in three bands."
+  },
+  "SO/5xR_500_crit/XRayLuminosityInRestframe": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray luminosity in three bands."
+  },
+  "SO/5xR_500_crit/XRayLuminosityInRestframeWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray luminosity in three bands. Excludes gas that was recently heated by AGN."
+  },
+  "SO/5xR_500_crit/XRayLuminosityWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray luminosity in three bands. Excludes gas that was recently heated by AGN."
+  },
+  "SO/5xR_500_crit/XRayPhotonLuminosity": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray photon luminosity in three bands."
+  },
+  "SO/5xR_500_crit/XRayPhotonLuminosityInRestframe": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray photon luminosity in three bands."
+  },
+  "SO/5xR_500_crit/XRayPhotonLuminosityInRestframeWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total rest-frame Xray photon luminosity in three bands. Exclude gas that was recently heated by AGN."
+  },
+  "SO/5xR_500_crit/XRayPhotonLuminosityWithoutRecentAGNHeating": {
+   "dtype": "float64",
+   "shape": [
+    15329653,
+    3
+   ],
+   "description": "Total observer-frame Xray photon luminosity in three bands. Exclude gas that was recently heated by AGN."
+  },
+  "SOAP/HostHaloIndex": {
+   "dtype": "int64",
+   "shape": [
+    15329653
+   ],
+   "description": "Index (within the SOAP arrays) of the top level parent of this subhalo. -1 for central subhalos."
+  },
+  "SOAP/IncludedInReducedSnapshot": {
+   "dtype": "int32",
+   "shape": [
+    15329653
+   ],
+   "description": "Whether this halo is included in the reduced snapshot."
+  },
+  "SOAP/SubhaloRankByBoundMass": {
+   "dtype": "int32",
+   "shape": [
+    15329653
+   ],
+   "description": "Ranking by mass of the halo within its parent field halo. Zero for the most massive halo in the field halo."
+  }
+ },
+ "soap_required": {
+  "InputHalos/HaloCatalogueIndex": true,
+  "InputHalos/IsCentral": true,
+  "SOAP/HostHaloIndex": true,
+  "InputHalos/HaloCentre": true,
+  "BoundSubhalo/TotalMass": true,
+  "BoundSubhalo/GasMass": true,
+  "BoundSubhalo/NumberOfGasParticles": true,
+  "SO/200_crit/TotalMass": true,
+  "SO/200_crit/SORadius": true,
+  "SO/500_crit/TotalMass": true,
+  "SO/500_crit/SORadius": true,
+  "SO/5xR_500_crit/SORadius": true,
+  "SO/200_crit/ComptonY": true,
+  "SO/200_crit/ComptonYWithoutRecentAGNHeating": true,
+  "SO/200_crit/GasMass": true,
+  "SO/200_crit/NumberOfGasParticles": true,
+  "SO/500_crit/ComptonY": true,
+  "SO/500_crit/ComptonYWithoutRecentAGNHeating": true,
+  "SO/500_crit/GasMass": true,
+  "SO/500_crit/NumberOfGasParticles": true,
+  "SO/5xR_500_crit/ComptonY": true,
+  "SO/5xR_500_crit/ComptonYWithoutRecentAGNHeating": true,
+  "SO/5xR_500_crit/GasMass": true,
+  "SO/5xR_500_crit/NumberOfGasParticles": true,
+  "SO/500_crit/XRayLuminosity": true,
+  "SO/500_crit/XRayLuminosityWithoutRecentAGNHeating": true,
+  "SO/500_crit/XRayLuminosityInRestframe": true,
+  "SO/500_crit/XRayLuminosityInRestframeWithoutRecentAGNHeating": true
+ },
+ "soap_concentration_like": [
+  "SO/200_crit/Concentration",
+  "SO/200_crit/ConcentrationUnsoftened",
+  "SO/200_crit/DarkMatterConcentration",
+  "SO/200_crit/DarkMatterConcentrationUnsoftened",
+  "SO/500_crit/Concentration",
+  "SO/500_crit/ConcentrationUnsoftened",
+  "SO/500_crit/DarkMatterConcentration",
+  "SO/500_crit/DarkMatterConcentrationUnsoftened"
+ ],
+ "soap_formation_like": [
+  "BoundSubhalo/LuminosityWeightedMeanStellarAge",
+  "BoundSubhalo/MassWeightedMeanStellarAge",
+  "BoundSubhalo/StarFormationRate",
+  "ExclusiveSphere/1000kpc/LuminosityWeightedMeanStellarAge",
+  "ExclusiveSphere/1000kpc/MassWeightedMeanStellarAge",
+  "ExclusiveSphere/1000kpc/StarFormationRate",
+  "ExclusiveSphere/100kpc/LuminosityWeightedMeanStellarAge",
+  "ExclusiveSphere/100kpc/MassWeightedMeanStellarAge",
+  "ExclusiveSphere/100kpc/StarFormationRate",
+  "ExclusiveSphere/10kpc/LuminosityWeightedMeanStellarAge",
+  "ExclusiveSphere/10kpc/MassWeightedMeanStellarAge",
+  "ExclusiveSphere/10kpc/StarFormationRate",
+  "ExclusiveSphere/3000kpc/LuminosityWeightedMeanStellarAge",
+  "ExclusiveSphere/3000kpc/MassWeightedMeanStellarAge",
+  "ExclusiveSphere/3000kpc/StarFormationRate",
+  "ExclusiveSphere/300kpc/LuminosityWeightedMeanStellarAge",
+  "ExclusiveSphere/300kpc/MassWeightedMeanStellarAge",
+  "ExclusiveSphere/300kpc/StarFormationRate",
+  "ExclusiveSphere/30kpc/LuminosityWeightedMeanStellarAge",
+  "ExclusiveSphere/30kpc/MassWeightedMeanStellarAge",
+  "ExclusiveSphere/30kpc/StarFormationRate",
+  "ExclusiveSphere/500kpc/LuminosityWeightedMeanStellarAge",
+  "ExclusiveSphere/500kpc/MassWeightedMeanStellarAge",
+  "ExclusiveSphere/500kpc/StarFormationRate",
+  "ExclusiveSphere/50kpc/LuminosityWeightedMeanStellarAge",
+  "ExclusiveSphere/50kpc/MassWeightedMeanStellarAge",
+  "ExclusiveSphere/50kpc/StarFormationRate",
+  "InclusiveSphere/1000kpc/LuminosityWeightedMeanStellarAge",
+  "InclusiveSphere/1000kpc/MassWeightedMeanStellarAge",
+  "InclusiveSphere/1000kpc/StarFormationRate",
+  "InclusiveSphere/100kpc/LuminosityWeightedMeanStellarAge",
+  "InclusiveSphere/100kpc/MassWeightedMeanStellarAge",
+  "InclusiveSphere/100kpc/StarFormationRate",
+  "InclusiveSphere/10kpc/LuminosityWeightedMeanStellarAge",
+  "InclusiveSphere/10kpc/MassWeightedMeanStellarAge",
+  "InclusiveSphere/10kpc/StarFormationRate",
+  "InclusiveSphere/3000kpc/LuminosityWeightedMeanStellarAge",
+  "InclusiveSphere/3000kpc/MassWeightedMeanStellarAge",
+  "InclusiveSphere/3000kpc/StarFormationRate",
+  "InclusiveSphere/300kpc/LuminosityWeightedMeanStellarAge",
+  "InclusiveSphere/300kpc/MassWeightedMeanStellarAge",
+  "InclusiveSphere/300kpc/StarFormationRate",
+  "InclusiveSphere/30kpc/LuminosityWeightedMeanStellarAge",
+  "InclusiveSphere/30kpc/MassWeightedMeanStellarAge",
+  "InclusiveSphere/30kpc/StarFormationRate",
+  "InclusiveSphere/500kpc/LuminosityWeightedMeanStellarAge",
+  "InclusiveSphere/500kpc/MassWeightedMeanStellarAge",
+  "InclusiveSphere/500kpc/StarFormationRate",
+  "InclusiveSphere/50kpc/LuminosityWeightedMeanStellarAge",
+  "InclusiveSphere/50kpc/MassWeightedMeanStellarAge",
+  "InclusiveSphere/50kpc/StarFormationRate",
+  "InputHalos/HBTplus/Depth",
+  "InputHalos/HBTplus/DescendantTrackId",
+  "InputHalos/HBTplus/LastMaxMass",
+  "InputHalos/HBTplus/LastMaxVmaxPhysical",
+  "InputHalos/HBTplus/SnapshotIndexOfBirth",
+  "InputHalos/HBTplus/SnapshotIndexOfLastMaxMass",
+  "InputHalos/HBTplus/SnapshotIndexOfLastMaxVmax",
+  "ProjectedAperture/100kpc/projx/StarFormationRate",
+  "ProjectedAperture/100kpc/projy/StarFormationRate",
+  "ProjectedAperture/100kpc/projz/StarFormationRate",
+  "ProjectedAperture/10kpc/projx/StarFormationRate",
+  "ProjectedAperture/10kpc/projy/StarFormationRate",
+  "ProjectedAperture/10kpc/projz/StarFormationRate",
+  "ProjectedAperture/30kpc/projx/StarFormationRate",
+  "ProjectedAperture/30kpc/projy/StarFormationRate",
+  "ProjectedAperture/30kpc/projz/StarFormationRate",
+  "ProjectedAperture/50kpc/projx/StarFormationRate",
+  "ProjectedAperture/50kpc/projy/StarFormationRate",
+  "ProjectedAperture/50kpc/projz/StarFormationRate",
+  "SO/1000_crit/StarFormationRate",
+  "SO/100_crit/StarFormationRate",
+  "SO/200_crit/StarFormationRate",
+  "SO/200_mean/StarFormationRate",
+  "SO/2500_crit/StarFormationRate",
+  "SO/500_crit/StarFormationRate",
+  "SO/50_crit/StarFormationRate",
+  "SO/5xR_500_crit/StarFormationRate",
+  "SO/BN98/StarFormationRate",
+  "SOAP/IncludedInReducedSnapshot"
+ ],
+ "soap_xray_like": [
+  "SO/500_crit/XRayLuminosity",
+  "SO/500_crit/XRayLuminosityCoreExcision",
+  "SO/500_crit/XRayLuminosityInRestframe",
+  "SO/500_crit/XRayLuminosityInRestframeCoreExcision",
+  "SO/500_crit/XRayLuminosityInRestframeWithoutRecentAGNHeating",
+  "SO/500_crit/XRayLuminosityInRestframeWithoutRecentAGNHeatingCoreExcision",
+  "SO/500_crit/XRayLuminosityWithoutRecentAGNHeating",
+  "SO/500_crit/XRayLuminosityWithoutRecentAGNHeatingCoreExcision",
+  "SO/500_crit/XRayPhotonLuminosity",
+  "SO/500_crit/XRayPhotonLuminosityCoreExcision",
+  "SO/500_crit/XRayPhotonLuminosityInRestframe",
+  "SO/500_crit/XRayPhotonLuminosityInRestframeCoreExcision",
+  "SO/500_crit/XRayPhotonLuminosityInRestframeWithoutRecentAGNHeating",
+  "SO/500_crit/XRayPhotonLuminosityInRestframeWithoutRecentAGNHeatingCoreExcision",
+  "SO/500_crit/XRayPhotonLuminosityWithoutRecentAGNHeating",
+  "SO/500_crit/XRayPhotonLuminosityWithoutRecentAGNHeatingCoreExcision"
+ ],
+ "soap_heating_filter": {
+  "AGN_delta_T_in_K": [
+   88014419.7177
+  ],
+  "Tmax_in_K": [
+   175611854.8365807
+  ],
+  "Tmin_in_K": [
+   8801441.971770002
+  ],
+  "a_limit": 0.9989555948537917,
+  "delta_logT_max": [
+   0.3
+  ],
+  "delta_logT_min": [
+   -1.0
+  ],
+  "delta_time_in_Myr": 15.0,
+  "use_AGN_delta_T": 1.0
+ },
+ "soap_cosmology": {
+  "Cosmological run": [
+   1
+  ],
+  "Critical density [internal units]": [
+   12.871065523187008
+  ],
+  "H [internal units]": [
+   68.09999996711613
+  ],
+  "H0 [internal units]": [
+   68.09999996711613
+  ],
+  "Hubble time [internal units]": [
+   0.014684287819131808
+  ],
+  "Lookback time [internal units]": [
+   9.020562075079397e-16
+  ],
+  "M_nu_eV": [
+   0.06
+  ],
+  "N_eff": [
+   3.0440016274835076
+  ],
+  "N_nu": [
+   1.0
+  ],
+  "N_ur": [
+   2.0308
+  ],
+  "Omega_b": [
+   0.0486
+  ],
+  "Omega_cdm": [
+   0.256011
+  ],
+  "Omega_g": [
+   5.332434871909157e-05
+  ],
+  "Omega_k": [
+   2.5212782972516834e-09
+  ],
+  "Omega_lambda": [
+   0.693922
+  ],
+  "Omega_m": [
+   0.30461099999999997
+  ],
+  "Omega_nu": [
+   0.0013890794316214667
+  ],
+  "Omega_nu_0": [
+   0.0013890794316214667
+  ],
+  "Omega_r": [
+   7.791804710018577e-05
+  ],
+  "Omega_ur": [
+   2.459369838109419e-05
+  ],
+  "Redshift": [
+   0.0
+  ],
+  "Scale-factor": [
+   1.0
+  ],
+  "T_CMB_0 [K]": [
+   2.7255
+  ],
+  "T_CMB_0 [internal units]": [
+   2.7255
+  ],
+  "T_nu_0 [eV]": [
+   0.0001681894745267796
+  ],
+  "T_nu_0 [internal units]": [
+   1.951757805
+  ],
+  "Universe age [internal units]": [
+   0.014073763029629052
+  ],
+  "a_beg": [
+   0.03125
+  ],
+  "a_end": [
+   1.0
+  ],
+  "deg_nu": [
+   1.0
+  ],
+  "deg_nu_tot": [
+   1.0
+  ],
+  "h": [
+   0.681
+  ],
+  "time_beg [internal units]": [
+   9.662961221985618e-05
+  ],
+  "time_end [internal units]": [
+   0.014073763029629052
+  ],
+  "w": [
+   -1.0
+  ],
+  "w_0": [
+   -1.0
+  ],
+  "w_a": [
+   0.0
+  ]
+ },
+ "soap_named_columns": {},
+ "soap_rows": 15329653,
+ "wall_seconds": 225.40441393852234
+}

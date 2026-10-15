@@ -1,0 +1,31 @@
+#!/bin/bash
+#PBS -j oe
+# Unbounded (MERLIN_PARAM_SPACE=linear) Merlin / PCA on one input set prepared by merlin_beam_prepare.py
+# (results_merlin_unbinned$TAG), trained and evaluated in results_merlin_unbinned${TAG}_lin with the settings of
+# merlin_linear.pbs (early stop 30, lr patience 10, 61,440 rows, seeds 1-3); then posterior_rows.py on the 3,000 test
+# rows (--truncate --ranks --seed-means) and 300,000 B12 posterior draws, into posterior_rows_whitening/<NAME>_unbounded_*.
+#   qsub -q mini_B -N wlin_<name> -l select=1:ncpus=16:mem=32gb -l walltime=06:00:00 -v TAG=<tag>,NAME=<name> whiten_lin.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+PY=/home/kristero10/envs/sbi27/bin/python; C=${NCPUS:-16}
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1
+S=results_merlin_unbinned$TAG; O=${S}_lin
+[ -s $S/features_merlin.npz ] || { echo "no $S/features_merlin.npz"; exit 1; }
+mkdir -p $O
+for f in features_merlin.npz features_moped.npz prepare.json; do [ -e $S/$f ] && ln -sfn ../$S/$f $O/$f; done
+echo "host=$(hostname) ncpus=$C tag=$TAG name=$NAME start=$(date -Is)"
+LIN="MERLIN_TAG=${TAG}_lin MERLIN_PARAM_SPACE=linear MERLIN_PATIENCE=30 MERLIN_LR_PATIENCE=10"
+env $LIN OMP_NUM_THREADS=4 $PY merlin_compression.py train --variants merlin --seeds 1 2 3 --workers 3 --threads 4 & m=$!
+env $LIN OMP_NUM_THREADS=1 $PY merlin_compression.py train --variants pca --seeds 1 2 3 --workers 3 --threads 1 & p=$!
+wait $m; c1=$?; wait $p; c2=$?
+echo "trained=$(date -Is) codes=$c1,$c2"
+code=1
+if [ $c1 -eq 0 ] && [ $c2 -eq 0 ]; then
+  env $LIN OMP_NUM_THREADS=$C $PY merlin_compression.py evaluate --variants merlin pca --threads $C && \
+  env MERLIN_PARAM_SPACE=linear OMP_NUM_THREADS=$C $PY posterior_rows.py --out posterior_rows_whitening --threads $C \
+    --truncate --ranks --seed-means --b12 --b12-samples 300000 \
+    ${NAME}_unbounded_merlin=merlin:$O:merlin ${NAME}_unbounded_pca=merlin:$O:pca
+  code=$?
+fi
+echo "finished=$(date -Is) code=$code"; exit $code

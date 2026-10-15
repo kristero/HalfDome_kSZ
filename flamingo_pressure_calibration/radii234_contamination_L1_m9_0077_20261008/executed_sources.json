@@ -1,0 +1,18 @@
+{
+  "control.py": "4862caffc3f084211ddc54ff19467642b6756d6456ed5f8fb79f73a5fd810df0",
+  "swift_reader.py": "003214fcc3b1b3de453484e49685f87b3aa8406880adfa930c7a02119e56fb97",
+  "remote_control.py": "20025c03ec642abf9d440fd2d0f43489593fe5060625e59ed6fce6433e51f787",
+  "pilot_physics.py": "5826641c6117fcf4a4d155f649f41ee0915ee19881899b5d06485003c51221c0",
+  "orientations.py": "eeb513033ef2bcb1e67316ccff7826854602ca28a8cdaeaf2be516ce0d70bba6",
+  "prepare_study.py": "a180ac4bd9f8f0435e690c51ac74c79df39a6835a5b09adaa390cee567b04fdc",
+  "models.py": "df190ed06209b3f4f8849052223bbb17d7d2ba6bcd159491f8dfa33338979f1a",
+  "check_fresh_mask.py": "adf1120f9bd7a6a0fdaf0c1d7097e8bca302670242ffd5702fa0b479f052fb66",
+  "measure.py": "82602e5022f7df8ea2ed6a321bc0a6e223eb09e303bce1a2e87cb984d4d2eaba",
+  "fit_study.py": "4eaa47fcdd6f46a77f0eeb6ac877b14ac8719b3b7e6f1bf4974259b97a92df8b",
+  "projection_model.py": "ab770da5c89f9a5237d0553118d3b84207cfa453e032d1da6b1ededd4ab81e8c",
+  "extract_study.py": "0fd6282916602daca130cc2c70f318ebbccaa5aec6b0ca794cda366e8bdf4155",
+  "dependencies/catalogue_stage.py": "52996e99cc36cf16bf4d7780b05ac73d3f3ad4f9a4162911bfacc4c441dff1db",
+  "dependencies/flamingo_io.py": "46d9c71615d8d6089228d4697685cdc9dcab4c773cf66684cd88db1577f2a0be",
+  "dependencies/common.py": "afb677d837231dde4ab2537e51b552c338afd5e3fda09751a9ac6f998fdcce30",
+  "study_config.json": "5d0370c98bf7c7f86a3b525734f49f93ed472e226f7df4659dfa77bf5e53dcd8"
+}

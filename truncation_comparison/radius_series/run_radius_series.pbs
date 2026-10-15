@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -N tsz_radius_series
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=64gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -o /lustre/work/kristero10/tsz_truncation_radius_series_20260925/logs/
+#PBS -S /bin/bash
+set -euo pipefail
+ROOT=/lustre/work/kristero10/tsz_truncation_radius_series_20260925
+CAMPAIGN=/lustre/work/kristero10/flamingo_tsz_comparison_20260914
+mkdir -p "$ROOT/logs" "$ROOT/output" "$ROOT/caches"
+export JULIA_DEPOT_PATH="$CAMPAIGN/runtime/depot:/home/kristero10/.julia"
+export LD_LIBRARY_PATH="$CAMPAIGN/runtime/julia-1.12.2/lib/julia:${LD_LIBRARY_PATH:-}"
+export JULIA_NUM_PRECOMPILE_TASKS=8 JULIA_PKG_PRECOMPILE_AUTO=0 HDF5_USE_FILE_LOCKING=FALSE
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 OMP_NUM_THREADS=26
+echo "host=$(hostname) start=$(date -Is)"
+"$CAMPAIGN/runtime/julia-1.12.2/bin/julia" --startup-file=no --threads=26 --project="$CAMPAIGN/runtime/julia_env" \
+  "$ROOT/code/paint_radius_series.jl" \
+  --catalog=/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5 \
+  --nside="${NSIDE:-4096}" --max-halos="${MAX_HALOS:-0}" --chunk-size=1000000 --lmax=8192 --save-maps=true \
+  --output-dir="$ROOT/output" --cache-dir="$ROOT/caches" --use-cache=false
+echo "done $(date -Is)"

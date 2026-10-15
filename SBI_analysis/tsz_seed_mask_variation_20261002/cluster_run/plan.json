@@ -1,0 +1,285 @@
+{
+  "root": "/lustre/work/kristero10/tsz_seed_mask_variation_20261002",
+  "model_source": "/home/kristero10/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local/results_merlin_unbinned_beam_nnwhite_asinh_p30",
+  "primary_space": "linear",
+  "spaces": [
+    "linear",
+    "logit"
+  ],
+  "baseline": "s100_m12345",
+  "cases": [
+    {
+      "label": "s100_m12345",
+      "simulation_seed": 100,
+      "mask_seed": 12345,
+      "path": "results/seed_100/mask_12345"
+    },
+    {
+      "label": "s100_m12346",
+      "simulation_seed": 100,
+      "mask_seed": 12346,
+      "path": "results/seed_100/mask_12346"
+    },
+    {
+      "label": "s100_m12347",
+      "simulation_seed": 100,
+      "mask_seed": 12347,
+      "path": "results/seed_100/mask_12347"
+    },
+    {
+      "label": "s100_m12348",
+      "simulation_seed": 100,
+      "mask_seed": 12348,
+      "path": "results/seed_100/mask_12348"
+    },
+    {
+      "label": "s100_m12349",
+      "simulation_seed": 100,
+      "mask_seed": 12349,
+      "path": "results/seed_100/mask_12349"
+    },
+    {
+      "label": "s100_m12350",
+      "simulation_seed": 100,
+      "mask_seed": 12350,
+      "path": "results/seed_100/mask_12350"
+    },
+    {
+      "label": "s100_m12351",
+      "simulation_seed": 100,
+      "mask_seed": 12351,
+      "path": "results/seed_100/mask_12351"
+    },
+    {
+      "label": "s100_m12352",
+      "simulation_seed": 100,
+      "mask_seed": 12352,
+      "path": "results/seed_100/mask_12352"
+    },
+    {
+      "label": "s100_m12353",
+      "simulation_seed": 100,
+      "mask_seed": 12353,
+      "path": "results/seed_100/mask_12353"
+    },
+    {
+      "label": "s100_m12354",
+      "simulation_seed": 100,
+      "mask_seed": 12354,
+      "path": "results/seed_100/mask_12354"
+    },
+    {
+      "label": "s102_m12345",
+      "simulation_seed": 102,
+      "mask_seed": 12345,
+      "path": "results/seed_102/mask_12345"
+    },
+    {
+      "label": "s104_m12345",
+      "simulation_seed": 104,
+      "mask_seed": 12345,
+      "path": "results/seed_104/mask_12345"
+    },
+    {
+      "label": "s106_m12345",
+      "simulation_seed": 106,
+      "mask_seed": 12345,
+      "path": "results/seed_106/mask_12345"
+    },
+    {
+      "label": "s108_m12345",
+      "simulation_seed": 108,
+      "mask_seed": 12345,
+      "path": "results/seed_108/mask_12345"
+    },
+    {
+      "label": "s110_m12345",
+      "simulation_seed": 110,
+      "mask_seed": 12345,
+      "path": "results/seed_110/mask_12345"
+    },
+    {
+      "label": "s112_m12345",
+      "simulation_seed": 112,
+      "mask_seed": 12345,
+      "path": "results/seed_112/mask_12345"
+    },
+    {
+      "label": "s114_m12345",
+      "simulation_seed": 114,
+      "mask_seed": 12345,
+      "path": "results/seed_114/mask_12345"
+    },
+    {
+      "label": "s116_m12345",
+      "simulation_seed": 116,
+      "mask_seed": 12345,
+      "path": "results/seed_116/mask_12345"
+    },
+    {
+      "label": "s118_m12345",
+      "simulation_seed": 118,
+      "mask_seed": 12345,
+      "path": "results/seed_118/mask_12345"
+    }
+  ],
+  "parameters": [
+    "P0_amp",
+    "x_c_amp",
+    "beta_amp",
+    "P0_alpha_m",
+    "x_c_alpha_m",
+    "beta_alpha_m",
+    "P0_alpha_z",
+    "x_c_alpha_z",
+    "beta_alpha_z"
+  ],
+  "truth": [
+    18.1,
+    0.497,
+    4.35,
+    0.154,
+    -0.00865,
+    0.0393,
+    -0.758,
+    0.731,
+    0.415
+  ],
+  "noise_seeds": [
+    39001001,
+    39001002
+  ],
+  "noise_prescription": "SO baseline deproj0, full-depth N_ell per split (training convention)",
+  "noise_fixed": true,
+  "simulation_seeds": [
+    100,
+    102,
+    104,
+    106,
+    108,
+    110,
+    112,
+    114,
+    116,
+    118
+  ],
+  "mask_seeds": [
+    12345,
+    12346,
+    12347,
+    12348,
+    12349,
+    12350,
+    12351,
+    12352,
+    12353,
+    12354
+  ],
+  "catalogues": [
+    {
+      "seed": 100,
+      "path": "/lustre/work/ruizm/halos/lightcone_100.hdf5",
+      "bytes": 15425622199,
+      "rows": 85224251,
+      "manifest_sha512": "a6b507d2b36022bbfb47e9059717703518a335baca8befb4573db3f04e9b906509e50082b6f4c2324616e13efe5e962b34899b879b1bc0f21536719f624ae6fc",
+      "sha512_recomputed": false
+    },
+    {
+      "seed": 102,
+      "path": "/lustre/work/ruizm/halos/lightcone_102.hdf5",
+      "bytes": 15092452655,
+      "rows": 85267919,
+      "manifest_sha512": "7c862b4a38f1aae52cd45f682bd4514f58824d27a6e7dc88d5257f2e0ee2edf6f31f454d891af012616940d2f48f43a1f0735f42829035d291e19850a5750e0f",
+      "sha512_recomputed": false
+    },
+    {
+      "seed": 104,
+      "path": "/lustre/work/ruizm/halos/lightcone_104.hdf5",
+      "bytes": 15085937993,
+      "rows": 85231113,
+      "manifest_sha512": "6cd83290dbdec012e4e80d1e6523c9aed24ce461f400ddb8e19293f0c8150061fc3131c609d984bb6e4bb9263a112709f007f31d8fc8c28ecc3aa71444db94e6",
+      "sha512_recomputed": false
+    },
+    {
+      "seed": 106,
+      "path": "/lustre/work/ruizm/halos/lightcone_106.hdf5",
+      "bytes": 15090054305,
+      "rows": 85254369,
+      "manifest_sha512": "683c14a277c9df2adeec946893bf0763a1a50d3a667663bb71a459ed9f304634fafcaffeec8f8a551076ac767a55bb6ee312e8b47e30d389979c07ffb375d974",
+      "sha512_recomputed": false
+    },
+    {
+      "seed": 108,
+      "path": "/lustre/work/ruizm/halos/lightcone_108.hdf5",
+      "bytes": 15083226176,
+      "rows": 85215792,
+      "manifest_sha512": "993fb24a2f249ddf97c103d2314749af85380fb3dc4e83ff75e5014f8d77f46e58f637373eda400a82f07b3c493f1ad1027dcdd9ca9ca6f00e65f190d728d04f",
+      "sha512_recomputed": false
+    },
+    {
+      "seed": 110,
+      "path": "/lustre/work/ruizm/halos/lightcone_110.hdf5",
+      "bytes": 15090811865,
+      "rows": 85258649,
+      "manifest_sha512": "922d8d97e4476aed5972d9717e2a01991a1fa9678f55ffb7e0b74a9ee04b296c5a79867b25ef038207a65ee1b5cdb5c470cf462d050cb4b82cadca74b1e47601",
+      "sha512_recomputed": false
+    },
+    {
+      "seed": 112,
+      "path": "/lustre/work/ruizm/halos/lightcone_112.hdf5",
+      "bytes": 15088649633,
+      "rows": 85246433,
+      "manifest_sha512": "288008b36a45ce5a3e636daa8f970478d7117201d5ce91289a21d2ad8e06eec1c4129d1a4b975df7dc52d03739dbf8ef553b0b10eae0f4e4deda59a227090977",
+      "sha512_recomputed": false
+    },
+    {
+      "seed": 114,
+      "path": "/lustre/work/ruizm/halos/lightcone_114.hdf5",
+      "bytes": 15090498929,
+      "rows": 85256881,
+      "manifest_sha512": "dd368bb329505062423576a0a856ca11aa36358e8f57f7a106f3eb90a05fd103ac8ce1968c6a435a010d7f8cef14b214a70a316a71390a8a827d1f626b70270d",
+      "sha512_recomputed": false
+    },
+    {
+      "seed": 116,
+      "path": "/lustre/work/ruizm/halos/lightcone_116.hdf5",
+      "bytes": 15083937008,
+      "rows": 85219808,
+      "manifest_sha512": "097fbbc3c55c8fe2b2ec397608bc079bb3e8d2a3facd98a183cc85bef0ac39de804177620e26906ef31b39ccb6190985ec5d5cffd79a99d7c993ed9c25af4b6a",
+      "sha512_recomputed": false
+    },
+    {
+      "seed": 118,
+      "path": "/lustre/work/ruizm/halos/lightcone_118.hdf5",
+      "bytes": 15086939282,
+      "rows": 85236770,
+      "manifest_sha512": "b9fd639c1ef81dc4cd9557e9505a5a7c7ac94f6114354bce229fb1ae6566fb282cd289b15b73b5ec1f80899672df7036098370d9e523d22367f92e4272537e31",
+      "sha512_recomputed": false
+    }
+  ],
+  "ell_min": 80,
+  "ell_max": 7979,
+  "beam_fwhm_arcmin": 2.0,
+  "fsky": 0.4,
+  "apodization_arcmin": 60.0,
+  "samples_per_posterior": 90000,
+  "posterior_rng_seed": 2,
+  "raw_nside": 8192,
+  "output_nside": 4096,
+  "mass_definition": "M200c",
+  "sphere_R200c": 4.0,
+  "mass_min_Msun": 1000000000000.0,
+  "resources": {
+    "paint_jobs": 10,
+    "analysis_jobs": 1,
+    "queue": "mini",
+    "cpus_per_job": 26,
+    "paint_memory_gb": 64,
+    "analysis_memory_gb": 24,
+    "walltime": "23:59:00",
+    "estimated_map_peak_GiB": "25-40",
+    "new_disk_GiB_upper_estimate": 2,
+    "catalogue_bytes_read_once": 151218130045
+  },
+  "interpretation": "Noise-conditional robustness test. Rotated masks overlap; not independent mocks."
+}

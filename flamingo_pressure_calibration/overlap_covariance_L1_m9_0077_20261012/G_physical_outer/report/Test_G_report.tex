@@ -1,0 +1,918 @@
+
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=2.1cm]{geometry}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{graphicx}
+\usepackage{booktabs,array}
+\usepackage{float}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\setlist{nosep,leftmargin=1.4em}
+\setlength{\parskip}{3pt}
+\setlength{\parindent}{0pt}
+\newcommand{\Rc}{R_{200c}}
+\newcommand{\Rfit}{R_{\rm fit}}
+\newcommand{\Rcut}{R_{\rm cut}}
+\newcommand{\ftr}{f_{\rm tr}}
+\newcommand{\ntwo}{n_{\rm 2h}}
+\newcommand{\pk}{p_{\rm keep}}
+\begin{document}
+
+\begin{center}
+{\LARGE\bfseries Test G: physically motivated outer profiles\\[3pt] for the electron pressure and density}\\[8pt]
+{\large Equations, fitted profiles against the stacks, and results}\\[6pt]
+FLAMINGO L1\_m9, snapshot 0077 ($z=0$) \quad$\cdot$\quad overlap/covariance study \texttt{overlap\_covariance\_L1\_m9\_0077\_20261012}\quad$\cdot$\quad 13 October 2026
+\end{center}
+
+\section*{Summary}
+\begin{itemize}
+\item \textbf{Goal.} Calibrate the electron pressure (tSZ) and the electron density (kSZ, FRB DM) separately, with an outer
+  component that is physically motivated and tested, not an extra free power law; compare Lee22-style
+  parametrisations by reduced $\chi^2$ with as few parameters as possible.
+\item \textbf{Pressure: P2m} (\S\ref{sec:pmodels}). The bound B12 profile with a splashback-like transition, plus the linear
+  2-halo gas at an outer temperature that depends on mass; 44 parameters. tSZ error 0.52\% (S1; 0.38\% on held-out
+  haloes). A self-similar outer temperature is 1.3--4.4 times too cold at 3--4~$\Rc$.
+\item \textbf{Electrons: E2gf} (\S\ref{sec:emodels}). The bound B16 profile with the transition, plus the
+  parameter-free linear 2-halo term; 41 parameters. kSZ 0.32\%, DM 0.50\% (S1). The transition sits at 2.1--2.4~$\Rc$
+  (1.3--1.4~$R_{200m}$), the splashback scale.
+\item \textbf{Fewest parameters.} Lee22's gNFW with every parameter a broken power law in mass (break at
+  $10^{14.1}$~M$_\odot$) plus the physical outer term: 14 (pressure) and 12 (electron) parameters; tSZ 1.14\%,
+  kSZ 1.26\%, DM 0.50\%.
+\item \textbf{Scatter.} One lognormal amplitude per halo (S1) stays best; separate inner and outer amplitudes (S2) do worse.
+\item \textbf{Fit and cut.} Both fields: fit to all gas at $\Rfit=\Rcut=4\,\Rc$ (objective a), hard cut at 4~$\Rc$, paint
+  the model times the ownership correction $\pk$.
+\end{itemize}
+
+\tableofcontents
+
+%==========================================================================================================
+\section{Data, stacks and units}\label{sec:data}
+
+\subsection{Haloes and mass bins}
+The sample is the overlap study's 4,588 centrals of FLAMINGO L1\_m9 at $z=0$: 300 random haloes per 0.2-dex bin of
+$M_{200c}$ below $10^{14.5}$~M$_\odot$, 213 added for the overlap tests, and every halo above. Test G calibrates the ten
+bins from $10^{13.5}$ to $10^{15.5}$~M$_\odot$ (Table~\ref{tab:bins}). Halo $h$ carries the inclusion weight
+$w_h=1/\pi_h$, the inverse of its inclusion probability.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{The ten calibrated mass bins (FLAMINGO L1\_m9, $z=0$, masses in M$_\odot$). Averages are inclusion-weighted; $b$ is the Tinker et al. (2010) bias at $\Delta=200/\Omega_m$, $\nu$ the peak height, $R_{200m}/R_{200c}$ from NFW with the SOAP concentration. The last two columns are the S1 scatter variances, $\sigma^2=\ln(\langle X^2\rangle/\langle X\rangle^2)$ of the per-halo totals inside 4 $R_{200c}$.}
+\label{tab:bins}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+log $M_{200c}$ bin & $N$ & $N_{\rm eff}$ & $\langle\log M\rangle$ & $\langle R_{200c}\rangle$ [Mpc] & $\langle b\rangle$ & $\nu$ & $R_{200m}/R_{200c}$ & $\sigma^2_{\ln Y}$ & $\sigma^2_{\ln N_e}$ \\
+\midrule
+13.5--13.7 & 326 & 319 & 13.59 & 0.71 & 1.54 & 1.40 & 1.67 & 0.306 & 0.045 \\
+13.7--13.9 & 324 & 315 & 13.79 & 0.83 & 1.75 & 1.53 & 1.68 & 0.153 & 0.045 \\
+13.9--14.1 & 319 & 310 & 13.99 & 0.97 & 2.02 & 1.68 & 1.68 & 0.073 & 0.036 \\
+14.1--14.3 & 327 & 319 & 14.19 & 1.13 & 2.36 & 1.85 & 1.69 & 0.064 & 0.036 \\
+14.3--14.5 & 317 & 309 & 14.39 & 1.32 & 2.83 & 2.05 & 1.69 & 0.037 & 0.028 \\
+14.5--14.7 & 895 & 895 & 14.59 & 1.53 & 3.43 & 2.28 & 1.69 & 0.046 & 0.030 \\
+14.7--14.9 & 326 & 326 & 14.78 & 1.78 & 4.24 & 2.54 & 1.69 & 0.050 & 0.027 \\
+14.9--15.1 & 127 & 127 & 14.98 & 2.08 & 5.36 & 2.86 & 1.70 & 0.023 & 0.018 \\
+15.1--15.3 & 21 & 21 & 15.17 & 2.40 & 6.80 & 3.21 & 1.70 & 0.014 & 0.016 \\
+15.3--15.5 & 6 & 6 & 15.35 & 2.76 & 8.62 & 3.59 & 1.68 & 0.007 & 0.005 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Per-halo shell profiles}
+Radii are in units of each halo's own $\Rc$, $x=r/\Rc$. The 35 shells have edges
+\[ x_s\in\{0,\,0.025,\dots,0.837\ (\text{0.069-dex log grid}),\,1,\,1.152,\,1.34,\,1.5,\,1.75,\,2,\,2.18,\,2.5,\,3,\,3.30,\,3.63,\,4\} \]
+with geometric volumes $V_s=\tfrac{4\pi}{3}\Rc^3\,(x_{s+1}^3-x_s^3)$. For every halo $h$ and shell $s$, summed over the gas
+particles $i$ in the shell:
+\begin{align}
+P_h(s) &= \frac{m_e c^2}{\sigma_T}\,\frac{\sum_{i\in s} y_i}{V_s\,P_{200}}
+        = \frac{\sum_{i\in s} N_{e,i}\,k_B T_i}{V_s\,P_{200}},
+\qquad P_{200}=\frac{G M_{200c}\,(200\rho_{\rm crit})\,f_b}{2\Rc}, \label{eq:P}\\
+E_h(s) &= \frac{\mu_{\rm XGP}\sum_{i\in s} N_{e,i}}{V_s\,f_b\,\rho_{\rm crit}},
+\qquad N_{e,i}=n_{e,i}\,\frac{m_i}{\rho_i},\qquad \mu_{\rm XGP}=\frac{m_e+2m_p/(1+X_H)}{0.9}=1.2632\,m_p, \label{eq:E}
+\end{align}
+where $y_i=\sigma_T k_B T_i N_{e,i}/(m_e c^2)$ is the particle's Compton-$y$ contribution (FLAMINGO's
+\texttt{ComptonYParameters}), $X_H=0.76$ and $f_b=\Omega_b/\Omega_m$. $E$ is XGPaint's electron-density unit (it includes
+XGPaint's factor $1/0.9$). Recently AGN-heated gas is removed: particles heated within the last 15~Myr ($a_{\rm last}\ge
+0.998956$) with $8.8\times10^6\le T\le1.756\times10^8$~K (SOAP's filter). Two gas selections are used:
+\begin{itemize}
+\item \textbf{all gas} (``main''): everything in the shell, own satellites included;
+\item \textbf{A2-ii} (the painting target): a particle belongs to the painted halo ($M_{200c}\ge6.6\times10^{12}$~M$_\odot$)
+  with the smallest $r/\Rc$, so neighbouring painted haloes do not count each other's gas twice.
+\end{itemize}
+
+\subsection{Stacks}
+In bin $c$ the stack is the inclusion-weighted mean, with the reliability-weighted standard deviation and the effective
+number of haloes:
+\begin{equation}
+\bar F_c(s)=\frac{\sum_h w_h F_h(s)}{\sum_h w_h},\qquad
+{\rm SD}_c(s)^2=\frac{\sum_h w_h\,[F_h(s)-\bar F_c(s)]^2}{\sum_h w_h\,(1-\sum_h \tilde w_h^2)},\qquad
+N_{\rm eff}=\frac{(\sum_h w_h)^2}{\sum_h w_h^2},
+\end{equation}
+with $\tilde w_h=w_h/\sum w$. The error of the mean shown in the figures is ${\rm SD}/\sqrt{N_{\rm eff}}$. A shell enters a
+bin's fit only if it is resolved for every halo of the bin: inner edge $\ge\max(0.04,\,4\epsilon/\Rc)$ ($\epsilon$ the
+softening), at least 20 gas particles, and inner edge $\ge2\times$ the upper-median smoothing length in the shell.
+
+\subsection{Normalisation constants}
+With $k_BT_{200}=0.59\,m_p\,GM_{200c}/(2\Rc)$, the units of eqs.~(\ref{eq:P}) and (\ref{eq:E}) are related by
+\begin{equation}
+\frac{P}{P_{200}}=\kappa_P\,\frac{E}{200}\,\frac{T_e}{T_{200}},\qquad \kappa_P=\frac{0.59\,m_p}{\mu_{\rm XGP}}=0.4671,
+\label{eq:kappaP}
+\end{equation}
+which the stacks satisfy to $0.3$--$1.2\%$ (measured $P/[(E/200)(T_M/T_{200})]=0.4685$--$0.4727$). In $E$ units the cosmic
+mean electron density is not $\Omega_m$ but
+\begin{equation}
+\bar E=\kappa_E\,\Omega_m=0.3348,\qquad \kappa_E=\frac{E}{\rho_{\rm gas}/(f_b\rho_{\rm crit})}=1.0940\ \text{(measured at 2--4 }\Rc),
+\label{eq:ebar}
+\end{equation}
+against $(1+X)/2\cdot\mu_{\rm XGP}/m_p=1.107$ for fully ionised primordial gas ($\Omega_m=0.306$; stars neglected).
+
+%==========================================================================================================
+\section{Profile models}\label{sec:models}
+
+\subsection{Bound (inner) profiles}
+Pressure uses B12's generalised NFW and electrons B16's density profile, with their published shape constants:
+\begin{align}
+P_g(x)&=0.5176\,P_0\left(\frac{x}{x_c}\right)^{-0.3}\left(1+\frac{x}{x_c}\right)^{-\beta}, \label{eq:B12}\\
+E_g(x)&=\rho_0\left(\frac{x}{0.5}\right)^{-0.2}\left[1+\left(\frac{x}{0.5}\right)^{\alpha}\right]^{-(\beta-0.2)/\alpha}. \label{eq:B16}
+\end{align}
+The factor $0.5176=(2+2X)/(3+5X)$ ($X=0.76$) is the electron share of B12's thermal pressure. Free per bin: $(P_0,x_c,\beta)$ and
+$(\rho_0,\alpha,\beta)$.
+
+\subsection{The splashback-like transition}\label{sec:transition}
+The bound profile is multiplied by the transition term of Diemer \& Kravtsov (2014, DK14),
+\begin{equation}
+\ftr(x)=\left[1+\left(\frac{x}{x_t}\right)^4\right]^{-\gamma_t/4},
+\qquad
+\ftr\to1\ (x\ll x_t),\qquad \ftr\to(x/x_t)^{-\gamma_t}\ (x\gg x_t), \label{eq:ftr}
+\end{equation}
+with $x_t$ free per bin and $\gamma_t$ global (or fixed at 6). Beyond $x_t$ the bound component's logarithmic slope steepens
+by $\gamma_t$, so the bound gas ends within a factor of a few in radius, and the outer term takes over.
+
+\textbf{What ``splashback-like'' means.}
+\begin{itemize}
+\item \textbf{Splashback in dark matter.} The splashback radius is where matter reaches the apocentre of its first orbit
+  after falling into a halo. Inside it, matter has orbited at least once; outside, it is still falling in. Stacked dark
+  matter profiles steepen sharply there, typically at 0.8--1.5~$R_{200m}$, and further inside for faster-accreting
+  (higher-$\nu$) haloes (Diemer \& Kravtsov 2014; Adhikari, Dalal \& Chamberlain 2014; More, Diemer \& Kravtsov 2015).
+  DK14 model this edge with eq.~(\ref{eq:ftr}) multiplying the orbiting profile, plus an infalling (2-halo) term.
+\item \textbf{The same form for gas.} Test G multiplies the bound gas profile by eq.~(\ref{eq:ftr}) and adds the 2-halo gas.
+  It is ``splashback-like'' because the term is a phenomenological edge of the bound gas, not a dynamical measurement.
+  Gas is collisional: infalling gas is shocked and does not orbit, so its edge need not coincide with the dark matter
+  splashback radius, and the accretion shock is expected further out (roughly 1.5--2 times the splashback radius,
+  2.5--5~$\Rc$ here).
+\item \textbf{What the fit finds.} The electron edge sits at the dark matter splashback scale: $x_t=2.1$--$2.4\,\Rc$, i.e.
+  1.3--1.4~$R_{200m}$ ($R_{200m}/\Rc=1.67$--$1.70$, Table~\ref{tab:bins}), with $\gamma_t=5.1$. The steepest slope of the
+  total electron model moves inward with peak height, from 2.28 to 1.20~$\Rc$ (1.36 to 0.71~$R_{200m}$) as $\nu$ runs
+  from 1.4 to 3.6 (Table~\ref{tab:E2gfbins}), as expected for splashback. Pressure shows the edge only in P2m ($x_t\approx2.0\,\Rc$); no accretion-shock cutoff is
+  detected inside 4~$\Rc$. Figure~\ref{fig:components} shows the decomposition.
+\end{itemize}
+
+\subsection{The linear 2-halo term}
+For a halo of mass $M$ and radius $\Rc$ the mean electron density around it at $r=x\Rc$ is
+\begin{equation}
+\ntwo(x)=\bar E\,\bigl[1+b(M)\,\xi_{\rm lin}(x\Rc)\bigr], \label{eq:n2h}
+\end{equation}
+with $\bar E$ from eq.~(\ref{eq:ebar}), $\xi_{\rm lin}$ the linear matter correlation function of the FLAMINGO cosmology at
+$z=0$ (CLASS), and $b(M)$ the Tinker et al. (2010) bias at $\Delta=200/\Omega_m$ evaluated at $M_{200c}$. A bin uses the
+inclusion-weighted mean of the per-halo terms, $T_c(x)=\sum_h w_h\,b(M_h)\,\xi_{\rm lin}(x R_h)/\sum_h w_h$, which is exact
+for a stack in $x$. The term has no free parameter.
+
+\subsection{Electron models}\label{sec:emodels}
+\begin{align}
+\text{E0:}\quad & E(x)=E_g(x)\\
+\text{E1:}\quad & E(x)=E_g(x)+A\,(x/2)^{-s}\quad(\text{Test F; }A,\,s\text{ per bin},\ s\le3)\\
+\text{E2g6, E2gf:}\quad & E(x)=E_g(x)\,\ftr(x)+\bar E\,[1+T_c(x)]\quad(\gamma_t=6,\text{ or global})\label{eq:E2}\\
+\text{E3:}\quad & E(x)=\text{E2gf}+\bar E\,A_{\rm inf}\,(b/b_{\rm piv})^{a}\,(x/2)^{-s_{\rm inf}}\,D(x)\quad(\text{global }A_{\rm inf},a,s_{\rm inf})\\
+\text{E3pb:}\quad & E(x)=\text{E2gf}+\bar E\,A_c\,(x/2)^{-s_c}\,D(x)\quad(\text{per-bin infall; universality test})
+\end{align}
+with $b_{\rm piv}=b(10^{14.5}\,{\rm M}_\odot)=3.14$ and the core damping $D(x)=x^4/(x^4+0.1^4)$, which switches the
+power-law terms off inside $0.1\,\Rc$.
+
+\subsection{Pressure models}\label{sec:pmodels}
+For pressure the outer gas is the 2-halo electron density at an outer temperature $\tau(x)=T_{\rm out}/T_{200}$, converted
+with eq.~(\ref{eq:kappaP}):
+\begin{align}
+\text{P0:}\quad & P(x)=P_g(x)\\
+\text{P1:}\quad & P(x)=P_g(x)+A\,(x/2)^{-s}\quad(\text{Test F})\\
+\text{P2:}\quad & P(x)=P_g(x)\,\ftr(x)+\frac{\kappa_P}{200}\,n_{\rm out}(x)\,\tau(x)\,D(x),\qquad n_{\rm out}=\bar E\,[1+T_c(x)],\quad
+\tau(x)=\tau_0\,(x/2)^{-q} \label{eq:P2}
+\end{align}
+P2g6 and P2gf have $\gamma_t=6$ or global, with global $\tau_0$ and $q$. Variants:
+\begin{align}
+\text{P2m:}\quad & \tau_0\to\tau_0\,(M/10^{14.5}\,{\rm M}_\odot)^{-p_M}\quad(\text{mass-dependent outer temperature, global }p_M)\label{eq:P2m}\\
+\text{P2s:}\quad & \tau(x)\to\tau(x)\,\bigl[1+(x/x_{\rm sh})^8\bigr]^{-1}\quad(\text{accretion-shock cutoff, global }x_{\rm sh})\\
+\text{P2i:}\quad & n_{\rm out}\to n_{\rm out}+\bar E\,A_{\rm inf}(b/b_{\rm piv})^{a}(x/2)^{-s_{\rm inf}}D(x)\quad(\text{E3's infall, fixed})
+\end{align}
+In P2m the mass enters through each bin's mean $\log M$. Since $T_{200}\propto M^{2/3}$, $T_{\rm out}\propto M^{2/3-p_M}$.
+
+\subsection{Shell averages and the cut}
+Models are compared with the data as volume-weighted shell averages, by 32-point Gauss--Legendre quadrature in every
+shell,
+\begin{equation}
+S_c(s)=\frac{\int_{x_s}^{x_{s+1}}F_c(x)\,x^2\,dx}{\int_{x_s}^{x_{s+1}}x^2\,dx},\qquad S_c(s)=0\ \text{ for } x_{s+1}>\Rcut .
+\end{equation}
+Painting multiplies both components at every node by the ownership correction
+\begin{equation}
+\pk(x,M)=1-\frac{f(M)}{1+[x/x_h(M)]^{-n}},\qquad f=f_0+f_1 v,\quad \ln x_h=\ell_0+\ell_1 v,\quad v=\log_{10}(M/{\rm M}_\odot)-14.5,
+\label{eq:pkeep}
+\end{equation}
+fitted per field to $\ln(\bar F_{\rm A2ii}/\bar F_{\rm all})$ on the shells beyond 1.34~$\Rc$ with weights $\sqrt{N_{\rm eff}}$
+(Table~\ref{tab:pkeep}). Well beyond $x_h\approx3.3$--$3.4$ electrons keep half of the all-gas density ($f\simeq0.5$) and
+pressure less than a fifth ($f\simeq0.82$): the A2-ii partition gives most of the hot outer gas to neighbouring painted
+haloes. At 4~$\Rc$, $\pk=0.38$--$0.40$ for pressure, and from $0.56$ (high mass) to $0.71$ (low mass) for electrons.
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Ownership correction $p_{\rm keep}(x,M)$, eq.~(\ref{eq:pkeep}), fitted to the stacked A2-ii/all ratio beyond 1.34 $R_{200c}$.}
+\label{tab:pkeep}
+\begin{tabular}{lrrrrrr}
+\toprule
+field & $f_0$ & $f_1$ & $x_h(10^{14.5})$ & $\ell_1$ & $n$ & RMS per bin (top two bins) \\
+\midrule
+pressure & 0.821 & $-$0.040 & 3.44 & $-$0.011 & 6.92 & 1.0--4.3\% (22, 8\%) \\
+electrons & 0.500 & 0.019 & 3.29 & $-$0.138 & 6.39 & 0.3--1.4\% (2, 8\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Parameter counts}
+For the 10 bins: E0, P0 $3\times10=30$; E1, P1 $5\times10=50$; E2g6 $4\times10=40$; E2gf 41; E3 44; E3pb 61; P2g6
+$4\times10+2=42$; P2gf, P2i 43; P2s, P2m 44.
+
+%==========================================================================================================
+\section{Fitting}\label{sec:fit}
+
+\subsection{Objectives}
+All fits work on $\ln$ of the stack, on the resolved shells inside $\Rfit$. Two objectives, minimised as
+$\sum_c\sum_s r_{cs}^2$:
+\begin{align}
+\text{(a) current diagonal:}\quad & r_{cs}=\frac{\ln S_c(s)-\ln\bar F_c(s)}{\max\bigl[{\rm SD}_c(s)/\bar F_c(s),\,0.05\bigr]}, \label{eq:obja}\\
+\text{(d) importance diagonal:}\quad & r_{cs}=\sqrt{W_{cs}}\,\bigl[\ln S_c(s)-\ln\bar F_c(s)\bigr],
+\end{align}
+with $W$ Test F's importance maps ($\sum_{cs}W_{cs}=1$): $W_{\rm tSZ}$ for pressure, $(W_{\rm kSZ}+W_{\rm DM})/2$ for
+electrons. Objective (a) weights each shell by the halo-to-halo scatter, not by the error of the mean; it is the convention
+of the earlier tests.
+
+\subsection{Joint fit}
+Models with global parameters are fitted jointly over the ten bins by trust-region least squares with the analytic
+Jacobian, in $\theta=\ln p$ for positive parameters. Each fit starts from per-bin fits with the globals fixed (multi-start
+$x_t\in\{1.5,2.5,4\}$) and from two global starts. Bounds: $x_t\in[0.5,20]$, $\gamma_t\in[0.5,30]$, $s_{\rm inf}\le3.9$,
+$q\in[-4,3.9]$, $p_M\in[-3,3]$, $x_{\rm sh}\in[1.2,20]$. E0/P0 and E1/P1 use Test F's own fitting functions, so they
+reproduce Test F's fits.
+
+\subsection{Model discrepancy and information criteria}
+For each fit, $\sigma_d$ solves
+\begin{equation}
+\mathbf r_c^{\rm T}\,(\mathbf C_c+\sigma_d^2\mathbf I)^{-1}\,\mathbf r_c=\nu_c,\qquad \nu_c=n_c-(k_{\rm bin}+k_{\rm glob}/N_{\rm bins}),
+\end{equation}
+with $\mathbf r_c=\ln\mathbf S_c-\ln\bar{\mathbf F}_c$ and $\mathbf C_c$ the bootstrap covariance of $\ln\bar F$ (1000
+inclusion-weighted resamples), shrunk towards the neighbouring bins' pooled correlation. For AIC and BIC the errors of all
+compared models are inflated by a common $\sigma_{{\rm ref},c}$ per bin, the smallest $\sigma_d$ among them:
+\begin{equation}
+\chi^2=\sum_c \mathbf r_c^{\rm T}(\mathbf C_c+\sigma_{{\rm ref},c}^2\mathbf I)^{-1}\mathbf r_c,\qquad
+{\rm AIC}=\chi^2+2k,\qquad {\rm BIC}=\chi^2+k\ln n ,
+\end{equation}
+with $k$ all free parameters and $n$ all fitted shells.
+
+%==========================================================================================================
+\section{Observables and scores}\label{sec:obs}
+
+\subsection{Halo model}
+Profiles are propagated with the frozen lightcone halo model of the earlier studies. For a halo of mass $M$ at redshift $z$,
+\begin{equation}
+u_\ell(M,z)=a(M,z)\,4\pi\int_0^{\Rcut}x^2\,F(M,z,x)\,\frac{\sin(qx)}{qx}\,dx,\qquad q=\frac{(\ell+1/2)\,\Rc}{D_A(z)},
+\end{equation}
+with $a$ the Compton-$y$ (pressure) or optical-depth (electrons) normalisation and the declared redshift response
+$F(M,z,x)=F_0(M,x)\,F_{\rm pub}(M,z,x)/F_{\rm pub}(M,0,x)$. Over the lightcone cells (halo counts $N$ in mass and redshift):
+\begin{align}
+C_\ell^{\rm 1h}&=\sum_{\rm cells}N\,\frac{|u_\ell|^2}{4\pi},\qquad
+C_\ell^{\rm 2h}=\sum_z\frac{P_{\rm lin}(\ell,z)}{V_z}\Bigl[\sum_M N\,b\,\frac{u_\ell}{4\pi}\Bigr]^2,\\
+C_\ell^{\rm kSZ,1h}&=\sum_{\rm cells}\sum_{\rm haloes}\frac{v_{\rm LOS}^2}{c^2}\,\frac{|\tau_\ell|^2}{4\pi}\quad(\text{catalogue velocities}).
+\end{align}
+DM is the halo-only observer DM for a source at $z_s=1$ (cells at $z\le1$, factor $1/(1+z)$): its mean, its compound-Poisson
+variance, and the exact per-sightline PDF (FFT), summarised by the 16, 50, 84, 97.5 and 99.9\% quantiles. Outside the
+calibrated mass range ($10^{13.5}$--$10^{15.388}$~M$_\odot$) every model and the truth use the published B12/B16 profiles.
+
+\subsection{Evaluation in the shell basis}
+The calibrated bins enter only through their shell averages. The 1-halo terms and the DM variance are bilinear in the
+profile, so with the per-bin second moments $\langle F_sF_t\rangle_c$
+\begin{equation}
+C_\ell^{\rm 1h}=\sum_c\sum_{s,t}K_{c,st}(\ell)\,\langle F_sF_t\rangle_c+C_\ell^{\rm 1h,fb},\qquad
+C_\ell^{\rm 2h}=\sum_z\frac{P_{\rm lin}}{V_z}\Bigl[W^{\rm fb}_z(\ell)+\sum_{c,s}\bar F_{c}(s)\,W_{z,cs}(\ell)\Bigr]^2,
+\end{equation}
+exact for any profile form (fb = the fallback haloes outside the calibrated range).
+
+\subsection{Truth and scatter models}
+The \textbf{truth} uses the measured per-halo profiles to 4~$\Rc$: the second moments $\langle F_sF_t\rangle$ over the bin's
+haloes (inclusion-weighted), which include the halo-to-halo scatter, and every halo's own DM column. The \textbf{truth mean}
+uses the stack alone, $\bar F_s\bar F_t$. A model is scored with three predictions of the second moments:
+\begin{align}
+\text{det:}\quad&\langle F_sF_t\rangle=S_sS_t,\\
+\text{S1:}\quad&\langle F_sF_t\rangle=e^{\sigma_c^2}S_sS_t,\qquad \sigma_c^2=\ln\frac{\langle X^2\rangle}{\langle X\rangle^2},\quad
+X=Y(<4\Rc)\ \text{or}\ N_e(<4\Rc)\ \text{per halo},\\
+\text{S2:}\quad&\langle F_sF_t\rangle=M_{\rm bb}B_sB_t+M_{\rm bo}(B_sO_t+O_sB_t)+M_{\rm oo}O_sO_t,\qquad
+M_{ij}=\frac{\langle X_iX_j\rangle}{\langle X_i\rangle\langle X_j\rangle},
+\end{align}
+with $B$, $O$ the bound and outer components, $X_{\rm b}$ the per-halo integral inside 1~$\Rc$ and $X_{\rm o}$ that over
+1.5~$\Rc$--$\Rcut$. The tSZ$\times$DM cross term uses $\langle YN\rangle/(\langle Y\rangle\langle N\rangle)$. For the DM PDF
+the amplitudes are lognormal with unit mean: 9 Gauss--Hermite nodes (S1), or $5\times5$ correlated nodes (S2).
+
+\subsection{Errors and family scores}
+For each observable $\epsilon_O=O_{\rm model}/O_{\rm truth}-1$, and a family scores the RMS of its members:
+\begin{equation}
+{\rm RMS}_{\rm fam}=\Bigl[\frac{1}{n_{\rm fam}}\sum_{O\in{\rm fam}}\epsilon_O^2\Bigr]^{1/2},
+\end{equation}
+with tSZ $=C_\ell^{yy}$ (1h+2h), kSZ $=C_\ell^{\rm kSZ,1h}$ and tSZ$\times$DM $=C_\ell^{y\,\rm DM}$ at $\ell=100,300,1000,3000$
+($\ell=8000$ is reported but excluded); DM = mean, variance and the five quantiles. ``vs mean'' compares the det prediction
+with the truth mean (the profile fit alone). Evaluations: \emph{all} (all-gas model against the all-gas truth),
+\emph{paint} (all-gas model $\times\,\pk$ against the A2-ii truth: the HalfDome painting target), \emph{a2ii} (a model
+fitted directly to the A2-ii stacks).
+
+\subsection{Cross-validation}
+The 1~Gpc box is split into $4^3$ blocks of 250~Mpc, assigned to 8 folds. For each fold everything is recalibrated on the
+other 7/8 of the volume: stacks, fits (globals included), 2-halo templates, $\pk$ and the scatter tables. The
+out-of-fold prediction weights the fold models by the held-out inclusion-weight shares $\omega_{ck}$: linear terms
+$\sum_k\omega_{ck}F_k$, second moments $\sum_k\omega_{ck}\langle F_sF_t\rangle_k$, DM PDF a mixture of the fold models.
+
+%==========================================================================================================
+\section{Lee22-style parametrisations and model selection}\label{sec:sel}
+
+\subsection{Profile and mass laws}
+The inner profile is Lee22's gNFW for both fields,
+\begin{equation}
+F_{\rm in}(x)=A\left(\frac{x}{x_c}\right)^{\gamma}\left(1+\frac{x}{x_c}\right)^{-\beta},\qquad \gamma=-0.3, \label{eq:lee22}
+\end{equation}
+and each of $p\in\{A,x_c,\beta\}$ follows a law in mass (in $\ln p$):
+\begin{align}
+\text{PB:}\quad&\text{free per bin}\qquad\qquad
+\text{const:}\quad \ln p=\ln p_0\qquad\qquad
+\text{pl:}\quad \ln p=\ln p_0+a_m\ln(M/10^{14.5}\,{\rm M}_\odot),\\
+\text{bpl:}\quad&\ln p=\ln p_0+\begin{cases}a_m\,\ln(M/M_{\rm cut}),&M<M_{\rm cut}\\ a'_m\,\ln(M/M_{\rm cut}),&M\ge M_{\rm cut}\end{cases}
+\qquad(\text{one }M_{\rm cut}\text{, free or Lee22's}),\\
++c:\quad&\ln p\to\ln p+a_c\ln(c_{200c}/10),\qquad
+\gamma:\ \text{fixed}\ (-0.3),\ \text{global, or}\ \gamma_0(M/10^{14.5})^{a_\gamma}.
+\end{align}
+Named models: PL1 (pl in $A$; $x_c$, $\beta$ constant), PL2 (pl in $A$, $x_c$; $\beta$ constant), PL3 (pl in all three),
+BPLa (bpl in $A$, pl in $x_c$, $\beta$), BPLs (pl in $A$, bpl in $x_c$, $\beta$), BPLall (bpl in all three), PL3gM (PL3 with $\gamma$ a mass law), PL3c3 (PL3 + $c$ terms), and
+\_L22 versions with $M_{\rm cut}$ fixed at Lee22's value ($10^{13.77}$--$10^{13.78}$~M$_\odot$ after the $h$ conversion).
+Lee22's own choices are BPLa for pressure and BPLs for electrons.
+
+\subsection{Outer options}
+\begin{align}
+\text{O0:}\quad&F=F_{\rm in}\\
+\text{O1:}\quad&F=F_{\rm in}+\begin{cases}\bar E\,[1+T_c(x)]&\text{electrons (0 parameters)}\\
+\frac{\kappa_P}{200}\,\bar E\,[1+T_c(x)]\,\tau_0\,(x/2)^{-q}\,D(x)&\text{pressure }(\tau_0,\,q)\end{cases}\\
+\text{O2:}\quad&\text{O1 with }F_{\rm in}\to F_{\rm in}\,[1+(x/x_t)^4]^{-3/2},\quad x_t=x_{t0}\,(M/10^{14.5}\,{\rm M}_\odot)^{a_{xt}}\quad(+2)
+\end{align}
+
+\subsection{Likelihoods and selection rule}
+The data vector is $\ln\bar F$ on the strictly resolved shells inside $\Rfit$ of each cell (mass bins; also concentration
+quartiles or halves). Three likelihoods:
+\begin{itemize}
+\item \textbf{stat}: $\chi^2=\sum_c\mathbf r_c^{\rm T}\mathbf C_c^{-1}\mathbf r_c$ with the shrunk bootstrap covariance of
+  $\ln\bar F$; Hartlap factors $h=(N-p-2)/(N-1)$ are reported.
+\item \textbf{floor}: $\mathbf C_c\to\mathbf C_c+\sigma_d^2\mathbf I$ with one $\sigma_d$ per (field, data set, $\Rfit$),
+  chosen so that the per-bin reference (PB with its best outer option) has $\chi^2/\nu=1$.
+\item \textbf{L22} (Lee22's convention): $\mathbf C_c^{\rm L22}={\rm Cov}_h(\ln F)/N_{\rm eff}$, precision multiplied by $h$;
+  cells with $N\le p+2$ are dropped.
+\end{itemize}
+Reduced $\chi^2=\chi^2/\nu$ with $\nu=n-k$; ${\rm BIC}=\chi^2+k\ln n$. The spatial cross-validation $\chi^2$ uses the
+held-out stacks with ${\rm Cov}\times N_{\rm eff,all}/N_{\rm eff,fold}+\sigma_d^2\mathbf I$. \textbf{Selection}: the model
+with the fewest parameters whose $\Delta{\rm BIC}\le6$ (floor) and whose CV $\chi^2$ lies within the best CV model's
+fold-to-fold scatter ($\sqrt K\times$ the SD of its per-fold $\chi^2$).
+
+%==========================================================================================================
+\section{Fitted profiles against the stacked profiles}\label{sec:profiles}
+
+Figures~\ref{fig:profP} and \ref{fig:profE} compare, for every calibrated bin, the stacked profile with the models fitted
+to 4~$\Rc$: the minimum change (B12 or B16 refitted), Test F's empirical outer power law, Test G's physical model, and the
+fewest-parameter Lee22-style model. Table~\ref{tab:figrms} summarises the shell residuals. Figure~\ref{fig:components}
+splits the physical models into their components, and Fig.~\ref{fig:paint} shows the painted model against the A2-ii
+stacks.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/profiles_pressure.pdf}
+\caption{Electron pressure: stacked profiles (points; open = shells not resolved for every halo, not fitted) and models
+fitted to 4~$\Rc$ with objective (a), all gas. Lower panels: model/stack; the grey band is the error of the stacked mean,
+dotted lines mark $\pm10\%$. Light grey area in the upper panels: 16--84\% of the haloes.}
+\label{fig:profP}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/profiles_electrons.pdf}
+\caption{Electron density, as Fig.~\ref{fig:profP}.}
+\label{fig:profE}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Shell RMS of $\ln(\mathrm{model}/\mathrm{stack})$ [\%] in Figs.~\ref{fig:profP}--\ref{fig:profE}, median (maximum) over the eight bins with $N\ge127$.}
+\label{tab:figrms}
+\begin{tabular}{lrrrr}
+\toprule
+field & model & $<1R$ & 1--2$R$ & 2--4$R$ \\
+\midrule
+pressure & P0 & 1.5 (3.6) & 8.2 (11.8) & 39.2 (51.1) \\
+pressure & P1 & 0.6 (0.9) & 1.3 (1.7) & 3.2 (7.0) \\
+pressure & P2m & 0.4 (1.3) & 1.0 (1.6) & 7.9 (12.0) \\
+pressure & BPLall+O2 & 1.7 (4.7) & 3.0 (12.8) & 21.7 (32.9) \\
+electrons & E0 & 3.6 (7.8) & 8.1 (18.9) & 24.4 (35.6) \\
+electrons & E1 & 2.1 (7.8) & 2.5 (5.8) & 3.2 (10.9) \\
+electrons & E2gf & 1.2 (1.7) & 1.5 (1.8) & 4.3 (13.4) \\
+electrons & BPLall+O2 & 1.6 (4.3) & 1.3 (6.1) & 4.3 (15.5) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/components.pdf}
+\caption{Components of the recommended models for four bins, plotted as $x^2F$ (the stacks are the points). The core
+alone (dotted) is the B12/B16 profile without the transition; multiplied by $\ftr$ it gives the bound component (dashed),
+which steepens beyond $x_t$ (vertical line). The outer term (dash-dot) is the 2-halo gas; for pressure it is
+$\kappa_P/200\,\bar E[1+T_c]\,\tau\,D$. Shaded: 1.0--1.5~$R_{200m}$, the dark matter splashback band. The thin grey line is
+the 4~$\Rc$ cut.}
+\label{fig:components}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{figures/painting_ratio.pdf}
+\caption{Painting target: the all-gas fit multiplied by $\pk(x,M)$, divided by the A2-ii stack, per bin.}
+\label{fig:paint}
+\end{figure}
+
+%==========================================================================================================
+\section{Results}\label{sec:results}
+
+\subsection{Normalisation, 2-halo level and outer temperatures}
+\begin{itemize}
+\item The stacked electrons at 3--4~$\Rc$ match the parameter-free 2-halo term within $\pm10\%$ for $10^{13.9}$--$10^{14.9}$;
+  groups lie 16--26\% above it and the most massive bins 15--19\% below (Table~\ref{tab:twohalo}). With A2-ii the outer
+  electrons fall below the 2-halo level (to 0.50--0.59 in clusters), because the partition gives neighbour gas away.
+\item The measured outer temperature falls with mass in units of $T_{200}$: $T_e/T_{200}=0.34\to0.10$ at 3--4~$\Rc$ from
+  $10^{13.6}$ to $10^{15.35}$. A self-similar $\tau(x)$ cannot follow this; P2m's $T_{\rm out}\propto M^{0.24}$ can.
+\item Earlier quick estimates used $\bar E=\Omega_m$; with eq.~(\ref{eq:ebar}) their 2-halo ratios are 0.915 times lower and
+  their pressure-``implied'' temperatures 1.96 times higher.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Left: stacked electron density over the parameter-free linear 2-halo prediction $\bar E[1+\langle b\,\xi_{\rm lin}\rangle]$, volume-integrated per band of $x=r/R_{200c}$ (all gas; last column the A2-ii painting target). Right: measured electron-weighted temperature $T_e/T_{200}$ per band.}
+\label{tab:twohalo}
+\begin{tabular}{lrrrr|rrr}
+\toprule
+bin & $1.5$--$2$ & $2$--$3$ & $3$--$4$ & $3$--$4$ (A2-ii) & $1.5$--$2$ & $2$--$3$ & $3$--$4$ \\
+\midrule
+13.5--13.7 & 4.12 & 2.12 & 1.26 & 1.03 & 0.43 & 0.35 & 0.34 \\
+13.7--13.9 & 3.93 & 1.90 & 1.16 & 0.90 & 0.41 & 0.32 & 0.29 \\
+13.9--14.1 & 3.51 & 1.68 & 1.07 & 0.80 & 0.38 & 0.28 & 0.24 \\
+14.1--14.3 & 3.20 & 1.58 & 1.02 & 0.76 & 0.37 & 0.27 & 0.22 \\
+14.3--14.5 & 2.93 & 1.52 & 1.02 & 0.74 & 0.35 & 0.25 & 0.20 \\
+14.5--14.7 & 2.60 & 1.41 & 0.98 & 0.68 & 0.33 & 0.23 & 0.18 \\
+14.7--14.9 & 2.39 & 1.30 & 0.91 & 0.62 & 0.32 & 0.23 & 0.15 \\
+14.9--15.1 & 2.08 & 1.20 & 0.85 & 0.56 & 0.29 & 0.20 & 0.12 \\
+15.1--15.3 & 1.95 & 1.13 & 0.81 & 0.50 & 0.29 & 0.17 & 0.12 \\
+15.3--15.5 & 2.05 & 1.26 & 0.85 & 0.59 & 0.30 & 0.17 & 0.10 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{../figures/G2_two_halo_ratio.png}\hfill
+\includegraphics[width=0.49\textwidth]{../figures/G3_outer_temperature.png}
+\caption{Left: stacked electrons over the linear 2-halo prediction per band and bin. Right: measured outer temperature
+against the fitted $\tau(x)$ of P2gf and P2m.}
+\end{figure}
+
+\subsection{Pressure}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Pressure models fitted to all gas, objective (a), $R_{\rm fit}=4$: shell RMS of $\ln(S/\bar F)$ per region, median model-discrepancy term $\sigma_d$, and information criteria with a common $\sigma_{\rm ref}$ per bin ($n=252$ shells).}
+\label{tab:icP}
+\begin{tabular}{lrrrrrrr}
+\toprule
+model & $k$ & RMS $<1R$ [\%] & 1--2$R$ & 2--4$R$ & $\sigma_d$ [\%] & $\Delta$AIC & $\Delta$BIC \\
+\midrule
+P2m & 44 & 1.3 & 2.4 & 7.9 & 0.63 & 20.4 & 0.0 \\
+P1 & 50 & 2.1 & 3.0 & 4.0 & 0.48 & 0.0 & 0.8 \\
+P2g6 & 42 & 1.4 & 4.3 & 17.7 & 5.02 & 153.1 & 125.7 \\
+P2gf & 43 & 1.8 & 4.1 & 17.5 & 5.45 & 176.2 & 152.2 \\
+P2i & 43 & 1.8 & 4.0 & 17.5 & 4.96 & 150.3 & 126.3 \\
+P2s & 44 & 1.8 & 4.0 & 17.4 & 5.47 & 194.6 & 174.2 \\
+P0 & 30 & 3.0 & 8.8 & 28.2 & 14.57 & 942.4 & 872.6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{tSZ family RMS [\%] (relative errors of $C_\ell^{yy}$ at $\ell=100,300,1000,3000$), painting target (model $\times\,p_{\rm keep}$ against the A2-ii truth) unless stated, $R_{\rm fit}=R_{\rm cut}=4$.}
+\label{tab:obsP}
+\begin{tabular}{lrrrrrr}
+\toprule
+model & det & S1 & S2 & det vs mean & CV S1 & S1, all gas \\
+\midrule
+P2m (a) & 3.19 & 0.52 & 1.43 & 0.30 & 0.38 & 0.94 \\
+P1 (a) & 3.15 & 0.59 & 2.25 & 0.36 & 0.44 & 1.06 \\
+P1 (d) & 2.77 & 0.58 & 1.89 & 0.22 & 0.82 & 1.26 \\
+P2gf (a) & 3.01 & 0.58 & 2.09 & 0.36 & 0.59 & 1.18 \\
+P2g6 (a) & 2.91 & 0.54 & 1.87 & 0.25 & -- & 1.18 \\
+P0 (a) & 2.04 & 1.31 & 1.24 & 1.06 & 1.58 & 1.96 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{itemize}
+\item P2m ties with Test F's P1 on BIC with 6 fewer parameters and is more accurate inside 2~$\Rc$; the self-similar P2
+  variants leave 17\% residuals at 2--4~$\Rc$.
+\item Best overall: objective (d) at $\Rfit=3$, $\Rcut=4$ gives 0.44--0.49\% for every P2 variant, within the CV scatter.
+\item P2m's outer temperature law is checked only at 3--4~$\Rc$, where it matches the measured $T_e$ within $-35\%$ to
+  $+12\%$. Inside 2~$\Rc$ its power law ($q=1.44$) runs hotter than the gas (up to about 3 times at $\Rc$ in groups), and
+  the outer term carries 9--32\% of the pressure at 0.5~$\Rc$ and 15--35\% at $\Rc$, most in the lowest bins
+  (Fig.~\ref{fig:components}). Inside $\Rc$ the bound/outer split is therefore a fit decomposition, not a physical one:
+  the profile is accurate, but the outer term there should not be read as 2-halo gas.
+\end{itemize}
+
+\subsection{Electrons}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Electron models fitted to all gas, objective (a), $R_{\rm fit}=4$: shell RMS of $\ln(S/\bar F)$ per region, median model-discrepancy term $\sigma_d$, and information criteria with a common $\sigma_{\rm ref}$ per bin ($n=252$ shells).}
+\label{tab:icE}
+\begin{tabular}{lrrrrrrr}
+\toprule
+model & $k$ & RMS $<1R$ [\%] & 1--2$R$ & 2--4$R$ & $\sigma_d$ [\%] & $\Delta$AIC & $\Delta$BIC \\
+\midrule
+E3 & 44 & 1.0 & 1.9 & 10.0 & 2.31 & 0.0 & 0.0 \\
+E2gf & 41 & 1.2 & 2.0 & 10.0 & 2.38 & 28.2 & 17.6 \\
+E2g6 & 40 & 1.3 & 2.1 & 9.9 & 2.49 & 43.9 & 29.8 \\
+E1 & 50 & 2.8 & 3.5 & 6.2 & 1.98 & 249.4 & 270.5 \\
+E0 & 30 & 8.5 & 13.7 & 21.6 & 12.97 & 4390.6 & 4341.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{kSZ / DM family RMS [\%] (kSZ: $C_\ell^{\rm kSZ,1h}$ at $\ell=100$--$3000$; DM: mean, variance and the 16, 50, 84, 97.5, 99.9\% quantiles of the halo DM PDF), painting target, $R_{\rm fit}=R_{\rm cut}=4$.}
+\label{tab:obsE}
+\begin{tabular}{lrrrrrr}
+\toprule
+model & det & S1 & S2 & det vs mean & CV S1 & S1, all gas \\
+\midrule
+E2gf (a) & 1.96 / 1.55 & 0.32 / 0.50 & 1.02 / 1.22 & 0.49 / 0.56 & 0.33 / -- & 0.75 / 0.25 \\
+E2g6 (a) & 2.01 / 1.56 & 0.26 / 0.53 & 1.07 / 1.24 & 0.51 / 0.59 & 0.25 / 0.52 & 0.66 / 0.30 \\
+E1 (d) & 2.31 / 1.55 & 0.37 / 0.54 & 1.34 / -- & 0.81 / 0.53 & 0.37 / 0.54 & 0.37 / -- \\
+E1 (a) & 1.03 / 1.81 & 1.52 / 1.20 & 0.57 / 1.54 & 0.98 / 1.14 & 1.52 / -- & 1.97 / 1.22 \\
+E3 (a) & 1.18 / 1.00 & 1.02 / 0.43 & 0.32 / 0.76 & 0.47 / 0.39 & 1.00 / -- & 1.55 / 0.63 \\
+E0 (a) & 1.15 / 1.36 & 2.70 / 0.82 & 1.61 / -- & 2.15 / 0.79 & 2.69 / -- & 2.58 / 0.65 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{itemize}
+\item E3's best BIC comes from its infall term acting as an inner cusp ($s_{\rm inf}$ at its bound of 3.9); per bin, an
+  outer excess exists only below $10^{14.1}$ (Table~\ref{tab:globals}). E3 is not adopted.
+\item E2 is better than E1 inside 2~$\Rc$ and robust at any $\Rfit$: its det DM error is 1.6--2.2\% for $\Rfit=2$--4
+  ($\Rcut=4$), while E1's is 77--387\% for $\Rfit=1$--3, because its free power law diverges in the unresolved core. E1
+  follows 2--4~$\Rc$ better (3.5\% vs 10\%) because the 2-halo level is off by $-19\%$ to $+26\%$ across mass.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Global parameters of the physical models (all gas, objective a, $R_{\rm fit}=4$). $\gamma_t=6$ is fixed in P2g6 and E2g6.}
+\label{tab:globals}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+model & $\gamma_t$ & $\tau_0$ & $q$ & $p_M$ & $x_{\rm sh}$ & $A_{\rm inf}$ & $a$ & $s_{\rm inf}$ & at bound \\
+\midrule
+E2gf & 5.10 & -- & -- & -- & -- & -- & -- & -- & -- \\
+E3 & 5.30 & -- & -- & -- & -- & 0.011 & $-$2.32 & 3.90 & s\_inf \\
+P2g6 & -- & 0.189 & 1.24 & -- & -- & -- & -- & -- & -- \\
+P2gf & 2.15 & 0.115 & 0.69 & -- & -- & -- & -- & -- & -- \\
+P2i & 1.97 & 0.094 & 0.40 & -- & -- & -- & -- & -- & -- \\
+P2m & 2.70 & 0.350 & 1.44 & 0.429 & -- & -- & -- & -- & -- \\
+P2s & 2.04 & 0.099 & 0.37 & -- & 5.04 & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{tSZ$\times$DM cross-check, painting target, objective (a), $R_{\rm fit}=R_{\rm cut}=4$, S1 [\%].}
+\label{tab:cross}
+\begin{tabular}{lrrr}
+\toprule
+pressure model & electron model & tSZ$\times$DM RMS (S1) & vs truth mean \\
+\midrule
+P0 & E0 & 2.49 & 3.86 \\
+P0 & E1 & 1.46 & 3.05 \\
+P0 & E2gf & 1.24 & 2.90 \\
+P1 & E0 & 1.86 & 3.09 \\
+P1 & E1 & 0.81 & 2.29 \\
+P1 & E2gf & 0.57 & 2.15 \\
+P2m & E0 & 1.86 & 3.06 \\
+P2m & E1 & 0.81 & 2.26 \\
+P2m & E2gf & 0.57 & 2.11 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{../figures/G4_residuals_P_main_a_Rf4.png}\hfill
+\includegraphics[width=0.49\textwidth]{../figures/G4_residuals_E_main_a_Rf4.png}
+\caption{Shell residuals of every model at $\Rfit=4$ (all gas, objective a), pressure (left) and electrons (right).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.32\textwidth]{../figures/G6_grid_P_tSZ.png}\hfill
+\includegraphics[width=0.32\textwidth]{../figures/G6_grid_E_kSZ.png}\hfill
+\includegraphics[width=0.32\textwidth]{../figures/G6_grid_E_DM.png}
+\caption{Fit radius $\times$ cut radius: tSZ, kSZ and DM family RMS of the physical models (painting target).}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.49\textwidth]{../figures/G5_transition_vs_mass.png}\hfill
+\includegraphics[width=0.49\textwidth]{../figures/G10_pkeep.png}
+\caption{Left: transition radius and steepest-slope radius against mass. Right: the ownership correction $\pk$ against
+the stacked A2-ii/all ratio.}
+\end{figure}
+
+\subsection{Scatter}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Inputs of the two-component scatter S2 (all gas, $R_{\rm cut}=4$): log-amplitude scatter of the per-halo integrals inside 1 $R_{200c}$ (in) and over 1.5--4 $R_{200c}$ (out), and their correlation.}
+\label{tab:s2}
+\begin{tabular}{lrrrrrr}
+\toprule
+bin & $\sigma_{\rm in}$ (P) & $\sigma_{\rm out}$ (P) & $\rho$ (P) & $\sigma_{\rm in}$ (E) & $\sigma_{\rm out}$ (E) & $\rho$ (E) \\
+\midrule
+13.5--13.7 & 0.190 & 1.002 & 0.21 & 0.189 & 0.306 & 0.00 \\
+13.7--13.9 & 0.158 & 0.822 & 0.31 & 0.161 & 0.338 & $-$0.02 \\
+13.9--14.1 & 0.112 & 0.714 & 0.06 & 0.113 & 0.332 & $-$0.04 \\
+14.1--14.3 & 0.097 & 0.725 & 0.07 & 0.080 & 0.343 & $-$0.01 \\
+14.3--14.5 & 0.093 & 0.624 & $-$0.03 & 0.060 & 0.318 & 0.05 \\
+14.5--14.7 & 0.095 & 0.750 & 0.01 & 0.046 & 0.341 & 0.09 \\
+14.7--14.9 & 0.097 & 0.780 & 0.18 & 0.039 & 0.328 & 0.20 \\
+14.9--15.1 & 0.110 & 0.603 & $-$0.04 & 0.036 & 0.270 & 0.03 \\
+15.1--15.3 & 0.071 & 0.468 & $-$0.04 & 0.037 & 0.254 & 0.18 \\
+15.3--15.5 & 0.109 & 0.326 & $-$0.36 & 0.030 & 0.134 & 0.32 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{itemize}
+\item S1 (one amplitude per halo) gives the best observables. S2 under-predicts the 1-halo boost: P2m tSZ 1.43\% against
+  0.52\%; E2 kSZ/DM 1.02/1.22\% against 0.32/0.50\%.
+\item The likely reason: the inner amplitude is taken from the total inside 1~$\Rc$, which averages over the anti-correlated
+  core and 0.5--1.5~$\Rc$ shells. Concentration moves gas between them while nearly conserving that total, so
+  $\sigma_{\rm in}$ underestimates the core scatter. A shape (pivot) scatter component would be the physical next step;
+  it was not tested.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{../figures/G7_scatter_paint_a_Rf4.png}
+\caption{Scatter predictions against the scatter-inclusive truth (painting target, $\Rfit=\Rcut=4$).}
+\end{figure}
+
+\subsection{Lee22-style ladder}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Lee22-style ladder, pressure, mass-binned stacks, $R_{\rm fit}=4$ (floor likelihood; best outer option per inner law).}
+\label{tab:ladderP}
+\begin{tabular}{lrrrrrr}
+\toprule
+model & $k$ & $\chi^2/\nu$ (floor) & $\Delta$BIC & $\Delta$BIC$\le6$ & CV &  \\
+\midrule
+PL1+O0 & 4 & 15.50 & 3474.7 & no & no &  \\
+PL2+O0 & 5 & 6.11 & 1145.3 & no & no &  \\
+PL3+O0 & 6 & 6.14 & 1150.7 & no & no &  \\
+PL2+O1 & 7 & 3.75 & 565.3 & no & no &  \\
+PL3+O1 & 8 & 3.65 & 543.5 & no & no &  \\
+BPLa\_L22+O1 & 9 & 2.60 & 290.4 & no & no &  \\
+PL3gM+O1 & 10 & 2.17 & 188.2 & no & no &  \\
+BPLs+O1 & 11 & 1.86 & 117.7 & no & yes &  \\
+BPLall+O1 & 12 & 1.42 & 16.1 & no & yes &  \\
+BPLs+O2 & 13 & 1.85 & 122.8 & no & yes &  \\
+BPLall+O2 & 14 & 1.32 & 0.0 & yes & yes & \textbf{selected} \\
+PB+O0 & 30 & 4.48 & 767.9 & no & no &  \\
+PB+O1 & 32 & 1.09 & 23.6 & no & yes &  \\
+PB+O2 & 34 & 1.00 & 13.8 & no & yes &  \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Lee22-style ladder, electrons, mass-binned stacks, $R_{\rm fit}=4$ (floor likelihood; best outer option per inner law).}
+\label{tab:ladderE}
+\begin{tabular}{lrrrrrr}
+\toprule
+model & $k$ & $\chi^2/\nu$ (floor) & $\Delta$BIC & $\Delta$BIC$\le6$ & CV &  \\
+\midrule
+PL1+O1 & 4 & 20.72 & 4793.5 & no & no &  \\
+PL2+O1 & 5 & 4.70 & 820.6 & no & no &  \\
+PL3+O1 & 6 & 3.92 & 629.4 & no & no &  \\
+BPLa\_L22+O1 & 7 & 2.99 & 402.8 & no & no &  \\
+BPLa+O1 & 8 & 2.09 & 185.8 & no & no &  \\
+BPLs+O1 & 9 & 2.40 & 266.3 & no & no &  \\
+PL3gM+O2 & 10 & 1.39 & 22.8 & no & no &  \\
+BPLs+O2 & 11 & 1.57 & 71.4 & no & yes &  \\
+BPLall+O2 & 12 & 1.26 & 0.0 & yes & yes & \textbf{selected} \\
+PB+O1 & 30 & 1.44 & 117.2 & no & yes &  \\
+PB+O2 & 32 & 1.00 & 29.3 & no & yes &  \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{itemize}
+\item With Lee22's convention (covariance of the mean) their best models give $\chi^2/\nu=3.7$ (P) and 5.4--5.5 (E) on our
+  concentration-split cells, close to their 3.3 and 5.1; per-halo scatter would give 0.05--0.06. Lee22 therefore used the
+  covariance of the mean.
+\item The fitted break mass is $10^{14.10}$--$10^{14.23}$~M$_\odot$ for $\Rfit=2$--4 (at 4 $R_{200c}$: P $10^{14.12}$, E $10^{14.13}$), about 0.35 dex above Lee22's;
+  Lee22's own break choices are rejected by $\Delta$BIC 190--340 at 1.34~$\Rc$.
+\item Concentration terms help on concentration-split cells but not for painting: HalfDome has no concentrations, and the
+  $c$-models painted at the bin-mean concentration describe the mass stacks worse than the mass-only fit.
+\item In the pressure BPLall+O2 fit the outer temperature rises with radius ($q<0$): with a self-similar $\tau$ the O1 term
+  absorbs shape mismatch rather than describing the gas.
+\end{itemize}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Observables of the ladder's selected minimal models and of reference models with the same outer option (painting target, $R_{\rm cut}=4$; pressure: tSZ RMS [\%]; electrons: kSZ / DM RMS [\%]). Fits at 1.34 $R_{200c}$ are extrapolated to 4 $R_{200c}$.}
+\label{tab:selobs}
+\begin{tabular}{lrrrrrrr}
+\toprule
+field & $R_{\rm fit}$ & model & $k$ & det & S1 & det vs mean & selected \\
+\midrule
+pressure & 4 & BPLall+O2 & 14 & 3.25 & 1.14 & 0.89 & yes \\
+pressure & 4 & PB+O2 & 34 & 4.61 & 2.12 & 2.07 &  \\
+pressure & 4 & PL3+O2 & 10 & 5.86 & 8.77 & 8.80 &  \\
+pressure & 4 & PL1+O2 & 8 & 7.43 & 4.79 & 4.73 &  \\
+pressure & 1.34 & BPLall+O0 & 10 & 3.39 & 1.63 & 1.66 & yes \\
+pressure & 1.34 & PB+O0 & 30 & 5.07 & 2.52 & 2.60 &  \\
+pressure & 1.34 & PL3+O0 & 6 & 2.72 & 5.62 & 5.68 &  \\
+pressure & 1.34 & PL1+O0 & 4 & 10.31 & 7.64 & 7.66 &  \\
+electrons & 4 & BPLall+O2 & 12 & 1.13 / 1.45 & 1.26 / 0.50 & 0.79 / 0.55 & yes \\
+electrons & 4 & PB+O2 & 32 & 1.34 / 1.42 & 1.22 / 0.46 & 0.83 / 0.45 &  \\
+electrons & 4 & PL3+O2 & 8 & 0.74 / 1.91 & 1.54 / -- & 0.98 / 1.18 &  \\
+electrons & 4 & PL1+O2 & 6 & 1.23 / 2.22 & 2.20 / -- & 1.70 / 2.35 &  \\
+electrons & 1.34 & BPLall+O0 & 10 & 11.95 / 7.48 & 10.38 / -- & 10.76 / 7.31 & yes \\
+electrons & 1.34 & PB+O0 & 30 & 12.08 / 7.37 & 10.50 / -- & 10.88 / 7.18 &  \\
+electrons & 1.34 & PL3+O0 & 6 & 10.03 / 6.49 & 8.51 / -- & 8.87 / 6.30 &  \\
+electrons & 1.34 & PL1+O0 & 4 & 8.27 / 9.86 & 7.22 / -- & 7.42 / 10.10 &  \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{Fitted parameters of BPLall+O2 at $R_{\rm fit}=4$ (floor likelihood). Amplitude, $x_c$ and $\beta$ laws are in $\ln$ ($q\_0$ = value at $M_{\rm cut}$, am / amp = slopes below / above $M_{\rm cut}$ in $\ln M$); $\ln x_{t0}$, $a_{xt}$: transition; pressure: $\ln\tau_0$, $q$.}
+\label{tab:bpl}
+\begin{tabular}{lrrrrr}
+\toprule
+field & parameter & value & field & parameter & value \\
+\midrule
+pressure & A\_0 & 1.655 & pressure & a\_xt & $-$0.353 \\
+pressure & A\_am & 1.114 & electrons & A\_0 & 6.649 \\
+pressure & A\_amp & 0.333 & electrons & A\_am & 1.359 \\
+pressure & xc\_0 & 0.028 & electrons & A\_amp & 0.541 \\
+pressure & xc\_am & $-$0.393 & electrons & xc\_0 & 0.827 \\
+pressure & xc\_amp & $-$0.215 & electrons & xc\_am & $-$0.906 \\
+pressure & beta\_0 & 1.839 & electrons & xc\_amp & $-$0.370 \\
+pressure & beta\_am & $-$0.006 & electrons & beta\_0 & 2.087 \\
+pressure & beta\_amp & $-$0.067 & electrons & beta\_am & $-$0.396 \\
+pressure & log10Mcut & 14.116 & electrons & beta\_amp & $-$0.142 \\
+pressure & ln\_tau0 & $-$2.483 & electrons & log10Mcut & 14.125 \\
+pressure & q\_tau & $-$0.377 & electrons & ln\_xt0 & 1.268 \\
+pressure & ln\_xt0 & 1.941 & electrons & a\_xt & $-$0.069 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{../figures/G9_ladder_P_mass.png}\\[2pt]
+\includegraphics[width=\textwidth]{../figures/G9_ladder_E_mass.png}
+\caption{Parsimony ladders (mass-binned stacks): reduced $\chi^2$ with the floor and $\Delta$BIC against the number of free
+parameters, per fit radius; circled = selected.}
+\end{figure}
+
+\subsection{Cross-validation}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{../figures/G8_cv.png}
+\caption{Out-of-fold (spatial 8-fold) family RMS of the candidate configurations.}
+\end{figure}
+
+%==========================================================================================================
+\section{Recommendation}\label{sec:rec}
+\begin{itemize}
+\item \textbf{Pressure: P2m}, eqs.~(\ref{eq:B12}), (\ref{eq:ftr}), (\ref{eq:P2}), (\ref{eq:P2m}); 44 parameters
+  (Table~\ref{tab:P2mbins}). Fit to all gas at $\Rfit=\Rcut=4$, objective (a), hard 4~$\Rc$ cut, S1 scatter, painted
+  $\times\,\pk$. Errors: tSZ 0.52\% (CV 0.38\%), 0.30\% vs the truth mean.
+\item \textbf{Electrons: E2gf}, eqs.~(\ref{eq:B16}), (\ref{eq:ftr}), (\ref{eq:E2}); 41 parameters (Table~\ref{tab:E2gfbins});
+  same fit, cut, scatter and painting. Errors: kSZ 0.32\%, DM 0.50\%.
+\item \textbf{Fewest parameters:} BPLall+O2 (14 and 12 parameters), at tSZ 1.14\%, kSZ 1.26\%, DM 0.50\%. A smooth-in-mass
+  version of P2m (broken power laws plus the mass-dependent outer temperature) was not tested.
+\end{itemize}
+
+\section{Caveats}
+\begin{itemize}
+\item The 2-halo term uses the linear $\xi$, Tinker10 bias at $\Delta=200/\Omega_m$ evaluated at $M_{200c}$, bin-mean
+  templates, no halo exclusion, and $\bar E$ with stars not removed (a few per cent high).
+\item $\pk$ is a population average; everything is $z=0$ only; the top bins have $N=21$ and 6.
+\item In P2m's lowest bin the B12 $\beta$ sits at its upper bound (20): the inner shells there start at 0.35~$\Rc$ and do
+  not constrain the core shape (Table~\ref{tab:P2mbins}).
+\item Exact DM quantiles were not computed for $\Rcut<2$; S1/S2 DM PDFs only for the listed subsets.
+\item 2 of 161 joint fits hit the iteration limit (P2m at $\Rfit=1$, objective d); many $\Rfit\le1.5$ fits sit on bounds by
+  construction.
+\item The selection-stage fits use the GLS likelihood, where the noisy pressure outskirts carry little weight, so their
+  observables are worse than those of the per-field models.
+\end{itemize}
+
+\section{Runs and verification}
+\begin{itemize}
+\item STRW maas, nice 19 with ionice and load/memory guards. Attempt 1 (4 workers; stopped to switch to 8 at the user's
+  request): kernels 521~s, prepare 2~s, parity 33~s, fits 162~s. Attempt 2 (8 workers): evaluate 951~s, selection 382~s,
+  cv 154~s; exit 0; peak tree RSS 7.0~GiB; load 24--25 on 48 threads, $\ge175$~GiB free.
+\item Parity with Test F: the rebuilt basis and DM quantiles are bitwise equal; E0/P0 equal Test F's fits; E1/P1 reproduce
+  Test F to $6\times10^{-6}$ / $4\times10^{-4}$. \texttt{verification.json}: all checks passed.
+\item This report's curves are evaluated with Test G's own code at the stored parameters and reproduce the stored fit
+  shells to $10^{-15}$.
+\end{itemize}
+
+%==========================================================================================================
+\appendix
+\section{Per-bin parameters}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{P2m per-bin parameters (all gas, objective a, $R_{\rm fit}=4$); globals in Table~\ref{tab:globals}. RMS in \% (objective-a shells).}
+\label{tab:P2mbins}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+bin & $P_0$ & $x_c$ & $\beta$ & $x_t$ & $x_{\rm steep}$ & RMS $<1R$ & 1--2$R$ & 2--4$R$ & at bound \\
+\midrule
+13.5--13.7 & 0.856 & 6.977 & 20.0 & 2.093 & 1.78 & 0.3 & 0.2 & 7.3 & beta \\
+13.7--13.9 & 2.485 & 2.429 & 9.555 & 2.014 & 1.74 & 0.2 & 0.7 & 6.7 &  \\
+13.9--14.1 & 4.011 & 2.238 & 10.2 & 2.101 & 1.64 & 0.3 & 1.5 & 8.6 &  \\
+14.1--14.3 & 6.517 & 1.461 & 7.896 & 2.021 & 1.66 & 0.3 & 0.8 & 4.6 &  \\
+14.3--14.5 & 9.699 & 1.044 & 6.637 & 2.006 & 1.70 & 0.6 & 0.8 & 6.2 &  \\
+14.5--14.7 & 12.9 & 0.904 & 6.381 & 1.963 & 1.67 & 0.5 & 1.1 & 11.1 &  \\
+14.7--14.9 & 15.5 & 0.772 & 5.939 & 2.068 & 1.77 & 0.9 & 1.3 & 7.5 &  \\
+14.9--15.1 & 14.7 & 0.919 & 6.806 & 2.117 & 1.70 & 1.3 & 1.6 & 7.7 &  \\
+15.1--15.3 & 22.3 & 0.375 & 3.624 & 1.081 & 1.50 & 1.0 & 2.5 & 11.6 &  \\
+15.3--15.5 & 41.2 & 0.423 & 4.894 & 3.094 & 2.24 & 2.9 & 6.5 & 4.0 &  \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}[H]
+\centering
+\footnotesize
+\caption{E2gf per-bin parameters (all gas, objective a, $R_{\rm fit}=4$); $\gamma_t$ in Table~\ref{tab:globals}. RMS in \%.}
+\label{tab:E2gfbins}
+\begin{tabular}{lrrrrrrrrr}
+\toprule
+bin & $\rho_0$ & $\alpha$ & $\beta$ & $x_t$ & $x_{\rm steep}$ & RMS $<1R$ & 1--2$R$ & 2--4$R$ & at bound \\
+\midrule
+13.5--13.7 & 231.7 & 2.337 & 2.130 & 2.402 & 2.28 & 1.4 & 1.8 & 3.1 &  \\
+13.7--13.9 & 404.9 & 1.940 & 2.548 & 2.303 & 2.11 & 1.0 & 1.3 & 2.3 &  \\
+13.9--14.1 & 733.5 & 1.622 & 3.036 & 2.252 & 1.95 & 1.7 & 1.5 & 2.7 &  \\
+14.1--14.3 & 1060.0 & 1.508 & 3.379 & 2.303 & 1.86 & 1.4 & 1.6 & 4.3 &  \\
+14.3--14.5 & 1512.9 & 1.387 & 3.683 & 2.381 & 1.78 & 1.5 & 1.9 & 4.5 &  \\
+14.5--14.7 & 2031.9 & 1.314 & 3.962 & 2.368 & 1.66 & 0.7 & 1.4 & 5.6 &  \\
+14.7--14.9 & 2620.1 & 1.216 & 4.097 & 2.235 & 1.60 & 0.4 & 1.0 & 9.8 &  \\
+14.9--15.1 & 2852.3 & 1.238 & 4.274 & 2.135 & 1.49 & 0.5 & 1.4 & 14.8 &  \\
+15.1--15.3 & 3473.6 & 1.104 & 4.126 & 1.816 & 1.49 & 1.4 & 2.1 & 18.2 &  \\
+15.3--15.5 & 5099.7 & 1.082 & 4.665 & 2.694 & 1.20 & 1.8 & 4.2 & 16.2 &  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Files}
+\begin{itemize}
+\item Code: \texttt{G\_physical\_outer/g\_*.py} and \texttt{run\_test\_g.py}.
+\item This report: \texttt{report/make\_report\_figures.py} (figures) and \texttt{report/build\_report.py} (tables, text,
+  PDF).
+\item Results: \texttt{results/} (\texttt{fits.npz}, \texttt{evaluate.npz}, \texttt{prepare.npz}, \texttt{selection.npz},
+  \texttt{tables/G\_*.csv}).
+\item Figures: \texttt{figures/} and \texttt{report/figures/}; short summary: \texttt{REPORT.md}.
+\end{itemize}
+
+\end{document}

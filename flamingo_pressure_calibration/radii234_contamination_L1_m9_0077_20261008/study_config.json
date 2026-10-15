@@ -1,0 +1,42 @@
+{
+  "simulation": "L1_m9",
+  "snapshot": 77,
+  "mass_edges_log10_Msun": [
+    12.5,
+    12.7,
+    12.9,
+    13.1,
+    13.3,
+    13.5,
+    13.7,
+    13.9,
+    14.1,
+    14.3,
+    14.5,
+    14.7,
+    14.9,
+    15.1,
+    15.3,
+    15.5
+  ],
+  "random_centrals_per_lower_bin": 300,
+  "all_centrals_above_logmass": 14.5,
+  "seed": 20261008,
+  "sphere_radii_R200c": [
+    2,
+    3,
+    4
+  ],
+  "primary": "all gas",
+  "components": [
+    "central_bound",
+    "own_satellites_bound",
+    "other_halos_bound",
+    "unbound"
+  ],
+  "workers": 8,
+  "RAM_limit_GiB": 40,
+  "wall_limit_minutes": 180,
+  "SWIFT_representatives_per_bin": 3,
+  "views": 10
+}

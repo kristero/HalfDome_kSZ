@@ -1,0 +1,19 @@
+Seed and mask sensitivity of frozen Merlin inference
+
+Primary: unbounded model. Companion: prior-bounded model.
+Baseline: simulation 100, mask 12345; same SO baseline deproj0 split noise in every observation.
+Widths are q84-q16. A normalized shift of one is half the baseline 68% interval.
+Mask rotations overlap on the same sky. Their scatter is spatial variation, not independent-mock covariance.
+This tests sensitivity conditional on one noise pair; it is not a coverage calibration or a retrained posterior.
+Unbounded tail mass outside the training prior is extrapolation; it is tabulated explicitly.
+
+parameter, simulation median scatter / baseline half-width, mask median scatter / baseline half-width
+P0_amp, 1.1630, 0.9458
+x_c_amp, 0.1929, 0.1735
+beta_amp, 0.3173, 0.2596
+P0_alpha_m, 0.7362, 1.2027
+x_c_alpha_m, 0.6134, 0.8354
+beta_alpha_m, 0.1781, 0.3280
+P0_alpha_z, 0.3889, 0.4184
+x_c_alpha_z, 0.4800, 0.4197
+beta_alpha_z, 0.1516, 0.0728

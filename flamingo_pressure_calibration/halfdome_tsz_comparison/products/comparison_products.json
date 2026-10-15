@@ -1,0 +1,107 @@
+{
+ "nside": 4096,
+ "lmax": 8192,
+ "maps": {
+  "halfdome_flamingo": {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/halfdome_tsz_comparison/output/halfdome_y_flamingo_sphere4_nside4096.fits",
+   "mean_y": 1.1306806716502152e-06,
+   "std_y": 2.1867495944408746e-06,
+   "zero_fraction": 0.0,
+   "negative_fraction": 0.0,
+   "negative_to_positive_sum": -0.0,
+   "min_y": 1.1490926641097597e-09,
+   "max_y": 0.0008885986440352184,
+   "finite_fraction": 1.0,
+   "percentiles_1_50_99_99.9": [
+    9.435502118675063e-08,
+    6.534108220584252e-07,
+    8.203208343855825e-06,
+    2.5696652535806103e-05
+   ],
+   "seconds": 36.9
+  },
+  "halfdome_flamingo_particle_shells": {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/halfdome_tsz_comparison/output/halfdome_y_flamingo_particle_shells_sphere4_nside4096.fits",
+   "mean_y": 1.0190909201440005e-06,
+   "std_y": 2.1774547778320816e-06,
+   "zero_fraction": 0.0,
+   "negative_fraction": 0.0,
+   "negative_to_positive_sum": -0.0,
+   "min_y": 4.6532441291071344e-10,
+   "max_y": 0.0008437990070260527,
+   "finite_fraction": 1.0,
+   "percentiles_1_50_99_99.9": [
+    5.595962586516207e-08,
+    5.366881263224083e-07,
+    8.102521232678063e-06,
+    2.5705518559913843e-05
+   ],
+   "seconds": 35.4
+  },
+  "halfdome_b12": {
+   "path": "/home/cbllover/HalfDome/truncation_comparison/radius_series/output_local/halfdome_y_sphere4_nside4096.fits",
+   "mean_y": 1.014070572445737e-06,
+   "std_y": 1.912634172113498e-06,
+   "zero_fraction": 0.0,
+   "negative_fraction": 0.0,
+   "negative_to_positive_sum": -0.0,
+   "min_y": 6.388721361588695e-10,
+   "max_y": 0.0004669026424890266,
+   "finite_fraction": 1.0,
+   "percentiles_1_50_99_99.9": [
+    6.274339362916845e-08,
+    5.390201609963444e-07,
+    7.846026898490995e-06,
+    2.2618757432140197e-05
+   ],
+   "seconds": 60.4
+  },
+  "flamingo_lc0": {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/halfdome_tsz_comparison/flamingo_maps/L2p8_m9_lc0_lensed_tSZ_rot_same_rot_nside4096.npy",
+   "mean_y": 1.6109068051941805e-06,
+   "std_y": 2.0696578418358993e-06,
+   "zero_fraction": 0.0011318624019622803,
+   "negative_fraction": 0.0011318624019622803,
+   "negative_to_positive_sum": 0.00026370225698188173,
+   "min_y": -2.3689680009070693e-05,
+   "max_y": 0.0004794139874268165,
+   "finite_fraction": 1.0,
+   "percentiles_1_50_99_99.9": [
+    3.368366631690791e-07,
+    1.1535481526966522e-06,
+    8.808653453292879e-06,
+    2.4839532611037187e-05
+   ],
+   "seconds": 54.5
+  },
+  "flamingo_lc1": {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/halfdome_tsz_comparison/flamingo_maps/L2p8_m9_lc1_lensed_tSZ_rot_same_rot_nside4096.npy",
+   "mean_y": 1.6063276002958073e-06,
+   "std_y": 2.087129313047865e-06,
+   "zero_fraction": 0.001196230451265971,
+   "negative_fraction": 0.001196230451265971,
+   "negative_to_positive_sum": 0.0002791700989100803,
+   "min_y": -1.9716167951161858e-05,
+   "max_y": 0.0005309266237975587,
+   "finite_fraction": 1.0,
+   "percentiles_1_50_99_99.9": [
+    3.3085880037702805e-07,
+    1.1476691312142578e-06,
+    8.851413385151802e-06,
+    2.519582038160573e-05
+   ],
+   "seconds": 32.8
+  }
+ },
+ "cutouts_lonlat_deg": [
+  [
+   60.0,
+   30.0
+  ],
+  [
+   200.0,
+   -45.0
+  ]
+ ],
+ "cutout_size_deg": 8.0
+}

@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -j oe
+# Unbounded MOPED (noise-level features) at 61,440 rows next to the unbounded Merlin / PCA; observation posteriors of
+# all three; SBC ranks of the 3,000 test rows for the unbounded and the bounded networks.
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+PY=/home/kristero10/envs/sbi27/bin/python; C=${NCPUS:-16}
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1
+O=results_merlin_unbinned_asinh_p30_lin
+LIN="MERLIN_TAG=_asinh_p30_lin MERLIN_PARAM_SPACE=linear MERLIN_PATIENCE=30 MERLIN_LR_PATIENCE=10"
+echo "host=$(hostname) ncpus=$C start=$(date -Is)"
+env $LIN OMP_NUM_THREADS=1 $PY merlin_compression.py train --variants moped --seeds 1 2 3 --workers 3 --threads 1 && \
+env $LIN OMP_NUM_THREADS=$C $PY merlin_compression.py evaluate --variants moped --threads $C && \
+env $LIN OMP_NUM_THREADS=$C $PY obs_posteriors.py --models Merlin PCA MOPED --merlin-folder $O --out obs_posteriors_lin --threads $C && \
+env $LIN OMP_NUM_THREADS=$C $PY posterior_rows.py --out posterior_rows --ranks --threads $C \
+  sbc_merlin_lin=merlin:$O:merlin sbc_pca_lin=merlin:$O:pca sbc_moped_lin=merlin:$O:moped && \
+OMP_NUM_THREADS=$C $PY posterior_rows.py --out posterior_rows --ranks --threads $C \
+  sbc_merlin=merlin:results_merlin_unbinned_asinh_p30:merlin sbc_pca=merlin:results_merlin_unbinned_asinh_p30:pca \
+  sbc_moped=ens:results_final_noise/moped_noisy/N61440
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

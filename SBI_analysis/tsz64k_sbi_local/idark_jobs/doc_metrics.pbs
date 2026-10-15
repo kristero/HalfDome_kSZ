@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -j oe
+# Per-row metric data for the explainer (doc_metric_data.py -> doc_metric_data/); SPECS = the model specs.
+#   qsub -q mini_B -N doc_metrics -l select=1:ncpus=16:mem=32gb -l walltime=04:00:00 -v SPECS="<label=kind:path[:variant] ...>",B12=0 doc_metrics.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+C=${NCPUS:-16}
+export PYTHONUNBUFFERED=1 OMP_NUM_THREADS=$C MERLIN_PARAM_SPACE=logit
+echo "host=$(hostname) start=$(date -Is) specs=$SPECS"
+/home/kristero10/envs/sbi27/bin/python doc_metric_data.py --out doc_metric_data --threads $C --b12-samples ${B12:-0} $SPECS
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

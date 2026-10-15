@@ -1,0 +1,496 @@
+<section id="sbi64k" class="topic">
+<h2>3. 64k SBI: final results</h2>
+
+<div class="lede">This section establishes what the 64k flat-prior tSZ dataset supports when it is fed to neural posterior estimation (NPE): which version of the analysis is final and why, how each test metric is computed, how well the nine Battaglia et al. (2012, B12) pressure-profile parameters are recovered (correlations, widths, corner plots), whether the posteriors are calibrated (coverage, TARP, SBC), and how the results grow with the number of simulations. The short answer: with beam-consistent noise and 61,440 training simulations, Merlin gives the best marginal constraints on the HalfDome sky it was trained on (mean Pearson r 0.729) and calibrated joint posteriors, the 40-band network gives the highest joint log density of the truth (−2.35 nats against −2.96), and every network is still limited by the number of simulations, not by the SO noise. How much of Merlin's lead is specific to that one sky is the subject of sections 4 and 5.</div>
+
+<h3>3.1 What is inferred, from what</h3>
+
+<p>The simulator is the frozen dataset generator <code>tSZ_64k_flat_prior_SO_baseline_deproj0/</code> (GitHub tag <code>tsz64k-flat-prior-v1</code>, commit b46ab65; not edited for this report). For each parameter vector θ it paints a Compton-y map of all 85,224,251 HalfDome lightcone halos with M<sub>200c</sub> ≥ 10<sup>12</sup> M<sub>☉</sub> (the catalogue masses, in M<sub>☉</sub>/h, are divided by h = 0.68 before the cut; <code>engine/benchmark.jl</code>, <code>catalogue_pass!</code>), using a generalised NFW (gNFW) electron-pressure profile. A gNFW profile is a broken power law in the scaled radius x = r/R<sub>200c</sub>: an inner slope γ inside the core radius x<sub>c</sub> and an outer slope set by β beyond it, multiplied by the self-similar pressure scale P<sub>200c</sub> of a halo of mass M<sub>200c</sub> (the mass inside the radius where the mean density is 200 times the critical density).</p>
+
+<div class="eq">P<sub>th</sub>(x) / P<sub>200c</sub> = P<sub>0</sub> (x/x<sub>c</sub>)<sup>γ</sup> [1 + (x/x<sub>c</sub>)<sup>α</sup>]<sup>−β</sup>,&#160;&#160; A = A<sub>0</sub> (M<sub>200c</sub> / 10<sup>14</sup> M<sub>☉</sub>)<sup>α<sub>m</sub><sup>A</sup></sup> (1+z)<sup>α<sub>z</sub><sup>A</sup></sup> for A ∈ {P<sub>0</sub>, x<sub>c</sub>, β}<br>P<sub>200c</sub> = G M<sub>200c</sub> 200 ρ<sub>crit</sub>(z) f<sub>b</sub> / (2 R<sub>200c</sub>),&#160;&#160; P<sub>e</sub> = 0.5176 P<sub>th</sub>,&#160;&#160; y = (σ<sub>T</sub> / m<sub>e</sub>c<sup>2</sup>) ∫ P<sub>e</sub> dl</div>
+
+<p>The nine inferred parameters are the three amplitudes P<sub>0</sub>, x<sub>c</sub>, β and their mass and redshift slopes α<sub>m</sub> and α<sub>z</sub>; α = 1 and γ = −0.3 are fixed. The factor 0.5176 converts thermal to electron pressure for a fully ionised hydrogen-helium gas with hydrogen mass fraction X<sub>H</sub> = 0.76: P<sub>e</sub>/P<sub>th</sub> = 2(X<sub>H</sub> + 1)/(5X<sub>H</sub> + 3). All nine have independent flat priors (P<sub>0</sub> 1 to 60, x<sub>c</sub> 0.025 to 4, β 2.8 to 16, α<sub>m</sub><sup>P0</sup> −0.6 to 1.5, α<sub>m</sub><sup>xc</sup> −1 to 0.4, α<sub>m</sub><sup>β</sup> −0.2 to 0.4, α<sub>z</sub><sup>P0</sup> −6 to 0.5, α<sub>z</sub><sup>xc</sup> −1.5 to 3, α<sub>z</sub><sup>β</sup> −0.5 to 2; bundle README). The B12 point used as the reference mock is (18.1, 0.497, 4.35, 0.154, −0.00865, 0.0393, −0.758, 0.731, 0.415). Gas is counted only inside a sphere of 4 R<sub>200c</sub>, so the line-of-sight integral is a chord of that sphere and y falls to zero at the projected radius 4 R<sub>200c</sub>.</p>
+
+<p>The 65,536 parameter points are a scrambled Sobol sequence (a low-discrepancy design: every power-of-two prefix is itself balanced), and every row gets its own two noise seeds from a hash of its index:</p>
+
+<pre class="code" data-src="tSZ_64k_flat_prior_SO_baseline_deproj0/design/design_tests.py:L9-L21"><code>LOW=np.array([1,.025,2.8,-.6,-1,-.2,-6,-1.5,-.5])
+HIGH=np.array([60,4,16,1.5,.4,.4,.5,3,2])
+NAMES=['P0','xc','beta','alpha_m_P0','alpha_m_xc','alpha_m_beta',
+       'alpha_z_P0','alpha_z_xc','alpha_z_beta']
+
+
+def design(count,seed=20260920):
+    return LOW+(HIGH-LOW)*qmc.Sobol(9,scramble=True,seed=seed).random_base2(int(np.ceil(np.log2(count))))[:count]
+
+
+def noise_seed(row,split,stream='train',master=20260920):
+    key=f'sphere4-flat-v1|{master}|{stream}|{row}|{split}'.encode()
+    return int.from_bytes(hashlib.sha256(key).digest()[:8],'big')&amp;((1&lt;&lt;63)-1)</code></pre>
+<p class="code-note">LOW and HIGH are the prior box. <code>design</code> maps Sobol points linearly into the box (flat prior, no rejection). <code>noise_seed</code> gives the 131,072 split seeds, all distinct; they seed Julia 1.12.2's MersenneTwister, so the noise maps are reproducible from the row index alone (section 4 discusses the seeds and the mask).</p>
+
+<p>Each painted map (raw HEALPix NSIDE 8192, harmonic transform to ℓ<sub>max</sub> 12287, 2 arcmin Gaussian beam, NSIDE 4096 output; NSIDE is the HEALPix resolution parameter, and NSIDE 4096 pixels are about 0.86 arcmin across) becomes an observation in <code>save_observation</code>. The noise is the Simons Observatory (SO) Large Aperture Telescope baseline noise curve of the tSZ internal-linear-combination (ILC) map with no extra foreground component deprojected ("Deproj-0"), file <code>SO_LAT_Nell_T_atmv1_baseline_fsky0p4_ILC_tSZ.txt</code>:</p>
+
+<pre class="code" data-src="tSZ_64k_flat_prior_SO_baseline_deproj0/engine/engine.jl:L20-L45"><code>function save_observation(signal, cfg, path, seeds; save_unmasked=true)
+    mkpath(path)
+    nside = signal.resolution.nside
+    mask = random_apodized_cap_mask(nside, .4, 60., MersenneTwister(12345))
+    if save_unmasked
+        write_npy_float64_vector(joinpath(path,"unmasked_clean_cl.npy"),
+            compute_cl(cfg.base_cfg,signal), "unmasked clean")
+    end
+    signal.pixels .*= mask.mask.pixels
+    write_npy_float64_vector(joinpath(path,"masked_clean_cl.npy"),
+        compute_cl(cfg.base_cfg,signal), "masked clean")
+    noise_hashes = String[]
+    if !isempty(seeds)
+        @assert length(seeds) == 2 &amp;&amp; seeds[1] != seeds[2]
+        ell, native = read_so_noise_native_cl(cfg.baseline_noise_path,7979;
+            column=2,input_is_dl=false)
+        noise_cl = so_noise_cl_vector_for_synalm(ell,native,7979)
+        splits = [generate_gaussian_noise_map(noise_cl,nside,7979,MersenneTwister(s)) for s in seeds]
+        append!(noise_hashes,pixel_sha.(splits))
+        @assert noise_hashes[1] != noise_hashes[2]
+        for split in splits
+            split.pixels .= split.pixels .* mask.mask.pixels .+ signal.pixels
+        end
+        cross = compute_cross_cl(cfg.base_cfg,splits[1],splits[2])
+        @assert all(isfinite,cross)
+        write_npy_float64_vector(joinpath(path,"masked_noisy_cross_cl.npy"),cross,"signed split cross")</code></pre>
+<p class="code-note">Line 23: one fixed apodised cap mask covering a sky fraction f<sub>sky</sub> = 0.4, 60 arcmin apodisation, seed 12345. Lines 34-37: two Gaussian SO baseline Deproj-0 noise maps from the row's two seeds. Lines 40-43: each split is mask × noise + masked signal, and the stored spectrum is the cross spectrum of the two splits. Because the two noise maps are independent, the cross removes on average the noise power N<sub>ℓ</sub> that an auto spectrum would carry, but keeps its scatter, so the stored spectrum can be negative where noise dominates. Each split carries the full SO N<sub>ℓ</sub> (<code>split_Nell_multiplier = 1</code>). The noise is added without the beam (the engine records <code>noise_beam_applied = false</code>), which is the production-noise issue that the beam-consistent correction of section 3.3 fixes at the spectrum level.</p>
+
+<p>The collector stores D<sub>ℓ</sub> = ℓ(ℓ+1)C<sub>ℓ</sub>/2π for ℓ = 80 to 7979, 7,900 numbers per row. The collaborator's production run (Flatiron) finished 64,440 of the 65,536 rows; 274 batches of four rows (1,096 rows) failed and were never rerun there (<code>SBI_analysis/tsz64k_sbi_local/final_dataset.py</code> docstring and <code>data/final_status/missing_batches.json</code>; a disk-quota error according to the project notes). Those 1,096 rows were regenerated on idark with the same bundle and serve as an independent validation set (section 3.11). No mode-coupling correction is applied anywhere: training spectra and any observation pass through the same mask and estimator, so the inference never needs one.</p>
+
+<aside class="xgpaint"><h4>XGPaint edit: the parametrised B12 profile and the β convention (f16a7f3, e67a8a1) behind every 64k row</h4>
+<p>The bundle pins XGPaint to tag <code>validated-tsz256-20260922</code> of kristero/XGPaint.jl (<code>tSZ_64k_flat_prior_SO_baseline_deproj0/julia_env/Manifest.toml:L1976-L1982</code>, git-tree-sha1 3b57cacb). In the dev checkout <code>/home/kn18001/.julia/dev/XGPaint</code> that tag is commit 35f79ad, whose tree is identical to ce1d239; the current HEAD (1660e08) differs from it only in <code>test/runtests.jl</code>, so the excerpt below is the code that painted every row. Three fork commits matter for this dataset (plus the merge b924ab1 that made the second one necessary):</p>
+<ul>
+<li><strong>f16a7f3</strong> (2026-02-09, "Parametrized physical model"): <code>Battaglia16ThermalSZProfile</code> takes the B12 amplitudes and slopes as keywords (15 profile keywords, the amplitude, mass slope and redshift slope of each of P<sub>0</sub>, x<sub>c</sub>, α, β and γ, besides the cosmology keywords Ω<sub>c</sub>, Ω<sub>b</sub> and h; <code>src/profiles_y.jl:L27-L41</code> at f16a7f3). Without it the nine parameters could not be varied; upstream (WebSky-CITA main, 29ec48a) hard-coded the B12 values in <code>get_params</code>. This commit kept upstream's conversion <code>β = γ - α * β_raw</code>, which is correct with upstream's shape function <code>x̄^γ (1 + x̄^α)^((β - γ)/α)</code>.</li>
+<li><strong>e67a8a1</strong> (2026-04-30): the outer-slope convention. Before, <code>src/profiles_y.jl</code> line 81 read <code>β = -γ - α * β_raw  # Sigurd's conversion from Battaglia to standard NFW</code>. That line, and the new shape function <code>x̄^γ (1 + x̄^α)^(-(β + γ)/α)</code>, came in with b924ab1 (2026-03-02, "addition of Adrian fixes"), the fork's merge of Adrian Bayer's commit 9f37b1e from the upstream <code>adrian</code> branch (a fix aimed at the kSZ τ profile). Together they gave an outer factor (1 + x/x<sub>c</sub>)<sup>+β<sub>raw</sub></sup>, a pressure that rises with radius, so the fork's B12 tSZ profile was wrong from 2026-03-02 to 2026-04-30. After the fix (excerpt) the outer factor is (1 + x/x<sub>c</sub>)<sup>−β<sub>raw</sub></sup>, the B12 form. This is a correctness fix rather than a percent-level change; no saved comparison quantifies the old-convention spectra, and every 64k row was painted after the fix. The same commit added the <code>prepare_profile_slice</code> / <code>evaluate_profile_slice</code> hooks (<code>src/profiles.jl:L56-L66</code>, with <code>fill_profile_slice!</code>) through which the cache grid is filled, and the tSZ <code>prepare_profile_slice</code> (<code>src/profiles_y.jl:L147</code>) that returns the amplitude 0.5176 G M 200 ρ<sub>crit</sub> f<sub>b</sub> / 2 × σ<sub>T</sub>/(m<sub>e</sub>c<sup>2</sup>) × P<sub>0</sub>.</li>
+<li><strong>35f79ad</strong> (2026-09-24): restores <code>N_logθ = length(logθs)</code> in <code>build_max_paint_logradius</code>, dropped by 07fc686. It makes the tree identical to ce1d239 again and changes no number.</li>
+</ul>
+<pre class="code" data-src="XGPaint.jl/src/profiles_y.jl:L73-L86"><code>function get_params(model::Battaglia16ThermalSZProfile{T}, M_200, z) where T
+	z₁ = z + 1
+	m = M_200 / (1e14M_sun)
+	P₀ = powerlaw_value(model.P0, m, z₁)
+	xc = powerlaw_value(model.x_c, m, z₁)
+	α = powerlaw_value(model.alpha, m, z₁)
+	β_raw = powerlaw_value(model.beta, m, z₁)
+    γ = powerlaw_value(model.gamma, m, z₁)
+    # Battaglia parameterizes the outer factor as (1 + x^α)^(-β_raw), while
+    # generalized_nfw expects the asymptotic outer slope directly. Matching the
+    # large-radius behavior x^(γ - αβ_raw) = x^(-β) gives β = αβ_raw - γ.
+    β = α * β_raw - γ
+    return (xc=T(xc), α=T(α), β=T(β), γ=T(γ), P₀=T(P₀))
+end</code></pre>
+<p class="code-note">Line 84 is the corrected conversion β = αβ<sub>raw</sub> − γ (the asymptotic outer slope that <code>generalized_nfw</code> expects).</p>
+<p><strong>Not XGPaint edits</strong> (project code that works around XGPaint behaviour): XGPaint's own projection integrates the gNFW profile along the full line of sight to 10<sup>5</sup> R<sub>200c</sub> and only cuts the projected disc. The 4 R<sub>200c</sub> sphere is imposed by a wrapper type in the bundle, <code>ChordMeanProfile</code>, which extends XGPaint's slice hooks from outside the package and never calls XGPaint's line-of-sight quadrature for tSZ:</p>
+<pre class="code" data-src="tSZ_64k_flat_prior_SO_baseline_deproj0/engine/spherical_truncation_profiles.jl:L120-L135"><code># XGPaint's profile_grid calls prepare_profile_slice once per (M, z) and
+# evaluate_profile_slice per theta; both are extended for this type.
+function XGPaint.prepare_profile_slice(m::ChordMeanProfile, mass, z)
+    inner = m.inner
+    Mu = mass * XGPaint.M_sun
+    par = XGPaint.get_params(inner, Mu, z)
+    θ200 = theta_r200c(inner, mass, z)
+    xc, α, β, γ = Float64(par.xc), Float64(par.α), Float64(par.β), Float64(par.γ)
+    A = projection_amplitude(inner, mass, z, θ200, xc, α, β, γ)
+    return (; θ200, xc, α, β, γ, A, X=m.sphere)
+end
+
+@inline function XGPaint.evaluate_profile_slice(::ChordMeanProfile, p, theta, mass, z)
+    x = Float64(theta) / p.θ200
+    return p.A * chord_mean(x, p.xc, p.α, p.β, p.γ, p.X)
+end</code></pre>
+<p class="code-note">The cached quantity is the chord mean (chord integral divided by the chord length 2L); the painter multiplies it by the exact chord factor 2X√(1 − (θ/θ<sub>max</sub>)<sup>2</sup>). The wrapper still depends on the two XGPaint edits above: it reads the gNFW parameters through <code>XGPaint.get_params</code> (line 125, so the e67a8a1 β conversion applies) and the amplitude through the fork's tSZ <code>prepare_profile_slice</code> (<code>projection_amplitude</code>, line 104 of the same file). The shared-geometry painter (<code>engine/benchmark.jl</code>), the mask, the noise, the beam and the beam-consistent noise correction (<code>SBI_analysis/tsz64k_sbi_local/beamfix/</code>) are also project code, as is everything in the SBI pipeline below.</p>
+</aside>
+
+<aside class="note">All 65,536 rows share one HalfDome sky: the halo positions, masses and redshifts never change, only the pressure profile and the noise. The test metrics below therefore measure how well the profile parameters are recovered on this sky. They contain no cosmic (sample) variance, and information that comes from this sky's specific halo pattern (section 3.9) would not transfer to FLAMINGO or to the real sky.</aside>
+
+<h3>3.2 From a spectrum to a posterior</h3>
+
+<p><strong>Neural posterior estimation.</strong> NPE trains a conditional density estimator q<sub>φ</sub>(θ | x) on pairs (θ, x) drawn from the prior and the simulator by minimising the mean of −log q<sub>φ</sub>(θ | x). That average equals the expected Kullback-Leibler divergence between the true posterior and q<sub>φ</sub> plus a constant, so a flexible enough q<sub>φ</sub> approaches p(θ | x) for every x at once ("amortised": a new posterior costs one network evaluation). The density estimator here is a masked autoregressive flow (MAF) from the sbi package: a chain of invertible maps from a standard Gaussian in which each parameter is shifted and scaled with coefficients predicted from the previous parameters and the conditioning input. 40 bins use MAF 128×5 (128 hidden units, 5 transforms), MOPED MAF 64×5, Merlin and PCA MAF 128×5 behind their own input layers. A neural spline flow (NSF), whose transforms are monotonic rational-quadratic splines rather than shifts and scalings, was tested as a capacity control.</p>
+
+<p><strong>Where the flow lives: logit space.</strong> The flow does not model θ but u = logit((θ − θ<sub>min</sub>)/w), w = θ<sub>max</sub> − θ<sub>min</sub>. A flat prior on θ becomes an independent standard logistic distribution on u, every sample maps back inside the prior box, and densities convert with the Jacobian of the map:</p>
+
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/train_ensemble.py:L60-L83"><code>def to_u(theta, low, high):
+    """Map parameters from the prior box to logit space.
+
+    theta: (..., dim) parameters; low, high: (dim,) prior bounds. Returns u = logit((theta - low) / (high - low)),
+    float64 of the same shape. A flat prior on theta becomes an independent standard logistic prior on u.
+    """
+    unit = np.clip((np.asarray(theta, dtype=np.float64) - low) / (high - low), UNIT_CLIP, 1 - UNIT_CLIP)
+    # logit(s) = log s - log(1 - s); the clip keeps points on the box edges finite
+    return np.log(unit) - np.log1p(-unit)
+
+
+def from_u(u, low, high):
+    """Inverse of to_u: theta = low + (high - low) * sigmoid(u), float64 of the shape of u (..., dim)."""
+    return low + (high - low) / (1 + np.exp(-np.asarray(u, dtype=np.float64)))
+
+
+def log_jacobian_theta_per_u(u, low, high):
+    """log |d theta / d u| summed over parameters (theta-space density = u-space density / this).
+
+    u: (..., dim) logit-space points; low, high: (dim,) prior bounds. Returns (...,) float64.
+    """
+    u = np.asarray(u, dtype=np.float64)
+    # d theta / du = width * sigmoid(u) * sigmoid(-u), and -log sigmoid(u) = log(1 + e^-u) = logaddexp(0, -u)
+    return np.sum(np.log(high - low) - np.logaddexp(0, u) - np.logaddexp(0, -u), axis=-1)</code></pre>
+<p class="code-note"><code>log_jacobian_theta_per_u</code> is Σ<sub>i</sub> log |dθ<sub>i</sub>/du<sub>i</sub>| with dθ/du = w σ(u) σ(−u). Every log p of the truth below is the network's u-space log density minus this term, so all log densities are in θ units and directly comparable with the flat-prior value. The clip (UNIT_CLIP = 10<sup>−9</sup>) keeps truths on a box edge finite.</p>
+
+<div class="eq">u = log[t/(1 − t)],&#160; t = (θ − θ<sub>min</sub>)/w;&#160;&#160;&#160; log p<sub>θ</sub>(θ | x) = log q<sub>u</sub>(u | x) − Σ<sub>i</sub> log |dθ<sub>i</sub>/du<sub>i</sub>|;&#160;&#160;&#160; log p<sub>prior</sub>(θ) = −Σ<sub>i</sub> log w<sub>i</sub> = −12.90 inside the box</div>
+
+<p>A "bounded" network is one trained in logit space. An "unbounded" network (environment switch <code>MERLIN_PARAM_SPACE=linear</code> in <code>merlin_compression.py</code>) uses u = t, so posterior mass can leak past the prior edges. Section 3.7 shows why the bounded networks are the ones to use.</p>
+
+<p><strong>Ensembles.</strong> Each configuration is trained with three seeds, and the posterior is their equal-weight mixture. A truth in the tail of one seed's posterior still has density under the mixture, which raises the test log p over single seeds by 0.7 to 1.1 nats for Merlin and 1.1 to 1.7 for PCA (results_doc, section 10), and by 0.3 to 0.8 nats for the final 40-band ensemble (single seeds −3.14, −2.85, −2.66 against −2.35; <code>lp_seeds</code> in <code>doc_metric_data/beam_bins40.npz</code>).</p>
+
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/train_ensemble.py:L369-L376"><code>        terms = []
+        with torch.no_grad():
+            for net in self.nets:
+                chunks = [net.log_prob(torch.from_numpy(u[i:i + samples_per_call]), condition=x).numpy()
+                          for i in range(0, u.shape[0], samples_per_call)]
+                terms.append(np.concatenate(chunks, axis=0))
+        # equal-weight mixture: log of the mean of the seed densities
+        return np.logaddexp.reduce(np.stack(terms), axis=0) - np.log(len(self.nets))</code></pre>
+<p class="code-note">log q<sub>ens</sub> = logsumexp<sub>k</sub> log q<sub>k</sub> − log 3. Sampling draws n/3 points from each seed and shuffles them per row (<code>sample_u</code>, L334-L357), so 1,000 requested draws give 999.</p>
+
+<p><strong>Compressions.</strong> The four ways of turning 7,900 multipoles into the flow's conditioning input differ only in that input. <em>40 bins</em>: averages of D<sub>ℓ</sub> over 200-multipole bands weighted by the number of modes 2ℓ + 1 (the last band is 100 wide), each passed through a signed asinh whose scale is the band's noise level and then z-scored. The noise level is the standard deviation of the band's split cross power at zero signal, N<sub>b</sub>/√ν<sub>b</sub>, where N<sub>b</sub> is the per-split band noise power and ν<sub>b</sub> the effective number of modes, both fitted from the training rows (<code>sbi_final.py</code>, <code>fit_noise_model</code> and <code>bins40_scale</code>). <em>MOPED</em> (Massively Optimised Parameter Estimation and Data compression): the fixed linear map at B12 from the 256-row diagnostic, one number per parameter, built from the derivatives of the mean spectrum and the noise covariance at the B12 point. <em>PCA</em> (principal component analysis): the multipoles are whitened with a noise covariance (L<sup>−1</sup>x with C = LL<sup>T</sup>, estimated with Oracle Approximating Shrinkage, OAS), projected on the 75 to 86 leading principal components of the whitened noise-free spectra, then put through a centred asinh and z-score. <em>Merlin</em> (Wernersson, Franco-Abellan &amp; Cañas-Herrera 2026, arXiv:2609.24946, as cited in <code>merlin_compression.py</code>): the same PCA inputs passed through a learned head (2048 → 512 → 18 features) trained jointly with the flow. The asinh is linear within one noise unit and logarithmic beyond, which keeps rows that differ by many decades of tSZ power on an O(1) input scale. Section 5 describes Merlin, the whitening and the smoothing tests in full; here only their results are compared.</p>
+
+<table class="data">
+<thead><tr><th></th><th>40 bins (sbi <code>NPE.train</code>)</th><th>Merlin and PCA (<code>merlin_compression.py</code>)</th></tr></thead>
+<tbody>
+<tr><td>optimiser</td><td>Adam, learning rate 7×10<sup>−4</sup>, no schedule</td><td>AdamW, 5×10<sup>−4</sup>, ×0.1 after 11 epochs without a relative gain of 10<sup>−4</sup></td></tr>
+<tr><td>batch / validation share</td><td>512 / 10 %</td><td>256 / 20 %</td></tr>
+<tr><td>early stopping</td><td>30 epochs without gain</td><td>30 epochs without gain</td></tr>
+<tr><td>epochs at N = 61,440</td><td>340, 404, 436 (beam set)</td><td>about 75 to 110</td></tr>
+</tbody>
+</table>
+<p>Sources: <code>doc_metric_data/beam_bins40_N61440_metrics.json</code> (training records), results_doc section 10. The recipes differ; that is one of the open caveats of the comparison in section 3.8.</p>
+
+<h3>3.3 Which version is final, and why</h3>
+
+<p>The analysis went through several corrections. The table lists the steps that changed the numbers. From the third row on, every step uses the same nested-training-set protocol: a fixed random permutation (seed 0) sets aside 3,000 test rows, a second permutation (seed 1) orders the remaining 61,440, and the training set of size N is the first N rows of that order.</p>
+
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/sbi_final.py:L205-L209"><code>    # fixed test rows; the prefixes of a random order of the pool are the nested training sets
+    perm = np.random.default_rng(0).permutation(n_rows)
+    test, pool = np.sort(perm[:TEST_ROWS]), perm[TEST_ROWS:]
+    order = pool[np.random.default_rng(1).permutation(len(pool))]
+    train_sizes = [s for s in BASE_SIZES if s &lt; len(order)] + [len(order)]</code></pre>
+<p class="code-note">Because smaller training sets are prefixes of larger ones and the test rows never change, every convergence curve below is nested and every pair of networks can be compared row by row.</p>
+
+<table class="data">
+<thead><tr><th>step</th><th>what changed</th><th>held-out rows / N</th><th>log p (nats)</th><th>mean r</th><th>TARP 68 %</th><th>source</th></tr></thead>
+<tbody>
+<tr><td>box-space NPE</td><td>flow on θ, rejection to the box</td><td>768 / 24,647</td><td>n/a</td><td>n/a</td><td class="num">0.51</td><td><code>results_finished_rows/diagnostics/diagnostics.json</code></td></tr>
+<tr><td>logit-space ensembles</td><td>u = logit(t), 3 seeds</td><td>768 / 24,647</td><td class="num">−5.89 ± 0.13</td><td class="num">0.52</td><td class="num">0.72</td><td><code>results_logit/config_comparison.md</code></td></tr>
+<tr><td>full data, median-scale asinh</td><td>3,000 test rows, nested N</td><td>3,000 / 61,440</td><td class="num">−4.61</td><td class="num">0.552</td><td class="num">0.73</td><td><code>results_final/</code></td></tr>
+<tr><td>noise-level asinh</td><td>asinh scale N<sub>b</sub>/√ν<sub>b</sub> (band noise sd) instead of the median band power</td><td>3,000 / 61,440</td><td class="num">−2.39</td><td class="num">0.584</td><td class="num">0.72</td><td><code>results_final_noise/</code></td></tr>
+<tr><td>beam-consistent noise</td><td>C<sup>ss</sup> + B C<sup>sn</sup> + B<sup>2</sup> C<sup>nn</sup></td><td>3,000 / 61,440</td><td class="num">−2.354</td><td class="num">0.590</td><td class="num">0.726</td><td><code>beamfix/fetched/results/series.json</code></td></tr>
+<tr><td>Merlin / PCA, asinh inputs</td><td>production noise, B12 whitening</td><td>3,000 / 61,440</td><td class="num">−3.38 / −4.67</td><td class="num">0.720 / 0.677</td><td class="num">0.674 / 0.692</td><td><code>results_merlin_unbinned_asinh_p30/</code></td></tr>
+<tr><td>Merlin / PCA, final</td><td>beam-consistent, noise-only whitening</td><td>3,000 / 61,440</td><td class="num">−2.96 / −4.56</td><td class="num">0.729 / 0.684</td><td class="num">0.675 / 0.697</td><td><code>results_merlin_unbinned_beam_nnwhite_asinh_p30/</code></td></tr>
+</tbody>
+</table>
+<p>The first five rows are 40-band networks. The first two rows use a different, smaller held-out set, so their log p is not comparable with the others; their TARP values are. The box-space networks (2-seed ensembles, flows trained directly on θ and rejection-sampled into the box) covered only 51 % of truths with their 68 % regions and 84 to 86 % with their 95 % regions; the logit-space ensembles on the same rows were calibrated, which is why everything after that step is bounded. The median-scale asinh put the lower half of the prior, B12 included, into the linear part of the asinh where differences are tiny compared with the spread that sets the z-score; the noise-level scale moved the 40-band log p from −4.61 to −2.39 nats, more than a doubling of the training set is worth.</p>
+
+<p><strong>Beam-consistent noise.</strong> The SO noise curves are beam-deconvolved, so on a map they belong under the same beam as the signal. The engine beamed the signal and added the noise unbeamed, which overstates the noise × noise term by 1/B<sub>ℓ</sub><sup>2</sup> and the signal × noise term by 1/B<sub>ℓ</sub>, where B<sub>ℓ</sub> is the transfer function of the 2 arcmin Gaussian beam (B<sub>ℓ</sub> &lt; 1, falling with ℓ). Write C<sup>ss</sup> for the masked clean signal spectrum, C<sup>nn</sup> for the cross spectrum of the two masked noise maps, C<sup>sn</sup> for the signal × noise cross terms and C<sup>noisy</sup> for the stored split cross spectrum, so that C<sup>noisy</sup> = C<sup>ss</sup> + C<sup>sn</sup> + C<sup>nn</sup>. Rather than repaint, the noise maps were regenerated on idark from their seeds, giving C<sup>nn</sup> per row, and the spectrum was corrected as C<sup>beam</sup> = C<sup>ss</sup> + B<sub>ℓ</sub>(C<sup>noisy</sup> − C<sup>ss</sup> − C<sup>nn</sup>) + B<sub>ℓ</sub><sup>2</sup>C<sup>nn</sup> (<code>beamfix/beamfix.py</code>, function <code>correct</code>). The band noise rms after the correction is unchanged at low ℓ and 13 % of the production value in the last band (results_doc section 3). This is a project-side correction, not an XGPaint change. Its effect on the SBI is small: in the staged series the paired log p gain over production noise at N = 61,440 is +0.35 nats with a row error of 0.02 (<code>series.json</code>, <code>paired_log_p_noise</code>), but the training scatter of a 40-band ensemble is larger (its three single seeds give −3.14, −2.85 and −2.66), and the Merlin size series with and without the correction (B12 whitening) agree within 0.04 nats from 2,000 to 32,000 simulations and differ by +0.11 at 61,440 (<code>metrics_merlin.json</code> of <code>results_merlin_unbinned_asinh_p30[_N*]</code> and <code>results_merlin_unbinned_beam_asinh_p30[_N*]</code>). It is kept because it is the physically correct noise, not because it improves the numbers.</p>
+
+<p><strong>Noise-only whitening.</strong> Merlin and PCA need a whitening covariance. The first choice was 20 SO noise draws of the B12 mock (OAS shrinkage 0.95, so the correlation between neighbouring multipoles was shrunk away), which also carries the B12 signal × noise term and so depends on a fiducial model. The final choice uses the regenerated noise × noise spectra of the 61,440 training rows (shrinkage 0.17, lag-1 correlation 0.455), which needs no fiducial (results_doc section 5). For Merlin it is at least as good: its log p goes from −3.28 to −2.96 and its mean r rises by 0.0080 ± 0.0018 with all nine parameters positive. For PCA the change is within the errors (mean r −0.0020 ± 0.0038; log p −4.33 ± 0.13 to −4.56 ± 0.20; results_doc section 11.8 and the metrics files below).</p>
+
+<p>The final set, used for every figure from 3.1 to 3.10, is therefore: beam-consistent noise, the full 61,440 training rows, bounded three-seed ensembles, Merlin and PCA with noise-only whitening, and the 40-band network of the last stage of the staged beam series, all evaluated on the same 3,000 test rows. Three things decide "final": it is the physically correct observation model (beam-consistent noise), it uses every simulation produced, and it is fiducial-free and calibrated. A Merlin variant whitened with a 420-draw B12 covariance model reaches −2.82 ± 0.08 nats, but it depends on the B12 fiducial and is used here only for the Fisher comparison in Figure 3.11.</p>
+
+<figure class="fig"><img src="fig/3_sbi64k/01_headline_scorecard_beam.png" alt="Six small panels comparing Merlin, PCA and 40 bins on test log p, Pearson r, RMSE, width, interval score and TARP" loading="lazy"><figcaption><strong>Figure 3.1</strong> The final scorecard at N = 61,440 (beam-consistent noise, bounded ensembles, 3,000 test rows; Merlin and PCA with noise-only whitening). Merlin leads on every marginal measure (r, RMSE over the prior-centre RMSE, 68 % width over the flat width, interval score); 40 bins has the highest joint log p; TARP at the 68 % level is 0.675 (Merlin), 0.697 (PCA), 0.726 (40 bins) against a target of 0.68. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/compare_scorecard_beam.png (doc_figures.py, fig_compare_scorecard)</span></figcaption></figure>
+
+<table class="data">
+<thead><tr><th>network (beam-consistent noise, N = 61,440, bounded)</th><th>log p</th><th>r</th><th>RMSE / prior</th><th>width / flat</th><th>cov. 68 %</th><th>TARP 68 / 95</th><th>interval score</th></tr></thead>
+<tbody>
+<tr><td>Merlin, noise-only whitening</td><td class="num">−2.96 ± 0.05</td><td class="num">0.729</td><td class="num">0.663</td><td class="num">0.551</td><td class="num">0.675</td><td class="num">0.675 / 0.952</td><td class="num">0.526</td></tr>
+<tr><td>PCA, noise-only whitening</td><td class="num">−4.56 ± 0.20</td><td class="num">0.684</td><td class="num">0.712</td><td class="num">0.673</td><td class="num">0.721</td><td class="num">0.697 / 0.959</td><td class="num">0.580</td></tr>
+<tr><td>40 bins</td><td class="num">−2.35</td><td class="num">0.590</td><td class="num">0.787</td><td class="num">0.777</td><td class="num">0.721</td><td class="num">0.726 / 0.963</td><td class="num">0.656</td></tr>
+<tr><td>Merlin, B12 whitening (20 draws)</td><td class="num">−3.28 ± 0.05</td><td class="num">0.721</td><td class="num">0.672</td><td class="num">0.567</td><td class="num">0.684</td><td class="num">0.675 / 0.953</td><td class="num">0.534</td></tr>
+<tr><td>PCA, B12 whitening (20 draws)</td><td class="num">−4.33 ± 0.13</td><td class="num">0.686</td><td class="num">0.708</td><td class="num">0.660</td><td class="num">0.719</td><td class="num">0.698 / 0.962</td><td class="num">0.574</td></tr>
+<tr><td>Merlin, 420-draw B12 covariance model</td><td class="num">−2.82 ± 0.08</td><td class="num">0.728</td><td class="num">0.664</td><td class="num">0.547</td><td class="num">0.674</td><td class="num">0.672 / 0.953</td><td>n/a</td></tr>
+</tbody>
+</table>
+<p>The ± on log p is the scatter of the three single-seed means divided by √3 (<code>test_log_prob_err</code>). The row standard error of the mean log p is about 0.09 for Merlin and PCA and 0.063 for 40 bins. The 40-band single-seed means are −3.14, −2.85, −2.66 (<code>doc_metric_data/beam_bins40.npz</code>, <code>lp_seeds</code>), so its seed error would be about 0.14. Sources: <code>results_merlin_unbinned_beam_nnwhite_asinh_p30/metrics_{merlin,pca}.json</code>, <code>results_merlin_unbinned_beam_asinh_p30/</code>, <code>results_merlin_unbinned_beam_w420_asinh_p30/</code>, <code>doc_metric_data/beam_bins40_N61440_metrics.json</code>; interval scores of the first three rows from <code>scripts/sbi64k/final_calibration_numbers.json</code> (report helper; equal to results_doc section 12), of the B12-whitened rows recomputed with the same formula from the stored per-row quantiles in <code>doc_metric_data/beam_b12_{merlin,pca}.npz</code>.</p>
+
+<aside class="key">With 61,440 simulations and beam-consistent noise, Merlin recovers the nine B12 parameters best on every marginal measure (mean r 0.729, 68 % intervals 0.55 of the flat width) with calibrated joint coverage (TARP 0.675 / 0.952). The 40-band network keeps the highest joint log density of the truth (−2.35 against −2.96 nats). All networks still gain 1.3 to 1.5 nats per doubling of the training set. These are results on the one training sky; sections 4 and 5 show that part of Merlin's lead is that sky's fingerprint.</aside>
+
+<h3>3.4 How each metric is computed</h3>
+
+<p>Every stored metric comes from one function, run on the 3,000 test rows with 999 posterior draws per row (fixed torch and numpy seeds, so the draws are reproducible and the per-row files written later reproduce the stored r exactly):</p>
+
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/sbi_final.py:L327-L353"><code>    torch.manual_seed(1)
+    s, _, _ = ens.posterior(x, samples, rng=np.random.default_rng(1))          # (samples, rows, 9)
+    mean = s.mean(0)
+    q16, q84 = np.quantile(s, [.16, .84], axis=0)
+    # density of the truth: the network's u-space density divided by |d theta / d u|
+    u_t = to_u(truth, low, high)
+    lp = ens.log_prob_u(u_t[None], x)[0] - log_jacobian_theta_per_u(u_t, low, high)
+    torch.manual_seed(1)
+    truth_t = torch.tensor(truth, dtype=torch.float32)
+    references = get_tarp_references(truth_t)                  # random reference points (torch seed 1)
+    ecp, alpha = _run_tarp(torch.tensor(s, dtype=torch.float32), truth_t, references, l2, None, True)
+    c68, c95 = np.interp([.68, .95], np.ravel(alpha.numpy()), np.ravel(ecp.numpy()))
+    # the prior's RMSE: the posterior mean replaced by the centre of the box
+    prior_rmse = np.sqrt(np.mean(((truth - (low + high) / 2) / width) ** 2, axis=0))
+    flat_edge = 2 * EDGE
+    metrics = dict(mean_log_prob_theta=float(lp.mean()),
+                   mean_log_prob_theta_sem=float(lp.std() / np.sqrt(len(lp))),
+                   tarp68=float(c68), tarp95=float(c95),
+                   marginal_coverage68=np.mean((truth &gt;= q16) &amp; (truth &lt;= q84), axis=0).tolist(),
+                   median_width68_over_prior=np.median((q84 - q16) / width, axis=0).tolist(),
+                   pearson_r=[float(np.corrcoef(truth[:, i], mean[:, i])[0, 1]) for i in range(9)],
+                   rmse_over_prior_rmse=(np.sqrt(np.mean(((mean - truth) / width) ** 2, axis=0))
+                                         / prior_rmse).tolist(),
+                   median_width68_over_flat=np.median((q84 - q16) / (FLAT_WIDTH68 * width), axis=0).tolist(),
+                   edge_mass_ratio=(edge_fraction(s, low, high) / flat_edge).tolist(),
+                   edge_mass_ratio_truth=(edge_fraction(truth, low, high) / flat_edge).tolist())
+    return metrics, lp</code></pre>
+<p class="code-note">L328: posterior draws s (draws × rows × 9). L333: log p of the truth from the u-space density and the Jacobian. L336-L338: TARP with sbi's implementation. L345: marginal 68 % coverage; L346 and L350: widths; L347: Pearson r; L348-L349: RMSE relative to the prior centre; L351: the edge-mass ratio (share of draws in the outer 1 % of each prior range over its flat value of 2 %, a check for pile-ups at the box edges).</p>
+
+<h4>Log p of the truth</h4>
+<div class="eq">⟨log p⟩ = (1/N) Σ<sub>j</sub> [ log q<sub>ens</sub>(u<sub>j</sub> | x<sub>j</sub>) − log |dθ/du|<sub>u<sub>j</sub></sub> ],&#160;&#160;&#160; SEM<sub>seeds</sub> = sd<sub>k</sub>(⟨log p⟩<sub>k</sub>) / √3</div>
+<p>The mean log posterior density of the true parameters is a proper scoring rule for the full nine-dimensional posterior: it is maximised in expectation only by the true posterior, and it rewards putting density where the truth is jointly in all nine parameters, including along narrow degeneracies. A flat posterior scores −12.90 nats. One nat is a factor e in density, so "1.3 nats per doubling" means that each doubling of N multiplies the density at the truth by about e<sup>1.3</sup> ≈ 3.7 on average (in the geometric-mean sense). It is the most sensitive metric and also the most fragile: an overconfident miss costs that row tens of nats (the worst Merlin row scores −34.7; results_doc section 12), so a minority of such rows can move the mean.</p>
+
+<h4>Pearson r of truth against posterior mean, and RMSE</h4>
+<div class="eq">r<sub>i</sub> = corr<sub>j</sub>(θ<sub>ji</sub>, μ<sub>ji</sub>),&#160;&#160;&#160; RMSE<sub>i</sub> / RMSE<sub>prior</sub> = √⟨(μ<sub>ji</sub> − θ<sub>ji</sub>)<sup>2</sup>⟩<sub>j</sub> / √⟨(c<sub>i</sub> − θ<sub>ji</sub>)<sup>2</sup>⟩<sub>j</sub>,&#160; c<sub>i</sub> = (θ<sub>i</sub><sup>min</sup> + θ<sub>i</sub><sup>max</sup>)/2</div>
+<p>For each parameter, r is the correlation across the 3,000 test rows between the true value and the posterior mean μ. It measures how well the posterior mean tracks the truth, ignoring the width. r is unchanged by any linear rescaling or offset of the posterior means, so a uniform shrinkage towards the prior centre would not lower it. What lowers r is that rows with weak data all collapse onto the prior centre whatever their true value, which turns the truth-mean cloud horizontal (Figure 3.2, bottom). r is therefore a measure of information, not of bias; bias shows up in the RMSE and in the coverage. RMSE ratio 1 means nothing was learned (always guessing the prior centre). For a flat prior the prior-centre RMSE is w/√12.</p>
+
+<h4>68 % width</h4>
+<div class="eq">W<sub>i</sub> = median<sub>j</sub> (q<sub>84,ji</sub> − q<sub>16,ji</sub>) / (0.6827 w<sub>i</sub>)</div>
+<p>The median over test rows of the central 68 % interval, in units of the 68 % interval of a flat posterior (0.6827 of the prior range). A flat posterior scores about 1.</p>
+
+<h4>Marginal coverage</h4>
+<p>The share of test rows whose truth lies inside its central 68 % (or 95 %) interval. A calibrated posterior gives 0.68 (0.95), within a 95 % binomial range of ±1.96√(0.68·0.32/3000) = ±0.017 for 3,000 rows. Coverage above 0.68 means intervals that are too wide (conservative); below means too narrow (overconfident). Width and coverage must be read together.</p>
+
+<h4>TARP: coverage of the joint posterior</h4>
+<div class="eq">f<sub>j</sub> = (1/n) Σ<sub>s</sub> 1[ d(θ<sup>(s)</sup><sub>j</sub>, θ<sup>ref</sup><sub>j</sub>) &lt; d(θ<sub>j</sub>, θ<sup>ref</sup><sub>j</sub>) ],&#160;&#160;&#160; ECP(α) = (1/N) Σ<sub>j</sub> 1[ f<sub>j</sub> &lt; α ]</div>
+<p>TARP (Tests of Accuracy with Random Points, Lemos et al. 2023) checks the nine-dimensional posterior at once. For each test row a reference point θ<sup>ref</sup> is drawn uniformly within the range of the test truths, all parameters are scaled to that range, and f<sub>j</sub> is the fraction of the row's posterior draws that lie closer (Euclidean distance) to the reference point than the truth does. Each reference point defines a ball around it; for a calibrated posterior the truth's position within these balls is uniform, f is uniform on [0, 1], and the expected coverage probability ECP(α) lies on the diagonal. The implementation is sbi 0.27's <code>_run_tarp</code> (histogram of f with 300 bins for 3,000 rows, cumulative sum); the stored tarp68 and tarp95 are the curve at α = 0.68 and 0.95. The grey band in the figures is the 95 % Kolmogorov-Smirnov band ±1.358/√3000 = ±0.025.</p>
+
+<h4>Simulation-based calibration (SBC)</h4>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/posterior_rows.py:L76-L82"><code>    x, truth = ens.f['x_held'], ens.f['theta_held']
+    torch.manual_seed(1)                                   # the draws of sbi_final.row_metrics
+    s, _, _ = ens.posterior(x, samples, rng=np.random.default_rng(1))       # (samples, rows, 9)
+    q = np.quantile(s, [.025, .16, .5, .84, .975], axis=0)
+    out = dict(truth=truth, mean=s.mean(0), q025=q[0], q16=q[1], median=q[2], q84=q[3], q975=q[4])
+    if ranks:
+        out['rank'] = np.sum(s &lt; truth[None], axis=0)          # (rows, 9): samples below the truth</code></pre>
+<p class="code-note">The rank of the truth is the number of the row's 999 draws below it, per parameter. If the posterior is calibrated, the truth is just one more draw and the ranks are uniform on 0 to 999. The figures show the empirical CDF (ECDF) of rank/999 minus the uniform CDF: a hump below then above zero means ranks cluster in the middle (posterior too wide), the opposite S means too narrow, a one-sided bulge means a bias.</p>
+
+<h4>Interval score</h4>
+<div class="eq">IS<sub>α</sub> = (u − l) + (2/α)(l − θ) 1[θ &lt; l] + (2/α)(θ − u) 1[θ &gt; u],&#160;&#160; α = 0.32,&#160; in units of the prior width</div>
+<p>Width and coverage pull in opposite directions, so neither ranks two methods alone. The interval score is a proper score for the central 68 % interval [l, u]: its width plus a penalty proportional to how far the truth falls outside (lower is better; <code>doc_figures.py:L541-L545</code>). A flat posterior scores about 0.84.</p>
+
+<h4>Comparing two networks on the same rows</h4>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/doc_build.py:L220-L245"><code>def pairs_table(mset, boot=2000):
+    """Paired differences between compressions on the same test rows: mean r, log p, interval score, with errors."""
+    rows = per_row(mset)
+    rng = np.random.default_rng(7)
+    out = []
+    for a, b, name in (('bins40', 'merlin', 'Merlin − 40 bins'), ('pca', 'merlin', 'Merlin − PCA'),
+                       ('bins40', 'pca', 'PCA − 40 bins')):
+        if a not in rows or b not in rows:
+            continue
+        A, B = rows[a], rows[b]
+        assert np.array_equal(A['truth'], B['truth'])
+        t = A['truth']
+        n = len(t)
+        dr = (pearson(t, B['mean']) - pearson(t, A['mean'])).mean()
+        bs = []
+        for _ in range(boot):
+            i = rng.integers(0, n, n)
+            bs.append((pearson(t[i], B['mean'][i]) - pearson(t[i], A['mean'][i])).mean())
+        sa, sb = pearson(t[None], A['seed_mean']).mean(1), pearson(t[None], B['seed_mean']).mean(1)
+        e_r = np.hypot(np.std(bs, ddof=1), np.sqrt(sa.var(ddof=1) / 3 + sb.var(ddof=1) / 3))
+        dl = B['lp'] - A['lp']
+        la, lb = A['lp_seeds'].mean(1), B['lp_seeds'].mean(1)
+        e_l = np.hypot(dl.std(ddof=1) / np.sqrt(n), np.sqrt(la.var(ddof=1) / 3 + lb.var(ddof=1) / 3))
+        di = row_interval_score(B) - row_interval_score(A)
+        out.append([name, f'{dr:+.3f} ± {e_r:.3f}', f'{dl.mean():+.2f} ± {e_l:.2f}',
+                    f'{di.mean():+.3f} ± {di.std(ddof=1) / np.sqrt(n):.3f}'])</code></pre>
+<p class="code-note">Differences between two networks are much smaller than the test-set scatter of either, but most of that scatter is shared because both see the same rows. The r difference is bootstrapped with the same resampled rows for both networks (seed 7, 2,000 resamples) and the seed-to-seed scatter of r (from each seed's own posterior means) is added in quadrature. The log p difference uses per-row differences plus the seed scatter. The interval-score error is the paired row error only (per-seed quantiles were not stored).</p>
+
+<h3>3.5 Correlations: truth against posterior mean</h3>
+
+<figure class="fig"><img src="fig/3_sbi64k/02_truth_vs_posterior_mean_beam.png" alt="Hexbin plots of posterior mean against truth for alpha_z of P0 and alpha_m of beta, for 40 bins, PCA and Merlin" loading="lazy"><figcaption><strong>Figure 3.2</strong> Truth against posterior mean over the 3,000 test rows for the best-constrained parameter, α<sub>z</sub><sup>P0</sup> (top; r = 0.800, 0.820, 0.863 for 40 bins, PCA, Merlin) and the worst, α<sub>m</sub><sup>β</sup> (bottom; r = 0.324, 0.469, 0.517). The coloured line is the diagonal and the dotted line the prior centre: where the data are weak the posterior mean collapses onto the prior centre and the cloud turns horizontal. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/metric_r_beam.png (doc_figures.py, fig_metric_r)</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/3_sbi64k/03_pearson_r_per_parameter_beam.png" alt="Bar chart of Pearson r per parameter for 40 bins, PCA and Merlin" loading="lazy"><figcaption><strong>Figure 3.3</strong> Pearson r of truth and posterior mean for each parameter at N = 61,440 (beam-consistent noise, bounded). Merlin is highest for all nine; the gap to 40 bins is largest for β, P<sub>0</sub> and α<sub>m</sub><sup>β</sup>. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/compare_params_beam.png (doc_figures.py, fig_compare_params)</span></figcaption></figure>
+
+<table class="data">
+<thead><tr><th></th><th>P<sub>0</sub></th><th>x<sub>c</sub></th><th>β</th><th>α<sub>m</sub><sup>P0</sup></th><th>α<sub>m</sub><sup>xc</sup></th><th>α<sub>m</sub><sup>β</sup></th><th>α<sub>z</sub><sup>P0</sup></th><th>α<sub>z</sub><sup>xc</sup></th><th>α<sub>z</sub><sup>β</sup></th></tr></thead>
+<tbody>
+<tr><td>r, Merlin</td><td class="num">0.728</td><td class="num">0.780</td><td class="num">0.703</td><td class="num">0.844</td><td class="num">0.822</td><td class="num">0.517</td><td class="num">0.863</td><td class="num">0.777</td><td class="num">0.531</td></tr>
+<tr><td>r, PCA</td><td class="num">0.648</td><td class="num">0.744</td><td class="num">0.638</td><td class="num">0.793</td><td class="num">0.793</td><td class="num">0.469</td><td class="num">0.820</td><td class="num">0.757</td><td class="num">0.491</td></tr>
+<tr><td>r, 40 bins</td><td class="num">0.526</td><td class="num">0.699</td><td class="num">0.478</td><td class="num">0.659</td><td class="num">0.649</td><td class="num">0.324</td><td class="num">0.800</td><td class="num">0.730</td><td class="num">0.450</td></tr>
+<tr><td>width/flat, Merlin</td><td class="num">0.473</td><td class="num">0.533</td><td class="num">0.669</td><td class="num">0.225</td><td class="num">0.449</td><td class="num">0.846</td><td class="num">0.270</td><td class="num">0.587</td><td class="num">0.905</td></tr>
+<tr><td>width/flat, 40 bins</td><td class="num">0.892</td><td class="num">0.723</td><td class="num">0.862</td><td class="num">0.702</td><td class="num">0.708</td><td class="num">0.992</td><td class="num">0.500</td><td class="num">0.645</td><td class="num">0.974</td></tr>
+<tr><td>cov. 68 %, Merlin</td><td class="num">0.643</td><td class="num">0.686</td><td class="num">0.669</td><td class="num">0.649</td><td class="num">0.669</td><td class="num">0.675</td><td class="num">0.661</td><td class="num">0.705</td><td class="num">0.716</td></tr>
+<tr><td>cov. 68 %, 40 bins</td><td class="num">0.730</td><td class="num">0.707</td><td class="num">0.700</td><td class="num">0.716</td><td class="num">0.714</td><td class="num">0.718</td><td class="num">0.727</td><td class="num">0.728</td><td class="num">0.747</td></tr>
+</tbody>
+</table>
+<p>Sources: <code>pearson_r</code>, <code>median_width68_over_flat</code>, <code>marginal_coverage68</code> in <code>results_merlin_unbinned_beam_nnwhite_asinh_p30/metrics_{merlin,pca}.json</code> and <code>doc_metric_data/beam_bins40_N61440_metrics.json</code>.</p>
+
+<p>The pattern is physical. The redshift slope of the amplitude, α<sub>z</sub><sup>P0</sup>, and the mass slope α<sub>m</sub><sup>P0</sup> change the tSZ power of whole classes of halos and so the overall amplitude and the shape of the spectrum across ℓ. α<sub>z</sub><sup>P0</sup> is the best-measured parameter for every compression; α<sub>m</sub><sup>P0</sup> is second for Merlin and (tied with α<sub>m</sub><sup>xc</sup>) for PCA, while the 40-band network measures it only fourth best (r 0.659, after α<sub>z</sub><sup>xc</sup> and x<sub>c</sub>). The slopes of β (α<sub>m</sub><sup>β</sup>, α<sub>z</sub><sup>β</sup>) change only how steeply the halo outskirts fall off, and only differentially with mass or redshift; they are the least informed for every compression (Merlin's 68 % intervals are 0.85 and 0.91 of the flat width). Merlin's gain over 40 bins is largest for β, P<sub>0</sub> and α<sub>m</sub><sup>β</sup> (+0.225, +0.202 and +0.194 in r), three parameters that the 40-band network barely narrows (widths 0.86, 0.89, 0.99 of flat), then for the mass slopes of P<sub>0</sub> and x<sub>c</sub> (+0.185 and +0.173), and smallest for the redshift slopes of P<sub>0</sub> and x<sub>c</sub> (+0.063 and +0.047). The paired difference of the mean r is +0.139 ± 0.004, and Merlin − PCA is +0.046 ± 0.003 (<code>scripts/sbi64k/final_calibration_numbers.json</code>, identical to results_doc section 12). Merlin's head therefore extracts something that the band averages lose and that linear PCA cannot exploit. Section 3.9 shows what it is likely to be.</p>
+
+<h3>3.6 Widths and marginal coverage</h3>
+
+<figure class="fig"><img src="fig/3_sbi64k/04_width68_beam.png" alt="Histogram of per-row mean 68 percent width and bar chart of median width per parameter" loading="lazy"><figcaption><strong>Figure 3.4</strong> (a) Distribution over test rows of the 68 % width relative to the flat width, averaged over the nine parameters: medians 0.52 (Merlin), 0.64 (PCA), 0.76 (40 bins). The secondary peak near 0.9 is the faint skies: of the rows whose mean width exceeds 0.85 of the flat width, 93 % (Merlin), 83 % (PCA) and 90 % (40 bins) are fainter than 0.1× B12, against 16 % of all test rows. (b) Median width per parameter. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/metric_width_beam.png (doc_figures.py, fig_metric_width); faint-sky shares from scripts/sbi64k/final_calibration_numbers.json</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/3_sbi64k/05_marginal_coverage_beam.png" alt="Intervals of 60 test rows with truths, and 68 and 95 percent coverage per parameter" loading="lazy"><figcaption><strong>Figure 3.5</strong> (a) Merlin's 68 % intervals of P<sub>0</sub> for 60 test rows sorted by the true P<sub>0</sub>; red intervals miss the truth. (b) 68 % (filled) and 95 % (open) marginal coverage per parameter; grey: the 95 % binomial range around 0.68. Merlin scatters around 0.68 (from 0.643 for P<sub>0</sub> and 0.649 for α<sub>m</sub><sup>P0</sup>, below the binomial range, to 0.716 for α<sub>z</sub><sup>β</sup>); PCA and 40 bins are slightly conservative (0.70 to 0.75). Overall 68 / 95 % coverage: Merlin 0.675 / 0.943, PCA 0.721 / 0.958, 40 bins 0.721 / 0.962; Merlin's 95 % intervals are therefore slightly too narrow (the binomial range around 0.95 is ±0.008). <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/metric_coverage_beam.png; 95 % values from scripts/sbi64k/final_calibration_numbers.json</span></figcaption></figure>
+
+<p>Narrower is only better if coverage holds. Merlin's intervals are 0.55 of the flat width on the median against 0.78 for 40 bins, and its coverage is close to nominal, so most of the narrowing is real. Its undercoverage grows with sky brightness: the 68 % coverage over all nine parameters is 0.69 to 0.71 for skies below 1× B12 and 0.64 above 1000× B12 (95 %: 0.93), while for P<sub>0</sub> and α<sub>m</sub><sup>P0</sup> it is low in most brightness bins (0.60 to 0.71; <code>coverage_by_brightness</code> in <code>scripts/sbi64k/final_calibration_numbers.json</code>). The interval score, which trades width against misses, ranks the three in the same order as r: Merlin 0.526, PCA 0.580, 40 bins 0.656, with a paired Merlin − 40 bins difference of −0.130 ± 0.003.</p>
+
+<h3>3.7 Joint calibration: TARP, SBC, bounded and unbounded</h3>
+
+<figure class="fig"><img src="fig/3_sbi64k/06_tarp_beam.png" alt="TARP expected coverage curves and their deviation from the diagonal" loading="lazy"><figcaption><strong>Figure 3.6</strong> TARP. (a) Expected coverage against credibility level α for the three final networks; (b) the difference from the diagonal with the 95 % KS band (grey) and the stored levels 0.68 and 0.95 (dotted). Merlin stays inside the band everywhere (largest deviation −0.011 at α ≈ 0.50); PCA reaches +0.024 at α ≈ 0.63, just inside the band edge (0.025); 40 bins is conservative, up to +0.052 at α ≈ 0.64. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/metric_tarp_beam.png; deviations from scripts/sbi64k/final_calibration_numbers.json</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/3_sbi64k/07_sbc_beam.png" alt="SBC rank histogram for beta and ECDF minus uniform for all nine parameters per compression" loading="lazy"><figcaption><strong>Figure 3.7</strong> SBC. Left: rank histograms of the true β among 999 draws. Right: ECDF minus uniform for all nine parameters, one panel per compression, with the 95 % KS band ±0.025. 40 bins and PCA show the hump-below-then-above shape of posteriors that are slightly too wide (all nine parameters outside the band; largest 0.057 for 40 bins, α<sub>z</sub><sup>β</sup>, and 0.043 for PCA, α<sub>z</sub><sup>P0</sup>). Merlin's curves are flat within or near the band (three parameters slightly outside, at most 0.029 for P<sub>0</sub>). <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/metric_sbc_beam.png (doc_figures.py, fig_metric_sbc); maxima from scripts/sbi64k/final_calibration_numbers.json</span></figcaption></figure>
+
+<p>TARP and SBC agree: the final Merlin ensemble is calibrated jointly (TARP inside the band at every level) and close to calibrated per parameter, with P<sub>0</sub> and α<sub>m</sub><sup>P0</sup> slightly overconfident (68 % coverage 0.643 and 0.649; three SBC curves just outside the band); PCA and 40 bins err on the safe side. Over the whole training-size range the 40-band TARP stayed at 71 to 74 % (68 % level) and 96 to 97 % (95 % level) in both the median-scale and noise-scale runs (<code>results_final/convergence_table.md</code>, <code>results_final_noise/convergence_table.md</code>), so the calibration does not depend on N; only the sharpness does.</p>
+
+<figure class="fig"><img src="fig/3_sbi64k/08_bounded_vs_unbounded.png" alt="Per-parameter r, RMSE, width and coverage for bounded, unbounded and truncated Merlin and PCA" loading="lazy"><figcaption><strong>Figure 3.8</strong> Bounded (logit space) against unbounded (linear space) Merlin and PCA, production noise, N = 61,440, and the unbounded posteriors truncated to the prior box. r and RMSE are unchanged (Merlin mean r 0.720 bounded, 0.721 unbounded); the unbounded intervals are narrower (Merlin width 0.561 → 0.502) but undercover (68 % coverage 0.678 → 0.631; truncated 0.568), and log p drops (−3.38 → −3.59). <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_corrected_inputs/fig_bounded_vs_unbounded.png (bounded_vs_unbounded.py)</span></figcaption></figure>
+
+<p>Why the unbounded networks look sharper but are worse: a flow in linear space cannot produce a density that ends at a prior edge, so a posterior that is flat or piles up against a bound becomes a hump with tails past the bound. On the beam-consistent set the unbounded Merlin keeps r (0.729) but its coverage drops to 0.627 and its TARP to 0.635 / 0.953, and 33 to 34 % of its probability lies outside the prior box (results_doc section 9; <code>results_merlin_unbinned_beam_nnwhite_asinh_p30_lin/metrics_merlin.json</code>). In the SBC of the production-noise networks every unbounded network exceeds the 95 % band (largest |ECDF − uniform| 0.048 for Merlin against a band of 0.025), while the bounded Merlin stays within or near it (largest 0.032; <code>results_publication/publication_numbers.json</code>, <code>sbc_unbounded</code> and <code>sbc_bounded</code>). The bounded PCA and MOPED networks in the same file also exceed the band (largest 0.048 and 0.046), so SBC alone separates the two parametrisations clearly only for Merlin; the decisive evidence is the coverage, the TARP and the probability outside the box. The bounded networks are therefore the ones used for all constraints; the unbounded ones are kept only as a diagnostic of where the data push past the prior (section 3.12).</p>
+
+<h3>3.8 Why log p and the marginal metrics disagree</h3>
+
+<p>40 bins has the weakest marginals but the highest log p. Splitting the per-row log p by the brightness of the test sky (signal at ℓ ≈ 1980 relative to B12) shows where the 0.61-nat gap comes from:</p>
+
+<figure class="fig"><img src="fig/3_sbi64k/09_logp_by_brightness_beam.png" alt="Histogram of per-row log p and mean log p in bins of sky brightness" loading="lazy"><figcaption><strong>Figure 3.9</strong> (a) Per-row log p of the truth: means / medians −2.35 / −1.29 (40 bins), −4.56 / −3.14 (PCA), −2.96 / −1.41 (Merlin). A second group near −11, just above the flat-prior value −12.9, is mainly Merlin and PCA. (b) Mean log p in bins of the test sky's tSZ power relative to B12: the second group is the faint skies. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/metric_logp_beam.png (doc_figures.py, fig_metric_logp)</span></figcaption></figure>
+
+<table class="data">
+<thead><tr><th>signal relative to B12</th><th>test rows</th><th>40 bins</th><th>Merlin</th><th>PCA</th><th>share of the gap, 40 bins − Merlin</th></tr></thead>
+<tbody>
+<tr><td>below 0.01×</td><td class="num">279</td><td class="num">−9.93</td><td class="num">−11.17</td><td class="num">−11.42</td><td class="num">+0.11</td></tr>
+<tr><td>0.01 to 0.1×</td><td class="num">209</td><td class="num">−6.14</td><td class="num">−10.17</td><td class="num">−10.48</td><td class="num">+0.28</td></tr>
+<tr><td>0.1 to 1×</td><td class="num">398</td><td class="num">−2.96</td><td class="num">−5.90</td><td class="num">−7.10</td><td class="num">+0.39</td></tr>
+<tr><td>1 to 10×</td><td class="num">570</td><td class="num">−1.14</td><td class="num">−1.03</td><td class="num">−2.63</td><td class="num">−0.02</td></tr>
+<tr><td>10 to 100×</td><td class="num">568</td><td class="num">−0.58</td><td class="num">+0.56</td><td class="num">−1.11</td><td class="num">−0.22</td></tr>
+<tr><td>100 to 1000×</td><td class="num">449</td><td class="num">−0.50</td><td class="num">−0.21</td><td class="num">−1.64</td><td class="num">−0.04</td></tr>
+<tr><td>above 1000×</td><td class="num">527</td><td class="num">−1.19</td><td class="num">−1.78</td><td class="num">−4.98</td><td class="num">+0.10</td></tr>
+<tr><td>all</td><td class="num">3,000</td><td class="num">−2.35</td><td class="num">−2.96</td><td class="num">−4.56</td><td class="num">+0.61</td></tr>
+</tbody>
+</table>
+<p>Source: results_doc section 12 (<code>doc_build.py</code>, <code>contrib_numbers</code>, from <code>doc_metric_data/</code>).</p>
+
+<p>Three regimes. <strong>Faint skies</strong> (below 0.1× B12): Merlin and PCA stay near the prior while 40 bins still reaches −6.1 at 0.01 to 0.1×. The PCA and Merlin asinh is centred on the pool median, a sky about 14 times brighter than B12, so the projections of a faint sky on the first two principal components lie about 1,300 and 2,100 noise units from the centre (24 to 270 on components 3 to 6; results_doc section 7), in the logarithmic part of the asinh; a tenfold change in a faint sky then moves the input by only a few thousandths of its unit scale. The 40-band asinh is centred on zero and keeps such skies distinguishable. <strong>Skies of 0.1 to 1× B12</strong> carry the largest share (0.39 nats): here Merlin's marginals are better (RMSE 0.214 against 0.234 of the prior width) but 40 bins gives the higher log p for 83 % of these rows, i.e. its joint posterior follows the narrow parameter degeneracies more closely, which log p rewards and one-parameter metrics do not see. <strong>The brightest skies</strong> (above 1000×): Merlin's intervals are narrow (width 0.43 against 0.69) but contain the truth only 64 % of the time at 68 %, and log p punishes the misses hard. Over all rows Merlin has the higher log p on 45 % of test rows but the lower mean.</p>
+
+<aside class="note">These are observations, not established causes. The two network families were trained with different recipes (40 bins with sbi's trainer for 340 to 436 epochs; Merlin and PCA with AdamW for about 100), and log p has not levelled off with N (section 3.10), so log p reacts more to such differences than the marginal metrics do. A Merlin run with a zero-centred asinh and a matched trainer would test how much of the gap is the compression and how much the recipe; it has not been run.</aside>
+
+<h3>3.9 Corner plots of the B12 mock, parameter correlations and the Fisher bound</h3>
+
+<figure class="fig"><img src="fig/3_sbi64k/10_corner_B12_three_compressions.png" alt="Nine by nine corner plot of the B12 mock posterior for 40 bins, PCA and Merlin" loading="lazy"><figcaption><strong>Figure 3.10</strong> Posterior of the B12 mock (the B12 sky with one pair of SO noise realisations, seeds 39001001/39001002) for the three final networks, beam-consistent noise, bounded; shaded 68 % and line 95 % highest-density regions of smoothed 2-D histograms; star and dashed lines: the input values. Mean 68 % widths over the prior range: Merlin 0.47, PCA 0.53, 40 bins 0.56. All three miss x<sub>c</sub> and β at 68 %: their posteriors run up the x<sub>c</sub>-β ridge to large values (40 bins also misses α<sub>z</sub><sup>P0</sup>, and its P<sub>0</sub> marginal piles up at the upper prior edge, 60). <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/obs_b12_three.png (doc_figures.py, fig_obs_b12_three; 300,000 draws each from posterior_rows_whitening/beam_nn_bounded_{merlin,pca}_b12.npy and doc_metric_data/beam_bins40_b12.npy); widths from b12_width68_over_prior in the metrics files</span></figcaption></figure>
+
+<p>A corner plot shows every one- and two-parameter marginal of the nine-dimensional posterior. The contours are highest-posterior-density (HPD) levels of Gaussian-smoothed histograms (<code>publication_figures.py</code>, <code>hpd_levels</code> and <code>corner</code>): the 68 % region is the smallest region of the 2-D marginal containing 68 % of the draws. The tilt of a 2-D contour is the parameter-parameter correlation. For the B12 mock the strongest correlations are:</p>
+
+<table class="data">
+<thead><tr><th>pair</th><th>40 bins</th><th>PCA</th><th>Merlin</th><th>Fisher, all multipoles (Gaussian, no box)</th></tr></thead>
+<tbody>
+<tr><td>α<sub>z</sub><sup>xc</sup> – α<sub>z</sub><sup>β</sup></td><td class="num">+0.79</td><td class="num">+0.70</td><td class="num">+0.87</td><td class="num">+0.97</td></tr>
+<tr><td>x<sub>c</sub> – β</td><td class="num">+0.75</td><td class="num">+0.67</td><td class="num">+0.83</td><td class="num">+0.98</td></tr>
+<tr><td>α<sub>m</sub><sup>xc</sup> – α<sub>m</sub><sup>β</sup></td><td class="num">+0.43</td><td class="num">+0.62</td><td class="num">+0.77</td><td class="num">+0.98</td></tr>
+<tr><td>α<sub>m</sub><sup>P0</sup> – α<sub>m</sub><sup>xc</sup></td><td class="num">−0.75</td><td class="num">−0.71</td><td class="num">−0.74</td><td class="num">−0.95</td></tr>
+<tr><td>P<sub>0</sub> – α<sub>z</sub><sup>P0</sup></td><td class="num">−0.55</td><td class="num">−0.60</td><td class="num">−0.65</td><td class="num">−0.95</td></tr>
+<tr><td>P<sub>0</sub> – x<sub>c</sub></td><td class="num">−0.41</td><td class="num">−0.59</td><td class="num">−0.63</td><td class="num">−0.96</td></tr>
+<tr><td>α<sub>z</sub><sup>P0</sup> – α<sub>z</sub><sup>xc</sup></td><td class="num">−0.56</td><td class="num">−0.65</td><td class="num">−0.61</td><td class="num">−0.93</td></tr>
+</tbody>
+</table>
+<p>Source: <code>scripts/sbi64k/b12_posterior_correlations.json</code> (report helper; Pearson correlations of the stored B12 draws: 300,000 for 40 bins, and the 30,000-draw files <code>b12_samples_{merlin,pca}.npy</code> of the noise-only-whitened Merlin and PCA, which come from the same networks as the corner plot; Fisher column: the correlation matrix of the "every multipole" entry of <code>results_fisher_b12_beam/fisher_forecast_b12.json</code>, which the calibration changes by less than 0.01 for these seven pairs and by at most 0.03 elsewhere in the matrix).</p>
+
+<p>The physics of the ridges: a larger core radius x<sub>c</sub> spreads the pressure outwards, and a steeper outer slope β cuts it back, so x<sub>c</sub> and β trade off at nearly fixed projected profile; the same holds for their mass and redshift slopes. The amplitude P<sub>0</sub> trades off against its redshift slope because the power is dominated by halos over a limited redshift range. The posterior's position along the x<sub>c</sub>-β ridge is set by prior volume: the box extends to β = 16 and x<sub>c</sub> = 4, and many large-β, large-x<sub>c</sub> profiles fit the B12 spectrum once P<sub>0</sub> is rescaled. In the earlier study on the 25,944 rows then available, each row's noise-free 40-band spectrum was rescaled by the exact factor that a change of P<sub>0</sub> produces and compared with the noise-free B12 spectrum, with χ<sup>2</sup> summed over the 40 bands in units of the scatter of 20 SO noise draws of the B12 sky (the noisy B12 mock itself has χ<sup>2</sup> = 48 against the noise-free spectrum). The 25 rows with χ<sup>2</sup> &lt; 100 had a median β of 11.6 (range 4.3 to 15.8). The networks of that study were MOPED logit-space ensembles (<code>results_logit/</code>). Their β posterior conditional on the other eight parameters at their true values peaked at 4.38 (noise-trained network, noisy mock) and 4.48 (noise-free-trained network, noise-free spectrum), close to the input 4.35, so the network does respond to β when the degenerate directions are fixed. Feeding the noise-trained network the noise-free B12 spectrum gave the same marginal (β median 11.26 against 11.23 for the noisy mock), and re-beaming the noise-free spectrum from 2 arcmin to FWHM 1.8 to 2.2 arcmin moved the median only between 11.31 and 11.12 (<code>input_scan</code>; all numbers from <code>results_logit/beta_bias.json</code>). The high marginal β is therefore a degeneracy plus prior-volume effect, not a noise or beam artefact.</p>
+
+<figure class="fig"><img src="fig/3_sbi64k/11_corner_B12_fisher_vs_merlin.png" alt="Corner plot comparing the boxed Fisher forecast with the bounded and unbounded Merlin posteriors of the B12 mock" loading="lazy"><figcaption><strong>Figure 3.11</strong> B12 mock: the Fisher forecast (a Gaussian centred on the input values) times the prior box (grey filled: all 7,900 multipoles, calibrated covariance; grey dashed: Merlin's own PCA inputs) against Merlin bounded (purple) and unbounded (red). Beam-consistent noise; Merlin here is the 420-draw-whitened variant. Mean 68 % width over the prior range: Fisher, all multipoles 0.23 (0.12 to 0.34); Fisher, PCA inputs 0.29; Merlin bounded 0.46; Merlin unbounded 0.43 (72 % of its draws inside the box). PDF beside the PNG. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_publication/fig_pub_corner_B12_fisher_merlin_beam_pca.png (publication_figures.py, fisher_corners 'beam_w420'); numbers from results_publication/publication_numbers_fisher.json</span></figcaption></figure>
+
+<p><strong>The boxed Fisher forecast.</strong> The Fisher matrix F = J<sup>T</sup>C<sup>−1</sup>J (J the derivatives of the spectrum with respect to θ at B12, C the noise covariance) gives the Gaussian posterior an ideal unbiased analysis would reach if the spectrum were linear in θ. Multiplying that Gaussian by the flat prior box gives the "boxed Fisher" posterior. The first version, inside <code>sbi_final.py checks</code>, used the 40 bands:</p>
+
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/sbi_final.py:L680-L712"><code>    for level, cov in (('baseline', C), ('goal', C * np.outer(sd, sd))):
+        F = J.T @ np.linalg.solve(cov, J) * np.outer(width, width)                   # prior-width units
+        lam, vec = np.linalg.eigh((F + F.T) / 2)
+        order = np.argsort(lam)[::-1]
+        lam, vec = lam[order], vec[:, order]                # best-measured direction first
+        base = vec if base is None else base
+        sigma = 1 / np.sqrt(lam)
+        rng = np.random.default_rng(4)
+        # the Gaussian posterior centred on the truth, truncated to the unit box
+        inside, quad, proj = 0, 0.0, []
+        for _ in range(draws // chunk):
+            g = rng.standard_normal((chunk, 9))
+            x = mu + (g * sigma) @ vec.T
+            ok = np.all((x &gt; 0) &amp; (x &lt; 1), axis=1)
+            inside += int(ok.sum())
+            quad += float(np.sum(g[ok] ** 2))
+            proj.append((x[ok] - mu) @ base)
+        # entropy of the truncated Gaussian: log Z + log det(2 pi Sigma)/2 + E[chi^2 | inside]/2
+        log_norm = 0.5 * np.sum(np.log(2 * np.pi * sigma ** 2))
+        H = np.log(inside / draws) + log_norm + 0.5 * quad / inside
+        # log Z(m) for MLEs m scattered around the truth (floored at half a sample)
+        log_z = []
+        for _ in range(centres):
+            m = mu + (rng.standard_normal(9) * sigma) @ vec.T
+            y = m + (rng.standard_normal((per_centre, 9)) * sigma) @ vec.T
+            log_z.append(np.log(max(np.mean(np.all((y &gt; 0) &amp; (y &lt; 1), axis=1)), 0.5 / per_centre)))
+        # unit-box densities to theta units: subtract sum log width
+        out[level] = dict(sigma_eig=sigma.tolist(), inside_fraction=inside / draws,
+                          std_along_baseline_eigenvectors=np.concatenate(proj).std(0).tolist(),
+                          entropy_theta=float(H + np.sum(np.log(width))),
+                          expected_log_prob_truth_theta=float(-log_norm - 4.5 - np.mean(log_z)
+                                                              - np.sum(np.log(width))),
+                          expected_log_prob_truth_sem=float(np.std(log_z) / np.sqrt(centres)))</code></pre>
+<p class="code-note">L681: F in prior-width units; L682-L686: eigen-decomposition, best-measured direction first; L689-L699: Monte Carlo of the Gaussian truncated to the box (inside fraction, entropy); L701-L705: the box normalisation Z(m) for maximum-likelihood points m scattered around the truth, which enters the expected log density of the truth, E log p = −½ log det(2πΣ) − 9/2 − E log Z(m).</p>
+
+<p>With the 40 bands, the boxed Fisher expects log p(θ<sub>B12</sub>) = +7.98 nats at SO baseline noise (+8.71 at SO goal noise), while the 40-band NPE at 61,440 gave −6.29 for the B12 truth averaged over 21 noise draws (median-scale run; <code>results_final/checks.json</code>). Measured from the prior (−12.90), the NPE has 6.6 of the roughly 20.9 nats the ideal would have. The gap sits in five tight Fisher directions: the Fisher eigen-widths are 5×10<sup>−5</sup>, 5×10<sup>−4</sup>, 0.008, 0.051 and 0.076 prior widths, while the NPE's posterior standard deviations along the same directions are 0.12 to 0.29; the four loose directions (eigen-widths 0.41 to 10.7) are prior-limited for both. The later, calibrated Fisher of all 7,900 multipoles (420 noise realisations of the B12 sky; Richardson derivatives, i.e. finite differences at steps h and 2h combined as (4J<sub>h</sub> − J<sub>2h</sub>)/3; a covariance model calibrated on held-out realisations; <code>fisher_forecast_b12.py</code>) is the grey region of Figure 3.11. It is much tighter than anything a 40-band or PCA analysis can reach (marginal Fisher sd 1.1 to 2.7 prior widths for the 40 bands against 0.09 to 0.23 for all multipoles, calibrated; <code>results_fisher_b12_beam/fisher_forecast_b12.json</code>). That information lives in multipole-to-multipole fine structure of the derivatives: smoothing the derivatives over ±50 multipoles inflates the marginal sd to 0.73 to 1.78 prior widths. Its h and 2h derivatives agree to coherence 1.0000 in every period band (<code>derivative_coherence_by_period</code>), so the fine structure is a deterministic response of the simulator, not finite-difference noise; it is attributed to the one fixed HalfDome sky, whose halo pattern imprints structure in ℓ that does not average out. Merlin's PCA inputs keep part of it (Fisher marginal sd 0.39 to 1.01 prior widths for Merlin's PCA inputs, between the two cases above), which plausibly explains why Merlin and PCA beat 40 bins on the marginals. Sections 4 and 5 test this directly: when the same pressure law is painted on other HalfDome lightcones or seen through other masks, the Merlin posterior median of P<sub>0</sub> moves from about 12 to 45-54 on the other lightcones and to 24-46 through the other masks against a truth of 18.1 (section 4 summary), and a 50-multipole-band variant (band50) removes most of the shift at the price of wider intervals. The metrics of this section are therefore metrics on the training sky.</p>
+
+<h3>3.10 Convergence with the number of simulations</h3>
+
+<figure class="fig"><img src="fig/3_sbi64k/12_convergence_three_compressions_beam.png" alt="Test log p, mean r, RMSE and width against training-set size for 40 bins, PCA and Merlin" loading="lazy"><figcaption><strong>Figure 3.12</strong> The final compressions against the number of training simulations (beam-consistent noise, bounded, 3,000 test rows; Merlin and PCA with B12 whitening along the curve, squares: noise-only whitening at 61,440; 40 bins from the staged series at 8k to 61,440). Merlin at 2,000 simulations (r 0.578) is already close to 40 bins at 61,440 (0.590) and above the first, median-scale 40-band run at 61,440 (0.552); log p rises without levelling for all three. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/fig/compare_sizes_beam.png (doc_figures.py, fig_compare_sizes)</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/3_sbi64k/13_convergence_40band_noise_variants.png" alt="Four panels: log p, TARP, mean r and widths against N for five 40-band and MOPED variants" loading="lazy"><figcaption><strong>Figure 3.13</strong> The noise tests: 40 bands with SO map noise, no noise, Gaussian noise at the SO baseline and goal levels, and MOPED, all with the noise-level asinh, production noise. (a) log p with the saturating fit L<sub>∞</sub> − A N<sup>−α</sup> (dotted); (b) TARP 68 %; (c) mean r; (d) mean 68 % width over the prior range for the test rows (solid) and the B12 mock (dashed). At 61,440: map noise −2.39, no noise −1.54, Gaussian baseline −2.58, Gaussian goal −2.44, MOPED −4.20 nats. Re-rendered locally from the stored metrics because the idark copy lost its minus signs; the plotting code is unchanged. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_final_noise/ (sbi_final.py report); re-render scripts/sbi64k/rerender_convergence_noise.py</span></figcaption></figure>
+
+<p>The saturating fit is how "no flattening" is decided:</p>
+
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/sbi_final.py:L566-L582"><code>        # log p gained by the last doubling of N, interpolated linearly in log N
+        gain = float(lp[-1] - np.interp(np.log(N[-1] / 2), np.log(N), lp)) if len(N) &gt; 1 else None
+        entry = dict(N=N.tolist(), log_prob=lp.tolist(), gain_last_doubling=gain)
+        if len(N) &gt;= 4:
+            # weighted fit of the saturating model with L_inf within [-1, +20] nats of the last point
+            lower, upper = [lp[-1] - 1, 0, 0.01], [lp[-1] + 20, 1e3, 3]
+            try:
+                (L, A_, al), _ = curve_fit(saturating, N, lp, p0=(lp[-1] + 1, 1, 0.5), sigma=np.maximum(se, 1e-3),
+                                           maxfev=20000, bounds=(lower, upper))
+                grid = np.logspace(np.log10(N[0]), np.log10(8 * N[-1]), 100)
+                a1.plot(grid, saturating(grid, L, A_, al), color=COLORS[name], lw=0.8, ls=':')
+                entry.update(fit=dict(L_inf=float(L), A=float(A_), alpha=float(al)),
+                             predicted=dict((f'x{k}', float(saturating(k * N[-1], L, A_, al))) for k in (2, 4, 8)),
+                             remaining_to_asymptote=float(L - saturating(N[-1], L, A_, al)))
+                at_bound = [p for p, value, lo, hi in zip(('L_inf', 'A', 'alpha'), (L, A_, al), lower, upper)
+                            if min(value - lo, hi - value) &lt;= FIT_BOUND_TOLERANCE * (hi - lo)]
+                entry['fit_at_bound'] = bool(at_bound)</code></pre>
+<p class="code-note">The model is L<sub>∞</sub> − A (N/10<sup>4</sup>)<sup>−α</sup> with the asymptote allowed up to 20 nats above the last point. In every variant of <code>results_final_noise/convergence.json</code> the fit ends at that upper bound (<code>fit_at_bound</code> true for L<sub>inf</sub>), and in <code>results_final</code> (median scale) L<sub>∞</sub> = 15.39 = −4.61 + 20 is also the bound: the data show no curvature that would locate an asymptote. The log-linear slope against log<sub>2</sub>N (<code>sbi_final.py:L868-L873</code>) is therefore the honest summary.</p>
+
+<figure class="fig"><img src="fig/3_sbi64k/14_logp_gain_per_doubling.png" alt="Log p against N and the log p gained per doubling of N for the 64k series and the 524k narrow-prior set" loading="lazy"><figcaption><strong>Figure 3.14</strong> (a) Test log p against N for the 64k series: 40 bins with production noise and the median-scale asinh (dotted), with the noise-level asinh (dashed), with beam-consistent noise (solid), and Merlin and PCA with beam-consistent noise. (b) The local gain per doubling between consecutive sizes, and the historical 524k narrow-prior MOPED set (grey; different prior, fixed noise maps, 495 test rows, so only its shape is comparable). Overall log-linear gains: 1.27, 1.49, 1.46 (40 bins), 1.27 (PCA), 1.53 (Merlin) nats per doubling; 2.32 for the 524k set, whose local gain falls to 1.54, 1.23 and 1.11 nats above 65,536 simulations. New figure for this report, from stored metrics only. <span class="src">source: scripts/sbi64k/logp_gain_per_doubling.py (reads results_final, results_final_noise, beamfix/fetched/results/series.json, results_merlin_unbinned_beam_asinh_p30*, results_524k_moped); numbers in scripts/sbi64k/logp_gain_per_doubling.json</span></figcaption></figure>
+
+<p>On the 64k prior, every network gains 1.3 to 1.5 nats per doubling of the training set, and the last step, from 32,000 to 61,440 simulations, gave 0.95 to 2.1 nats per doubling depending on the network (log p difference divided by log<sub>2</sub>(61,440/32,000); <code>scripts/sbi64k/logp_gain_per_doubling.json</code>). Over the same range the 40-band TARP stays at 0.71 to 0.74 (68 %), the mean r of the first, median-scale 40-band run rose from 0.432 to 0.552, and Merlin's from 0.578 to 0.721 (B12 whitening). Only the narrower, older 524k set shows the expected bend, with local gains of 2.7 to 3.7 nats per doubling between 8,192 and 65,536 simulations falling to about 1.1 nats by 513,042 simulations; that set has a prior 1.8 to 7.6 times narrower per parameter (<code>width_ratio_64k_over_524k</code> in <code>results_final/fig_correlation_prior_comparison.json</code>) and the same noise maps in every row, so it suggests, but does not show, that the 64k curves would also bend somewhere above 10<sup>5</sup> simulations.</p>
+
+<figure class="fig"><img src="fig/3_sbi64k/15_limits_noise_capacity_fisher.png" alt="Four panels: log p differences of noise variants, B12 posterior width along Fisher eigen-directions, B12 log p against Fisher ideal, and network size" loading="lazy"><figcaption><strong>Figure 3.15</strong> Is the NPE limited by the training set, the network or the noise? (median-scale inputs, production noise; the first full run). (a) Paired log p relative to 40 bands with map noise; dashed: the gain of one doubling of N (+1.27), dotted: the ideal goal − baseline gain (+0.73). (b) B12 posterior sd along the Fisher eigen-directions against the boxed Fisher ideal. (c) The B12 truth log p against the ideal analysis (+8.0 baseline, +8.7 goal). (d) Network size: MAF 256×8 and NSF 128×5 against MAF 128×5. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_final/fig_checks.png (sbi_final.py checks); numbers in results_final/checks.json</span></figcaption></figure>
+
+<p><strong>Noise is not the limit.</strong> In the median-scale run, training without noise gained +0.47 ± 0.27 nats at 61,440, Gaussian noise at the baseline level +0.30 ± 0.38 and at the SO goal level −0.12 ± 0.21, all within about one doubling of N (<code>results_final/checks.json</code>, <code>differences_to_bins40_noisy</code>). With the noise-level asinh the noise level matters a little more: no noise reaches −1.54 against −2.39 for map noise at 61,440 (Figure 3.13), and in the staged beam series the paired clean − noisy difference is +0.62 nats at 61,440 (row error 0.03, training scatter not included; <code>series.json</code>). Even that is less than the 1.5 nats one more doubling of simulations would give. <strong>The network is a secondary limit.</strong> MAF 256×8 adds +0.73 ± 0.23 nats at 32,000 and +0.86 ± 0.22 at 61,440 over MAF 128×5, and NSF 128×5 +0.65 ± 0.21 at 61,440 (<code>checks.json</code>). The larger MAF was trained at only those two sizes; its step from 32,000 to 61,440 (+1.02 nats) is similar to that of MAF 128×5 (+0.90), so the gain from capacity does not shrink as N grows. A bigger network is worth half to two thirds of a doubling of data (0.65 to 0.86 nats against 1.27), and both help. Neither comes close to the tight Fisher directions: the B12 posterior sd along the five tightest directions shrinks only from 0.19-0.32 to 0.12-0.29 prior widths between 2,000 and 61,440 simulations and stays at 0.12-0.29 with MAF 256×8 or NSF 128×5 (<code>b12_std_along_fisher_eigenvectors</code> in <code>checks.json</code>), against Fisher widths of 5×10<sup>−5</sup> to 0.08. <strong>The simulations are the main limit</strong>, which is the working conclusion rather than a proof: log p keeps rising with N at a similar rate (1.3 to 1.5 nats per doubling) for every network, and the remaining information (section 3.9) sits in a few very narrow directions of parameter space that a density estimator can only resolve with many more training points.</p>
+
+<h3>3.11 Independent validation on the 1,096 idark rows</h3>
+
+<figure class="fig"><img src="fig/3_sbi64k/16_validation_idark_rows.png" alt="Validation log p against test log p for every ensemble, and marginal coverage on the idark rows" loading="lazy"><figcaption><strong>Figure 3.16</strong> The 1,096 rows that the Flatiron run lost, regenerated on idark with the same bundle, as an independent test set for the median-scale ensembles of <code>results_final</code>. (a) Validation log p against test log p for all 33 ensembles (five variants at six sizes plus three larger-network runs): mean difference −0.04 nats (−0.10 to +0.03). (b) Marginal 68 % coverage on the idark rows at N = 61,440 with TARP 73 / 97 % (MAF 128×5), 70 / 96 % (MAF 256×8), 72 / 97 % (MOPED). <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_final/fig_validation.png (sbi_final.py validate); numbers from results_final/validation.json</span></figcaption></figure>
+
+<p>The idark rows were painted by a different machine and job system from the training rows. Their log p agrees with the test-row log p to −0.04 nats on average over the 33 ensembles (−0.10 to +0.03 for single ensembles, against row standard errors of 0.06 to 0.14 on the 1,096 rows), which shows that the metrics are not tuned to the 3,000 test rows and that the regenerated rows are consistent with the production rows. The validation rows are not a uniform draw in P<sub>0</sub> (Kolmogorov-Smirnov p = 0.005 against the flat prior), while the other eight parameters are consistent with flat (p ≥ 0.99; <code>prior_ks_pvalues</code> in <code>validation.json</code>). The lost batches are not a random subset of the design: they come in 61 runs of consecutive design rows between rows 7,456 and 60,687 (<code>data/rows_validation_1096/row_id.npy</code>), so their parameters need not be uniform; why only P<sub>0</sub> deviates was not investigated. The final beam-consistent networks have not been run on these rows.</p>
+
+<h3>3.12 Open issues</h3>
+
+<aside class="note">
+<ul>
+<li><strong>Simulation-limited.</strong> log p rises 1.3 to 1.5 nats per doubling with no measurable flattening at 61,440 simulations on the 64k prior; more simulations (or truncated sequential rounds around a given observation) are the main lever. Merlin passes the final 40-band mean r (0.590) with 4,000 simulations and PCA with 8,000, so they are the efficient choice for new runs.</li>
+<li><strong>One fixed sky.</strong> All metrics are conditional on the single HalfDome halo catalogue and mask. The all-multipole information is a fixed-sky fingerprint and does not transfer to other skies (sections 4 and 5: other lightcones and masks shift the Merlin posterior; band50 is the mitigation tested). A training set with varied lightcones and masks, or a compression restricted to smooth spectral structure, is needed before posteriors on FLAMINGO or real data can be trusted at the precision quoted here.</li>
+<li><strong>Merlin's two weak regimes.</strong> Near-prior posteriors for faint skies (the asinh is centred on the pool median) and undercoverage for skies above 1000× B12. An untested remedy: a zero-centred asinh for the PCA and Merlin inputs, with the 40-band trainer.</li>
+<li><strong>Different trainers</strong> for the 40-band and the Merlin/PCA networks; a like-for-like log p comparison needs a matched recipe.</li>
+<li><strong>Prior edges.</strong> The α<sub>z</sub><sup>P0</sup> prior (−6 to 0.5) is wide on the negative side and 48 % of the test truths lie below −3. For truths in [−1, 0) and [0, 0.5) the final Merlin posterior means are low by 0.46 and 0.68 and the 68 % coverage is 0.62 and 0.45 (40 bins: −0.91 and 0.51 in the top bin; <code>scripts/sbi64k/final_calibration_numbers.json</code>). Part of this is the expected pull of a weakly informed posterior towards the prior centre (Bayesian calibration holds on average over the prior, not for each truth value), and it is consistent with the B12 posterior of α<sub>z</sub><sup>P0</sup> sitting below its input value (Merlin median −1.23 against −0.758). The unbounded networks are the diagnostic of where the data push past the box.</li>
+<li><strong>Validation set</strong> evaluated only with the median-scale ensembles of <code>results_final</code> (the four 40-band variants and MOPED, production noise), not with the final beam-consistent networks.</li>
+</ul>
+</aside>
+
+<p class="path">Code lives in <code>SBI_analysis/tsz64k_sbi_local/</code> (untracked in git): <code>sbi_final.py</code> (split L205-L209, row_metrics L305-L353, report/convergence fit L522-L655, boxed Fisher L658-L714, checks L769-L884, validate L393-L456), <code>train_ensemble.py</code> (logit map L60-L83, sbi training L241-L278, Ensemble L308-L404), <code>merlin_compression.py</code> (Merlin head L325-L359, training L382-L443, evaluate with seed errors L498-L556), <code>posterior_rows.py</code> (per-row summaries and SBC ranks L73-L89), <code>doc_metric_data.py</code> (per-row lp, TARP curve, ranks L82-L101), <code>doc_figures.py</code> and <code>doc_build.py</code> (explainer figures and tables), <code>publication_figures.py</code> (corner L107, SBC L220, Fisher corners L346), <code>fisher_forecast_b12.py</code>, <code>beamfix/</code>. Report helpers: <code>reports/halfdome_overview_20261007/scripts/sbi64k/</code>.</p>
+</section>

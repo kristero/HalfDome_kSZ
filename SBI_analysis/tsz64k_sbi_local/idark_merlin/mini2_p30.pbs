@@ -1,0 +1,19 @@
+#!/bin/bash
+#PBS -N merlin_p30
+#PBS -q mini2
+#PBS -l select=1:ncpus=48:mem=96gb
+#PBS -l walltime=24:00:00
+#PBS -j oe
+# Longer-training check of the Merlin / PCA / MOPED comparison: early stop after 30 epochs, learning rate x0.1 after
+# 10 (instead of Merlin's 5 and 3); all nine networks, then evaluation and plots, in results_merlin_unbinned_p30.
+set -uo pipefail
+cd /home/kristero10/merlin_unbinned_20260929
+PY=/home/kristero10/envs/sbi27/bin/python
+export MERLIN_TAG=_p30 MERLIN_PATIENCE=30 MERLIN_LR_PATIENCE=10 MPLBACKEND=Agg
+echo "host=$(hostname) start=$(date -Is)"
+OMP_NUM_THREADS=10 $PY merlin_compression.py train --variants merlin --seeds 1 2 3 --workers 3 --threads 10 &
+OMP_NUM_THREADS=3 $PY merlin_compression.py train --variants pca moped --seeds 1 2 3 --workers 6 --threads 3 &
+wait
+echo "trained=$(date -Is)"
+OMP_NUM_THREADS=32 $PY merlin_compression.py evaluate --threads 32 && $PY merlin_compression.py plot
+echo "finished=$(date -Is) code=$?"

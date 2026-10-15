@@ -1,0 +1,22 @@
+#!/bin/bash
+#PBS -N bf_stage
+#PBS -j oe
+# Beam-fix stage K: corrected spectra (build), the NPE ensembles at N = 8000 K with the median and the noise-level
+# asinh scale (series, series --asinh-scale noise), results/ (report).
+#   qsub -q mini -l select=1:ncpus=24:mem=64gb -l walltime=24:00:00 -v RUN=$HOME/tsz64k_beamfix_20260930,K=1 stage.pbs
+set -euo pipefail
+RUN=${RUN:?}; K=${K:?}
+cd "$RUN"
+mkdir -p logs
+KK=$(printf %02d "$K")
+exec > "logs/stage${KK}_${PBS_JOBID%%.*}.log" 2>&1
+PY=/home/kristero10/envs/sbi27/bin/python
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 PYTHONUNBUFFERED=1   # torch threads are set explicitly
+N=${NCPUS:-24}
+echo "host=$(hostname) ncpus=$N stage=$K start=$(date -Is)"
+[ -e "stages/stage$KK/qa.json" ] || $PY code/beamfix.py --run "$RUN" build "$K"
+$PY code/beamfix.py --run "$RUN" series "$K" --workers 3 --threads $((N / 3))
+# the same stage with noise-level asinh scales (series_noise/); skips whatever is already trained and evaluated
+$PY code/beamfix.py --run "$RUN" series "$K" --asinh-scale noise --workers 3 --threads $((N / 3))
+$PY code/beamfix.py --run "$RUN" report
+echo "finished=$(date -Is)"

@@ -1,0 +1,39 @@
+{
+ "source": "Lee et al. 2022 (arXiv:2205.01710) Table 7, no-concentration electron-pressure fit: P0 = 2.8 (M/M_cut)^{1.08 | 0.80} (1+z)^-1.89, x_c = 2.10 (M/M_cut)^-0.35 (1+z)^0.53, beta = 9.4 (M/M_cut)^-0.06 (1+z)^0.60, alpha = 1, gamma = -0.3, log10 M_cut = 13.60 h^-1 Msun",
+ "mapping": "GNFW with alpha = 1, gamma = -0.3 and the beta convention of Battaglia+12, as the engine; engine pivot M200c = 1e14 Msun (XGPaint), M_cut converted with h = 0.68; P0 / 0.5176 (electron -> thermal, XGPaint); P0 mass slope = the high-mass branch 0.80 (halos above M_cut ~ 5.9e13 Msun dominate the tSZ power)",
+ "not_representable": "the low-mass P0 slope 1.08 below M_cut and the shape clip above 10^14.8 h^-1 Msun",
+ "corrected": "alpha_z_P0 = -1.89 + 2: the (1+z)^2 bookkeeping correction of the printed pressure (lee22-corrected-20260930; verified against CAMELS-TNG and FLAMINGO)",
+ "noise_seeds": [
+  39001001,
+  39001002
+ ],
+ "noise_note": "the noise pair of the B12 observation (Battaglia12.npz)",
+ "cases": {
+  "Lee22_corrected": {
+   "theta": {
+    "P0": 8.30177376075001,
+    "xc": 1.7411699981608508,
+    "beta": 9.102848585322382,
+    "alpha_m_P0": 0.8,
+    "alpha_m_xc": -0.35,
+    "alpha_m_beta": -0.06,
+    "alpha_z_P0": 0.1100000000000001,
+    "alpha_z_xc": 0.53,
+    "alpha_z_beta": 0.6
+   }
+  },
+  "Lee22_printed": {
+   "theta": {
+    "P0": 8.30177376075001,
+    "xc": 1.7411699981608508,
+    "beta": 9.102848585322382,
+    "alpha_m_P0": 0.8,
+    "alpha_m_xc": -0.35,
+    "alpha_m_beta": -0.06,
+    "alpha_z_P0": -1.89,
+    "alpha_z_xc": 0.53,
+    "alpha_z_beta": 0.6
+   }
+  }
+ }
+}

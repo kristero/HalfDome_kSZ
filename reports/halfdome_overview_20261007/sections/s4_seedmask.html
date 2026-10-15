@@ -1,0 +1,523 @@
+<section id="seedmask" class="topic">
+<h2>4. Seed, mask and simulation impact</h2>
+
+<div class="lede">The 64k tSZ posterior estimator was trained on one HalfDome halo lightcone (simulation seed 100) seen through one sky mask (mask seed 12345). Only the nine pressure-profile parameters of Battaglia et al. (2012, B12) and the Simons Observatory (SO) noise changed from one training row to the next. This section shows what that choice costs. When the same pressure law is painted onto nine other lightcones, or observed through nine other masks, the original Merlin posterior median of P<sub>0</sub> moves from about 12 to 45-54 on the other lightcones and to 24-46 through the other masks (the truth is 18.1). Controlled spectral tests trace the shift to the fine multipole pattern of the training sky, which the network learned as if it were pressure information. The best mitigation tested, retraining on 50-multipole bands, removes most of the disagreement between skies. The price is 68% intervals that are 18-25% wider at the Battaglia truth and about 46% wider when averaged over the prior.</div>
+
+<h3>4.1 The question: what the training set holds fixed</h3>
+
+<p>Simulation-based inference (SBI) replaces an explicit likelihood with simulations. In neural posterior estimation (NPE) one draws parameters θ from the prior, runs the simulator to obtain data x, and trains a conditional density estimator q<sub>φ</sub>(θ | x) on the pairs. If the network is flexible enough and the simulations are numerous, q<sub>φ</sub> converges to the posterior p(θ | x) <em>of the simulator that generated the pairs</em>, including every assumption frozen inside that simulator. The project's estimator, Merlin, first whitens each spectrum with the Cholesky factor L of the SO noise covariance (C = LL<sup>T</sup>, so L<sup>-1</sup>x has unit noise covariance). It then projects the result onto 83 principal components (PCA) and passes each component through an asinh transform, which is linear within about one noise unit of the centre and logarithmic beyond. A learned compression head reduces this to 18 features, which condition a masked autoregressive flow (MAF, a normalising flow built from autoregressive affine layers). Three independently trained networks are mixed with equal weight. Section 5 describes this chain. Here only the training set matters.</p>
+
+<p>The 64k dataset (<code>tSZ_64k_flat_prior_SO_baseline_deproj0</code>) draws 65,536 parameter vectors from a scrambled Sobol sequence (a quasi-random, low-discrepancy sequence that fills the box more evenly than independent random draws; seed 20260920) that is uniform over the box in Table 4.1. The inference uses 64,440 of these rows: a 61,440-row training pool and 3,000 reserved test rows. Each row has two noise seeds of its own, derived from a SHA-256 hash of the row and split index with master seed 20260920, so no two rows share a noise map. But every row is painted from the same halo catalogue, <code>lightcone_100.hdf5</code> (85,224,251 halos with M<sub>200c</sub> ≥ 10<sup>12</sup> M<sub>⊙</sub>), and observed through the same apodised cap mask with seed 12345. The bundle README states the consequence directly: "the fixed mask and single catalogue give conditional-noise spectra, not a full observational covariance." Formally, the network learns</p>
+
+<div class="eq">q<sub>φ</sub>(θ | D) ≃ p(θ | D, H<sub>100</sub>, W<sub>12345</sub>), &#160;&#160;whereas inference on a new sky needs &#160;&#160;p(θ | D) = ∫∫ p(θ, H, W | D) dH dW.</div>
+
+<p>Here θ is the nine-parameter pressure vector, D the beam-corrected pseudo-spectrum (defined in 4.2), H the halo lightcone and W the mask. Why should this matter? The tSZ power spectrum is dominated by rare, massive clusters. A given lightcone contains a particular set of them at particular positions and redshifts. A given mask selects a particular subset and couples neighbouring multipoles. The masked clean spectrum is therefore not a smooth curve. It carries a multipole-to-multipole pattern, a fingerprint of that sky and window. In the training set this fingerprint is the same in every row and is modulated only by θ. The noise varies, so the network learns to average over noise. It has no reason to treat the fingerprint as a nuisance, because inside the training distribution the fingerprint is a deterministic function of θ. A different sky carries a different fingerprint, and nothing prevents the network from reading that change as a change in pressure. The seed/mask programme of 2-6 October 2026 measured how large this effect is, why it acts in a common direction, and what removing it costs.</p>
+
+<table class="data">
+<thead><tr><th>Parameter</th><th>Meaning</th><th>B12 truth (painted in every sky)</th><th>Uniform training prior</th></tr></thead>
+<tbody>
+<tr><td>P<sub>0</sub></td><td>pressure normalisation at the pivot mass, z = 0</td><td class="num">18.1</td><td class="num">[1, 60]</td></tr>
+<tr><td>x<sub>c</sub></td><td>core radius in units of R<sub>200c</sub></td><td class="num">0.497</td><td class="num">[0.025, 4]</td></tr>
+<tr><td>β</td><td>outer slope</td><td class="num">4.35</td><td class="num">[2.8, 16]</td></tr>
+<tr><td>α<sub>m,P0</sub>, α<sub>m,xc</sub>, α<sub>m,β</sub></td><td>mass exponents</td><td class="num">0.154, −0.00865, 0.0393</td><td class="num">[−0.6, 1.5], [−1, 0.4], [−0.2, 0.4]</td></tr>
+<tr><td>α<sub>z,P0</sub>, α<sub>z,xc</sub>, α<sub>z,β</sub></td><td>redshift exponents</td><td class="num">−0.758, 0.731, 0.415</td><td class="num">[−6, 0.5], [−1.5, 3], [−0.5, 2]</td></tr>
+</tbody>
+</table>
+<p class="path">Table 4.1 source: <code>tSZ_64k_flat_prior_SO_baseline_deproj0/design/design_manifest.json</code> (bounds, Sobol seed, noise-seed rule) and page 4 of <code>SBI_analysis/tsz_joint_report_20261005/output/pdf/HalfDome_Merlin_seed_mask_and_Pearson_report.pdf</code>. The fixed training catalogue and mask are set in <code>tSZ_64k_flat_prior_SO_baseline_deproj0/reference/test256/base_command.json:11</code> (<code>halfdome_path=…/lightcone_100.hdf5</code>) and <code>:32-36</code> (<code>mask_fsky=0.4</code>, <code>mask_apodization_arcmin=60.0</code>, <code>mask_seed=12345</code>), and asserted by the engine at <code>tSZ_64k_flat_prior_SO_baseline_deproj0/engine/engine.jl:60</code>.</p>
+
+<h3>4.2 What was varied: lightcones, masks and noise</h3>
+
+<p>Three kinds of randomness enter an observation: the halo realisation, the sky window and the instrument noise. The study varied the first two and deliberately froze the third, so that every difference between observations is a sky or window effect and not a noise fluctuation.</p>
+
+<table class="data">
+<thead><tr><th>Seed</th><th>Values</th><th>What it controls</th><th>Status in the study</th></tr></thead>
+<tbody>
+<tr><td>Simulation (lightcone) seed</td><td>100, 102, …, 118</td><td>Gaussian initial conditions of the HalfDome lightcone, hence the halo positions, masses and redshifts</td><td>varied: 10 skies. Seed 120, the non-Gaussian lightcone, is excluded.</td></tr>
+<tr><td>Mask seed</td><td>12345, …, 12354</td><td>a Mersenne Twister stream that draws the centre of the 40% cap</td><td>varied: 10 cap orientations. 12345 is the training mask.</td></tr>
+<tr><td>Split-noise seeds</td><td>39001001, 39001002</td><td>the two noise maps of the B12 observation, drawn from the SO LAT baseline tSZ noise curve of the internal-linear-combination (ILC) map with no deprojected component ("deproj0", column 2 of the noise table)</td><td>fixed in every observation</td></tr>
+<tr><td>Training-row noise seeds</td><td>per-row SHA-256 rule, master seed 20260920</td><td>noise of the 64,440 rows used by the original model (61,440 training, 3,000 reserved test rows)</td><td>untouched. The original model is never retrained.</td></tr>
+<tr><td>Network seeds</td><td>1, 2, 3</td><td>training seeds of the three ensemble members</td><td>fixed. All three members are evaluated and mixed.</td></tr>
+<tr><td>Posterior sampling seeds</td><td>2 (first study), 7103 (joint-density draws)</td><td>base draws of the flow</td><td>identical across observations (common random numbers), which suppresses Monte Carlo noise in differences</td></tr>
+</tbody>
+</table>
+<p class="path">Sources: <code>SBI_analysis/tsz_seed_mask_variation_20261002/prepare_idark.py:77-94</code> (tasks per lightcone), <code>SBI_analysis/tsz_seed_mask_variation_20261002/analyze.py:144-148</code> (posterior seed), <code>SBI_analysis/tsz_robustness_methods_20261004/joint_truth.py:43-44</code> (seed 7103), <code>tSZ_64k_flat_prior_SO_baseline_deproj0/design/design_manifest.json</code> (training noise rule), <code>SBI_analysis/tsz_robustness_methods_20261004/plan.json</code> (network seeds <code>training_seeds</code>; <code>training_rows</code> = 61,440 and <code>row_ids_count</code> = 64,440), page 7 of the joint report PDF (exclusion of seed 120).</p>
+
+<p><strong>The physics painted in every sky.</strong> Each halo receives a Battaglia et al. (2012, B12) generalised Navarro-Frenk-White (gNFW) pressure profile. B12 fit the <em>thermal</em> gas pressure; XGPaint converts it to electron pressure with a fixed factor:</p>
+<div class="eq">P<sub>th</sub>(r | M, z) / P<sub>200</sub>(M, z) = P<sub>0</sub>(M, z) · (x/x<sub>c</sub>)<sup>−0.3</sup> · [1 + x/x<sub>c</sub>]<sup>−β(M, z)</sup>, &#160;&#160; x = r / R<sub>200c</sub><br>P<sub>200</sub> = 200 ρ<sub>crit</sub>(z) f<sub>b</sub> G M<sub>200c</sub> / (2 R<sub>200c</sub>), &#160;&#160; f<sub>b</sub> = Ω<sub>b</sub>/Ω<sub>m</sub>, &#160;&#160; P<sub>e</sub> = 0.5176 P<sub>th</sub><br>A(M, z) = A<sub>0</sub> · (M / 10<sup>14</sup> M<sub>⊙</sub>)<sup>α<sub>m,A</sub></sup> · (1 + z)<sup>α<sub>z,A</sub></sup>, &#160;&#160; A ∈ {P<sub>0</sub>, x<sub>c</sub>, β}<br>y(b) = (σ<sub>T</sub> / m<sub>e</sub>c<sup>2</sup>) ∫ P<sub>e</sub>(√(b<sup>2</sup> + l<sup>2</sup>)) dl, &#160;&#160; |l| ≤ √((4R<sub>200c</sub>)<sup>2</sup> − b<sup>2</sup>)</div>
+<p>P<sub>200</sub> is the self-similar pressure scale of a halo of mass M<sub>200c</sub> (the mass inside R<sub>200c</sub>, the radius enclosing a mean density of 200 times the critical density). The factor 0.5176 is hard-coded in XGPaint (<code>P_e_los</code> and the amplitude in <code>prepare_profile_slice</code>, <code>src/profiles_y.jl:128</code> and <code>:158</code> at tag <code>validated-tsz256-20260922</code>). It equals 2(X<sub>H</sub> + 1)/(5X<sub>H</sub> + 3) for a hydrogen mass fraction X<sub>H</sub> = 0.76, the electron share of the pressure of fully ionised hydrogen-helium gas. It is the same in every sky and drops out of all seed and mask comparisons. The inner slope is fixed at −0.3 and the transition exponent at 1. Compton-y is the line-of-sight integral of electron pressure at impact parameter b, with σ<sub>T</sub> the Thomson cross-section and m<sub>e</sub>c<sup>2</sup> the electron rest energy. The integral is restricted to a sphere of radius 4R<sub>200c</sub>. Catalogue masses in M<sub>⊙</sub>/h are divided by h = 0.68, halos above 10<sup>12</sup> M<sub>⊙</sub> are kept, and all finite, non-negative catalogue redshifts are used (the profile cache spans z = 0.001-5; no low-redshift selection is applied). These choices are identical for all ten lightcones. The halo counts differ, from 85,215,792 (seed 108) to 85,267,919 (seed 102), because the halos themselves differ (<code>SBI_analysis/tsz_seed_offset_diagnosis_20261005/diagnostics.json</code>, <code>contracts</code>).</p>
+
+<p><strong>The observation.</strong> The painter samples the y map at the pixel centres of a HEALPix NSIDE 8192 grid, applies a 2-arcmin Gaussian beam in harmonic space and synthesises an NSIDE 4096 map. The map is multiplied by a 40%-sky cap with 60-arcmin cosine apodisation. Two independent SO noise maps are added, and the signed cross-spectrum of the two masked splits is measured. This is a pseudo-C<sub>ℓ</sub>, computed on the masked sky without f<sub>sky</sub> division, mask deconvolution or noise-bias subtraction. The analysis uses D<sub>ℓ</sub> = ℓ(ℓ+1)C<sub>ℓ</sub>/2π at ℓ = 80-7979 (7,900 multipoles). The trained model expects the beam-consistent combination</p>
+<div class="eq">D<sub>ℓ</sub><sup>obs</sup> = D<sub>ℓ</sub><sup>ss</sup> + B<sub>ℓ</sub> (D<sub>ℓ</sub><sup>prod</sup> − D<sub>ℓ</sub><sup>ss</sup> − D<sub>ℓ</sub><sup>nn</sup>) + B<sub>ℓ</sub><sup>2</sup> D<sub>ℓ</sub><sup>nn</sup></div>
+<p>Here ss is the masked beam-smoothed clean signal, prod the cross-spectrum of the two signal-plus-noise maps, nn the cross-spectrum of the two noise-only maps and B<sub>ℓ</sub> the 2-arcmin beam. The middle term is the signal-noise cross power, rescaled to the beam convention of the signal. This decomposition into a clean term, a signal-noise term and a noise-noise term is the basis of the offset diagnosis in 4.5. At a fixed mask the nn term is identical for every lightcone, because the noise maps are fixed.</p>
+
+<pre class="code" data-src="tSZ_visuals/run_halfdome_fullsky_so_noise.jl:L419-L455"><code>function random_unit_vector(rng::AbstractRNG)
+    z = 2.0 * rand(rng) - 1.0
+    phi = 2.0 * pi * rand(rng)
+    rxy = sqrt(max(0.0, 1.0 - z^2))
+    return rxy * cos(phi), rxy * sin(phi), z
+end
+
+function random_apodized_cap_mask(
+    nside::Integer,
+    fsky::Real,
+    apodization_arcmin::Real,
+    rng::AbstractRNG
+)
+    res = Healpix.Resolution(Int(nside))
+    mask = HealpixMap{Float64, RingOrder}(Int(nside))
+    fill!(mask.pixels, 0.0)
+
+    cx, cy, cz = random_unit_vector(rng)
+    radius = acos(1.0 - 2.0 * Float64(fsky))
+    apo = deg2rad(Float64(apodization_arcmin) / 60.0)
+    apo = min(max(apo, 0.0), 0.99 * radius)
+    inner_radius = radius - apo
+    support_count = 0
+
+    @inbounds for pix in eachindex(mask.pixels)
+        vx, vy, vz = Healpix.pix2vecRing(res, pix)
+        cosang = clamp(cx * vx + cy * vy + cz * vz, -1.0, 1.0)
+        angle = acos(cosang)
+
+        if angle &lt;= radius
+            support_count += 1
+            if apo == 0.0 || angle &lt;= inner_radius
+                mask.pixels[pix] = 1.0
+            else
+                x = (angle - inner_radius) / apo
+                mask.pixels[pix] = 0.5 * (1.0 + cos(pi * x))
+            end</code></pre>
+<p class="code-note">The mask seed only draws a random point on the sphere (lines 419-424), which becomes the cap centre. The cap radius acos(1 − 2f<sub>sky</sub>) encloses 40% of the sphere, and the outer 60 arcmin are tapered by a raised cosine (lines 450-455). Ten such caps with random centres overlap heavily, so the mask arm samples different sky regions and different mode coupling. It does not sample independent skies. The same function, byte-identical, lives in the frozen bundle at <code>tSZ_64k_flat_prior_SO_baseline_deproj0/halfdome_sources/code/halfdome/tSZ_visuals/run_halfdome_fullsky_so_noise.jl</code>.</p>
+
+<pre class="code" data-src="SBI_analysis/tsz_seed_mask_variation_20261002/paint_seed.jl:L216-L243"><code>    states = [blank_state(8192)]
+    count = catalogue_pass!(base, states, profiles; shared_geometry=true)
+    # Different simulations have different halo counts; only the training seed has a fixed reference count.
+    if TASK["simulation_seed"] == 100
+        @assert count == 85224251
+    end
+    @assert 0 &lt; count &lt;= TASK["catalogue_rows"]
+    signal = make_signal(states[1].m_hp, 4096)
+    states = nothing; profiles = nothing; profile = nothing; GC.gc()
+    save_spectrum(OUTDIR, "unmasked_clean_cl", compute_cl(base, signal))
+    ell, native = read_so_noise_native_cl(cfg.baseline_noise_path, 7979; column=2, input_is_dl=false)
+    noise_cl = so_noise_cl_vector_for_synalm(ell, native, 7979)
+    beam = Healpix.gaussbeam(deg2rad(2/60), 7979)
+    save_spectrum(OUTDIR, "beam_bl", beam)
+    noises = HealpixMap{Float64,RingOrder}[]
+    beamed_noises = HealpixMap{Float64,RingOrder}[]
+    for seed in TASK["noise_seeds"]
+        alm = Healpix.synalm(noise_cl, 7979, 7979, MersenneTwister(seed))
+        push!(noises, Healpix.alm2map(alm, 4096))
+        Healpix.almxfl!(alm, beam)
+        push!(beamed_noises, Healpix.alm2map(alm, 4096))
+    end
+    noise_hashes = pixel_sha.(noises)
+    @assert noise_hashes[1] != noise_hashes[2]
+    for seed in TASK["mask_seeds"]
+        observe_mask(signal, noises, beamed_noises, base, seed, beam)
+        GC.gc()
+    end</code></pre>
+<p class="code-note">One catalogue pass per lightcone (line 217) produces the full-sky signal, which is beam-smoothed and degraded to NSIDE 4096 (line 223). The two noise maps come from the fixed seeds in the task file (lines 232-237). Each noise map is kept twice, unbeamed (the training convention) and beamed (an exact diagnostic). The mask loop (lines 240-243) reuses one painted signal for every mask, so the ten masks of a lightcone differ only in the window. Lines 218-222 replace the frozen engine's fixed halo-count assertion; the second aside below explains why.</p>
+
+<pre class="code" data-src="SBI_analysis/tsz_seed_mask_variation_20261002/paint_seed.jl:L153-L176"><code>function observe_mask(signal, noises, beamed_noises, base, mask_seed, beam)
+    dir = joinpath(OUTDIR, "mask_$(mask_seed)")
+    mkpath(dir)
+    started = time()
+    info = random_apodized_cap_mask(4096, .4, 60., MersenneTwister(mask_seed))
+    mask = info.mask
+    mask_sha = pixel_sha(mask)
+    if mask_seed == 12345
+        @assert mask_sha == "a6c3d64d5ab83e79b6d9b76cccbaf66a708c3e68adce85b9a0d3f610d4100689"
+    end
+    masked_signal = deepcopy(signal)
+    masked_signal.pixels .*= mask.pixels
+    clean = compute_cl(base, masked_signal)
+    splits = [deepcopy(n) for n in noises]
+    for n in splits
+        n.pixels .*= mask.pixels
+    end
+    nn = compute_cross_cl(base, splits[1], splits[2])
+    for n in splits
+        n.pixels .+= masked_signal.pixels
+    end
+    noisy = compute_cross_cl(base, splits[1], splits[2])
+    splits = nothing; GC.gc()
+    corrected = clean .+ beam .* (noisy .- clean .- nn) .+ beam.^2 .* nn</code></pre>
+<p class="code-note">The function <code>observe_mask</code> builds the mask from its seed (line 157) and checks the training mask against its known SHA-256 (lines 160-162). It then measures the three spectra: masked clean signal (165), noise-only cross (170) and signal-plus-noise cross (174). Line 176 is the training-matched beam correction of the equation above. A second spectrum built from beamed noise maps (lines 178-182, not shown) is stored only as a check on that approximation.</p>
+
+<figure class="fig"><img src="fig/4_seedmask/01_grid_design.png" alt="10 by 10 grid of simulation seeds 100-118 against mask seeds 12345-12354, coloured by discovery, simulation test, mask test, joint test and mixed cells" loading="lazy"><figcaption><strong>Figure 4.1</strong> The full design: ten Gaussian lightcones crossed with ten masks. The black-outlined cell (lightcone 100, mask 12345) is the training sky. Methods were selected on the 30 discovery cells only (lightcones 100-110 × masks 12345-12349). The held-out tests are 4 new lightcones at the training mask, 5 new masks on the training lightcone and the 4 × 5 block in which both factors are new. The 41 mixed cells are descriptive only. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_joint_report_20261005/figures/grid_design.png</span></figcaption></figure>
+
+<p><strong>Checks before any inference.</strong> Repainting lightcone 100 reproduced the saved training-sky spectra to a relative error of 1.6 × 10<sup>−15</sup> (clean) and 1.8 × 10<sup>−15</sup> (noisy), and the transformed network inputs exactly (maximum error 0). The source is <code>SBI_analysis/tsz_seed_mask_variation_20261002/cluster_run/baseline_check.json</code>. The beam approximation was checked as well. The difference between the training-matched correction and the exact beamed-noise spectrum has a norm of 0.29-0.30 in every observation, measured in the full 7,900-dimensional noise-whitened coordinates L<sup>−1</sup>D, and changes the network inputs by at most 2.8 × 10<sup>−4</sup> (<code>final_results/validation.json</code> in the same directory; the norm is computed at <code>analyze.py:324</code>). In the same full whitened coordinates, the clean-spectrum differences from the training sky have norms of 46.7-57.2 for the other lightcones and 33.2-73.2 for the other masks (<code>SBI_analysis/tsz_seed_offset_diagnosis_20261005/diagnostics.json</code>, <code>spectral_metrics.full_noiseonly_clean_distance</code>). After projection onto the 83 retained PCA directions the lightcone differences are still 21.6-39.7 (<code>REPORT.md</code> of that directory). The beam approximation is therefore more than a hundred times smaller than the effect under study.</p>
+
+<aside class="xgpaint"><h4>XGPaint edit relied on here: the nine-parameter Battaglia12 profile (fork commits f16a7f3 and e67a8a1)</h4>
+<p>No XGPaint source was edited for any of the seed/mask experiments. All ten lightcones were painted by the frozen 64k engine, whose <code>tSZ_64k_flat_prior_SO_baseline_deproj0/julia_env/Manifest.toml:1976-1982</code> pins <code>kristero/XGPaint.jl</code> at tag <code>validated-tsz256-20260922</code>. In the dev checkout this tag resolves to commit <code>35f79ad</code>, whose message says its tree is identical to <code>ce1d239</code>, the XGPaint snapshot used by the validated 256-row test. What the study does rely on is that the fork can vary the Battaglia parameters at all. Upstream XGPaint (WebSky-CITA, <code>upstream/main</code> = <code>29ec48a</code>) hard-codes the B12 numbers inside <code>get_params</code>:</p>
+<pre class="code" data-src="XGPaint.jl@upstream-29ec48a/src/profiles_y.jl:L42-L52"><code>function get_params(::AbstractGNFW{T}, M_200, z) where T
+	z₁ = z + 1
+	m = M_200 / (1e14M_sun)
+	P₀ = 18.1 * m^0.154 * z₁^-0.758
+	xc = 0.497 * m^-0.00865 * z₁^0.731
+	β = 4.35 * m^0.0393 * z₁^0.415
+	α = 1
+    γ = -0.3
+    β = γ - α * β  # Sigurd's conversion from Battaglia to standard NFW
+    return (xc=T(xc), α=T(α), β=T(β), γ=T(γ), P₀=T(P₀))
+end</code></pre>
+<p class="code-note">Upstream fixes the nine B12 numbers in the source (lines 45-47), so they cannot be varied row by row. Line 50 stores β = γ − αβ<sub>raw</sub>, and upstream's <code>generalized_nfw</code> (<code>src/profiles_y.jl:34</code> at <code>29ec48a</code>) raises (1 + x̄<sup>α</sup>) to the power (β − γ)/α = −β<sub>raw</sub>, which is the B12 outer factor.</p>
+<p>Fork commit <code>f16a7f3</code> ("Parametrized physical model", 2026-02-09) added <code>PowerLawParam</code> fields and keyword arguments (<code>P0_amp</code>, <code>P0_alpha_m</code>, …) whose defaults are exactly the B12 values. It kept upstream's convention β = γ − αβ<sub>raw</sub> with exponent (β − γ)/α. The β convention was afterwards broken and later repaired, as follows (all checked in the dev checkout with <code>git log --graph</code>, <code>git merge-base</code> and <code>git show</code>). Adrian Bayer's commit <code>9f37b1e</code> ("fixing ksz", 2026-02-27, on the upstream WebSky-CITA <code>adrian</code> branch) changed the gNFW exponent to −(β + γ)/α, commented as a correction for the Battaglia 2016 tau profile. In the same commit it changed the tSZ conversion to β = −γ − αβ<sub>raw</sub>. Together these give the tSZ outer factor (1 + x̄<sup>α</sup>)<sup>+β<sub>raw</sub></sup>, which has the wrong sign. The fork merged that branch into the parametrised line in <code>b924ab1</code> ("addition of Adrian fixes", 2026-03-02, parents <code>b459728</code> and <code>077b849</code>), so the parametrised fork carried the wrong sign from then on. A separate fork commit, <code>71bc3fd</code> ("Adrian fixes", 2026-03-03), applies the same change on a side branch. It is not in the history of the tag used here. Commit <code>e67a8a1</code> (2026-04-30) restored the correct outer slope with β = αβ<sub>raw</sub> − γ. It also added the <code>prepare_profile_slice</code>/<code>evaluate_profile_slice</code> hooks that <code>profile_grid</code> calls (<code>src/profiles.jl</code>); the project's sphere wrapper extends these hooks and reads the tSZ amplitude from them. The state used here, after that fix, is:</p>
+<pre class="code" data-src="XGPaint.jl@validated-tsz256-20260922/src/profiles_y.jl:L73-L86"><code>function get_params(model::Battaglia16ThermalSZProfile{T}, M_200, z) where T
+	z₁ = z + 1
+	m = M_200 / (1e14M_sun)
+	P₀ = powerlaw_value(model.P0, m, z₁)
+	xc = powerlaw_value(model.x_c, m, z₁)
+	α = powerlaw_value(model.alpha, m, z₁)
+	β_raw = powerlaw_value(model.beta, m, z₁)
+    γ = powerlaw_value(model.gamma, m, z₁)
+    # Battaglia parameterizes the outer factor as (1 + x^α)^(-β_raw), while
+    # generalized_nfw expects the asymptotic outer slope directly. Matching the
+    # large-radius behavior x^(γ - αβ_raw) = x^(-β) gives β = αβ_raw - γ.
+    β = α * β_raw - γ
+    return (xc=T(xc), α=T(α), β=T(β), γ=T(γ), P₀=T(P₀))
+end</code></pre>
+<p class="code-note">Both versions produce the same outer factor (1 + x̄<sup>α</sup>)<sup>−β<sub>raw</sub></sup>. Upstream stores β = γ − αβ<sub>raw</sub> and uses the exponent (β − γ)/α. The fork stores the positive asymptotic slope β = αβ<sub>raw</sub> − γ and uses −(β + γ)/α (<code>src/profiles_y.jl:65</code> at the tag). File lines are those of the tag. At the current HEAD <code>1660e08</code> of the <code>cluster</code> branch the file is unchanged, since only <code>test/runtests.jl</code> differs.</p>
+<p><strong>Numerical effect in this study: none.</strong> Every sky was painted with θ = B12, where the parametrised profile equals upstream's hard-coded one, and all ten skies used the same pinned engine. Differences between seeds and masks therefore cannot come from XGPaint. The edit matters for the training set, where θ varies row by row.</p>
+</aside>
+
+<aside class="xgpaint"><h4>Not an XGPaint edit: the 4R<sub>200c</sub> sphere and the per-seed halo-count check (project side)</h4>
+<p>Upstream XGPaint integrates the gNFW profile along the whole line of sight (<code>_nfw_profile_los_quadrature</code>, out to 10<sup>5</sup> R<sub>200c</sub>) and only cuts the painted disc. The chord-limited 4R<sub>200c</sub> sphere is a <em>project-side wrapper</em>. <code>ChordMeanProfile</code> subtypes <code>XGPaint.AbstractGNFW</code> and extends two XGPaint methods by multiple dispatch. The XGPaint source itself is untouched:</p>
+<pre class="code" data-src="tSZ_64k_flat_prior_SO_baseline_deproj0/engine/spherical_truncation_profiles.jl:L113-L135"><code>"""Exact chord factor 2 L_max at angle theta given theta_max = X theta200c."""
+@inline function chord_factor(theta, theta_max, X)
+    ratio = theta / theta_max
+    ratio &gt;= 1 &amp;&amp; return 0.0
+    return 2X * sqrt(1 - ratio^2)
+end
+
+# XGPaint's profile_grid calls prepare_profile_slice once per (M, z) and
+# evaluate_profile_slice per theta; both are extended for this type.
+function XGPaint.prepare_profile_slice(m::ChordMeanProfile, mass, z)
+    inner = m.inner
+    Mu = mass * XGPaint.M_sun
+    par = XGPaint.get_params(inner, Mu, z)
+    θ200 = theta_r200c(inner, mass, z)
+    xc, α, β, γ = Float64(par.xc), Float64(par.α), Float64(par.β), Float64(par.γ)
+    A = projection_amplitude(inner, mass, z, θ200, xc, α, β, γ)
+    return (; θ200, xc, α, β, γ, A, X=m.sphere)
+end
+
+@inline function XGPaint.evaluate_profile_slice(::ChordMeanProfile, p, theta, mass, z)
+    x = Float64(theta) / p.θ200
+    return p.A * chord_mean(x, p.xc, p.α, p.β, p.γ, p.X)
+end</code></pre>
+<p class="code-note">The cached quantity is the chord mean g = y<sub>sphere</sub>/(2L), which stays positive and smooth up to the sphere edge, so XGPaint's log interpolator works without modification. The painter multiplies g by the exact chord factor 2X√(1 − (θ/θ<sub>max</sub>)<sup>2</sup>) for each pixel (<code>engine/balanced_painter.jl:30</code>). It uses XGPaint only for ring geometry (<code>get_relevant_rings</code> and <code>get_ring_disc_ranges</code>, <code>balanced_painter.jl:20-22</code>).</p>
+<p>The second project-side change is specific to this study. The frozen engine stops unless the catalogue yields exactly the training count, <code>@assert count == 85224251</code> (<code>tSZ_64k_flat_prior_SO_baseline_deproj0/engine/engine.jl:73</code>). Other lightcones legitimately contain different halos, so <code>paint_seed.jl:218-222</code> applies the exact count only to seed 100 and only bounds the count for the other seeds (see the excerpt above). Effect on numbers: none, since it only gates which runs may proceed. The seed-100 repaint still passed the exact count and reproduced the saved spectra.</p>
+</aside>
+
+<h3>4.3 First look: 19 observations at one Battaglia point (2 October)</h3>
+
+<p>The first experiment (<code>SBI_analysis/tsz_seed_mask_variation_20261002</code>) had two arms that share the baseline. The simulation arm painted lightcones 100-118 and observed each with the training mask. The mask arm observed lightcone 100 through masks 12345-12354. This gives 19 distinct observations, each passed through the frozen original Merlin ensemble with 90,000 posterior draws. The primary model is the unbounded one, a flow in linear parameter coordinates that can place mass outside the training box. The bounded companion uses a logit transform and stays inside the box.</p>
+
+<p>The spectra themselves change little. Figure 4.2 shows that the masked clean spectra of other lightcones differ from the training sky by tens of per cent at ℓ &lt; 500, where few modes and a few massive clusters dominate, and by about a per cent at ℓ &gt; 2000. The robustness report quantifies the relative scatter below ℓ ≈ 580 as 10.7% across lightcones and 15.0% across masks, falling below 0.7% above ℓ ≈ 2980 (<code>SBI_analysis/tsz_robustness_methods_20261004/final_results/INTERPRETATION.md</code>).</p>
+
+<figure class="fig"><img src="fig/4_seedmask/02_signal_variation.png" alt="Percentage change of the masked clean tSZ spectrum relative to the training sky, versus multipole, for the simulation arm, the mask arm and the combined grid" loading="lazy"><figcaption><strong>Figure 4.2</strong> Change of the masked clean B12 spectrum relative to the training sky (lightcone 100, mask 12345). Left: the other lightcones at the training mask. Middle: other masks on lightcone 100. Right: the median (line) and 16-84% range (band) over all 100 grid cells (<code>report.py:237-240</code>). Curves are plotted at the centres of the 50-multipole bands. The changes are large only at ℓ ≲ 600, the scales set by a few rare clusters and by the window. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_robustness_methods_20261004/final_results/report/signal_variation.png</span></figcaption></figure>
+
+<p>The posteriors move far more than the spectra. The baseline gives a P<sub>0</sub> median of 12.10 (68% interval 5.64-26.48). The nine other lightcones give medians of 45.50-53.66, and the nine other masks give 23.70-45.92 (<code>final_results/parameter_comparison.csv</code>). The study expresses shifts in units of the baseline half-width h = (q<sub>84</sub> − q<sub>16</sub>)/2, the half-width of the baseline 68% interval. This is a fixed yardstick, not a Gaussian significance.</p>
+
+<table class="data">
+<thead><tr><th>Parameter</th><th>scatter of medians / h, lightcone arm</th><th>scatter / h, mask arm</th><th>mean width ratio, lightcone arm</th><th>mean width ratio, mask arm</th></tr></thead>
+<tbody>
+<tr><td>P<sub>0</sub></td><td class="num">1.163</td><td class="num">0.946</td><td class="num">1.240</td><td class="num">1.318</td></tr>
+<tr><td>x<sub>c</sub></td><td class="num">0.193</td><td class="num">0.174</td><td class="num">0.683</td><td class="num">0.780</td></tr>
+<tr><td>β</td><td class="num">0.317</td><td class="num">0.260</td><td class="num">0.899</td><td class="num">0.951</td></tr>
+<tr><td>α<sub>m,P0</sub></td><td class="num">0.736</td><td class="num">1.203</td><td class="num">1.113</td><td class="num">1.069</td></tr>
+<tr><td>α<sub>m,xc</sub></td><td class="num">0.613</td><td class="num">0.835</td><td class="num">0.935</td><td class="num">1.023</td></tr>
+<tr><td>α<sub>z,P0</sub></td><td class="num">0.389</td><td class="num">0.418</td><td class="num">1.094</td><td class="num">1.034</td></tr>
+<tr><td>α<sub>z,xc</sub></td><td class="num">0.480</td><td class="num">0.420</td><td class="num">0.921</td><td class="num">1.015</td></tr>
+</tbody>
+</table>
+<p class="path">Source: <code>SBI_analysis/tsz_seed_mask_variation_20261002/final_results/RESULTS.txt</code> and <code>variation_summary.json</code> (linear model). α<sub>m,β</sub> and α<sub>z,β</sub> are omitted from the table; their scatter is 0.07-0.33 h.</p>
+
+<figure class="fig"><img src="fig/4_seedmask/03_first_study_variation.png" alt="Bar chart of the scatter of posterior medians in baseline half-widths per parameter for simulation and mask seeds, and width ratios with error bars" loading="lazy"><figcaption><strong>Figure 4.3</strong> First study, unbounded model. Top: standard deviation of the posterior medians across the ten lightcones (blue) or the ten masks (orange), in units of the baseline half-width. Bottom: mean ratio of 68% widths to the baseline width over the ten observations of each arm (baseline included), with error bars of ± one standard deviation across observations (<code>width_ratio_sd</code> in <code>variation_summary.json</code>). The P<sub>0</sub> scatter exceeds one half-width, and its posteriors also become about 24-32% wider on average. The x<sub>c</sub> posteriors become narrower. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_seed_mask_variation_20261002/final_results/figures/variation_unbounded_primary.png</span></figcaption></figure>
+
+<p>The maximum P<sub>0</sub> shift is 3.99 h for lightcones and 3.25 h for masks (<code>variation_summary.json</code>). With the same pressure law in every sky, the original model therefore returns pressure normalisations that disagree by several posterior widths. The README of that run already stated the limits: masks overlap, one noise pair is used, and the result is "a robustness test conditional on fixed noise and fiducial B12 physics" rather than a coverage calibration. Two follow-up questions were open. Does the effect survive a crossed design in which the two factors can interact? And why do nine independent lightcones all shift in the same direction?</p>
+
+<h3>4.4 The 10 × 10 robustness experiment (4-5 October)</h3>
+
+<p><code>SBI_analysis/tsz_robustness_methods_20261004</code> completed the grid of Figure 4.1. Each new lightcone was painted once (nine painting jobs) and all ten masks were applied to that painting. Together with the inference, the matched Merlin controls and the final comparison, the study used twelve idark jobs. The grid served two purposes. It measured the sensitivity of the original model, and it tested 23 alternative inference recipes against it (4.7). Three summary numbers are used throughout. For case c and parameter i, let m<sub>ci</sub> be the posterior median, w<sub>ci</sub> the 68% width, θ<sub>i</sub><sup>*</sup> the truth and h<sub>i</sub> the half-width of the <em>original</em> model on the training sky:</p>
+<div class="eq">T = √⟨[(m<sub>ci</sub> − θ<sub>i</sub><sup>*</sup>) / h<sub>i</sub>]<sup>2</sup>⟩<sub>c,i</sub> &#160;&#160;(truth displacement)<br>A = √⟨[(m<sub>ci</sub> − m̄<sub>i</sub>) / h<sub>i</sub>]<sup>2</sup>⟩<sub>c,i</sub> &#160;&#160;(agreement between skies)<br>G = exp ⟨ln(w<sub>ci</sub> / w<sub>ci</sub><sup>original</sup>)⟩<sub>c,i</sub> &#160;&#160;(geometric-mean width ratio)</div>
+<p>The denominator h<sub>i</sub> is fixed. A method cannot improve T or A by making its posteriors wider, and the width cost G is reported separately, compared case by case with the original model on the same sky. The joint report calls T "R" on its pages 10 and 17; the two are the same quantity. Beware that <code>final_results/INTERPRETATION.md</code> uses the letter R for the width ratio G instead.</p>
+
+<pre class="code" data-src="SBI_analysis/tsz_robustness_methods_20261004/report.py:L40-L51"><code>def metrics(evaluation, reference, ids):
+    """Use a fixed reference scale: broadening a candidate cannot hide its truth displacement."""
+    med = np.array(evaluation['median'])[ids]
+    width = np.array(evaluation['width68'])[ids]
+    scale = np.array(reference['width68'])[0] / 2
+    delta = (med - THETA) / scale
+    variance = np.mean(((med - med.mean(0)) / scale)**2, axis=0)
+    per_parameter_cost = np.exp(np.mean(np.log(width / np.array(reference['width68'])[ids]), axis=0))
+    return dict(truth_rms=float(np.sqrt(np.mean(delta**2))),
+                agreement_rms=float(np.sqrt(np.mean(variance))),
+                width_cost=float(np.exp(np.mean(np.log(per_parameter_cost)))),
+                worst_parameter_width_cost=float(np.max(per_parameter_cost)),</code></pre>
+<p class="code-note">Line 44 is the fixed yardstick: half the original model's 68% width on the first case, the training sky. Line 47 takes the width ratio per parameter as a geometric mean over cases, and line 50 averages these over parameters. Line 51 records the worst parameter, because a 25% average cap can hide a 60-80% increase for one parameter, as 4.7 shows.</p>
+
+<figure class="fig"><img src="fig/4_seedmask/04_posterior_simulation.png" alt="Nine panels of posterior medians and 68 percent intervals versus simulation seed for the original model and the band50 model, with dashed truth lines" loading="lazy"><figcaption><strong>Figure 4.4</strong> Lightcone arm (training mask 12345). Points are medians, bars 68% intervals and dashed lines the B12 truth. Blue is the original unbounded Merlin; orange is the retrained band50 model of 4.7. The original model gives P<sub>0</sub> ≈ 12 on the training lightcone and about 45-54 on every other lightcone. α<sub>m,xc</sub> and α<sub>z,xc</sub> jump in the opposite direction. Band50 agrees across lightcones, including seed 100, but its β and x<sub>c</sub> medians remain far from the truth. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_joint_report_20261005/figures/posterior_simulation.png</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/4_seedmask/05_posterior_mask.png" alt="Nine panels of posterior medians and 68 percent intervals versus mask seed for the original and band50 models" loading="lazy"><figcaption><strong>Figure 4.5</strong> Mask arm (training lightcone 100). The original model's P<sub>0</sub> median ranges from about 12 (training mask) to about 46 (mask 12354) and depends strongly on the mask. Band50 gives 32.25-34.55 for every mask (<code>evidence/study/posterior_intervals.csv</code>). PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_joint_report_20261005/figures/posterior_mask.png</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/4_seedmask/06_combined_P0_grid.png" alt="Two heat maps of the P0 posterior median over the 10 by 10 grid for the original model and band50 model" loading="lazy"><figcaption><strong>Figure 4.6</strong> P<sub>0</sub> medians on all 100 observations. In the original model (left) the training cell (top left, dark) is an outlier: it is the only cell below 20 (12.15). The next lowest are two other masks on the training lightcone, 23.8 (mask 12353) and 26.0 (mask 12349), and every other cell lies between 29.8 and 53.8. Band50 (right) is nearly uniform: 30.88-34.68 over all 100 cells, against 12.15-53.79 for the original (<code>evidence/study/posterior_intervals.csv</code>). Over the full grid, which includes discovery cells, T falls from 1.620 to 1.150, A from 0.444 to 0.092, and G = 1.215 (joint report, page 17). PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_joint_report_20261005/figures/combined_P0_grid.png</span></figcaption></figure>
+
+<p>The heat map makes the central fact plain. The training sky is the odd one out. Nothing is wrong with the other 99 observations; they are simply not the sky the network was conditioned on. On the held-out cells the original model has T = 1.746 (lightcones), 1.419 (masks) and 1.660 (both new), with A = 0.157, 0.459 and 0.342. The masks give the larger disagreement between cells but a smaller common displacement.</p>
+
+<p><strong>Simulation, mask and interaction.</strong> Because the grid is complete, the variance of the medians can be split exactly in the manner of a two-way analysis of variance. With g<sub>sm</sub> the normalised median in cell (s, m), g̅ the grand mean, a<sub>s</sub> = ⟨g<sub>sm</sub>⟩<sub>m</sub> − g̅ the lightcone effect and b<sub>m</sub> = ⟨g<sub>sm</sub>⟩<sub>s</sub> − g̅ the mask effect:</p>
+<div class="eq">⟨(g<sub>sm</sub> − g̅)<sup>2</sup>⟩ = ⟨a<sub>s</sub><sup>2</sup>⟩ + ⟨b<sub>m</sub><sup>2</sup>⟩ + ⟨(g<sub>sm</sub> − g̅ − a<sub>s</sub> − b<sub>m</sub>)<sup>2</sup>⟩</div>
+<p>This is implemented in <code>SBI_analysis/tsz_robustness_methods_20261004/report.py:89-100</code> and asserted to sum exactly. For the original model the fractions are 26.3% lightcone, 31.8% mask and 41.9% interaction. The largest share is thus neither factor alone: the response to a new lightcone depends on the mask through which it is seen. That is what one expects if the network responds non-linearly to the fine spectral pattern, which depends on both. Because the masks overlap, these fractions are descriptive, not variance components of independent factors.</p>
+
+<h3>4.5 Offset diagnosis: why independent skies shift the same way (5 October)</h3>
+
+<p>Two observations needed explaining. First, nine statistically independent lightcones give P<sub>0</sub> = 49.89 ± 2.32 and β = 13.01 ± 0.21, where ± is the scatter of the medians across skies and not a posterior uncertainty. The training sky gives P<sub>0</sub> = 12.15 and β = 9.70, against a truth of 18.1 and 4.35 (<code>SBI_analysis/tsz_seed_offset_diagnosis_20261005/seed_offset_summary.csv</code>). Second, the spectra differ by only a few per cent. Compared with seed 100, the other lightcones average −6.14% at ℓ = 80-579, −0.063% at 580-2979 and +0.742% at 2980-7979. Lightcone 106 has the opposite low-ℓ sign (+15.8%) yet still gives P<sub>0</sub> = 49.88 (<code>diagnostics.json</code>, <code>spectral_blocks</code>; <code>parameter_comparison.csv</code>). A uniform amplitude change cannot explain this. Clean tSZ power scales as P<sub>0</sub><sup>2</sup>, so tripling P<sub>0</sub> would multiply the power by about nine.</p>
+
+<p><strong>Why a common direction is expected.</strong> Write the clean spectrum of lightcone i as an ensemble mean plus a sky fluctuation ε<sub>i</sub>. Every comparison subtracts the same reference:</p>
+<div class="eq">Δ<sub>i</sub> = ε<sub>i</sub> − ε<sub>100</sub>, &#160;&#160; E[Δ<sub>i</sub> | ε<sub>100</sub>] = −ε<sub>100</sub>, &#160;&#160; Cov(Δ<sub>i</sub>, Δ<sub>j</sub>) = Cov(ε<sub>100</sub>) for i ≠ j (independent skies, equal covariance)</div>
+<p>All nine differences contain the negative of seed 100's particular fluctuation. Their signs are therefore not nine independent tests of a parameter bias. If the network maps the training-sky fingerprint onto its learned θ → D relation, then removing that fingerprint, which every other sky does, pushes all nine posteriors the same way. The diagnosis tested this mechanism by constructing counterfactual inputs.</p>
+
+<p><strong>Counterfactual inputs.</strong> Starting from the saved training-sky observation D<sub>0</sub>, the diagnosis adds controlled pieces of the observed change and passes the result through the unchanged original network, with its whitening, PCA, asinh and learned head. The pieces are as follows. <em>Actual</em> is the real observation of another sky. <em>Clean</em> adds only the clean-signal change δD<sup>ss</sup>. <em>Cross</em> adds only the change in the corrected signal-noise term (at a fixed mask the noise-noise term is identical and cancels). <em>Reverse</em> subtracts the clean change. <em>Smooth</em> adds a Gaussian-smoothed version of the fractional clean change. <em>Fine</em> adds the residual that the smoothing removes. <em>Scale blocks</em> add the clean change in one ℓ range only. The Gaussian kernel has standard deviation σ<sub>ℓ</sub> in multipole (σ<sub>ℓ</sub> = 5, 15, 50, 100), with four-sigma truncation and nearest-value edges.</p>
+<div class="eq">D<sup>smooth</sup> = D<sub>0</sub> + D<sub>100</sub><sup>ss</sup> · G<sub>σ</sub>[δD̄<sup>ss</sup> / D<sub>100</sub><sup>ss</sup>], &#160;&#160; D<sup>fine</sup> = D<sub>0</sub> + δD̄<sup>ss</sup> − D<sub>100</sub><sup>ss</sup> · G<sub>σ</sub>[δD̄<sup>ss</sup> / D<sub>100</sub><sup>ss</sup>]</div>
+<p>Here δD̄<sup>ss</sup> is the mean clean change of the nine other lightcones at mask 12345, and G<sub>σ</sub> is the Gaussian filter in ℓ. Smooth and fine add up exactly to the clean change. These hybrids are not physical mock skies. They isolate the estimator's response to one component while leaving everything else fixed.</p>
+
+<pre class="code" data-src="SBI_analysis/tsz_seed_offset_diagnosis_20261005/diagnose.py:L119-L145"><code>    base = noisy[0]
+    add('baseline', base, 'baseline', seed=100)
+    for i, seed in enumerate(SEEDS):
+        add(f'actual_{seed}', noisy[10*i], 'actual', seed=int(seed))
+    # These three paired cases isolate the exact terms for every other seed.
+    for i, seed in enumerate(SEEDS[1:], 1):
+        delta_clean = clean[10*i] - clean[0]
+        delta_noise = noisy[10*i] - base - delta_clean
+        add(f'clean_only_{seed}', base + delta_clean, 'clean_only', seed=int(seed))
+        add(f'cross_only_{seed}', base + delta_noise, 'cross_only', seed=int(seed),
+            note='Only the changed signal-noise cross term; identical noise-noise cancels.')
+        add(f'reversed_clean_{seed}', base - delta_clean, 'reversed_clean', seed=int(seed))
+        for fraction in [.1, .25, .5, .75]:
+            add(f'interpolate_{seed}_{fraction}', base + fraction*(noisy[10*i]-base),
+                'interpolation', seed=int(seed), fraction=fraction)
+    mean_clean = clean[10::10].mean(axis=0) - clean[0]
+    mean_noisy = noisy[10::10].mean(axis=0) - base
+    mean_cross = mean_noisy - mean_clean
+    add('mean_clean', base + mean_clean, 'mean')
+    add('mean_noisy', base + mean_noisy, 'mean')
+    add('mean_cross', base + mean_cross, 'mean')
+    add('mean_reversed_clean', base - mean_clean, 'mean')
+    # Preserve broad shape while suppressing the fine multipole fingerprint.
+    for sigma in [5, 15, 50, 100]:
+        smooth = clean[0] * gaussian_filter1d(mean_clean / clean[0], sigma, mode='nearest')
+        add(f'smooth_clean_{sigma}', base + smooth, 'smoothing', fraction=sigma)
+        add(f'fine_only_{sigma}', base + mean_clean - smooth, 'fine_structure', fraction=sigma)</code></pre>
+<p class="code-note">The array <code>noisy</code> holds the beam-corrected observations of the grid and <code>clean</code> the masked clean spectra. The grid is stored lightcone-major (ten masks per lightcone), so index <code>10*i</code> is the i-th lightcone, seed 100 + 2i, at the training mask, and index 0 is the training sky. Line 126 defines the signal-noise change as the remainder after the clean change; the noise-noise term cancels at a fixed mask (asserted at <code>diagnose.py:95-96</code>). Lines 141-145 build the smooth/fine pair. The smoothing acts on the <em>ratio</em> to the training spectrum, so it preserves the broad shape and amplitude of the change and removes its multipole-to-multipole pattern. An independent version that smooths the absolute change gives P<sub>0</sub> = 12.59 at σ<sub>ℓ</sub> = 50, which excludes an artefact of the ratio (REPORT.md).</p>
+
+<table class="data">
+<thead><tr><th>Input to the original unbounded model (training-sky observation plus …)</th><th>P<sub>0</sub> median</th><th>β median</th><th>α<sub>m,P0</sub> median</th></tr></thead>
+<tbody>
+<tr><td>nothing (training sky)</td><td class="num">12.23</td><td class="num">9.66</td><td class="num">−0.04</td></tr>
+<tr><td>mean change of the nine other observations (actual)</td><td class="num">51.81</td><td class="num">13.08</td><td class="num">0.72</td></tr>
+<tr><td>clean-signal change only</td><td class="num">43.22</td><td class="num">11.52</td><td class="num">1.18</td></tr>
+<tr><td>signal-noise change only</td><td class="num">17.60</td><td class="num">10.38</td><td class="num">−0.30</td></tr>
+<tr><td>smooth clean change, σ<sub>ℓ</sub> = 5</td><td class="num">13.90</td><td class="num">9.85</td><td class="num">0.14</td></tr>
+<tr><td>fine residual only, σ<sub>ℓ</sub> = 5</td><td class="num">40.09</td><td class="num">11.70</td><td class="num">0.97</td></tr>
+<tr><td>fine residual only, σ<sub>ℓ</sub> = 50</td><td class="num">42.43</td><td class="num">11.58</td><td class="num">1.11</td></tr>
+<tr><td>reversed clean change</td><td class="num">4.56</td><td class="num">7.13</td><td class="num">−0.09</td></tr>
+<tr><td>+0.742% clean-power amplitude only</td><td class="num">12.43</td><td class="num">9.71</td><td class="num">−0.04</td></tr>
+<tr><td><em>generating B12 truth</em></td><td class="num">18.1</td><td class="num">4.35</td><td class="num">0.154</td></tr>
+</tbody>
+</table>
+<p class="path">Source: <code>SBI_analysis/tsz_seed_offset_diagnosis_20261005/REPORT.md</code> (9,000 equal-mixture draws per input). Smooth controls at σ<sub>ℓ</sub> = 15, 50 and 100 give P<sub>0</sub> = 12.84, 12.83 and 12.91; the corresponding fine residuals give 41.89, 42.43 and 42.83. Clean change restricted to ℓ = 80-579, 580-2979 or 2980-7979 gives 16.37, 23.03 and 20.56 (<code>counterfactual_posteriors.csv</code>).</p>
+
+<p>The decomposition is unambiguous. The clean-signal change carries most of the shift, and the signal-noise term carries little. Within the clean change, the smooth part (amplitude and broad shape) returns the training-sky answer, and the fine residual reproduces the shift. The scale blocks show that the fine pattern acts collectively. No single ℓ range reproduces it: each block gives 16-23, against 43 for the whole clean change, and the three block responses do not add up to the full one. Removing one multipole range would therefore not be expected to remove the effect. This is consistent with 4.7, where none of the recipes with ℓ cuts was selected over full-range band50. Reversing the clean change drives P<sub>0</sub> to 4.56, so the network responds in a definite direction and does not simply return a high P<sub>0</sub> whenever it is given an unfamiliar input.</p>
+
+<figure class="fig"><img src="fig/4_seedmask/07_counterfactual_posterior_response.png" alt="Posterior medians and 68 percent intervals of P0, beta and alpha_m,P0 for ten counterfactual inputs, original model in blue and band50 model in orange" loading="lazy"><figcaption><strong>Figure 4.7</strong> Response to the counterfactual inputs, original model (blue) and retrained band50 model (orange, "Δℓ = 50"). "Smooth" and "Fine residual" here use σ<sub>ℓ</sub> = 50; "Low/Mid/High ell" add the clean change only in ℓ = 80-579, 580-2979 or 2980-7979. The original model swings from 4.6 to 51.8 in P<sub>0</sub>. Band50 stays at P<sub>0</sub> = 32.7-33.2 for every input shown (<code>counterfactual_posteriors.csv</code>): it no longer reads the fine pattern, but its median is still above the truth. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_seed_offset_diagnosis_20261005/plots/counterfactual_posterior_response.png</span></figcaption></figure>
+
+<p><strong>Masks and combined changes.</strong> A new mask changes all three terms of the observation, including the noise-noise spectrum, because the noise maps are multiplied by a different window. The extended controls separate the three terms using the saved beam operator:</p>
+
+<pre class="code" data-src="SBI_analysis/tsz_seed_offset_diagnosis_20261005/extended_controls.py:L43-L57"><code>    beam=np.load(d.PARENT/'results/seed_100/beam_bl.npy')[80:7980]
+    nbase=np.load(d.PARENT/'results/seed_100/mask_12345/noise_cl.npy')[80:7980]*d.DL*beam**2
+    mask_terms=[]
+    for i in range(1,10):
+        mask=12345+i
+        nn=np.load(d.PARENT/f'results/seed_100/mask_{mask}/noise_cl.npy')[80:7980]*d.DL*beam**2
+        delta_clean=clean[i]-clean[0]
+        delta_nn=nn-nbase
+        delta_cross=noisy[i]-base-delta_clean-delta_nn
+        assert np.allclose(base+delta_clean+delta_nn+delta_cross,noisy[i],rtol=1e-12,atol=1e-25)
+        smooth=clean[0]*gaussian_filter1d(delta_clean/clean[0],5,mode='nearest')
+        for family,delta in [('actual',noisy[i]-base),('clean',delta_clean),('nn',delta_nn),
+                             ('cross',delta_cross),('smooth',smooth),('fine',delta_clean-smooth)]:
+            add(f'mask_{family}_{mask}',base+delta,f'mask_{family}',mask)
+        mask_terms.append((delta_clean,delta_nn,delta_cross))</code></pre>
+<p class="code-note">For mask 12345 + i on lightcone 100, the change is split into the clean term, the beam-squared noise-noise term (lines 48-50, the saved nn spectrum times B<sub>ℓ</sub><sup>2</sup>) and the signal-noise remainder (line 51). Line 52 asserts that the three pieces add back to the real observation to 10<sup>−12</sup>. Each piece is then fed to the model on its own, together with the smooth and fine parts of the clean term (line 54).</p>
+
+<table class="data">
+<thead><tr><th>Mean change applied to the training-sky observation</th><th>actual P<sub>0</sub></th><th>clean only</th><th>smooth only (σ<sub>ℓ</sub> = 5)</th><th>fine only</th></tr></thead>
+<tbody>
+<tr><td>other lightcones, training mask</td><td class="num">51.81</td><td class="num">43.22</td><td class="num">13.90</td><td class="num">40.09</td></tr>
+<tr><td>other masks, training lightcone</td><td class="num">37.82</td><td class="num">37.37</td><td class="num">11.34</td><td class="num">37.73</td></tr>
+<tr><td>both changed (81 cells)</td><td class="num">47.09</td><td class="num">43.01</td><td class="num">13.30</td><td class="num">41.27</td></tr>
+</tbody>
+</table>
+<p class="path">Source: <code>SBI_analysis/tsz_seed_offset_diagnosis_20261005/REPORT.md</code>, "Mask and combined controls". For individual masks, the clean-only change accounts for most of the P<sub>0</sub> shift, while noise-noise-only changes leave P<sub>0</sub> at 8.30-13.52 and clean-only changes give 26.12-44.34 (<code>extended_control_posteriors.csv</code>; <code>plots/mask_term_controls.png</code>).</p>
+
+<figure class="fig"><img src="fig/4_seedmask/08_mechanism_summary.png" alt="Three by three panels of P0, beta and alpha_m,P0 for actual, clean, smooth and fine inputs, for simulation, mask and combined changes" loading="lazy"><figcaption><strong>Figure 4.8</strong> The mechanism in all three arms: lightcones (left), masks (middle) and both changed, the 81 cells with a new lightcone and a new mask (right). The smooth clean change (σ<sub>ℓ</sub> = 5) returns P<sub>0</sub>, β and α<sub>m,P0</sub> close to the training-sky values (dotted), well within their 68% intervals. The fine residual keeps the shift. Dashed lines are the truth. The dotted training-sky reference is itself displaced from the truth, a separate effect discussed below. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_seed_offset_diagnosis_20261005/plots/mechanism_summary.png</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/4_seedmask/09_fingerprint_per_seed.png" alt="P0, beta and alpha_m,P0 medians per simulation seed for smooth-change (green) and fine-change (red) controls" loading="lazy"><figcaption><strong>Figure 4.9</strong> Every lightcone separately: adding only the smooth part of its clean change (green, σ<sub>ℓ</sub> = 5) gives P<sub>0</sub> medians of 12.13-15.46, and adding only the fine part (red) gives 33.89-42.39. The effect is not produced by averaging over lightcones. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_seed_offset_diagnosis_20261005/plots/fingerprint_per_seed.png</span></figcaption></figure>
+
+<p><strong>What was ruled out.</strong></p>
+<ul>
+<li><em>A painting or preprocessing difference.</em> All lightcones share the h conversion, redshift selection, B12 vector, 4R<sub>200c</sub> sphere, beam, map resolutions and noise-map hashes (asserted at <code>diagnose.py:99-102</code>). The 10<sup>12</sup> M<sub>⊙</sub> mass cut is not in that assertion, but it is recorded identically in all ten painting contracts (<code>diagnostics.json</code>, <code>contracts</code>). The clean band powers reconstruct to 8.9 × 10<sup>−16</sup>, and the original inputs reconstruct exactly for all ten lightcones at the training mask.</li>
+<li><em>BatchNorm or a single bad network.</em> Batch-normalisation (BatchNorm) layers rescale their inputs with batch statistics during training; if they were left in training mode, a posterior would depend on which other inputs share its batch. All modules are in evaluation mode. Evaluating seed 100 in a different batch changes its log density by at most 1.91 × 10<sup>−6</sup>. All three ensemble members shift upwards.</li>
+<li><em>Prior extrapolation of the unbounded flow.</em> The bounded model shows the same pattern: P<sub>0</sub> = 52.16 for the mean new observation, 11.67 for the smooth control and 44.50 for the fine residual (both at σ<sub>ℓ</sub> = 50; <code>counterfactual_posteriors.csv</code>, model <code>original_bounded</code>).</li>
+<li><em>Inputs outside the training distribution.</em> In the standardised network inputs, the nearest-neighbour distance from each new observation to the training pool lies at the 22nd-31st percentile of the same distance for 600 reserved rows (<code>diagnostics.json</code>, <code>support.grid_percentile</code>; the reports round this to 22nd-30th). They lie inside the global support. The mismatch is conditional: the broad prior contains spectra that resemble the new sky at the wrong θ.</li>
+<li><em>A pure amplitude change.</em> Adding +0.742% of clean power, the high-ℓ mean change, moves P<sub>0</sub> only from 12.23 to 12.43.</li>
+<li><em>Noise fluctuation.</em> The 21 earlier B12 noise draws on the training sky gave P<sub>0</sub> medians of 9.3-23.6, far below the common value of about 50. Twenty of those draws entered the whitening covariance, so they are a conditional check, not an independent calibration.</li>
+</ul>
+<p class="path">Sources: <code>SBI_analysis/tsz_seed_offset_diagnosis_20261005/REPORT.md</code> ("Checks and reproducibility") and page 26 of the joint report.</p>
+
+<p><strong>Why P<sub>0</sub>, β and the exponents move together.</strong> At fixed mass, redshift and radius, with u = x/x<sub>c</sub>,</p>
+<div class="eq">d ln P<sub>e</sub> = d ln P<sub>0</sub> + (0.3 + βu/(1 + u)) d ln x<sub>c</sub> − ln(1 + u) dβ</div>
+<p>Raising P<sub>0</sub> raises the pressure, raising β lowers it at finite radius, and raising x<sub>c</sub> raises it again. These directions can compensate one another, and the six exponents add further freedom by shifting which masses and redshifts dominate each angular scale. A high P<sub>0</sub> with a high β and changed α values therefore does not imply proportionally more tSZ power. The shift is a coordinated move of all nine coordinates, not a slide along one degeneracy of the training-sky posterior. On the training sky the posterior correlations are P<sub>0</sub>-β −0.34 and P<sub>0</sub>-x<sub>c</sub> −0.65, yet the medians of the other skies move P<sub>0</sub>, β and x<sub>c</sub> all upwards, together with α<sub>m,P0</sub>, α<sub>m,β</sub> and α<sub>z,β</sub>, while α<sub>m,xc</sub>, α<sub>z,P0</sub> and α<sub>z,xc</sub> move down (<code>seed_offset_summary.csv</code>). The posteriors on the new skies also have a somewhat different shape: averaged over the nine lightcones at the training mask, x<sub>c</sub>-β stays at 0.82 (0.81 on the training sky), but P<sub>0</sub>-x<sub>c</sub> weakens to −0.39 and P<sub>0</sub>-β to −0.04 (<code>posterior_correlations.json</code>, 10,000 joint draws per sky; REPORT.md quotes the first two). The local derivative matrix of the spectrum with respect to θ is badly conditioned: its prior-scaled singular-value ratio is about 1.2 × 10<sup>−5</sup> (<code>diagnostics.json</code>, <code>linear_scores</code>), so some parameter combinations barely change the spectrum. A small, structured spectral change can therefore move the nine-dimensional solution a long way along these nearly flat directions. The REPORT warns that the linear inverse is too ill-conditioned to predict the nonlinear shifts quantitatively.</p>
+
+<aside class="note">The training-sky posterior is itself displaced in its marginal medians (P<sub>0</sub> 12.2 and β 9.7 against 18.1 and 4.35), yet the truth sits in a high-density region of the joint posterior. Its joint highest-posterior-density (HPD) level, the posterior mass at higher density than the density at the truth (defined fully in 4.7), is 0.072, so it lies on the boundary of the 7.2% highest-density region (<code>counterfactual_posteriors.csv</code>, baseline row, 9,000 draws; the 6,000-draw joint test of 4.7 gives 0.073). This displacement is present on the training sky itself, so it is not a seed or mask effect. The joint report lists nonlinear degeneracy (the x<sub>c</sub>-β correlation is +0.81), prior volume and finite density-estimator error as possible causes and states that their relative contributions have not been separated (page 26). Restoring agreement with the training sky (the smooth controls) restores this conditional answer, including its marginal offsets. The smooth control is a counterfactual and cannot serve as a bias correction: it needs the clean training-sky spectrum at the known B12 truth as its reference, which real data do not provide.</aside>
+
+<h3>4.6 The Pearson report: do posterior correlations change under the smooth controls?</h3>
+
+<p>The joint report (<code>SBI_analysis/tsz_joint_report_20261005</code>, 36 pages) added one new inference. Section 4.5 showed that adding only the smooth part of the sky change leaves the posterior <em>medians</em> close to the training-sky answer. The Pearson test asks whether that smooth part also leaves the <em>shape</em> of the posterior, its correlation structure, unchanged. If it did not, the smooth/fine split of 4.5 would be an incomplete description of the mechanism. The inputs are exactly the saved "smooth" controls from the simulation column of Figure 4.8. <code>smooth_clean_5</code> is primary and <code>smooth_clean_50</code> secondary. Each is the training-sky observation plus the Gaussian-smoothed fractional mean clean change of lightcones 102-118 at mask 12345. The control does not smooth the training sky itself or its noise. The training sky's own fine pattern and SO residual stay intact, and the original frozen Merlin is used, not the band50 model.</p>
+
+<pre class="code" data-src="SBI_analysis/tsz_joint_report_20261005/baseline_pearson.py:L74-L91"><code>    assert np.array_equal(noisy,saved_spectra['noisy'][0])
+    assert np.array_equal(clean,saved_spectra['clean'][0])
+    # This is the SAME mean-simulation control in the actual/clean/smooth/fine
+    # panels. It changes the baseline by a smooth part of the other skies'
+    # clean difference; it does not smooth the baseline itself or its noise.
+    mean_change=saved_spectra['clean'][10::10].mean(axis=0)-clean
+    spectra=[noisy]
+    definitions=[dict(label='original',target='unchanged',sigma_ell=0)]
+    control_errors=[]
+    for sigma in [5,50]:
+        smooth_change=clean*gaussian_filter1d(mean_change/clean,sigma,mode='nearest')
+        reconstructed=noisy+smooth_change
+        source_label=f'smooth_clean_{sigma}'
+        spectrum=saved_spectra['counterfactual'][case_ids[source_label]]
+        error=float(np.max(np.abs(reconstructed-spectrum))/np.max(np.abs(spectrum)))
+        assert error&lt;1e-12,error
+        control_errors.append(error)
+        spectra.append(spectrum)</code></pre>
+<p class="code-note">Lines 79-85 rebuild the control from the saved spectra, and lines 86-89 require it to match the stored diagnosis input to 10<sup>−12</sup>; the recorded error is 0 (<code>control_definition.json</code>). The Pearson matrix is then <code>np.corrcoef(draws, rowvar=False)</code> over all 90,000 physical-parameter draws without prior clipping (<code>baseline_pearson.py:55</code>). The Monte Carlo standard error (MCSE) is the standard deviation of the correlation over 90 batches of draws, divided by √90 (<code>baseline_pearson.py:59-60</code>). It measures sampling precision only, not training uncertainty.</p>
+
+<p>Pearson r between posterior parameters a and b is r<sub>ab</sub> = Cov(θ<sub>a</sub>, θ<sub>b</sub>)/(σ<sub>a</sub>σ<sub>b</sub>), computed over the draws of one posterior. It describes the orientation of the posterior cloud. It is a different quantity from the correlation between true parameters and posterior means across many test cases, used in the 6 October supplement and Section 3. That correlation cannot be measured on this grid, because the truth is the same in every sky.</p>
+
+<figure class="fig"><img src="fig/4_seedmask/10_baseline_smoothing.png" alt="Left: D_ell of the original training-sky observation and the sigma 5 and sigma 50 smooth-change controls between ell 580 and 980. Right: percent difference of the controls from the original versus ell" loading="lazy"><figcaption><strong>Figure 4.10</strong> The two control inputs. Left: over ℓ = 580-980 the original observation and both controls are almost indistinguishable, because the fine pattern of the training sky is kept. Right: the added smooth change as a percentage of the clean spectrum. The minimum is −15.3% at ℓ = 140 for σ<sub>ℓ</sub> = 5 (green) and −9.3% at ℓ = 232 for σ<sub>ℓ</sub> = 50 (purple), with a mean of +0.76% at ℓ ≥ 3000 for both (computed from <code>data/baseline_spectra.npz</code>). PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_joint_report_20261005/figures/baseline_smoothing.png</span></figcaption></figure>
+
+<table class="data">
+<thead><tr><th>Pair (unbounded model)</th><th>Original</th><th>σ<sub>ℓ</sub> = 5 control</th><th>σ<sub>ℓ</sub> = 50 control</th><th>Δr (σ<sub>ℓ</sub> = 5) ± MCSE</th></tr></thead>
+<tbody>
+<tr><td>P<sub>0</sub>-β</td><td class="num">−0.33747</td><td class="num">−0.27660</td><td class="num">−0.31664</td><td class="num">+0.0609 ± 0.0043</td></tr>
+<tr><td>P<sub>0</sub>-x<sub>c</sub></td><td class="num">−0.64529</td><td class="num">−0.63155</td><td class="num">−0.64224</td><td class="num">+0.0137 ± 0.0021</td></tr>
+<tr><td>x<sub>c</sub>-β</td><td class="num">+0.81307</td><td class="num">+0.79119</td><td class="num">+0.80354</td><td class="num">−0.0219 ± 0.0017</td></tr>
+</tbody>
+</table>
+<p class="path">Source: <code>SBI_analysis/tsz_joint_report_20261005/README.md</code> and <code>pearson_pairs.csv</code> (all 36 pairs × 2 controls × 2 models).</p>
+
+<figure class="fig"><img src="fig/4_seedmask/11_pearson_linear_delta.png" alt="Two lower-triangle heat maps of the change in posterior Pearson correlation for the sigma 5 and sigma 50 controls, unbounded model" loading="lazy"><figcaption><strong>Figure 4.11</strong> Change in every posterior Pearson correlation, control minus original, unbounded model. The largest change is P<sub>0</sub>-β, +0.061 at σ<sub>ℓ</sub> = 5 and +0.021 at σ<sub>ℓ</sub> = 50. Every other pair changes by at most 0.041 in magnitude (the next largest is β-α<sub>m,P0</sub>, −0.040 at σ<sub>ℓ</sub> = 5; <code>pearson_pairs.csv</code>). The companion matrices of r itself (<code>pearson_linear_primary.png</code>) look identical by eye. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_joint_report_20261005/figures/pearson_linear_delta.png</span></figcaption></figure>
+
+<p>The degeneracy structure is essentially unchanged: x<sub>c</sub>-β stays near +0.8 and P<sub>0</sub>-x<sub>c</sub> near −0.64. The P<sub>0</sub>-β change is many times its MCSE, so it is real for this network, but small. The bounded model behaves the same way: P<sub>0</sub>-β goes from −0.352 to −0.297 (σ<sub>ℓ</sub> = 5) and −0.330 (σ<sub>ℓ</sub> = 50). Truncating the unbounded draws to the prior box gives −0.361 → −0.292 and −0.336. Neither the prior tails nor the logit transform explain the response. Mean 68% width ratios are 1.012 and 0.999, and the medians barely move (P<sub>0</sub> 12.15 → 13.72 and 12.70; β 9.70 → 9.90 and 9.79). The fraction of draws with any coordinate outside the prior is 26.5%, 21.1% and 24.1%, and the truth HPD rank is 0.305 and 0.089 for the two controls (joint report, pages 30 and 32). The smooth part of the sky change therefore leaves both the location and the shape of the conditional posterior nearly intact. The test does not cover the fine part: no Pearson matrix was computed for the fine-only controls. On the real non-training skies, which contain both parts, the shape does change somewhat (P<sub>0</sub>-x<sub>c</sub> −0.65 → −0.39 and P<sub>0</sub>-β −0.34 → −0.04 on average, x<sub>c</sub>-β unchanged at about 0.8; 4.5), so the rest of the change, which 4.5 shows is dominated by the fine pattern, both moves and partly reshapes the posterior.</p>
+
+<h3>4.7 Quantified impact and the mitigations tried</h3>
+
+<p>The diagnosis shows that the original model's answer depends on information that is specific to its training sky. The robustness study tested whether a different compression could suppress that information without discarding too much real pressure information. All 23 new recipes start from 50-multipole bands. The 7,900 values of D<sub>ℓ</sub> are averaged in contiguous blocks of 50 (80-129, 130-179, …, 7930-7979), giving 158 band powers. Each multipole is weighted by 2ℓ + 1, the number of its harmonic modes on a full sky (<code>SBI_analysis/tsz_robustness_methods_20261004/common.py:48-54</code>). The covariance is transformed consistently, C<sub>band</sub> = A C A<sup>T</sup>. Band50 is <em>not</em> Gaussian smoothing with σ<sub>ℓ</sub> = 50, which is the Pearson control of 4.6, and it is not an average over 50 simulations. Its construction and training are part of Section 5. Sixteen of the recipes compress the bands with MOPED, a linear compression to nine numbers built from the local derivatives of the spectrum (defined below the table); the other seven retrain the Merlin network on the bands.</p>
+
+<table class="data">
+<thead><tr><th>Family (count)</th><th>Variants</th><th>Purpose</th></tr></thead>
+<tbody>
+<tr><td>MOPED, full range (2)</td><td>noise-only or total SO-residual covariance</td><td>nine summaries that preserve the local Fisher information for the chosen covariance</td></tr>
+<tr><td>MOPED, upper cuts (4)</td><td>ℓ<sub>max</sub> = 5979, 4979, 3979, 2979</td><td>remove small angular scales</td></tr>
+<tr><td>MOPED, lower or both cuts (4)</td><td>ℓ<sub>min</sub> = 280, 580, 1080; 580-4979</td><td>remove the large scales, where sky variance is largest</td></tr>
+<tr><td>MOPED, taper (1)</td><td>covariance inflated smoothly above ℓ ≈ 4000</td><td>down-weight small scales without a hard cut</td></tr>
+<tr><td>MOPED, sky covariance (4)</td><td>C<sub>eff</sub> = C + λS from lightcone, mask or combined discovery skies; λ = 1 or 0.1</td><td>treat sky variation as a nuisance covariance in the score weights</td></tr>
+<tr><td>MOPED, augmentation (1)</td><td>training spectra multiplied by discovery-sky clean ratios</td><td>approximate sky variation inside the training set</td></tr>
+<tr><td>Merlin (7)</td><td>full band50; lower cuts 280/580/1080; upper cuts 4979/3979; augmentation</td><td>the same learned head on bands, with or without cuts</td></tr>
+</tbody>
+</table>
+<p class="path">Source: page 11 of the joint report; <code>SBI_analysis/tsz_robustness_methods_20261004/README.md</code> and <code>EXTENSIONS.md</code>. MOPED (Massively Optimised Parameter Estimation and Data compression; Heavens, Jimenez &amp; Lahav 2000, <a href="https://arxiv.org/abs/astro-ph/9911102">arXiv:astro-ph/9911102</a>) builds weights W = L<sup>−T</sup>Q from a QR decomposition of L<sup>−1</sup>J. Here J is the derivative of the mean band powers with respect to θ at B12 and C = LL<sup>T</sup>, so the summaries W<sup>T</sup>d have unit covariance and preserve J<sup>T</sup>C<sup>−1</sup>J. That guarantee is local and holds only for the chosen covariance.</p>
+
+<pre class="code" data-src="SBI_analysis/tsz_robustness_methods_20261004/pipeline.py:L152-L170"><code>    for recipe in plan['candidates']:
+        name=recipe['name'];folder=root/'candidates'/name;folder.mkdir(exist_ok=True)
+        keep=(EDGES[:-1]&gt;=recipe['lmin'])&amp;(EDGES[1:]&lt;=recipe['lmax'])
+        # A requested boundary is rounded inward to a complete band and documented.
+        keep_ids=np.flatnonzero(keep)
+        c=(nn_cov if recipe['covariance']=='noiseonly' else cov).copy()
+        if recipe.get('nuisance'):
+            c+=recipe['strength']*covariances[recipe['nuisance']]
+        if recipe.get('taper'):
+            scale=np.sqrt(1+9*np.clip((centers-4000)/3980,0,1)**2)
+            c*=np.outer(scale,scale)
+        c=c[np.ix_(keep,keep)]
+        if recipe['network']=='merlin':
+            # Keep the original noise-only whitening convention for the Merlin band control.
+            l,jitter=safe_cholesky(nn_cov[np.ix_(keep,keep)])
+            partial=solve_triangular(l.T,np.eye(len(l)),lower=False)
+            audit=dict(jitter=jitter,directions=len(l),compression='whitened bands, learned Merlin head')
+        else:
+            partial,audit=moped_weights(derivatives[keep],c,design['high']-design['low'])</code></pre>
+<p class="code-note">One loop builds every recipe from the same 158 bands. Cuts keep complete bands only, with boundaries rounded inwards (line 154). The sky-nuisance recipes add the empirical discovery-sky covariance S of the clean residuals (lines 158-159). The taper (lines 160-162) scales the standard deviation of each band by s = √(1 + 9 min(1, max(0, (ℓ<sub>c</sub> − 4000)/3980))<sup>2</sup>), where ℓ<sub>c</sub> is the band centre. Element (i, j) of the covariance is multiplied by s<sub>i</sub>s<sub>j</sub>, so the band variance is unchanged below ℓ = 4000 and is inflated up to about ten times (standard deviation up to about √10) at the top of the range. The Merlin branch (lines 164-168) keeps the original noise-only convention and whitens the 158 bands directly, with no PCA step. Band50 Merlin therefore differs from the original in the banding, the banded whitening, the refitted asinh transform and the retraining. The prior, the 61,440-row pool, the three seeds and the head/flow architecture are the same. The experiment tests the whole recipe; it does not isolate the averaging alone.</p>
+
+<p><strong>Selection rule.</strong> Fixed in advance and evaluated on the 30 discovery skies only; no held-out sky was used for tuning or ranking. The rule picks the smallest √(T<sup>2</sup> + A<sup>2</sup>) among the recipes that improve both T and A over the original, pass a broad marginal and joint calibration screen on reserved prior rows, and keep the geometric-mean width ratio at G ≤ 1.25. The calibration screen uses the 1,500 even-indexed reserved rows. Its marginal part checks the fraction of rows whose true parameter falls inside the 68% and 95% marginal intervals (coverage). Its joint part uses random-reference distance ranks, the test of Lemos et al. 2023 (TARP, <a href="https://arxiv.org/abs/2302.03026">arXiv:2302.03026</a>). For each row it computes the fraction of posterior draws that lie closer to a random reference point than the truth does. For a calibrated posterior this fraction is uniform over rows, so the share of rows with a fraction below 0.68 (0.95) should be 68% (95%). Both parts must be within 0.10 (68% level) and 0.06 (95% level) of nominal, the marginal part for every one of the nine parameters (<code>selection.json</code>, <code>calibration_screen</code>; <code>SBI_analysis/tsz_robustness_methods_20261004/final_report.py:44-46</code>). The 25% cap was chosen by the user. Under it, retrained band50 Merlin over the full ℓ = 80-7979 range won in all three arms (<code>final_results/report/selection.json</code>). No recipe qualified within a 10% budget. With a 50% budget, sky-weighted MOPED wins: the combined-sky covariance with λ = 1 in the lightcone and combined arms, and its weak λ = 0.1 version in the mask arm (<code>selection.json</code>, <code>width_budget_winners</code>). Their full-set width costs are about 37-40% (INTERPRETATION.md); on the held-out skies the λ = 1 variant costs 35-39% (joint report page 20).</p>
+
+<figure class="fig"><img src="fig/4_seedmask/12_held_tradeoffs.png" alt="Three scatter panels of truth plus agreement cost against mean width ratio for all recipes on held-out skies, with the original at width ratio 1 and band50 marked by a star" loading="lazy"><figcaption><strong>Figure 4.12</strong> All 23 recipes on held-out observations: MOPED in blue, Merlin variants in green, the original in black and the selected band50 as an orange star. The vertical line is the 25% mean width cap. The vertical axis is √(T<sup>2</sup> + A<sup>2</sup>): 1.753, 1.492 and 1.695 for the original in the three arms. Every recipe brings it to 0.99-1.26, at mean width ratios of 1.18-1.41, so the choice is mostly about how much width is paid (computed from <code>evidence/study/summary.json</code>, <code>subsets.*.held_out</code>, which the plotting code reads). PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_joint_report_20261005/figures/held_tradeoffs.png</span></figcaption></figure>
+
+<table class="data">
+<thead><tr><th>Held-out test (cases)</th><th>T, original → band50</th><th>A, original → band50</th><th>mean width increase</th><th>worst parameter</th></tr></thead>
+<tbody>
+<tr><td>new lightcones (4)</td><td class="num">1.746 → 1.169</td><td class="num">0.157 → 0.050</td><td class="num">+24.7%</td><td class="num">+59.1%</td></tr>
+<tr><td>new masks (5)</td><td class="num">1.419 → 1.162</td><td class="num">0.459 → 0.098</td><td class="num">+17.9%</td><td class="num">+55.4%</td></tr>
+<tr><td>both new (20)</td><td class="num">1.660 → 1.162</td><td class="num">0.342 → 0.097</td><td class="num">+22.6%</td><td class="num">+74.4%</td></tr>
+</tbody>
+</table>
+<p class="path">Source: <code>SBI_analysis/tsz_robustness_methods_20261004/final_results/INTERPRETATION.md</code> (reductions of 33.0/18.1/30.0% in T and 68.2/78.7/71.5% in A); page 17 of the joint report. The bounded companion pays +27.0%, +17.1% and +25.9%, so it exceeds the cap in two arms. Some single-factor held-out cells had been seen in the 2 October study, so this is not a fully blind test.</p>
+
+<figure class="fig"><img src="fig/4_seedmask/13_variance_width.png" alt="Left: bar chart of mean normalised median variance from simulation, mask and interaction for the original and band50 models. Right: per-parameter width ratios of band50 to original on held-out observations" loading="lazy"><figcaption><strong>Figure 4.13</strong> Left: the balanced decomposition of median variance over the full grid. Band50 removes nearly all of it. Its remaining fractions are 12.4% lightcone, 73.1% mask and 14.4% interaction, against 26.3%, 31.8% and 41.9% for the original (INTERPRETATION.md). Mask variation dominates what remains, but its absolute size is much smaller. Right: per-parameter width ratios on held-out cells. P<sub>0</sub> pays 23-28%, while x<sub>c</sub>, α<sub>m,P0</sub> and α<sub>m,xc</sub> pay 33-74%, so the mass exponents are the main losers (<code>evidence/study/summary.json</code>, <code>width_cost_per_parameter</code>). PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_joint_report_20261005/figures/variance_width.png</span></figcaption></figure>
+
+<p><strong>Joint truth containment.</strong> Marginal medians can be displaced while the truth still lies in a high-density part of the joint posterior. The joint test computes the posterior mass at density higher than the density at the truth (the HPD level). A level below 0.68 means the truth is inside the 68% highest-posterior-density region. Densities must be compared in physical coordinates. For the bounded flow, which lives in logit space u, both the draws and the truth need the Jacobian of the transform θ(u). The joint report lists applying the Jacobian to both sample and truth densities among the source fixes made during the study (page 35) and calls it the density-coordinate fix (page 21):</p>
+
+<pre class="code" data-src="SBI_analysis/tsz_robustness_methods_20261004/joint_truth.py:L42-L49"><code>        ens=mc.ensemble(folder,variant,threads)
+        torch.manual_seed(7103)
+        u=ens.sample_u(x,6000,rng=np.random.default_rng(7103))
+        # Compare densities in the SAME physical parameter coordinates, not logit density.
+        log_samples=ens.log_prob_u(u,x)-log_jacobian_theta_per_u(u,ens.low,ens.high)
+        truth=to_u(np.broadcast_to(THETA,(len(x),9)),ens.low,ens.high)
+        log_truth=ens.log_prob_u(truth[None],x)[0]-log_jacobian_theta_per_u(truth,ens.low,ens.high)
+        hpd=np.mean(log_samples&gt;log_truth,axis=0)</code></pre>
+<p class="code-note">Lines 46 and 48 subtract the same log-Jacobian from the draws and from the truth, so the comparison is between densities in θ. Line 49 is the HPD level of the truth for each sky. Each sky uses 6,000 fresh draws with seed 7103, giving a rank MCSE of √(h(1 − h)/6000).</p>
+
+<figure class="fig"><img src="fig/4_seedmask/14_joint_truth_linear.png" alt="Joint HPD level of the B12 truth versus sky index for the original and selected models in the simulation, mask and combined arms" loading="lazy"><figcaption><strong>Figure 4.14</strong> Joint HPD level of the B12 truth, unbounded models. Index 0 is the training sky. The original model (blue) contains the truth at level 0.073 on the training sky and excludes it at 95% on almost every other sky: inside 68% on 1 of 100 skies and inside 95% on 2 of 100. Band50 (orange) contains it inside 68% on all 100 skies, at levels 0.135-0.294 (<code>joint_truth_linear.json</code>). Yet band50's x<sub>c</sub> and β marginal 68% intervals still miss the truth everywhere; all nine marginal 95% intervals contain it. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_robustness_methods_20261004/final_results/report/joint_truth_linear.png</span></figcaption></figure>
+
+<p>The diagnosis confirmed that band50 does not react to the fingerprint. Its P<sub>0</sub> median is 32.65 for the training-sky observation and 32.78 for the mean new observation. The ten inputs of Figure 4.7 give 32.65-33.24, and all 104 diagnosis inputs, including the individual real skies, give 32.12-34.20 (<code>counterfactual_posteriors.csv</code>, model <code>band50_linear</code>). Most of the fine pattern that drove the original model varies from multipole to multipole and is averaged out inside each 50-multipole band. Band50 also differs from the original in its whitening and training, so this insensitivity cannot be credited to the averaging alone.</p>
+
+<p><strong>The ℓ ≥ 580 cut.</strong> Because the sky variance of the spectrum is concentrated below ℓ ≈ 580, a matched band50 Merlin was also trained without the ten lowest bands. It keeps 148 of 158 bands (ℓ = 580-7979, 7,400 of 7,900 multipoles). This removes the largest angular scales, roughly π/580 ≈ 19 arcmin and above, not the small ones.</p>
+
+<figure class="fig"><img src="fig/4_seedmask/15_saved_scale_cut_comparison.png" alt="Three panels comparing original, band50 and band50 with ell at least 580: truth error, spread and 68 percent width ratio for simulation, mask and combined held-out tests" loading="lazy"><figcaption><strong>Figure 4.15</strong> Held-out comparison of the original (blue), band50 (orange) and band50 with ℓ ≥ 580 (teal). The cut slightly reduces truth error for new lightcones (1.169 → 1.148) and the spread for masks (0.0979 → 0.0905). On the combined set it is no better (T 1.162 → 1.166, A 0.0974 → 0.0991), and it costs more width: +28.7%, +22.5% and +27.0%, with worst parameters at +68.1%, +60.0% and +80.7%. The dotted line marks the 1.25 cap of the 5 October selection, which the 6 October report calls the former, arbitrary budget. PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_truth_mean_validation_20261006/figures/saved_scale_cut_comparison.png</span></figcaption></figure>
+
+<p><strong>The cost over the whole prior.</strong> The 18-29% costs above (band50 17.9-24.7%, ℓ ≥ 580 22.5-28.7%) were measured at one point, θ = B12, on the grid skies. The 6 October validation (<code>SBI_analysis/tsz_truth_mean_validation_20261006</code>) evaluated the same frozen models on 1,500 reserved rows spread over the whole prior. These rows still use the training lightcone and mask, but θ and the noise vary. The width cost there is larger: +45.64% for band50 unbounded, +46.41% for band50 bounded and +56.51% for the ℓ ≥ 580 control. The correlation between truth and posterior mean drops for every parameter: P<sub>0</sub> 0.733 → 0.537 → 0.508, x<sub>c</sub> 0.790 → 0.694 → 0.645, β 0.696 → 0.478 → 0.390 (original → band50 → ℓ ≥ 580; README of that directory). Marginal 68% coverage stays acceptable, at 63.2-66.8% for band50 unbounded and 68.3-73.0% bounded. A further measure is the mean log density at the truth, log q(θ<sub>true</sub> | x) in physical parameter coordinates averaged over the reserved rows; it rewards posteriors that are both narrow and correct. In the 5 October final test on the same 1,500 rows it falls from −3.013 ± 0.136 (original) to −5.481 ± 0.097 (band50, unbounded), where ± is the standard error over rows (joint report, page 21). This is another measure of the information lost.</p>
+
+<figure class="fig"><img src="fig/4_seedmask/16_width68_ratio_full_prior.png" alt="Per-parameter geometric-mean 68 percent width ratio relative to the matching original model over 1,500 reserved prior cases, for band50 unbounded and bounded and the ell at least 580 control" loading="lazy"><figcaption><strong>Figure 4.16</strong> Width cost across the prior (1,500 reserved rows; the fixed training sky; 9,000 draws per row). Each point is a parameter's geometric-mean 68% width relative to the matching original model. α<sub>m,P0</sub> is the most affected parameter, at 2.35 and 2.38 times the original width for the two band50 models and 2.54 times for the ℓ ≥ 580 cut. P<sub>0</sub> is at 1.71, 1.78 and 1.76 (<code>data/truth_mean_metrics.csv</code>). The overall factors are 1.456 (band50 unbounded), 1.464 (bounded) and 1.565 (ℓ ≥ 580). PDF beside the PNG. <span class="src">source: SBI_analysis/tsz_truth_mean_validation_20261006/figures/width68_ratio_geomean.png</span></figcaption></figure>
+
+<p>Why do the two costs differ? The validation README attributes the difference to the different observations and pressure parameters over which the widths are averaged. One plausible reading, not tested separately, is that many prior rows are bright and well measured, so the within-band structure carries real pressure information that band50 averages away, whereas at B12 the original posterior is already wide in the affected directions. Both numbers include the effect of retraining and changed preprocessing, not only the averaging itself. No sweep of band widths has been made: 50 was a practical choice, and widths of 25 or 100 would require refitted transforms and retrained networks.</p>
+
+<h3>4.8 What the seed/mask study establishes, and what is open</h3>
+
+<aside class="key">The original 64k Merlin posterior is conditional on lightcone 100 and mask 12345. On other skies with the identical B12 pressure law it shifts P<sub>0</sub> from about 12 to about 50, and the B12 truth falls outside the 95% joint region on almost every other sky. The cause is the fine multipole fingerprint of the clean training-sky spectrum, which the network treats as signal. Retrained band50 Merlin removes 68-79% of the disagreement between skies and puts the truth inside the joint 68% region on all 100 skies. It costs about 18-25% wider intervals at B12 and about 46% averaged over the prior. The ℓ ≥ 580 cut adds cost without a combined benefit.</aside>
+
+<ul>
+<li><strong>Agreement, truth and calibration are separate statements.</strong> Band50 varies far less between observations (agreement). It recovers B12 in joint density but not in every marginal median (truth). Its reserved-row marginal 68% coverage is close to nominal (63.2-66.8% in the 6 October validation with 9,000 draws per row; 63.3-66.9% in the 5 October final test, INTERPRETATION.md), but only on the fixed training sky (calibration). None of the tests certifies inference on unseen halo realisations across the prior.</li>
+<li><strong>The grid is conditional.</strong> One noise pair, overlapping masks and a single θ. The scatter measures sensitivity, not cosmic-variance coverage. Ten skies at one pressure point cannot define a nuisance covariance that is valid across the nine-dimensional prior.</li>
+<li><strong>The principled remedy has not been run.</strong> The remedy is to train with the lightcone and mask drawn independently of θ for each row, for example from the existing pool of ten lightcones and many mask seeds. This needs the training rows to be repainted, but no new N-body simulations. Entire lightcones and masks would be held out for validation, at several pressure points. A nuisance-hardened compression (Alsing &amp; Wandelt 2019, <a href="https://arxiv.org/abs/1903.01473">arXiv:1903.01473</a>) or C<sub>eff</sub> = C<sub>noise</sub> + C<sub>sky</sub> weighting is a possible interim step. It would have to enter the simulator and training consistently.</li>
+<li><strong>XGPaint is not implicated.</strong> Every sky used the same pinned fork tag at θ = B12. The only code changes were project-side painting orchestration (the per-seed count check), not physics.</li>
+</ul>
+
+<aside class="note">Open issues. (1) The training-sky marginal offsets (β ≈ 9.7 against 4.35) remain, and they are not a seed effect. (2) The bandwidth (25, 50 or 100) is not optimised. (3) The augmentation recipes approximate sky variation with B12 clean-spectrum ratios and keep the SO residual unchanged. They were not validated at other θ. (4) The counterfactual and Pearson controls are diagnostics and must not be used to correct real data.</aside>
+
+<p class="path">Code for this topic: painting <code>SBI_analysis/tsz_seed_mask_variation_20261002/paint_seed.jl</code> (identical copy in <code>SBI_analysis/tsz_robustness_methods_20261004/final_results/source_snapshot/</code>); 19-case inference <code>SBI_analysis/tsz_seed_mask_variation_20261002/analyze.py</code>; grid, recipes and metrics <code>SBI_analysis/tsz_robustness_methods_20261004/{pipeline.py, common.py, report.py, merlin_checks.py, joint_truth.py}</code>; diagnosis <code>SBI_analysis/tsz_seed_offset_diagnosis_20261005/{diagnose.py, extended_controls.py}</code>; Pearson <code>SBI_analysis/tsz_joint_report_20261005/baseline_pearson.py</code>; full-prior test <code>SBI_analysis/tsz_truth_mean_validation_20261006/evaluate_truth_mean.py</code>. Reports: <code>SBI_analysis/tsz_joint_report_20261005/output/pdf/HalfDome_Merlin_seed_mask_and_Pearson_report.pdf</code> (36 pages) and <code>SBI_analysis/tsz_truth_mean_validation_20261006/output/pdf/HalfDome_Merlin_complete_seed_mask_truth_mean_report.pdf</code> (44 pages; pages 3-26 repeat the seed/mask material, pages 27-29 cover band50 and the 580 cut). Figure copying: <code>reports/halfdome_overview_20261007/scripts/seedmask/copy_figures.py</code>.</p>
+</section>

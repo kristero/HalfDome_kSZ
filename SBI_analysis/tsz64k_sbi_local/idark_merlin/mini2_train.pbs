@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N merlin_m2
+#PBS -q mini2
+#PBS -l select=1:ncpus=40:mem=64gb
+#PBS -l walltime=24:00:00
+#PBS -j oe
+# The trainings left after the db02 slowdown, on the idle mini2 node (no /lustre there: the run is staged in $HOME):
+# the three Merlin seeds with 12 threads each and PCA seed 1 with 4, concurrently.
+set -uo pipefail
+cd /home/kristero10/merlin_unbinned_20260929
+PY=/home/kristero10/envs/sbi27/bin/python
+echo "host=$(hostname) start=$(date -Is)"
+OMP_NUM_THREADS=12 MKL_NUM_THREADS=12 $PY merlin_compression.py train --variants merlin --seeds 1 2 3 --workers 3 --threads 12 &
+OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 $PY merlin_compression.py train --variants pca --seeds 1 --workers 1 --threads 4 &
+wait
+echo "finished=$(date -Is)"; ls results_merlin_unbinned/*_seed*.pt

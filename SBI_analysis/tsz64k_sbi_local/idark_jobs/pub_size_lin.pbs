@@ -1,0 +1,24 @@
+#!/bin/bash
+#PBS -j oe
+# Training-set-size series of the unbounded (MERLIN_PARAM_SPACE=linear) Merlin / PCA / MOPED (noise-level MOPED
+# features), asinh inputs, early stop 30 / lr patience 10, first $N pool rows: results_merlin_unbinned_asinh_p30_lin_N$N.
+#   qsub -q mini_B -N lsize_<N> -l select=1:ncpus=10:mem=32gb -l walltime=06:00:00 -v N=<rows> pub_size_lin.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+PY=/home/kristero10/envs/sbi27/bin/python; C=${NCPUS:-10}
+export MERLIN_TAG=_asinh_p30_lin_N$N MERLIN_TRAIN_ROWS=$N MERLIN_PARAM_SPACE=linear MERLIN_PATIENCE=30 MERLIN_LR_PATIENCE=10
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1
+O=results_merlin_unbinned$MERLIN_TAG; mkdir -p $O
+ln -sfn ../results_merlin_unbinned_asinh_p30/features_merlin.npz $O/features_merlin.npz
+ln -sfn ../results_merlin_unbinned_asinh_p30/prepare.json $O/prepare.json
+ln -sfn ../results_merlin_unbinned_asinh_p30_lin/features_moped.npz $O/features_moped.npz
+echo "host=$(hostname) ncpus=$C N=$N start=$(date -Is)"
+T=$(( (C - 3) / 3 )); [ $T -lt 1 ] && T=1
+OMP_NUM_THREADS=$T $PY merlin_compression.py train --variants merlin --seeds 1 2 3 --workers 3 --threads $T & m=$!
+OMP_NUM_THREADS=1 $PY merlin_compression.py train --variants pca moped --seeds 1 2 3 --workers 3 --threads 1 & p=$!
+wait $m; c1=$?; wait $p; c2=$?
+echo "trained=$(date -Is) codes=$c1,$c2"
+code=1
+[ $c1 -eq 0 ] && [ $c2 -eq 0 ] && OMP_NUM_THREADS=$C $PY merlin_compression.py evaluate --threads $C && code=0
+echo "finished=$(date -Is) code=$code"; exit $code

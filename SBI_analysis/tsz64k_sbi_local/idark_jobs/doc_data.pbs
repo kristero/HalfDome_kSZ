@@ -1,0 +1,11 @@
+#!/bin/bash
+#PBS -j oe
+# Small arrays for the pipeline explainer figures (doc_figure_data.py -> doc_figure_data/).
+#   qsub -q mini_B -N doc_data -l select=1:ncpus=8:mem=24gb -l walltime=01:00:00 doc_data.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+export PYTHONUNBUFFERED=1 OMP_NUM_THREADS=${NCPUS:-8}
+echo "host=$(hostname) start=$(date -Is)"
+/home/kristero10/envs/sbi27/bin/python doc_figure_data.py
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

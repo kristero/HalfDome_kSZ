@@ -1,0 +1,12 @@
+# idark GroupA nodes: the repro-test (2026-09-24) Julia 1.12.2 environment and catalogue on /lustre; same run_root.
+[paths]
+julia = "/lustre/work/kristero10/tsz64k_repro_test_20260924/julia_tsz64k/julia-1.12.2/bin/julia"
+julia_depot = "/lustre/work/kristero10/tsz64k_repro_test_20260924/julia_tsz64k/depot"
+halfdome_catalogue = "/lustre/work/Globus-lt/halfdome/full_res/halos/lightcone_100.hdf5"
+run_root = "/home/kristero10/tsz64k_missing_20260928/run_root"
+
+[run]
+threads = 26
+audit_threads = 6
+batch_size = 4
+audit_rows_per_task = 256

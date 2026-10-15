@@ -1,0 +1,33 @@
+#!/bin/bash
+#PBS -N bf_regen
+#PBS -j oe
+# Beam-fix noise regeneration worker: PROCS copies of regen_noise.jl, each with NCPUS/PROCS threads, claiming tasks from
+# tasks/stage*.txt in stage order. Submitted by driver.py, e.g.
+#   qsub -q mini2 -l select=1:ncpus=56:mem=200gb -l walltime=72:00:00 -v RUN=$HOME/tsz64k_beamfix_20260930,PROCS=2,WALL_SECONDS=259200 regen.pbs
+# The Julia 1.12.2 build, depot, bundle and catalogue are the $HOME stage of the idark repro test (mini2 nodes do not mount
+# /lustre); the depot's first entry is writable, so a new CPU type compiles its caches there once.
+set -uo pipefail
+RUN=${RUN:?}; PROCS=${PROCS:-1}; WALL_SECONDS=${WALL_SECONDS:-86400}
+cd "$RUN"
+mkdir -p logs
+exec > "logs/regen_${PBS_JOBID%%.*}.log" 2>&1
+STAGE=$HOME/tsz64k_fixbeta_stage
+JROOT=$STAGE/julia_tsz64k
+export HALFDOME_REPO=$STAGE/HalfDome_kSZ
+export HALFDOME_CATALOGUE=$STAGE/lightcone_100.hdf5
+export JULIA_DEPOT_PATH="$HOME/tsz64k_fixbeta_20260928/depot:$JROOT/depot"
+export LD_LIBRARY_PATH="$JROOT/julia-1.12.2/lib/julia${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+N=${NCPUS:-8}
+T=$((N / PROCS))
+export OMP_NUM_THREADS=$T
+# leave the job 15 minutes for start-up and the last task's margin
+export REGEN_WALL_SECONDS=$((WALL_SECONDS - 900))
+echo "host=$(hostname) ncpus=$N procs=$PROCS threads=$T wall=$WALL_SECONDS start=$(date -Is)"
+for p in $(seq "$PROCS"); do
+  "$JROOT/julia-1.12.2/bin/julia" --startup-file=no \
+    --project="$HALFDOME_REPO/tSZ_64k_flat_prior_SO_baseline_deproj0/julia_env" --threads="$T" \
+    code/regen_noise.jl "$RUN" tasks/stage*.txt > "logs/regen_${PBS_JOBID%%.*}_p$p.log" 2>&1 &
+  sleep 30        # staggered starts: the first process compiles any missing caches
+done
+wait
+echo "finished=$(date -Is)"

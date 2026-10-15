@@ -1,0 +1,115 @@
+{
+ "doc": "I0 (local): export the stacking-choice variants used in I5 from the validated stacking cache\n(stacking_choices_20261014/core/stackcore.py, read-only) into I_fitting_a2ii/inputs/i0_variants.npz (+ json).\n\nFor every variant v, field f in {P, E} and mass bin b of the variant's scheme (calibrated range 13.5-15.5 in M200c):\n  mean_<v>_<f>  [nb, 35]  the stack on the 'fit' grid (= Test F's 35-shell F grid, x = r/R200c to 4)\n  sd_<v>_<f>    [nb, 35]  reliability-weighted halo-to-halo SD (objective (a) weights: sigma = max(SD/mean, 5%))\n  res_<v>_<f>   [nb, 35]  resolved shells of the variant's rule (strict, or per-halo: n_used > 0)\n  logm_<v>, lnc_<v> [nb]  inclusion-weighted mean log10 M200c [Msun] and mean ln c200c of the bin's haloes\n  bins_<v>      [nb, 2]   bin edges (log10 M200c [Msun])\nUnits: P = P_e / P200 (dimensionless), E = n_e mu_XGP / (rho_c f_b) (dimensionless); as the cache's 'P200' and\n'rhoc_fb' normalisations (identical to Test F / G).\nVariants (A2-ii = the painting partition, recent-AGN gas removed, inclusion-weighted mean, strict resolution rule,\nM200c 0.2-dex bins, unless stated):\n  a2ii        reference (must reproduce Test G's 35-shell A2-ii stacks; checked in i0_variants.json)\n  a2ii_agn    A2-ii with the recently AGN-heated gas kept\n  allgas      all gas (no partition; Test F 'main')\n  a2i         A2-i partition\n  unweighted  A2-ii, unweighted mean\n  median      A2-ii, inclusion-weighted median\n  m05         A2-ii in M200c 0.5-dex bins (13.5-14, 14-14.5, 14.5-15, 15-15.5)\n  perhalo     A2-ii, per-halo resolution rule (unresolved halo-shells dropped individually)\n  xray        all gas (no partition), X-ray phase only (SFR = 0, T >= 1e5 K, not AGN-heated); the cache has no\n              A2-ii x X-ray-phase variant, so compare with allgas to isolate the phase effect\n",
+ "variants": {
+  "a2ii": {
+   "agn": "removed",
+   "selection": "A2ii",
+   "phase": "all",
+   "statistic": "mean",
+   "scheme": "M200c_0.2",
+   "rule": "strict",
+   "keys": {
+    "P": "P|geometric|removed|A2ii|all|fit|P200",
+    "E": "E|geometric|removed|A2ii|all|fit|rhoc_fb"
+   }
+  },
+  "a2ii_agn": {
+   "agn": "kept",
+   "selection": "A2ii",
+   "phase": "all",
+   "statistic": "mean",
+   "scheme": "M200c_0.2",
+   "rule": "strict",
+   "keys": {
+    "P": "P|geometric|kept|A2ii|all|fit|P200",
+    "E": "E|geometric|kept|A2ii|all|fit|rhoc_fb"
+   }
+  },
+  "allgas": {
+   "agn": "removed",
+   "selection": "all",
+   "phase": "all",
+   "statistic": "mean",
+   "scheme": "M200c_0.2",
+   "rule": "strict",
+   "keys": {
+    "P": "P|geometric|removed|all|all|fit|P200",
+    "E": "E|geometric|removed|all|all|fit|rhoc_fb"
+   }
+  },
+  "a2i": {
+   "agn": "removed",
+   "selection": "A2i",
+   "phase": "all",
+   "statistic": "mean",
+   "scheme": "M200c_0.2",
+   "rule": "strict",
+   "keys": {
+    "P": "P|geometric|removed|A2i|all|fit|P200",
+    "E": "E|geometric|removed|A2i|all|fit|rhoc_fb"
+   }
+  },
+  "unweighted": {
+   "agn": "removed",
+   "selection": "A2ii",
+   "phase": "all",
+   "statistic": "unweighted_mean",
+   "scheme": "M200c_0.2",
+   "rule": "strict",
+   "keys": {
+    "P": "P|geometric|removed|A2ii|all|fit|P200",
+    "E": "E|geometric|removed|A2ii|all|fit|rhoc_fb"
+   }
+  },
+  "median": {
+   "agn": "removed",
+   "selection": "A2ii",
+   "phase": "all",
+   "statistic": "median",
+   "scheme": "M200c_0.2",
+   "rule": "strict",
+   "keys": {
+    "P": "P|geometric|removed|A2ii|all|fit|P200",
+    "E": "E|geometric|removed|A2ii|all|fit|rhoc_fb"
+   }
+  },
+  "m05": {
+   "agn": "removed",
+   "selection": "A2ii",
+   "phase": "all",
+   "statistic": "mean",
+   "scheme": "M200c_0.5",
+   "rule": "strict",
+   "keys": {
+    "P": "P|geometric|removed|A2ii|all|fit|P200",
+    "E": "E|geometric|removed|A2ii|all|fit|rhoc_fb"
+   }
+  },
+  "perhalo": {
+   "agn": "removed",
+   "selection": "A2ii",
+   "phase": "all",
+   "statistic": "mean",
+   "scheme": "M200c_0.2",
+   "rule": "per_halo",
+   "keys": {
+    "P": "P|geometric|removed|A2ii|all|fit|P200",
+    "E": "E|geometric|removed|A2ii|all|fit|rhoc_fb"
+   }
+  },
+  "xray": {
+   "agn": "removed",
+   "selection": "all",
+   "phase": "xray",
+   "statistic": "mean",
+   "scheme": "M200c_0.2",
+   "rule": "strict",
+   "keys": {
+    "P": "P|geometric|removed|all|xray|fit|P200",
+    "E": "E|geometric|removed|all|xray|fit|rhoc_fb"
+   }
+  }
+ },
+ "parity_vs_G_meanP_a2ii_max_rel": 1.5543122344752192e-15,
+ "parity_vs_G_meanE_a2ii_max_rel": 1.3322676295501878e-15
+}

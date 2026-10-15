@@ -1,0 +1,711 @@
+{
+  "pressure": {
+    "measured_fl_mean": 8.202642534447625e-18,
+    "measured_fl_rms": 7.978399806954724e-16,
+    "fl_painted_mean": 7.009636338070776e-18,
+    "hd_painted_mean": 7.585796711161102e-18,
+    "fl_painted_rms": 8.361571510322354e-16,
+    "hd_painted_rms": 8.86973327104337e-16,
+    "fl_painted_mean_over_full_gas": 0.8545583095488157,
+    "fl_painted_rms_over_full_gas": 1.0480261346433932
+  },
+  "electrons": {
+    "measured_fl_mean": 2.0758278278350541e-07,
+    "measured_fl_rms": 1.5106353707802374e-06,
+    "fl_painted_mean": 4.578749349153803e-08,
+    "hd_painted_mean": 5.2417735458748225e-08,
+    "fl_painted_rms": 1.6364559946709093e-06,
+    "hd_painted_rms": 1.677868785680636e-06,
+    "fl_painted_mean_over_full_gas": 0.22057462029156455,
+    "fl_painted_rms_over_full_gas": 1.083289870159525
+  },
+  "y": {
+    "measured_fl_mean": 5.1415744357436184e-08,
+    "measured_fl_rms": 5.383989407133594e-07,
+    "fl_painted_mean": 4.393111483015559e-08,
+    "hd_painted_mean": 4.75691836022561e-08,
+    "fl_painted_rms": 4.90697863919952e-07,
+    "hd_painted_rms": 5.291566172291072e-07,
+    "fl_painted_mean_over_full_gas": 0.8544292293961878,
+    "fl_painted_rms_over_full_gas": 0.9114019861736631
+  },
+  "tau": {
+    "measured_fl_mean": 0.00010652807328926857,
+    "measured_fl_rms": 0.00014153297548460177,
+    "fl_painted_mean": 2.349688211668528e-05,
+    "hd_painted_mean": 2.69029204101322e-05,
+    "fl_painted_rms": 8.479992174570063e-05,
+    "hd_painted_rms": 8.87444500876161e-05,
+    "fl_painted_mean_over_full_gas": 0.22056985911010848,
+    "fl_painted_rms_over_full_gas": 0.5991531051710739
+  },
+  "dm": {
+    "measured_fl_mean": 51.895695671328156,
+    "measured_fl_rms": 68.94851278556222,
+    "fl_painted_mean": 11.446626282645918,
+    "hd_painted_mean": 13.105895255263466,
+    "fl_painted_rms": 41.31071553239709,
+    "hd_painted_rms": 43.23231268588279,
+    "fl_painted_mean_over_full_gas": 0.22056985911010848,
+    "fl_painted_rms_over_full_gas": 0.5991531051710739
+  },
+  "deltaT": {
+    "measured_fl_mean": -0.04212922443545047,
+    "measured_fl_rms": 0.2945182149791473,
+    "fl_painted_mean": -0.009589144659192727,
+    "hd_painted_mean": -0.003779527619757474,
+    "fl_painted_rms": 0.21448196147005846,
+    "hd_painted_rms": 0.24072759547739028,
+    "fl_painted_rms_over_full_gas": 0.7282468470931225
+  },
+  "controls": {
+    "normalization_control": {
+      "pressure": {
+        "rms_ratio": 1.0170538626567573,
+        "mean_ratio": 1.013045664049578
+      },
+      "electrons": {
+        "rms_ratio": 1.0141954259402544,
+        "mean_ratio": 1.009469546883249
+      },
+      "y": {
+        "rms_ratio": 1.0163664283052365,
+        "mean_ratio": 1.013047405437905,
+        "power_ratio_k005_1": 1.0272747245514844
+      },
+      "tau": {
+        "rms_ratio": 1.0124332811811925,
+        "mean_ratio": 1.0094754269156623,
+        "power_ratio_k005_1": 1.0197270564012932
+      },
+      "dm": {
+        "rms_ratio": 1.0124332811811925,
+        "mean_ratio": 1.009475426915662,
+        "power_ratio_k005_1": 1.019727056401293
+      },
+      "deltaT": {
+        "rms_ratio": 1.0128168185162967,
+        "power_ratio_k005_1": 1.0200560907058838
+      }
+    },
+    "sem_weight_control": {
+      "pressure": {
+        "rms_ratio": 1.000854181147567,
+        "mean_ratio": 1.0013606255421978
+      },
+      "electrons": {
+        "rms_ratio": 0.9886314172495395,
+        "mean_ratio": 0.9856544519244527
+      },
+      "y": {
+        "rms_ratio": 1.0008818515024955,
+        "mean_ratio": 1.001363266569859,
+        "power_ratio_k005_1": 1.0008383429806433
+      },
+      "tau": {
+        "rms_ratio": 0.9890284832327915,
+        "mean_ratio": 0.9856561296223121,
+        "power_ratio_k005_1": 0.9916518102002485
+      },
+      "dm": {
+        "rms_ratio": 0.9890284832327915,
+        "mean_ratio": 0.9856561296223121,
+        "power_ratio_k005_1": 0.9916518102002485
+      },
+      "deltaT": {
+        "rms_ratio": 0.9889376416748586,
+        "power_ratio_k005_1": 0.9899831838686188
+      }
+    },
+    "paired_scatter_42": {
+      "pressure": {
+        "rms_ratio": 1.1377979019183377,
+        "mean_ratio": 1.0533112736573693
+      },
+      "electrons": {
+        "rms_ratio": 1.007877497295493,
+        "mean_ratio": 0.9916847959224739
+      },
+      "y": {
+        "rms_ratio": 1.155852761418661,
+        "mean_ratio": 1.0533247031972959,
+        "power_ratio_k005_1": 1.075763905131171
+      },
+      "tau": {
+        "rms_ratio": 1.0096803592037846,
+        "mean_ratio": 0.9916799300628625,
+        "power_ratio_k005_1": 1.0325635336372005
+      },
+      "dm": {
+        "rms_ratio": 1.0096803592037846,
+        "mean_ratio": 0.9916799300628624,
+        "power_ratio_k005_1": 1.0325635336372003
+      },
+      "deltaT": {
+        "rms_ratio": 1.0174771028701548,
+        "power_ratio_k005_1": 1.0043855293239705
+      }
+    },
+    "paired_scatter_43": {
+      "pressure": {
+        "rms_ratio": 0.9719791796955171,
+        "mean_ratio": 0.9922321742876856
+      },
+      "electrons": {
+        "rms_ratio": 1.0112529127868428,
+        "mean_ratio": 0.9812629656617053
+      },
+      "y": {
+        "rms_ratio": 0.9653952953760933,
+        "mean_ratio": 0.9922727429074187,
+        "power_ratio_k005_1": 0.9660651588333099
+      },
+      "tau": {
+        "rms_ratio": 0.9932987894205937,
+        "mean_ratio": 0.981269733708499,
+        "power_ratio_k005_1": 0.9552369975118197
+      },
+      "dm": {
+        "rms_ratio": 0.9932987894205937,
+        "mean_ratio": 0.9812697337084991,
+        "power_ratio_k005_1": 0.9552369975118197
+      },
+      "deltaT": {
+        "rms_ratio": 0.989349619723954,
+        "power_ratio_k005_1": 0.9488629616640966
+      }
+    },
+    "high_mass_cut_15p1": {
+      "pressure": {
+        "rms_ratio": 0.8014561302989096,
+        "mean_ratio": 0.9310110775188385
+      },
+      "electrons": {
+        "rms_ratio": 0.9790477180570605,
+        "mean_ratio": 0.9874009684977985
+      },
+      "y": {
+        "rms_ratio": 0.7574391723490164,
+        "mean_ratio": 0.9307791821255552,
+        "power_ratio_k005_1": 0.5082730837306667
+      },
+      "tau": {
+        "rms_ratio": 0.9713796258782401,
+        "mean_ratio": 0.9873752664120907,
+        "power_ratio_k005_1": 0.9178355330977022
+      },
+      "dm": {
+        "rms_ratio": 0.9713796258782401,
+        "mean_ratio": 0.9873752664120906,
+        "power_ratio_k005_1": 0.9178355330977019
+      },
+      "deltaT": {
+        "rms_ratio": 0.9186206667598189,
+        "power_ratio_k005_1": 0.7482122309211892
+      }
+    },
+    "joint_support_hybrid": {
+      "pressure": {
+        "rms_ratio": 1.0,
+        "mean_ratio": 1.0
+      },
+      "electrons": {
+        "rms_ratio": 1.0087228922842657,
+        "mean_ratio": 1.2573121602201893
+      },
+      "y": {
+        "rms_ratio": 1.0,
+        "mean_ratio": 1.0,
+        "power_ratio_k005_1": 1.0
+      },
+      "tau": {
+        "rms_ratio": 1.0589473550516437,
+        "mean_ratio": 1.2573101175194152,
+        "power_ratio_k005_1": 1.328347877598053
+      },
+      "dm": {
+        "rms_ratio": 1.0589473550516437,
+        "mean_ratio": 1.2573101175194155,
+        "power_ratio_k005_1": 1.3283478775980528
+      },
+      "deltaT": {
+        "rms_ratio": 1.0325188731017454,
+        "power_ratio_k005_1": 1.2862236508987213
+      }
+    },
+    "mass_mapping_alternative_0": {
+      "pressure": {
+        "rms_ratio": 0.8826948245141938,
+        "mean_ratio": 0.9696855836520949
+      },
+      "electrons": {
+        "rms_ratio": 0.992600600297316,
+        "mean_ratio": 0.9957969284041271
+      },
+      "y": {
+        "rms_ratio": 0.8408238941020886,
+        "mean_ratio": 0.969704189931658,
+        "power_ratio_k005_1": 0.668358140591795
+      },
+      "tau": {
+        "rms_ratio": 0.9882573897682702,
+        "mean_ratio": 0.9957980160068792,
+        "power_ratio_k005_1": 0.9710793269236212
+      },
+      "dm": {
+        "rms_ratio": 0.9882573897682702,
+        "mean_ratio": 0.9957980160068791,
+        "power_ratio_k005_1": 0.9710793269236211
+      },
+      "deltaT": {
+        "rms_ratio": 0.9704204893079372,
+        "power_ratio_k005_1": 0.8949895311311241
+      }
+    },
+    "mass_mapping_alternative_1": {
+      "pressure": {
+        "rms_ratio": 1.0231676091081414,
+        "mean_ratio": 1.0048222979507158
+      },
+      "electrons": {
+        "rms_ratio": 1.0009460597241824,
+        "mean_ratio": 0.9998086743025566
+      },
+      "y": {
+        "rms_ratio": 1.0298175681469255,
+        "mean_ratio": 1.004828757570999,
+        "power_ratio_k005_1": 1.0824899457912904
+      },
+      "tau": {
+        "rms_ratio": 1.0016213987446572,
+        "mean_ratio": 0.9998114235806406,
+        "power_ratio_k005_1": 1.0063129603002543
+      },
+      "dm": {
+        "rms_ratio": 1.0016213987446572,
+        "mean_ratio": 0.9998114235806403,
+        "power_ratio_k005_1": 1.0063129603002539
+      },
+      "deltaT": {
+        "rms_ratio": 1.0048193103591252,
+        "power_ratio_k005_1": 1.0208831856277243
+      }
+    },
+    "mass_mapping_alternative_2": {
+      "pressure": {
+        "rms_ratio": 0.8741657220742454,
+        "mean_ratio": 0.9553351450846577
+      },
+      "electrons": {
+        "rms_ratio": 0.9854902276652482,
+        "mean_ratio": 0.9909189112048862
+      },
+      "y": {
+        "rms_ratio": 0.8337538120130762,
+        "mean_ratio": 0.9553665050754843,
+        "power_ratio_k005_1": 0.659354979073621
+      },
+      "tau": {
+        "rms_ratio": 0.981018785708552,
+        "mean_ratio": 0.9909201193891383,
+        "power_ratio_k005_1": 0.9549854213759853
+      },
+      "dm": {
+        "rms_ratio": 0.981018785708552,
+        "mean_ratio": 0.9909201193891383,
+        "power_ratio_k005_1": 0.9549854213759851
+      },
+      "deltaT": {
+        "rms_ratio": 0.9664220767146986,
+        "power_ratio_k005_1": 0.8929028351878798
+      }
+    }
+  },
+  "matched_halo_union_scores": [
+    {
+      "observable": "y",
+      "fit": 1,
+      "cut": 1,
+      "relative_L2_percent": 28.350756988077364
+    },
+    {
+      "observable": "y",
+      "fit": 2,
+      "cut": 1,
+      "relative_L2_percent": 28.29117826135599
+    },
+    {
+      "observable": "y",
+      "fit": 3,
+      "cut": 1,
+      "relative_L2_percent": 28.184909086879678
+    },
+    {
+      "observable": "y",
+      "fit": 4,
+      "cut": 1,
+      "relative_L2_percent": 28.135765883527757
+    },
+    {
+      "observable": "y",
+      "fit": 1,
+      "cut": 2,
+      "relative_L2_percent": 28.269900966642332
+    },
+    {
+      "observable": "y",
+      "fit": 2,
+      "cut": 2,
+      "relative_L2_percent": 28.213824066333952
+    },
+    {
+      "observable": "y",
+      "fit": 3,
+      "cut": 2,
+      "relative_L2_percent": 28.117603163933737
+    },
+    {
+      "observable": "y",
+      "fit": 4,
+      "cut": 2,
+      "relative_L2_percent": 28.082252742054507
+    },
+    {
+      "observable": "y",
+      "fit": 1,
+      "cut": 3,
+      "relative_L2_percent": 29.846075246323743
+    },
+    {
+      "observable": "y",
+      "fit": 2,
+      "cut": 3,
+      "relative_L2_percent": 29.787525659670962
+    },
+    {
+      "observable": "y",
+      "fit": 3,
+      "cut": 3,
+      "relative_L2_percent": 29.692523872047023
+    },
+    {
+      "observable": "y",
+      "fit": 4,
+      "cut": 3,
+      "relative_L2_percent": 29.66027073295247
+    },
+    {
+      "observable": "y",
+      "fit": 1,
+      "cut": 4,
+      "relative_L2_percent": 30.278503405854778
+    },
+    {
+      "observable": "y",
+      "fit": 2,
+      "cut": 4,
+      "relative_L2_percent": 30.217942773131924
+    },
+    {
+      "observable": "y",
+      "fit": 3,
+      "cut": 4,
+      "relative_L2_percent": 30.120295868367496
+    },
+    {
+      "observable": "y",
+      "fit": 4,
+      "cut": 4,
+      "relative_L2_percent": 30.085798776476384
+    },
+    {
+      "observable": "tau",
+      "fit": 1,
+      "cut": 1,
+      "relative_L2_percent": 21.80030485625716
+    },
+    {
+      "observable": "tau",
+      "fit": 2,
+      "cut": 1,
+      "relative_L2_percent": 21.7507189929429
+    },
+    {
+      "observable": "tau",
+      "fit": 3,
+      "cut": 1,
+      "relative_L2_percent": 21.77162430283221
+    },
+    {
+      "observable": "tau",
+      "fit": 4,
+      "cut": 1,
+      "relative_L2_percent": 21.81888862978887
+    },
+    {
+      "observable": "tau",
+      "fit": 1,
+      "cut": 2,
+      "relative_L2_percent": 20.098481931068363
+    },
+    {
+      "observable": "tau",
+      "fit": 2,
+      "cut": 2,
+      "relative_L2_percent": 19.760569345924704
+    },
+    {
+      "observable": "tau",
+      "fit": 3,
+      "cut": 2,
+      "relative_L2_percent": 19.775155937191343
+    },
+    {
+      "observable": "tau",
+      "fit": 4,
+      "cut": 2,
+      "relative_L2_percent": 19.956581611849618
+    },
+    {
+      "observable": "tau",
+      "fit": 1,
+      "cut": 3,
+      "relative_L2_percent": 24.126338194745394
+    },
+    {
+      "observable": "tau",
+      "fit": 2,
+      "cut": 3,
+      "relative_L2_percent": 23.124401463289875
+    },
+    {
+      "observable": "tau",
+      "fit": 3,
+      "cut": 3,
+      "relative_L2_percent": 22.995058051244342
+    },
+    {
+      "observable": "tau",
+      "fit": 4,
+      "cut": 3,
+      "relative_L2_percent": 23.17425931279349
+    },
+    {
+      "observable": "tau",
+      "fit": 1,
+      "cut": 4,
+      "relative_L2_percent": 27.146933504835104
+    },
+    {
+      "observable": "tau",
+      "fit": 2,
+      "cut": 4,
+      "relative_L2_percent": 25.27743151007415
+    },
+    {
+      "observable": "tau",
+      "fit": 3,
+      "cut": 4,
+      "relative_L2_percent": 24.909489391812016
+    },
+    {
+      "observable": "tau",
+      "fit": 4,
+      "cut": 4,
+      "relative_L2_percent": 25.03479916400137
+    },
+    {
+      "observable": "dm",
+      "fit": 1,
+      "cut": 1,
+      "relative_L2_percent": 21.80030451420605
+    },
+    {
+      "observable": "dm",
+      "fit": 2,
+      "cut": 1,
+      "relative_L2_percent": 21.750718659051948
+    },
+    {
+      "observable": "dm",
+      "fit": 3,
+      "cut": 1,
+      "relative_L2_percent": 21.771624018315368
+    },
+    {
+      "observable": "dm",
+      "fit": 4,
+      "cut": 1,
+      "relative_L2_percent": 21.818888325193345
+    },
+    {
+      "observable": "dm",
+      "fit": 1,
+      "cut": 2,
+      "relative_L2_percent": 20.098482438589553
+    },
+    {
+      "observable": "dm",
+      "fit": 2,
+      "cut": 2,
+      "relative_L2_percent": 19.76056950989437
+    },
+    {
+      "observable": "dm",
+      "fit": 3,
+      "cut": 2,
+      "relative_L2_percent": 19.77515614282069
+    },
+    {
+      "observable": "dm",
+      "fit": 4,
+      "cut": 2,
+      "relative_L2_percent": 19.95658202699128
+    },
+    {
+      "observable": "dm",
+      "fit": 1,
+      "cut": 3,
+      "relative_L2_percent": 24.12633887914475
+    },
+    {
+      "observable": "dm",
+      "fit": 2,
+      "cut": 3,
+      "relative_L2_percent": 23.12440157209185
+    },
+    {
+      "observable": "dm",
+      "fit": 3,
+      "cut": 3,
+      "relative_L2_percent": 22.995058120070574
+    },
+    {
+      "observable": "dm",
+      "fit": 4,
+      "cut": 3,
+      "relative_L2_percent": 23.174259626531754
+    },
+    {
+      "observable": "dm",
+      "fit": 1,
+      "cut": 4,
+      "relative_L2_percent": 27.146934709970605
+    },
+    {
+      "observable": "dm",
+      "fit": 2,
+      "cut": 4,
+      "relative_L2_percent": 25.277431962284986
+    },
+    {
+      "observable": "dm",
+      "fit": 3,
+      "cut": 4,
+      "relative_L2_percent": 24.909489710474674
+    },
+    {
+      "observable": "dm",
+      "fit": 4,
+      "cut": 4,
+      "relative_L2_percent": 25.03479972578801
+    },
+    {
+      "observable": "deltaT",
+      "fit": 1,
+      "cut": 1,
+      "relative_L2_percent": 48.531474151035006
+    },
+    {
+      "observable": "deltaT",
+      "fit": 2,
+      "cut": 1,
+      "relative_L2_percent": 48.50042168111415
+    },
+    {
+      "observable": "deltaT",
+      "fit": 3,
+      "cut": 1,
+      "relative_L2_percent": 48.471543411959026
+    },
+    {
+      "observable": "deltaT",
+      "fit": 4,
+      "cut": 1,
+      "relative_L2_percent": 48.441576978691884
+    },
+    {
+      "observable": "deltaT",
+      "fit": 1,
+      "cut": 2,
+      "relative_L2_percent": 49.337040093543735
+    },
+    {
+      "observable": "deltaT",
+      "fit": 2,
+      "cut": 2,
+      "relative_L2_percent": 49.14393707335701
+    },
+    {
+      "observable": "deltaT",
+      "fit": 3,
+      "cut": 2,
+      "relative_L2_percent": 49.15939431988547
+    },
+    {
+      "observable": "deltaT",
+      "fit": 4,
+      "cut": 2,
+      "relative_L2_percent": 49.36218477383119
+    },
+    {
+      "observable": "deltaT",
+      "fit": 1,
+      "cut": 3,
+      "relative_L2_percent": 52.577470438729655
+    },
+    {
+      "observable": "deltaT",
+      "fit": 2,
+      "cut": 3,
+      "relative_L2_percent": 52.06994766899493
+    },
+    {
+      "observable": "deltaT",
+      "fit": 3,
+      "cut": 3,
+      "relative_L2_percent": 52.055792451805125
+    },
+    {
+      "observable": "deltaT",
+      "fit": 4,
+      "cut": 3,
+      "relative_L2_percent": 52.35393285774026
+    },
+    {
+      "observable": "deltaT",
+      "fit": 1,
+      "cut": 4,
+      "relative_L2_percent": 54.52727067948238
+    },
+    {
+      "observable": "deltaT",
+      "fit": 2,
+      "cut": 4,
+      "relative_L2_percent": 53.630983429728005
+    },
+    {
+      "observable": "deltaT",
+      "fit": 3,
+      "cut": 4,
+      "relative_L2_percent": 53.523015479499094
+    },
+    {
+      "observable": "deltaT",
+      "fit": 4,
+      "cut": 4,
+      "relative_L2_percent": 53.833790419823025
+    }
+  ],
+  "scope": "Finite z=0 boxes, selected mass interval, NGP pixels/cells. Neither lightcone predictions nor independent HalfDome gas validation."
+}

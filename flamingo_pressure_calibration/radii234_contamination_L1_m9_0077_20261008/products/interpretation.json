@@ -1,0 +1,135 @@
+{
+  "supported_bins": 11,
+  "diagnostic_bins": 4,
+  "aggregation": "Equal-bin medians; equal normalized-halo means within each bin.",
+  "recommendation": "Acquire 4R; fit 4R for an all-gas full-4R target. For inner profiles use the 2R fit or a separate inner component. Additive painting requires unique ownership and a diffuse component.",
+  "pressure": {
+    "stable_supported_holdout_bins": 10,
+    "median_heldout_full_4R_RMS_percent": [
+      20.35568065689459,
+      18.132032532857643,
+      15.610801307914926
+    ],
+    "heldout_full_4R_wins": [
+      0,
+      1,
+      9
+    ],
+    "median_training_population_inner_2R_RMS_percent": [
+      1.05518065379094,
+      1.8722154061387128,
+      4.793402307723175
+    ],
+    "median_retained_fraction_of_4R": [
+      0.8465505075585451,
+      0.9343780644020522,
+      1.0
+    ],
+    "median_cumulative_satellite_fraction": [
+      0.011227006908477034,
+      0.019690998632672825,
+      0.022591182860866407
+    ],
+    "median_cumulative_other_halo_fraction": [
+      6.618249603226296e-05,
+      0.002666048787569295,
+      0.016686492454652625
+    ],
+    "median_3_to_4R_ring_component_fraction": [
+      0.008763299999746031,
+      0.03679241118717276,
+      0.205887086324804,
+      0.7312666568635309
+    ],
+    "median_all_4R_RMS_by_target": {
+      "all": 14.946476397445247,
+      "no_other": 10.160865492805414,
+      "no_satellites_or_other": 10.414032665475812
+    },
+    "median_outer_ring_map_L2_by_fit_radius_percent": {
+      "1to2": [
+        5.8021701266652785,
+        3.0010005713700183,
+        5.56008271092424
+      ],
+      "2to3": [
+        30.92598676702715,
+        24.30546733790786,
+        15.597844487186386
+      ],
+      "3to4": [
+        57.97190322837293,
+        51.26918073487502,
+        43.21352094531597
+      ]
+    },
+    "median_native_4R_map_L2_original_z_percent": 3.121166967580162,
+    "median_native_4R_map_L2_ten_views_percent": 2.0113095012535966,
+    "median_core_excluded_4R_map_L2_by_fit_radius_percent": [
+      2.4480865667226097,
+      2.1627833026914853,
+      2.1840929271227894
+    ]
+  },
+  "electrons": {
+    "stable_supported_holdout_bins": 10,
+    "median_heldout_full_4R_RMS_percent": [
+      17.50176088622036,
+      13.028743317104965,
+      11.516395332088148
+    ],
+    "heldout_full_4R_wins": [
+      0,
+      2,
+      8
+    ],
+    "median_training_population_inner_2R_RMS_percent": [
+      2.5937222814178105,
+      3.575656535659571,
+      6.200932033290299
+    ],
+    "median_retained_fraction_of_4R": [
+      0.6522573063557019,
+      0.8298323683251572,
+      1.0
+    ],
+    "median_cumulative_satellite_fraction": [
+      0.01608329947754396,
+      0.025809501030490383,
+      0.024249208925942026
+    ],
+    "median_cumulative_other_halo_fraction": [
+      0.0007536775711315158,
+      0.007919690161304139,
+      0.027188624790270014
+    ],
+    "median_3_to_4R_ring_component_fraction": [
+      0.007126492663218225,
+      0.024129375784635466,
+      0.11735456362636354,
+      0.8376919024910916
+    ],
+    "median_all_4R_RMS_by_target": {
+      "all": 11.706796022187294,
+      "no_other": 10.068694928153146,
+      "no_satellites_or_other": 9.964309737188863
+    },
+    "median_outer_ring_map_L2_by_fit_radius_percent": {
+      "1to2": [
+        8.541061661882058,
+        4.911039397955954,
+        5.60526299349475
+      ],
+      "2to3": [
+        30.82584334135305,
+        19.949626389393902,
+        12.369940816385027
+      ],
+      "3to4": [
+        43.15306222373971,
+        40.19658690421256,
+        32.05927721840341
+      ]
+    }
+  }
+}

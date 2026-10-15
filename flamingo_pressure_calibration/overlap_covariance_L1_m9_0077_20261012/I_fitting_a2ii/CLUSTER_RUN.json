@@ -1,0 +1,114 @@
+{
+ "purpose": "Test I (fitting the A2-ii painting stacks: B12/B16 refits, the Lee22 parametrisation ladder, stacking-choice propagation), evaluated on Test H's fine A2-ii basis: full run on STRW maas; figures, I4 tables and the report section are made locally",
+ "command": "run 1: cd $STUDY_ROOT && nice -n 19 python -B I_fitting_a2ii/run_test_i.py --full --workers 8 --scratch /tmp/nagainis_halfdome_testI --cleanup-scratch   (through cluster_tests.py run I --workers 8 --rss-stop 16 --driver-args=\"--scratch /tmp/nagainis_halfdome_testI --cleanup-scratch\"); run 2 (supplement): cluster_tests.py run I --workers 8 --rss-stop 32 --driver-args=\"--stages suppbasis,supp --scratch /tmp/nagainis_halfdome_testI\" (no cleanup); run 3 (per-halo resolution rule on its own shells): cluster_tests.py run I --workers 8 --rss-stop 16 --driver-args=\"--stages phfits,pheval --scratch /tmp/nagainis_halfdome_testI\" (no cleanup)",
+ "scratch": "run 1: /tmp/nagainis_halfdome_testI held a hard link of Test H's basis_HA.npz; run 1's driver (attempts/run1_20261014/run_test_i.py) deleted /tmp/nagainis_halfdome_testH and /tmp/nagainis_halfdome_testI at its end (--cleanup-scratch; recorded in results/run_manifest.json scratch_removed) - Test H's scratch should not have been deleted.  The current driver deletes only Test I's own scratch and only with --cleanup-scratch.  run 2: i_supp suppbasis rebuilt basis_HA.npz into /tmp/nagainis_halfdome_testI/f_base_work (left in place for re-use; delete when the study is closed)",
+ "STUDY_ROOT_on_maas": "/home/nagainis/HalfDome_runtime/overlap_covariance_tests/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012",
+ "smoke_command": "cd $STUDY_ROOT/I_fitting_a2ii && I_PDF_LIMIT=16 python -B run_test_i.py --smoke",
+ "stages": "fits35, finefits, ladder, lvariants, evaluate (default all, in order; each in its own process); supplement stages suppbasis, supp (i_supp.py; run 2) and phfits, pheval (i_perhalo.py; run 3), only when named; inputs/i0_perhalo_x200.npz is made locally by i_perhalo_inputs.py",
+ "exit_status": "0 = completed; 1 = a stage failed (log tail in results/run_manifest.json)",
+ "code_to_deploy": [
+  "I_fitting_a2ii/i_common.py",
+  "I_fitting_a2ii/i_g35.py",
+  "I_fitting_a2ii/i_fine.py",
+  "I_fitting_a2ii/i_supp.py",
+  "I_fitting_a2ii/i_perhalo.py",
+  "I_fitting_a2ii/run_test_i.py",
+  "I_fitting_a2ii/write_cluster_run.py"
+ ],
+ "reads_modules_read_only": "F_observables/f_*.py, G_physical_outer/g_*.py (g_common, g_selection, g_physics, g_models, g_pdf), H_sensitivity/h_*.py (h_common, h_fits, h_pdf, h_params, h_truth, h_basis), analysis/*, kernels/engine.py - configured through environment variables; nothing is written outside I_fitting_a2ii/results and the scratch directory",
+ "inputs_local_files": [
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/I_fitting_a2ii/inputs/i0_variants.npz",
+   "bytes": 110823,
+   "sha256": "35118969d80c4ec8da698fc4e2b1081521c994b3351459e5923a61dbe61c9ad4"
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/I_fitting_a2ii/inputs/i0_variants.json",
+   "bytes": 4448,
+   "sha256": "845e6e3f68821b31d36fecc05118aa90200ccd9a55e44ec16705f90f3e3827f1"
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/I_fitting_a2ii/inputs/i0_perhalo_x200.npz",
+   "bytes": 34444,
+   "sha256": "aa89b0ada48a7542b5b5835c4ea8deb2c37f013d81658a0f37afeb6fc9a1d089"
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/I_fitting_a2ii/inputs/i0_perhalo_x200.json",
+   "bytes": 3376,
+   "sha256": "19fc18589d08a016714ab8e769078ce3c79cd581c5d94bdd964c6a22c5a773c0"
+  }
+ ],
+ "inputs_read_on_maas": {
+  "Test G 35-shell per-halo profiles (A2-ii and all gas)": "G_physical_outer/results/f_base/profiles.npz",
+  "Test G prepare products (ebar, kappa_P)": "G_physical_outer/results/prepare.npz",
+  "Test B halo table (SOAP concentration_200c for the c-split cells)": "B_covariance/results/halo_table.npz",
+  "Test G linear bias / xi table": "G_physical_outer/inputs/xi_bias_z0.npz",
+  "Test H fine per-halo profiles": "H_sensitivity/results/work/g/f_base/profiles.npz",
+  "Test H fine A2-ii basis (run 1: Test H's scratch, hard-linked into Test I's scratch; run 2: rebuilt by i_supp suppbasis with Test H's code into Test I's scratch)": "/tmp/nagainis_halfdome_testH/f_base_work/basis_HA.npz (run 1); /tmp/nagainis_halfdome_testI/f_base_work/basis_HA.npz (runs 2 and 3; run 3 re-uses run 2's rebuild)",
+  "Test H truth": "H_sensitivity/results/truth.npz, H_sensitivity/results/truth_summary.json",
+  "Test H A2-ii importance maps": "H_sensitivity/results/sens.npz",
+  "Test H DM-PDF fallback slot": "H_sensitivity/results/work/pdf_fallback_h.npz"
+ },
+ "test_H_basis_HA_sha256": "3a7c7f4cae9b483aa949fc1ecd263b390835127f9926121edb9057f83e7a9f1b",
+ "maas_runs": [
+  {
+   "attempt": 1,
+   "workers": 8,
+   "rss_stop_GiB": 16,
+   "nice": 19,
+   "launched": "2026-10-14 17:14 EEST",
+   "wrapper_pid": 3348556,
+   "stages": "all (fits35, finefits, ladder, lvariants, evaluate)",
+   "driver_args": "--scratch /tmp/nagainis_halfdome_testI --cleanup-scratch",
+   "load_at_launch": "24.0 / 24.2 / 26.2 (1/5/15 min) on 48 cores; 178.9 GiB available",
+   "test_H_status_at_launch": "test_H done (returncode 0, wall 3381 s, peak tree RSS 5.97 GiB) at 16:27 EEST",
+   "deployment": "the full cluster_tests.py mirror timed out after 15 min (local timeout 900 s, terminated before the remote extraction step); Test I files (i_*.py, run_test_i.py, write_cluster_run.py, CLUSTER_RUN.json, i_inputs.py, inputs/i0_variants.npz/json) were uploaded individually with SHA256 verification on maas (scratchpad upload_i.py, same remote_control transport); F/G/H modules are the versions already in the runtime tree (those Test G and H ran)",
+   "scratch_cleanup": "run 1's driver deleted BOTH /tmp/nagainis_halfdome_testH and /tmp/nagainis_halfdome_testI at 2026-10-14T14:39:51Z (results/run_manifest.json invocations[0].scratch_removed = ['/tmp/nagainis_halfdome_testH', '/tmp/nagainis_halfdome_testI']); deleting Test H's scratch was not allowed (coordinator note); the driver was changed to delete only Test I's own scratch (attempts/run1_20261014/ keeps run 1's driver); the coordinator was told at 20:22 EEST",
+   "outcome": "completed 2026-10-14 17:39:51 EEST: returncode 0, wall 1538 s, peak tree RSS 2.82 GiB, min machine available 176.6 GiB; stage walls (s): fits35 10, finefits 3, ladder 224, lvariants 28, evaluate 1272; fetched 20:22 EEST (cluster_tests.py fetch I, 15 files, 3.79 MiB, SHA256 checked; results/SHA256SUMS OK). I1 objective L could not be painted (no L fit in bins 15.1-15.3 / 15.3-15.5: N <= p + 2) -> run 2.",
+   "archived": "I_fitting_a2ii/attempts/run1_20261014/ (driver, write_cluster_run.py, CLUSTER_RUN.json, STATE.txt, poll log, done/receipt/log of run 1, code hashes)"
+  },
+  {
+   "attempt": 2,
+   "kind": "supplement",
+   "workers": 8,
+   "rss_stop_GiB": 32,
+   "nice": 19,
+   "launched": "2026-10-14 20:31:15 EEST",
+   "wrapper_pid": 3390680,
+   "stages": "suppbasis, supp (i_supp.py)",
+   "driver_args": "--stages suppbasis,supp --scratch /tmp/nagainis_halfdome_testI",
+   "load_at_launch": "[24.1, 24.04, 24.0] on 48 cores; 178.6 GiB available",
+   "deployment": "i_supp.py and run_test_i.py uploaded individually with SHA256 verification (scratchpad upload_i.py); i_common.py, i_g35.py, i_fine.py verified unchanged on maas",
+   "why": "complete I1 objective (L) (bins without an L fit painted with the objective-(a) fit) and evaluate the ladder paintings at every R_cut; run 1 had deleted Test H's fine basis, so the A2-ii basis HA was rebuilt with Test H's code",
+   "basis_rebuild": {
+    "rebuilt": true,
+    "bytes": 737228025,
+    "sha256_file": "2e1d041d7d1a5fc98d71377e8902e6197359c126cb9a6c1ca54c03e5fb702c17",
+    "parity_truthmean_a2ii_max_rel": 0.0,
+    "parity_truthmean_a2ii_n": 63,
+    "path": "/home/nagainis/HalfDome_runtime/overlap_covariance_tests/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/I_fitting_a2ii/results/work/h_supp/work/g/f_base/work/basis_HA.npz"
+   },
+   "basis_build_wall_s": 288.2281002663076,
+   "basis_build_peak_parent_GiB": 4.3325653076171875,
+   "outcome": "returncode 0, wall 702 s, peak tree RSS 6.82 GiB, min machine available 170.5 GiB; stage walls (s): suppbasis 298, supp 403; fetched with cluster_tests.py fetch I (SHA256 checked)",
+   "scratch_left": "/tmp/nagainis_halfdome_testI/f_base_work/basis_HA.npz (rebuilt A2-ii fine basis, ~0.8 GB) left on maas for re-use; Test H's /tmp/nagainis_halfdome_testH no longer exists (deleted by run 1)"
+  },
+  {
+   "attempt": 3,
+   "kind": "supplement (per-halo resolution rule on its own resolved shells)",
+   "workers": 8,
+   "rss_stop_GiB": 16,
+   "nice": 19,
+   "launched": "2026-10-14 21:53:22 EEST",
+   "wrapper_pid": 3411489,
+   "stages": "phfits, pheval (i_perhalo.py)",
+   "driver_args": "--stages phfits,pheval --scratch /tmp/nagainis_halfdome_testI",
+   "load_at_launch": "[24.15, 24.05, 24.05] on 48 cores; 178.5 GiB available",
+   "deployment": "i_perhalo.py, i_perhalo_inputs.py, run_test_i.py, write_cluster_run.py, CLUSTER_RUN.json, inputs/i0_perhalo_x200.npz/json uploaded individually with SHA256 verification (scratchpad upload_i.py); i_common.py, i_g35.py, i_fine.py, i_supp.py, inputs/i0_variants.npz/json verified unchanged on maas; local smoke test (--smoke, I_PDF_LIMIT=4) passed before launch",
+   "why": "independent verification 2: runs 1-2 fitted the per-halo variant on the strict shells, where its stack equals A2-ii, so it reproduced the reference by construction; run 3 fits it on its own resolved shells and paints its fine stack",
+   "basis": "re-used run 2's rebuilt A2-ii basis /tmp/nagainis_halfdome_testI/f_base_work/basis_HA.npz (sha256 2e1d041d..., results/perhalo/basis_check.json); A2-ii stack painted det reproduces Test H's truth mean to 0.0",
+   "outcome": "completed 2026-10-14 21:55:16 EEST: returncode 0, wall 110 s, peak tree RSS 2.39 GiB, min machine available 177.0 GiB; stage walls (s): phfits 6, pheval 104; parity: strict-mask refits = run 1 to 0.0, six run-1 painting rows reproduced to 0.0; fetched with cluster_tests.py fetch I (28 files, SHA256 checked); run-2 job records archived in attempts/run2_20261014/",
+   "scratch_left": "/tmp/nagainis_halfdome_testI (0.74 GB) still on maas; delete when the study is closed"
+  }
+ ]
+}

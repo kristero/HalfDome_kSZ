@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N robust_merlin
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=48gb
+#PBS -l walltime=23:59:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+: "${RUN_ROOT:?}"
+cd "$RUN_ROOT"
+export PYTHONUNBUFFERED=1 MPLBACKEND=Agg
+export OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=26 MKL_NUM_THREADS=26
+exec > "logs/merlin_checks_${PBS_JOBID%%.*}.log" 2>&1
+/usr/bin/time -v -o "logs/resources_merlin_checks_${PBS_JOBID%%.*}.txt" \
+ /home/kristero10/envs/sbi27/bin/python code/merlin_checks.py screen --root "$RUN_ROOT" --threads=26

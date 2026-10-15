@@ -1,0 +1,495 @@
+<section id="xgpaint" class="topic">
+<h2>Appendix: XGPaint edits</h2>
+
+<div class="lede">This appendix is the reference for what was changed in XGPaint, the Julia halo-painting package behind every tSZ, kSZ and halo-DM product in this project. It lists each commit of the kristero/XGPaint.jl fork on top of WebSky-CITA 29ec48a, shows the code before and after, says why it was changed, which products depend on it and by how much it moves the numbers, measured where possible. It then lists the XGPaint behaviours that were not changed in XGPaint but are handled in project code, so that a reader can tell a library edit from a project-side wrapper.</div>
+
+<h3>1. What XGPaint does, and where the fork sits</h3>
+
+<p>XGPaint (WebSky-CITA, Zack Li et al.) paints extragalactic foregrounds onto sky maps. For halo profiles the chain is always the same. A profile type (for example <code>Battaglia16ThermalSZProfile</code> or <code>BattagliaTauProfile</code>) returns, for a halo of mass M<sub>200c</sub> at redshift z, the line-of-sight (LOS) integral of a 3-D profile at an angle θ from the halo centre. <code>profile_grid</code> tabulates that function on a grid in (log θ, z, log<sub>10</sub>M); <code>build_interpolator</code> fits a cubic B-spline to the logarithm of the table (a <code>LogInterpolatorProfile</code>); the painter loops over halos and adds the interpolated value to every pixel closer than θ<sub>max</sub> to the halo, by default 4 θ<sub>200c</sub>. Here M<sub>200c</sub> and R<sub>200c</sub> are the mass and radius of the sphere whose mean density is 200 times the critical density ρ<sub>crit</sub>(z), θ<sub>200c</sub> = atan(R<sub>200c</sub>/d<sub>A</sub>) is its angular radius at angular-diameter distance d<sub>A</sub>, and x = r/R<sub>200c</sub> is the radius in units of R<sub>200c</sub>.</p>
+
+<p>Both profiles used here are generalized NFW (gNFW) shapes, a double power law with an inner slope γ, a core radius x<sub>c</sub>, a transition sharpness α and an outer slope. Battaglia et al. (2012, "B12") fit the thermal pressure; Battaglia (2016, "B16", the "AGN" fit) fits the gas density. Lee et al. (2022, "Lee22") fit electron density and pressure profiles of the same gNFW form to halos of the IllustrisTNG (TNG) hydrodynamical simulation; the project paints them through XGPaint with wrappers (Section 4.5). The electron pressure gives the Compton parameter y of the thermal Sunyaev-Zel'dovich (tSZ) effect, the electron column gives the Thomson optical depth τ of the kinetic SZ (kSZ) effect and the dispersion measure (DM) of a fast radio burst (FRB):</p>
+
+<div class="eq">gNFW shape: f(x) = (x/x<sub>c</sub>)<sup>γ</sup> [1 + (x/x<sub>c</sub>)<sup>α</sup>]<sup>−β′</sup> &nbsp;&nbsp;(β′ = the outer exponent as printed by Battaglia et al. 2012 and Lee22; for B16 the correct exponent is −(β+γ)/α, Section 4.3)<br>
+y(θ) = (σ<sub>T</sub>/m<sub>e</sub>c<sup>2</sup>) ∫ P<sub>e</sub> dl,&nbsp;&nbsp; τ(θ) = σ<sub>T</sub> ∫ n<sub>e</sub> dl,&nbsp;&nbsp; DM(θ) = ∫ n<sub>e</sub> dl / (1+z) &nbsp;&nbsp;(n<sub>e</sub>, P<sub>e</sub> and dl physical)<br>
+ne2d = ∫ n<sub>e</sub> dl (XGPaint's projected electron column),&nbsp;&nbsp; n<sub>e</sub> = ρ<sub>gas</sub>/m<sub>per e</sub>,&nbsp;&nbsp; m<sub>per e</sub> = m<sub>e</sub> + 2m<sub>p</sub>/(1+X<sub>H</sub>) = 1.1369 m<sub>p</sub></div>
+
+<p>Here σ<sub>T</sub> is the Thomson cross-section, m<sub>e</sub>c<sup>2</sup> the electron rest energy and m<sub>p</sub> the proton mass. X<sub>H</sub> = 0.76 is the hydrogen mass fraction, so m<sub>per e</sub> is the gas mass per free electron of fully ionized hydrogen and helium, and f<sub>b</sub> = Ω<sub>b</sub>/Ω<sub>m</sub> is the cosmic baryon fraction (0.158 for the cosmology of the FRB, Lee22 and tSZ painters, Ω<sub>b</sub> = 0.049, Ω<sub>c</sub> = 0.261, h = 0.68; 0.1573 for the HalfDome lightcone cosmology Ω<sub>b</sub> = 0.0486, Ω<sub>c</sub> = 0.2603, h = 0.6774 used by the kSZ maps of Figures 6.3 and 6.8). XGPaint integrates every LOS to 10<sup>5</sup> R<sub>200c</sub>, so the painted signal is a projection of the whole profile, cut only on the sky at θ<sub>max</sub>. The project calls this "projected" truncation, in contrast with the "spherical" (chord-limited) truncation of Section 4.4.</p>
+
+<figure class="fig"><img src="fig/6_xgpaint/01_fork_lineage.png" alt="Commit graph of the kristero/XGPaint.jl fork: upstream 29ec48a, the adrianbayer branch, fork main and fork cluster, with the two broken windows marked" loading="lazy"><figcaption><strong>Figure 6.1</strong> Every commit of the fork that leads to the validated tree, plus the test-only 1660e08 after it, one column per commit in commit order, with the branch it was made on (the figure title's "every fork commit" means these). Not drawn: the unmerged local branch <code>adrian</code> (71bc3fd, Section 3.6) and the older <code>sigmoid</code>/<code>physical_units</code> branch (5b3f516, 9bacc80, c6bf8e1, built on upstream's <code>sigmoid</code> branch rather than on 29ec48a); neither is an ancestor of the validated tree. Red bands mark the two broken states: b924ab1 to e67a8a1, when the Battaglia12 pressure exponent had the wrong sign, and 5dd0b57 to 07fc686, when the cluster branch did not parse. The validated tree 3b57cac is reached twice, by ce1d239 on main and by 35f79ad on cluster. <span class="src">source: scripts/xgpaint/make_figures.py (fig_lineage), data from git log in /home/kn18001/.julia/dev/XGPaint</span></figcaption></figure>
+
+<p>The dev checkout <code>/home/kn18001/.julia/dev/XGPaint</code> is on branch <code>cluster</code> at 1660e08, clean and in sync with <code>origin/cluster</code>. The last upstream commits it contains are 29ec48a and c609849 (2025-08-30). Two facts organise everything below. First, the source tree of 35f79ad is byte-identical to that of ce1d239 (both have git tree hash 3b57cacb…, a checksum over every file of the commit; <code>git diff ce1d239 35f79ad</code> is empty), and 1660e08 adds only tests. So the fork has exactly one validated source state, and the tag <code>validated-tsz256-20260922</code> points to it. Second, the net difference from upstream is confined to six source files: <code>XGPaint.jl</code> (one include, exports), <code>model.jl</code> (two additions), <code>profiles.jl</code>, <code>profiles_y.jl</code>, <code>profiles_tau.jl</code> and the new <code>profiles_frb.jl</code> (570 source lines added and 95 removed, plus 19 lines of tests). The shared helpers (<code>ρ_crit</code>, <code>R_Δ</code>, <code>angular_size</code>, the HEALPix workspace that finds the pixels of a disc on the equal-area HEALPix sphere pixelization, and <code>util.jl</code>) are untouched, which is what makes the like-for-like measurements in Section 3 possible.</p>
+
+<p class="path">Fork excerpts below are quoted from <code>SBI_analysis/so_32k_independent_noise/vendor/XGPaint/src/</code>, a git-tracked copy whose 15 source files are byte-identical to 35f79ad (checked with <code>git hash-object</code>). Upstream excerpts are quoted from <code>julia_env/dev/XGPaint.jl/src/</code>, whose <code>profiles_tau.jl</code>, <code>profiles_y.jl</code> and <code>model.jl</code> are identical to 29ec48a after stripping CRLF line endings.</p>
+
+<h3>2. Which XGPaint each pipeline ran</h3>
+
+<p>Julia resolves a package through the active environment's <code>Manifest.toml</code>, which either names a path (a "developed" checkout whose current files are loaded) or a git tree hash (an immutable snapshot). The table lists every manifest and copy found in the repository, compared file by file against the fork commits. "tSZ 64k dataset" below means the set of simulated Compton-y maps with sampled B12 coefficients on which the 64k SBI analysis of this report is trained.</p>
+
+<table class="data">
+<thead><tr><th>copy or manifest entry</th><th>what it is</th><th>source state</th><th>used by</th></tr></thead>
+<tbody>
+<tr><td><code>/home/kn18001/.julia/dev/XGPaint</code></td><td>dev checkout, resolved by the default environment <code>~/.julia/environments/v1.12</code></td><td>1660e08 (src = 35f79ad = ce1d239)</td><td>all local runs: Lee22 tSZ and DM products, FRB ray histograms run locally, truncation comparison (2026-09-17), y × DM cross-spectra, audits</td></tr>
+<tr><td>tag <code>validated-tsz256-20260922</code></td><td>pinned by git tree 3b57cac in <code>tSZ_64k_flat_prior_SO_baseline_deproj0/julia_env</code> and <code>SBI_analysis/tsz_local_profile_tests/julia_env</code></td><td>35f79ad, tree = ce1d239</td><td>tSZ 64k dataset (bundle tag tsz64k-flat-prior-v1), its idark reproduction test, the notebook kernel</td></tr>
+<tr><td>idark <code>/lustre/work/kristero10/flamingo_tsz_comparison_20260914/runtime/XGPaint</code></td><td>path in <code>SBI_analysis/flamingo_tsz/runtime_env</code>; Julia 1.12.2 runtime</td><td>tree = ce1d239 per the tag message; "same XGPaint 35f79ad" per <code>run_ksz_websky_idark.pbs</code> l.17</td><td>256-row accelerated tSZ test, tSZ comparison with the FLAMINGO hydrodynamical simulations, kSZ WebSky-recipe paint since 2026-10-05</td></tr>
+<tr><td>idark <code>/home/kristero10/XGPaint/XGPaint.jl</code></td><td>path in <code>julia_env/Manifest.toml</code> (cluster environment, Julia 1.6.2)</td><td>35f79ad per project notes; <code>src/XGPaint.jl</code> sha256 aadae01f… recorded on 2026-09-14 matches e67a8a1 and later</td><td>idark FRB, Lee22-corrected and kSZ jobs run with Julia 1.6</td></tr>
+<tr><td><code>SBI_analysis/so_32k_independent_noise/vendor/XGPaint</code></td><td>vendored snapshot, git-tracked</td><td>15/15 files = 35f79ad</td><td>the SO 32k independent-noise simulator package</td></tr>
+<tr><td><code>fnl_comparison/pair_100_120/pipeline_snapshot/XGPaint</code></td><td>vendored snapshot, untracked</td><td>15/15 files = 35f79ad</td><td>f<sub>NL</sub> (primordial non-Gaussianity) pair comparison (its manifest points at the idark copy of this snapshot)</td></tr>
+<tr><td><code>julia_env/dev/XGPaint.jl</code></td><td>untracked copy with CRLF line endings</td><td>upstream 1902953 (v0.4) with a locally edited <code>util.jl</code>; no fork edit, no <code>profiles_frb.jl</code></td><td>no manifest points to it; stale</td></tr>
+<tr><td><code>frb_map_generation/profiles.jl</code> (git-tracked, HalfDome commit 4894c57, 2026-07-07) and <code>./profiles.jl</code> (untracked, identical)</td><td>loose copy of XGPaint's <code>src/profiles.jl</code> only, CRLF, partly mis-encoded (137 lines with UTF-8 Greek letters read as Windows-1252, e.g. <code>sin_Î±</code>)</td><td>an intermediate working state before e67a8a1: its stage logging, threading and positivity floor, but no slice API and upstream's log θ<sub>min</sub> = −16.5; equal to no commit</td><td>included by no script; stale</td></tr>
+<tr><td><code>flamingo_pressure_calibration/cluster_results/metadata/reference_sources/profiles_y.jl</code></td><td>single reference file, untracked</td><td>= ce1d239/35f79ad <code>src/profiles_y.jl</code></td><td>reference copy stored with the FLAMINGO pressure-calibration metadata; not a package that Julia loads</td></tr>
+</tbody>
+</table>
+
+<aside class="note">The two idark copies could not be re-read for this appendix: <code>ssh.exe idark</code> timed out on 2026-10-07. Their state rests on the tag message, the PBS comment and commit 7f5b73a ("same XGPaint 35f79ad"), and on the one checksum recorded on idark (the 2026-09-14 operator probe hashes only <code>src/XGPaint.jl</code>, which proves a post-e67a8a1 state but not which later commit). The XGPaint audit of 2026-09-29 (workstream A of the Lee22 tSZ verification, "audit A" below) closed the same question for the local products by content rather than by commit: the stored Battaglia12 and Lee22 lookup tables equal today's code to 6.8×10<sup>-14</sup> and bit for bit, and three map patches repainted with today's code reproduce the stored maps to 4.4×10<sup>-16</sup> (<code>frb_map_generation/outputs/lee22_tsz_verification_20260929/A_xgpaint_audit/README.md</code>).</aside>
+
+<h3>3. The fork edits, one by one</h3>
+
+<h4>3.1 f16a7f3 (2026-02-09): a parametrized physical model</h4>
+
+<p>Upstream hard-codes the Battaglia fit coefficients inside <code>get_params</code>, so the only way to change a profile was to edit the package. The tSZ simulation-based inference needs the opposite: nine B12 coefficients drawn from a prior for every row of a dataset. f16a7f3 introduces a three-number container for a mass- and redshift-dependent power law and gives every Battaglia profile type fifteen keyword arguments (amplitude, mass slope and redshift slope for each of P<sub>0</sub>, x<sub>c</sub>, α, β, γ), with defaults equal to the published numbers.</p>
+
+<pre class="code" data-src="SBI_analysis/so_32k_independent_noise/vendor/XGPaint/src/model.jl:L8-L23"><code>"""
+    PowerLawParam(amp, alpha_m, alpha_z)
+
+Container for a redshift- and mass-dependent parameter of the form:
+
+```
+amp * m^alpha_m * (1 + z)^alpha_z
+```
+"""
+struct PowerLawParam{T}
+    amp::T
+    alpha_m::T
+    alpha_z::T
+end
+
+@inline powerlaw_value(p::PowerLawParam{T}, m, z1) where {T} = p.amp * m^p.alpha_m * z1^p.alpha_z</code></pre>
+<p class="code-note">Each parameter is p = amp · m<sup>α<sub>m</sub></sup> · (1+z)<sup>α<sub>z</sub></sup> with m = M<sub>200c</sub>/10<sup>14</sup> M<sub>☉</sub>. <code>get_params</code> now evaluates five of these instead of literals. Note that the argument is (1+z), passed as <code>z1</code>, exactly as in Battaglia's tables.</p>
+
+<aside class="xgpaint"><h4>XGPaint edit: f16a7f3, PowerLawParam</h4>
+<p><code>src/model.jl</code> l.8-23 (new); <code>src/profiles_y.jl</code> l.27-61 and l.73-98, <code>src/profiles_tau.jl</code> l.28-72 (constructors and <code>get_params</code>). Before: <code>P₀ = 18.1 * m^0.154 * z₁^-0.758</code> inside a generic <code>get_params(::AbstractGNFW{T}, …)</code>. After: <code>P₀ = powerlaw_value(model.P0, m, z₁)</code> inside <code>get_params(model::Battaglia16ThermalSZProfile{T}, …)</code>. Two side effects: the generic fallback is gone, so a new <code>AbstractGNFW</code> subtype must define its own <code>get_params</code> (the project's Lee22 wrappers do; the chord-mean wrapper of Section 4.4 instead calls its inner profile's <code>get_params</code> and overrides the slice functions), and <code>profile_grid</code>'s default log θ<sub>min</sub> moved from −16.5 to −15.7 while <code>build_interpolator</code> gained a <code>logM_max</code> keyword. Numbers: none at the default parameters (the defaults are the printed coefficients; <code>build_interpolator</code> passes an explicit θ range, so the default change never reaches a cache). Used by: the tSZ 64k dataset (<code>tSZ_visuals/model.jl</code> passes the nine sampled coefficients), every B12/B16 product through the defaults.</p></aside>
+
+<h4>3.2 Adrian Bayer's kSZ fix (9f37b1e, 077b849), merged in b924ab1 (2026-03-02)</h4>
+
+<p>Upstream's optical-depth code carried an admission in a comment: "need to sort this out, it's all in comoving...". Adrian Bayer's commit on the upstream <code>adrian</code> branch, titled "fixing ksz", sorted it out. It changes two things in <code>rho_2d</code>, the projected gas surface density from which <code>ne2d</code> and τ follow.</p>
+
+<pre class="code" data-src="julia_env/dev/XGPaint.jl/src/profiles_tau.jl:L68-L89"><code># returns a density, which we can check against Msun/Mpc² 
+function rho_2d(model::AbstractBattagliaTauProfile, r, m200c, z)
+    par = get_params(model, m200c, z)
+    r200c = R_Δ(model, m200c, z, 200)
+    X = r / object_size(model, r200c, z)  # either ang/ang or phys/phys
+    rho_crit = ρ_crit_comoving_h⁻²(model, z)  # need to sort this out, it's all in comoving...
+    result = par.P₀ * XGPaint._nfw_profile_los_quadrature(X, par.xc, par.α, par.β, par.γ)
+
+    return result * rho_crit * (r200c * (1+z))
+end
+
+function ne2d(model::AbstractBattagliaTauProfile, r, m200c, z)
+    me = constants.ElectronMass
+    mH = constants.ProtonMass
+    mHe = 4mH
+    xH = 0.76
+    nH_ne = 2xH / (xH + 1)
+    nHe_ne = (1 - xH)/(2 * (1 + xH))
+    factor = (me + nH_ne*mH + nHe_ne*mHe) / model.cosmo.h^2
+    result = rho_2d(model, r, m200c, z)  # (Msun/h) / (Mpc/h)^2
+    return result / factor
+end</code></pre>
+<p class="code-note">Upstream 29ec48a. The density is ρ<sub>crit</sub>(z)/(1+z)<sup>3</sup>/h<sup>2</sup> (a comoving density in h units) times R<sub>200c</sub>(1+z) (a comoving length); the h<sup>2</sup> cancels against the <code>/ model.cosmo.h^2</code> in <code>factor</code>. There is no f<sub>b</sub>.</p>
+
+<pre class="code" data-src="SBI_analysis/so_32k_independent_noise/vendor/XGPaint/src/profiles_tau.jl:L87-L113"><code># returns a density, which we can check against Msun/Mpc² 
+function rho_2d(model::AbstractBattagliaTauProfile, r, m200c, z)
+    par = get_params(model, m200c, z)
+    r200c = R_Δ(model, m200c, z, 200)   # this is physical units
+    X = r / object_size(model, r200c, z)  # either ang/ang or phys/phys
+    rho_crit = ρ_crit(model, z)   # this is physical units
+    rho_fit = par.P₀ * XGPaint._nfw_profile_los_quadrature(X, par.xc, par.α, par.β, par.γ)   # dimensionless _nfw_profile_los_quadrature comes from profiles_y.jl TODO move
+    return rho_fit * model.f_b * rho_crit * r200c # mistake in battaglia 2016: need f_b to convert from m to gas. note r200c due to integral over X
+end
+
+function ne2d(model::AbstractBattagliaTauProfile, r, m200c, z)
+    me = constants.ElectronMass
+    mH = constants.ProtonMass
+    mHe = 4mH
+    xH = 0.76
+    nH_ne = 2xH / (xH + 1)
+    nHe_ne = (1 - xH)/(2 * (1 + xH))
+    factor = (me + nH_ne*mH + nHe_ne*mHe)
+    result = rho_2d(model, r, m200c, z)  # (Msun) / (Mpc)^2
+    return 0.9 * result / factor
+end
+
+# r is either a physical or angular radius. unitful does not do little h, so physical radius 
+# is always in Mpc, and angular radius is always in radians.
+function compute_tau(model, r, m200c, z)
+    return constants.ThomsonCrossSection * ne2d(model, r, m200c, z) + 0  # ensure unitless
+end</code></pre>
+<p class="code-note">Fork 35f79ad. Physical ρ<sub>crit</sub>(z) times physical R<sub>200c</sub>, times f<sub>b</sub>; <code>factor</code> is the mass per electron without h; <code>ne2d</code> carries the 0.9 added later in e67a8a1 (Section 3.4). <code>compute_tau</code> is unchanged.</p>
+
+<p>The first change is units. A column density is ∫ n dl. If both density and path length are comoving, n<sub>com</sub> = n<sub>phys</sub>/(1+z)<sup>3</sup> and dl<sub>com</sub> = (1+z) dl<sub>phys</sub>, so the comoving column is the physical column divided by (1+z)<sup>2</sup>. The Thomson optical depth is σ<sub>T</sub> times the physical column, because σ<sub>T</sub> is a physical cross-section and every electron along the path scatters once. Upstream therefore returned τ too small by (1+z)<sup>2</sup>. The second change is f<sub>b</sub>. Battaglia (2016) prints its fit as ρ<sub>gas</sub> = ρ<sub>crit</sub> ρ<sub>fit</sub>; taken literally, with ρ<sub>0</sub> = 4000 at 10<sup>14</sup> M<sub>☉</sub>, that gas density is 1/f<sub>b</sub> too high, and the gas density needs the factor f<sub>b</sub>. The fork's comment says "mistake in battaglia 2016: need f_b to convert from m to gas". The project later confirmed this independently: Battaglia's own Fig. A1 is reproduced by its Table A1 only with ρ<sub>gas</sub> = f<sub>b</sub> ρ<sub>crit</sub> ρ<sub>fit</sub> (Lee22 calibration document, <code>frb_map_generation/lee22_tsz_corrected/doc/lee22_calibration.html</code> l.95).</p>
+
+<div class="eq">upstream: ne2d = P<sub>0</sub> I(X) ρ<sub>crit</sub>(z) R<sub>200c</sub> / [(1+z)<sup>2</sup> m<sub>per e</sub>]<br>
+fork:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ne2d = 0.9 P<sub>0</sub> I(X) f<sub>b</sub> ρ<sub>crit</sub>(z) R<sub>200c</sub> / m<sub>per e</sub><br>
+τ<sub>fork</sub> / τ<sub>upstream</sub> = 0.9 f<sub>b</sub> (1+z)<sup>2</sup>,&nbsp;&nbsp; I(X) = 2∫<sub>0</sub><sup>10<sup>5</sup></sup> f(√(l<sup>2</sup>+X<sup>2</sup>)) dl</div>
+
+<p>To measure rather than derive the ratio, the upstream functions that the fork changed were transcribed verbatim from <code>git show 29ec48a</code> into a module loaded next to the fork, sharing only the unchanged helpers, and both were evaluated for the same halo and angle (<code>scripts/xgpaint/measure_xgpaint_edits.jl</code>, 53 s). Over M<sub>200c</sub> = 10<sup>13</sup>-10<sup>15</sup> M<sub>☉</sub>, z = 0.01-3 and x = 0.1-3.5 the ratio equals 0.9 f<sub>b</sub>(1+z)<sup>2</sup> to the last printed digit (Figure 6.2). The fork's τ is 0.145 of upstream at z = 0.01, 0.320 at z = 0.5, 0.569 at z = 1, 1.28 at z = 2 and 2.28 at z = 3; the two agree only at z = 1.65. At each (M, z) the ratio is the same at all five radii to the ten printed digits, so the radial shape of τ is unchanged and the edit is a pure redshift-dependent rescaling.</p>
+
+<figure class="fig"><img src="fig/6_xgpaint/02_tau_fork_over_upstream.png" alt="Ratio of fork to upstream optical depth against redshift for three halo masses, following 0.9 f_b (1+z)^2" loading="lazy"><figcaption><strong>Figure 6.2</strong> Battaglia16 τ from the fork (35f79ad) divided by τ from upstream 29ec48a for the same halo and angle. Markers: measured at three masses and five radii each (they coincide); dashed: 0.9 f<sub>b</sub>(1+z)<sup>2</sup> read off the code diff (f<sub>b</sub> = 0.158). The y axis is logarithmic and spans 0.145 (z = 0.01) to 2.28 (z = 3); the horizontal line marks a ratio of 1. The same ratio applies to the FRB DM computed by the fork's <code>compute_DM</code> against the generator's fallback for an unmodified v0.4 install (<code>generate_halfdome_z1_dm_mass_windows.jl</code> l.80-107): at M = 10<sup>14</sup> M<sub>☉</sub> and x = 1 the fork gives 58.7 pc cm<sup>-3</sup> at z = 0.5 where the fallback would give 183.5. <span class="src">source: scripts/xgpaint/fork_vs_upstream_29ec48a.csv (measure_xgpaint_edits.jl), plot make_figures.py</span></figcaption></figure>
+
+<p>Whether f<sub>b</sub> belongs in the density was tested at the power-spectrum level on 2026-09-19, because one reading of Lee22's Fig. 5 suggested removing it. The full 85,224,251-halo lightcone was painted with and without f<sub>b</sub> in one pass (idark job 598208, HalfDome cosmology, f<sub>b</sub> = 0.0486/0.3089 = 0.1573). The "without" map was made by dividing each halo's contribution by f<sub>b</sub> inside the same loop, so its rms is 1/f<sub>b</sub> = 6.356 times larger and its power 6.356<sup>2</sup> = 40.40 times larger at every multipole (<code>truncation_comparison/spectra/binned_spectra_fb.csv</code>) by construction. The test is therefore not the ratio but which of the two absolute levels agrees with independent references. The references are CLASS-SZ (class_sz, the halo-model extension of the CLASS Boltzmann code), which gives a one-halo term (the signal of each halo with itself) and a two-halo term (correlations between different halos), and the WebSky halo curve of Stein et al. (2020). The kSZ power is quoted as D<sub>ℓ</sub> = ℓ(ℓ+1)C<sub>ℓ</sub>/2π, where C<sub>ℓ</sub> is the angular power spectrum at multipole ℓ. With f<sub>b</sub> the halo kSZ tracks CLASS-SZ's one-halo term below ℓ ≈ 2000 (Figure 6.3); at ℓ = 1000 it is 0.370 μK<sup>2</sup> against 0.429 μK<sup>2</sup> for CLASS-SZ one-halo plus two-halo. Without f<sub>b</sub> the map has 14.96 μK<sup>2</sup> at ℓ = 1000, excluded by CLASS-SZ and by the WebSky halo curve (0.199 μK<sup>2</sup>) alike.</p>
+
+<figure class="fig"><img src="fig/6_xgpaint/03_ksz_power_with_without_fb.png" alt="Halo kSZ power spectrum with and without f_b compared with CLASS-SZ and the WebSky halo curve" loading="lazy"><figcaption><strong>Figure 6.3</strong> Halo kSZ D<sub>ℓ</sub> of the HalfDome lightcone (Battaglia16 density, gas inside 4 R<sub>200c</sub>) with f<sub>b</sub> (production, the Adrian Bayer convention) and without it, against CLASS-SZ B16 (f<sub>free</sub> = 0.9, same truncation) and the digitized WebSky halo curve of Stein et al. (2020) Fig. 6. The remaining offset from the WebSky curve is decomposed in the kSZ analysis (<code>frb_map_generation/outputs/lee22_ksz_debug_20261002/synthesis/budget.txt</code>): WebSky's compensation (a uniform-density sphere subtracted from each halo), its mass and size cuts and 1.5 R<sub>200c</sub> truncation, its velocities from second-order Lagrangian perturbation theory (2LPT) instead of N-body velocities, and the 0.9 of Section 4.2. PDF beside the PNG. <span class="src">source: truncation_comparison/spectra/ksz_fb_websky_classsz_comparison.png; numbers truncation_comparison/KSZ_FB_WEBSKY_CLASSSZ_20260919.md</span></figcaption></figure>
+
+<aside class="xgpaint"><h4>XGPaint edit: 9f37b1e (adrianbayer), merged by b924ab1; b459728 superseded</h4>
+<p><code>src/profiles_tau.jl</code> l.87-107 (fork numbering). Before: <code>return result * rho_crit * (r200c * (1+z))</code> with <code>rho_crit = ρ_crit_comoving_h⁻²(model, z)</code> and <code>factor = (…)/model.cosmo.h^2</code>. After: <code>return rho_fit * model.f_b * rho_crit * r200c</code> with physical <code>ρ_crit(model, z)</code> and <code>factor = (me + nH_ne*mH + nHe_ne*mHe)</code>. The helpers <code>ρ_crit_comoving_h⁻²</code> and <code>r200c_comoving</code> were deleted from this file (the latter returns in e67a8a1, Section 3.4). Kristers' own b459728 had multiplied f<sub>b</sub> into <code>ne2d</code> in the old units on the same day; the merge b924ab1 kept Adrian's version (no f<sub>b</sub> in <code>ne2d</code>), so f<sub>b</sub> enters once. Numbers: τ and DM scale by f<sub>b</sub>(1+z)<sup>2</sup> (0.9 f<sub>b</sub>(1+z)<sup>2</sup> with e67a8a1), measured exact; each halo's kSZ contribution scales the same way, so a halo's kSZ power scales by the square. Used by: every B16 τ and DM product (kSZ maps, FRB ray histograms, DM maps, y × DM cross-spectra) and, through the shared <code>rho_2d</code>/<code>ne2d</code>, the Lee22 DM and τ wrappers (Section 4.5).</p></aside>
+
+<h4>3.3 The gNFW exponent convention, and the Battaglia12 sign bug of March-April 2026</h4>
+
+<p>The same Adrian commit also rewrote the exponent of the shared shape function. XGPaint uses one <code>generalized_nfw</code> for the B12 pressure and the B16 density, and each profile's <code>get_params</code> converts its printed β into whatever "β" that function expects. Upstream wrote the outer factor as [1+x̄<sup>α</sup>]<sup>(β−γ)/α</sup> and stored the B16 β with a minus sign; Adrian's version writes it as [1+x̄<sup>α</sup>]<sup>−(β+γ)/α</sup> with the B16 β positive, as printed (Battaglia's printed exponent is −(β−γ)/α, the second B16 typo; see Section 4.3).</p>
+
+<pre class="code" data-src="julia_env/dev/XGPaint.jl/src/profiles_y.jl:L32-L52"><code>function generalized_nfw(x, xc, α, β, γ)
+    x̄ = x / xc
+    return x̄^γ * (1 + x̄^α)^((β - γ) / α)
+end
+
+function _generalized_scaled_nfw(x̄, α, β, γ)
+    return x̄^γ * (1 + x̄^α)^((β - γ) / α)
+end
+
+
+function get_params(::AbstractGNFW{T}, M_200, z) where T
+	z₁ = z + 1
+	m = M_200 / (1e14M_sun)
+	P₀ = 18.1 * m^0.154 * z₁^-0.758
+	xc = 0.497 * m^-0.00865 * z₁^0.731
+	β = 4.35 * m^0.0393 * z₁^0.415
+	α = 1
+    γ = -0.3
+    β = γ - α * β  # Sigurd's conversion from Battaglia to standard NFW
+    return (xc=T(xc), α=T(α), β=T(β), γ=T(γ), P₀=T(P₀))
+end</code></pre>
+<p class="code-note">Upstream. With the B12 conversion β = γ − αβ<sub>B</sub> the exponent (β−γ)/α equals −β<sub>B</sub>, so the outer factor is [1+x̄]<sup>−β<sub>B</sub></sup> as in Battaglia et al. (2012). For B16 (<code>profiles_tau.jl</code>) upstream stores β = −3.83, and (β−γ)/α = −(3.83 − 0.2)/0.88, which is already the corrected −(β+γ)/α.</p>
+
+<pre class="code" data-src="SBI_analysis/so_32k_independent_noise/vendor/XGPaint/src/profiles_y.jl:L63-L86"><code>function generalized_nfw(x, xc, α, β, γ)
+    x̄ = x / xc
+    return x̄^γ * (1 + x̄^α)^(-(β + γ) / α)    # correction to battaglia 2016 tau.
+end
+
+function _generalized_scaled_nfw(x̄, α, β, γ)
+    return x̄^γ * (1 + x̄^α)^(-(β + γ) / α)
+end
+
+
+function get_params(model::Battaglia16ThermalSZProfile{T}, M_200, z) where T
+	z₁ = z + 1
+	m = M_200 / (1e14M_sun)
+	P₀ = powerlaw_value(model.P0, m, z₁)
+	xc = powerlaw_value(model.x_c, m, z₁)
+	α = powerlaw_value(model.alpha, m, z₁)
+	β_raw = powerlaw_value(model.beta, m, z₁)
+    γ = powerlaw_value(model.gamma, m, z₁)
+    # Battaglia parameterizes the outer factor as (1 + x^α)^(-β_raw), while
+    # generalized_nfw expects the asymptotic outer slope directly. Matching the
+    # large-radius behavior x^(γ - αβ_raw) = x^(-β) gives β = αβ_raw - γ.
+    β = α * β_raw - γ
+    return (xc=T(xc), α=T(α), β=T(β), γ=T(γ), P₀=T(P₀))
+end</code></pre>
+<p class="code-note">Fork. The exponent is −(β+γ)/α. To keep the B12 outer factor [1+x̄<sup>α</sup>]<sup>−β<sub>B</sub></sup>, the B12 conversion must be β = αβ<sub>B</sub> − γ, which is what the comment on l.81-83 derives. The same mapping, β<sub>XG</sub> = αβ′ − γ, is what the project's Lee22 wrappers pass (Section 4.5).</p>
+
+<p>The rewrite is a re-labelling only if every caller adapts. Adrian's commit adapted B16 (β = +3.83) but converted B12 with β = −γ − αβ<sub>B</sub>, which gives −(β+γ)/α = +β<sub>B</sub>: a pressure that grows as (1+x̄)<sup>+4.35</sup> at large radius. The merge b924ab1 brought this into the fork's main branch on 2026-03-02, and e67a8a1 fixed it on 2026-04-30. With an integrand rising like x<sup>4</sup> out to 10<sup>5</sup> R<sub>200c</sub> the LOS integral is meaningless: measured against the correct profile it is 1.7×10<sup>25</sup> to 2.7×10<sup>44</sup> times larger over 10<sup>13</sup>-10<sup>15</sup> M<sub>☉</sub>, z = 0.1-2, x = 0.1-3.5 (<code>scripts/xgpaint/b924ab1_los_ratio.csv</code>; the Lee22 document quotes 10<sup>29</sup>-10<sup>40</sup> for its grid). Figure 6.4 shows the 3-D shapes. After the fix, the fork's B12 and B16 shapes are identical to upstream's to the printed precision of the measurement files (ten to twelve digits; maximum |ratio − 1| = 0 in 3-D in <code>shape_functions_m1e14_z0p5.csv</code> and in projection in <code>fork_vs_upstream_29ec48a.csv</code>).</p>
+
+<figure class="fig"><img src="fig/6_xgpaint/04_b12_sign_bug_shape.png" alt="Battaglia12 3-D pressure shape for upstream, the fork after e67a8a1, and the divergent b924ab1 state" loading="lazy"><figcaption><strong>Figure 6.4</strong> The B12 3-D shape at 10<sup>14</sup> M<sub>☉</sub>, z = 0.5 under the three conventions. Upstream (thick) and the fork after e67a8a1 (dashed) coincide; the b924ab1 state (red) rises without bound. <span class="src">source: scripts/xgpaint/shape_functions_m1e14_z0p5.csv (measure_xgpaint_edits.jl), plot make_figures.py</span></figcaption></figure>
+
+<aside class="xgpaint"><h4>XGPaint edit: exponent convention (9f37b1e) and the B12 sign (b924ab1 → e67a8a1)</h4>
+<p><code>src/profiles_y.jl</code> l.63-70 and l.84 (fork numbering). Before (upstream): <code>x̄^γ * (1 + x̄^α)^((β - γ) / α)</code>, B12 <code>β = γ - α * β</code>, B16 <code>β = -3.83 …</code>. In b924ab1: exponent <code>-(β + γ) / α</code>, B12 <code>β = -γ - α * β_raw</code> (wrong), B16 <code>beta_amp = 3.83</code>. After e67a8a1: B12 <code>β = α * β_raw - γ</code>. Numbers: zero net change against upstream for B12 and B16 (measured identical); 10<sup>25</sup>-10<sup>44</sup> in y during the bug window. In none of the products traced here: the production B12 table (<code>cached_tSZ_HalfDome_cosmo_base_cosmo_fid.jld2</code>, written 2026-04-29 16:08 +0300, about 17 hours before e67a8a1 was committed) stores its angle axis under the key <code>prof_logthetas</code>, the name e67a8a1 introduced (upstream, b924ab1 and the loose intermediate <code>profiles.jl</code> of Section 2 all write <code>prof_logθs</code>), so it was built by a working tree that already contained e67a8a1's changes, and it equals the correct-sign profile to 6.8×10<sup>-14</sup>; the precompile caches compiled from 2026-09-02 on all record the HEAD source (audit A README; precompile caches are explained in Section 3.6); the tSZ 64k dataset pins the validated tree, and the idark copy hashed on 2026-09-14 is post-e67a8a1. A B12 table built from the b924ab1 code (from 2026-03-02 until the sign was fixed in the working tree, at the latest on 2026-04-29) would carry the bug; the evidence above covers the tables behind the products discussed in this report, not every table ever built in that window. Used by: every B12 y product including the tSZ 64k dataset, every B16 product, and the Lee22 wrappers' β mapping.</p></aside>
+
+<h4>3.4 e67a8a1 (2026-04-30): the 0.9, the FRB profile, profile slices, threaded tables and a positivity floor</h4>
+
+<p>This is the largest fork commit ("FRB + tSZ adapted for cluster testing/parallelizing", 448 lines added). Besides the B12 sign fix it does six things.</p>
+
+<p><strong>(a) A factor 0.9 in <code>ne2d</code>.</strong> <code>return 0.9 * result / factor</code> (fork <code>profiles_tau.jl</code> l.106). It acts as a free-electron fraction f<sub>free</sub> = 0.9 applied on top of full ionization; the commit does not say what it is meant to represent or where it comes from. It lowers every B16 τ and DM by 10 % and the kSZ power by 19 %. CLASS-SZ has a parameter of the same meaning (<code>f_free</code>, default 1.0), which the project sets to 0.9 in its comparisons to mirror XGPaint; with that setting the two B16 gas densities agree to 0.4 % and the electron conversions differ by 0.3 % in τ (Section 4.2). With the 0.9, XGPaint's electron density is n<sub>e</sub> = 0.9 ρ<sub>gas</sub>/m<sub>per e</sub> = 0.7916 ρ<sub>gas</sub>/m<sub>p</sub>, against WebSky's (1 − Y<sub>p</sub>/2) ρ<sub>gas</sub>/m<sub>p</sub> = 0.88 ρ<sub>gas</sub>/m<sub>p</sub> (Y<sub>p</sub> = 0.24, the helium mass fraction, with full ionization and no 0.9); that difference alone is a factor 0.809 in the kSZ power budget against the WebSky halo curve (<code>frb_map_generation/outputs/lee22_ksz_debug_20261002/synthesis/budget.txt</code>).</p>
+
+<p><strong>(b) <code>profiles_frb.jl</code>, the FRB DM profile.</strong> An <code>AbstractFRBProfile</code> is a τ profile whose evaluation returns the observed DM instead of τ. It reuses <code>rho_2d</code> and <code>ne2d</code> unchanged, so it inherits f<sub>b</sub>, the physical column and the 0.9.</p>
+
+<pre class="code" data-src="SBI_analysis/so_32k_independent_noise/vendor/XGPaint/src/profiles_frb.jl:L47-L60"><code>"""
+    compute_DM(model, r, M_200c, z)
+
+Compute the observed halo DM contribution in `pc/cm^3` directly from the
+projected electron column density.
+"""
+function compute_DM(model::AbstractFRBProfile{T}, r, M_200c, z) where T
+    electron_column = ustrip(u"m^-2", ne2d(model, r, M_200c, z))
+    return T(electron_column * M2_TO_PC_CM3 / (one(z) + z))
+end
+
+# direct evaluation follows the rest of the profile API: mass is in Msun and
+# the returned value is a plain number in pc/cm^3
+(model::AbstractFRBProfile)(r, M_200c, z) = compute_DM(model, r, M_200c * M_sun, z)</code></pre>
+<p class="code-note">DM = ne2d/(1+z), converted from m<sup>-2</sup> to pc cm<sup>-3</sup>. The 1/(1+z) is the cosmological factor of the observed DM: the dispersion delay accrued at the halo scales as 1/ν<sup>2</sup> with ν there (1+z) times the observed frequency, and the delay is then stretched by (1+z) on the way to the observer, a net 1/(1+z). The constant <code>M2_TO_PC_CM3</code> on l.3 is the subject of 71646e2 (Section 3.5).</p>
+
+<p><strong>(c) <code>r200c_comoving</code> moved to <code>model.jl</code></strong> and exported, now written as R<sub>Δ</sub>(M, z, 200) × (1+z). Measured against upstream's deleted formula it agrees to 2.2×10<sup>-16</sup>.</p>
+
+<p><strong>(d) Profile slices.</strong> <code>profile_grid</code> used to call <code>model(θ, M, z)</code> for every grid node, recomputing the mass- and redshift-dependent parameters, R<sub>200c</sub> and the amplitude 512 times per (M, z). e67a8a1 splits this into <code>prepare_profile_slice</code> (once per (M, z)) and <code>evaluate_profile_slice</code> (per θ), with generic fallbacks that call the model as before.</p>
+
+<pre class="code" data-src="SBI_analysis/so_32k_independent_noise/vendor/XGPaint/src/profiles.jl:L56-L77"><code>@inline prepare_profile_slice(model, mass, redshift) = nothing
+
+@inline evaluate_profile_slice(model, prepared, theta, mass, redshift) = model(theta, mass, redshift)
+
+function fill_profile_slice!(dest, model::AbstractGNFW{T}, logthetas, mass, redshift) where T
+    prepared = prepare_profile_slice(model, mass, redshift)
+    @inbounds for itheta in eachindex(logthetas)
+        theta = exp(logthetas[itheta])
+        dest[itheta] = max(zero(T), evaluate_profile_slice(model, prepared, theta, mass, redshift))
+    end
+    return nothing
+end
+
+
+function profile_grid(model::AbstractGNFW{T}; N_z=256, N_logM=128, N_logtheta=256, z_min=1e-3,
+        z_max=5.0, logM_min=12, logM_max=15.7, logtheta_min=-15.7, logtheta_max=2.5) where T
+
+    logthetas = LinRange(logtheta_min, logtheta_max, N_logtheta)
+    redshifts = LinRange(z_min, z_max, N_z)
+    logMs = LinRange(logM_min, logM_max, N_logM)
+    return profile_grid(model, logthetas, redshifts, logMs)
+end</code></pre>
+<p class="code-note"><code>fill_profile_slice!</code> fills one θ column for one (M, z). It is the function the project later reuses to build exact per-halo tables at low z (Section 4.1), and the hook through which the chord-mean wrapper and the Lee22 tSZ wrapper plug into XGPaint's table builder. The keyword defaults shown are the ones after ce1d239 (Section 3.5), and the z grid on l.74 is the one behind the low-z error of Section 4.1.</p>
+
+<p><strong>(e) Threaded tables.</strong> The table loop runs over the flattened (z, M) index in up to 8 × <code>nthreads</code> chunks instead of one chunk of masses per thread, and the beam transform and negative-value cleanup are threaded over the same flattened (z, M) index (one chunk per thread). Each (M, z) column is independent, so the values do not change; only the order in which columns are filled does. <code>cleanup_negatives!</code> was also rewritten to handle columns that start with, or consist only of, non-positive entries, where upstream indexed out of bounds; where upstream ran, it gives the same values.</p>
+
+<p><strong>(f) A positivity floor and a finite check.</strong> <code>build_interpolator</code> takes the logarithm of the table. Upstream did this directly, so a single zero (an underflow far outside the halo, or a profile clipped at zero by <code>max(zero(T), …)</code>) would put −∞ into the spline. The fork now refuses non-finite tables and, unless <code>XGPAINT_CLEANUP_NONPOSITIVE=false</code>, replaces non-positive entries by 10<sup>-6</sup> times the smallest positive entry (<code>replace_nonpositive_with_floor!</code>, fork <code>profiles.jl</code> l.222-273). This touches only entries that were zero or negative; the project's FRB painters set the flag explicitly (<code>paint_halfdome_matched_profile_dm_map.jl</code> l.263), and the tSZ 64k engine bypasses <code>build_interpolator</code> altogether with its own absolute floor of 10<sup>-300</sup>.</p>
+
+<aside class="xgpaint"><h4>XGPaint edit: e67a8a1, six changes besides the B12 sign</h4>
+<p>(a) <code>src/profiles_tau.jl</code> l.106: before <code>return result / factor</code>, after <code>return 0.9 * result / factor</code>; τ and DM ×0.9, kSZ power ×0.81; undocumented origin. (b) <code>src/profiles_frb.jl</code> (new, 61 lines) and two exports in <code>src/XGPaint.jl</code>; <code>compute_DM</code> defines the observed DM; numerically it is <code>ne2d/(1+z)</code>, so all of the B16 DM normalization comes from 9f37b1e and (a). (c) <code>src/model.jl</code> l.94-101: <code>r200c_comoving</code>, identical to upstream to 2.2×10<sup>-16</sup>. (d) <code>src/profiles.jl</code> l.56-67 and <code>src/profiles_y.jl</code> l.147-221: slices; values identical. (e) <code>src/profiles.jl</code> l.79-113 (table loop), l.152-172 (beam transform), l.175-220 (<code>cleanup_negatives!</code>, also made robust to leading or all non-positive columns): threading; values identical, because every table node is computed independently. (f) l.222-273 and 364-369: floor and finite check; changes only entries that were ≤ 0. Also: per-stage timing logs, and a cache-key rename <code>prof_logθs</code> → <code>prof_logthetas</code> whose fallback for older caches was garbled to <code>"prof_log?s"</code> (repaired in ce1d239). Used by: everything; (b) by all FRB DM products, (d) by the tSZ 64k engine, the Lee22 tSZ wrapper, the chord-mean wrapper and the exact low-z tables.</p></aside>
+
+<h4>3.5 cbf5cbd, 71646e2, ce1d239 (July 2026): grid defaults, a unit constant, quadrature tolerance, thread slots</h4>
+
+<p><strong>cbf5cbd (cluster branch, 2026-07-01)</strong> coarsened the defaults for cluster runs: <code>profile_grid</code> N<sub>logM</sub> 256 → 128, N<sub>logθ</sub> 512 → 256, log M<sub>min</sub> 11 → 12, <code>build_interpolator</code> N<sub>logθ</sub> 256 and pad 128, and loosened the LOS quadrature from <code>rtol=eps(), order=9</code> to <code>rtol=1e-3, order=7</code>. The quadrature change looks alarming but is small for these smooth integrands: measured against the validated setting it moves the B12 LOS integral by at most 6.8×10<sup>-6</sup> and the B16 one by at most 2.0×10<sup>-5</sup> (<code>scripts/xgpaint/quadrature_settings.csv</code>). It did not survive: the July merge resolved <code>profiles_y.jl</code> to main's version, so the validated tree has <code>rtol=1e-12, order=9</code>.</p>
+
+<p><strong>71646e2 (2026-07-13)</strong> fixed the unit constant of <code>compute_DM</code>. e67a8a1 had hard-coded <code>const M2_TO_PC_CM3 = 4.87e5</code> next to a commented-out expression in Unitful (Julia's physical-units package); 71646e2 uses the expression, <code>ustrip(u"pc*cm^-3", 1u"m^-2")</code>, which evaluates to 3.2408×10<sup>-23</sup>. The hard-coded value was 1.5×10<sup>28</sup> times too large, an error that would show up as DMs of order 10<sup>30</sup> pc cm<sup>-3</sup> at once. The test added in 1660e08 now pins <code>compute_DM</code> to Unitful's conversion of <code>ne2d/(1+z)</code>.</p>
+
+<p><strong>ce1d239 (main, 2026-07-13)</strong> is the commit whose tree is the validated one. It sets the <code>profile_grid</code> defaults to N<sub>logM</sub> = 128, N<sub>logθ</sub> = 256, log M<sub>min</sub> = 12 and the <code>build_interpolator</code> pad to 128 (keeping N<sub>logθ</sub> = 512 there), sizes per-thread buffers by <code>Threads.maxthreadid()</code> instead of <code>nthreads()</code>, repairs the cache-key fallback, and relaxes the quadrature tolerance slightly, from <code>rtol=eps()</code> (2.2×10<sup>-16</sup>, the double-precision machine epsilon) to <code>rtol=1e-12</code>, keeping order 9 of the adaptive Gauss-Kronrod quadrature (<code>quadgk</code>). The thread-slot change matters on Julia ≥ 1.9, where interactive threads can give <code>threadid()</code> values above <code>nthreads()</code> and the old per-thread arrays would be indexed out of bounds; on idark's Julia 1.6 the helper falls back to <code>nthreads()</code>. The tolerance change is measured at ≤ 7.8×10<sup>-16</sup> here and ≤ 7×10<sup>-14</sup> in audit A.</p>
+
+<aside class="xgpaint"><h4>XGPaint edit: cbf5cbd, 71646e2, ce1d239</h4>
+<p>cbf5cbd: <code>src/profiles.jl</code> l.39-40, 229 and <code>src/profiles_y.jl</code> l.97 (then); not in the validated tree; ≤ 2.0×10<sup>-5</sup> if it had been. 71646e2: <code>src/profiles_frb.jl</code> l.3, before <code>4.87e5</code>, after <code>ustrip(u"pc*cm^-3", 1u"m^-2")</code> = 3.2408×10<sup>-23</sup>. ce1d239: <code>src/profiles.jl</code> l.70-71, 150, 157, 226, 373, cache-key lines l.431-433 of <code>build_interpolator</code>; <code>src/profiles_y.jl</code> l.100 (<code>rtol=1e-12</code>). Grid defaults change the node layout of tables rebuilt with default arguments: the production B12 table (2026-04-29) has 512 θ × 256 z × 256 log M over [11, 15.7] with pad 256, the e67a8a1 defaults, while tables built at ce1d239 or later with defaults have 512 θ × 256 z × 128 log M over [12, 15.7] with pad 128. Loaded tables are not affected. A table rebuilt with default arguments after July has the coarser mass grid; no accuracy check of such tables against the finer e67a8a1 grid was found. Rebuilds were checked for reproducibility only: for example the kSZ caches rebuilt under Julia 1.12 give spectra equal to the production run to 7.4×10<sup>-11</sup> (HalfDome commit 7f5b73a), but both builds use the same ce1d239 defaults, so this does not test the grid change. The kSZ and truncation-comparison tables are built with these defaults (<code>paint_ksz_websky.jl</code> l.77, <code>truncation_comparison/build_truncation_caches.jl</code> l.28); in the kSZ painter the exact low-z tables of Section 4.1 replace them for halos at z &lt; 0.1. Used by: all products built after July 2026.</p></aside>
+
+<h4>3.6 The broken merge and its repair: 5dd0b57, 07fc686, 35f79ad, 1660e08</h4>
+
+<p>"Merge main into cluster preserving cluster interpolation defaults" (5dd0b57, 2026-07-13) left five half-edited lines in three places of <code>profiles.jl</code> (l.81 and 85 in <code>profile_grid</code>, l.294 in <code>build_max_paint_logradius</code>, l.382-383 in a print statement of <code>build_interpolator</code>), for example <code>N_logθ=256)</code> and <code>" pad=pad, pad,</code>. The file does not parse (<code>Meta.parseall</code> fails, verifier of audit A). It was nevertheless the HEAD of the dev checkout from 2026-07-13 until the checkout was fast-forwarded to 35f79ad on 2026-09-25 (<code>git reflog</code>). Audit A showed that it was never compiled. Julia stores each compiled package in a precompile cache (a <code>.ji</code> file) that records the size and CRC32c checksum of every source file it was built from. Every XGPaint precompile cache written between 2026-09-02 and 2026-09-25 records <code>profiles.jl</code> with CRC32c 8cfcf4e7 (26,851 bytes), which is the ce1d239 file, and no cache carries 5dd0b57's checksum; so on every compile date the working tree held the ce1d239 content as uncommitted changes on top of the broken HEAD (the reflog shows a "reset: moving to HEAD", which discards or stashes such changes, one second before the fast-forward). 07fc686 ("all fixes committed", 2026-09-24) repaired the syntax, but in <code>build_max_paint_logradius</code> it deleted the broken line <code>N_logθ=256)</code> instead of restoring it to <code>N_logθ = length(logθs)</code>, which the next statement needs; 35f79ad restored that line an hour later, which makes the tree byte-identical to ce1d239, and the tag was put on that commit. 1660e08 (2026-09-25) adds tests only: one check that <code>r200c_comoving</code> equals R<sub>Δ</sub>(M, z, 200)(1+z), added to an existing test set, and a new <code>frb_profile</code> test set that compares <code>BattagliaFRBProfile</code>'s DM with Unitful's conversion of <code>ne2d/(1+z)</code>. Despite its title, the merge did not preserve the cluster defaults: the resolved tree is main's.</p>
+
+<aside class="xgpaint"><h4>XGPaint edit: 5dd0b57 → 07fc686 → 35f79ad (provenance only)</h4>
+<p><code>src/profiles.jl</code> l.81, 85, 294, 382-383. Numbers: none; 35f79ad's tree equals ce1d239's (3b57cac). The local <code>main</code> branch (ce1d239) is one commit ahead of <code>origin/main</code> (71646e2), so ce1d239 itself is not on GitHub's main, but its tree is on GitHub as 35f79ad on <code>cluster</code> and as the tag. An unmerged local branch <code>adrian</code> (71bc3fd, 2026-03-03, "Adrian fixes") holds an alternative PowerLawParam whose docstring says z<sup>α<sub>z</sub></sup> but whose callers still pass 1+z, together with the b924ab1 B12 sign (<code>β = -γ - α * β_raw</code>); it is not an ancestor of any validated commit and is in no product.</p></aside>
+
+<h4>3.7 Summary: which product depends on which edit</h4>
+
+<table class="data">
+<thead><tr><th>edit</th><th>Lee22 (tSZ, DM)</th><th>B16 FRB DM</th><th>tSZ 64k</th><th>kSZ</th><th>effect on numbers</th></tr></thead>
+<tbody>
+<tr><td>f16a7f3 PowerLawParam</td><td>no (own <code>get_params</code>)</td><td>defaults</td><td>yes, nine sampled coefficients</td><td>defaults</td><td>none at defaults</td></tr>
+<tr><td>9f37b1e f<sub>b</sub>, physical column</td><td>DM and τ via <code>ne2d</code> (used as Lee22's n<sub>200</sub> requires: it contains f<sub>b</sub> and physical ρ<sub>crit</sub>)</td><td>yes</td><td>no</td><td>yes (B16)</td><td>τ, DM × f<sub>b</sub>(1+z)<sup>2</sup>; each halo's kSZ power × the square of that</td></tr>
+<tr><td>exponent convention (9f37b1e, e67a8a1)</td><td>yes, β<sub>XG</sub> = αβ′ − γ</td><td>yes</td><td>yes</td><td>yes</td><td>none (identical shapes); 10<sup>25</sup>-10<sup>44</sup> during b924ab1..e67a8a1, in none of the products traced here</td></tr>
+<tr><td>e67a8a1 0.9 in <code>ne2d</code></td><td>divided out (literal); kept in the old <code>xgpaint_ne2d</code> reading (× 0.6016)</td><td>yes</td><td>no</td><td>yes (rescaled to 0.88 in the WebSky recipe)</td><td>τ, DM × 0.9; kSZ power × 0.81</td></tr>
+<tr><td>e67a8a1 FRB profile; 71646e2 constant</td><td>DM wrapper subtypes it</td><td>yes</td><td>no</td><td>no</td><td>defines DM = ne2d/(1+z); constant 1.5×10<sup>28</sup> too large before 71646e2</td></tr>
+<tr><td>e67a8a1 slices, threads, floor</td><td>tSZ wrapper fast path; exact low-z tables</td><td>tables</td><td>yes (amplitude, tables)</td><td>tables, exact low-z tables</td><td>none, or entries ≤ 0 only</td></tr>
+<tr><td>cbf5cbd / ce1d239 grids, rtol</td><td>tables rebuilt after July</td><td>tables</td><td>own grids</td><td>tables</td><td>≤ 7×10<sup>-14</sup> (rtol); loaded tables unaffected, rebuilt default-grid tables not checked in general</td></tr>
+</tbody>
+</table>
+
+<aside class="key">The fork changes the physics of exactly one quantity: the Battaglia16 electron column, which is f<sub>b</sub>(1+z)<sup>2</sup> × 0.9 times upstream's (0.145 at z = 0.01, 0.32 at z = 0.5, 2.28 at z = 3). Everything else (the B12 pressure, all profile shapes, the values the table builder computes at its nodes) agrees with upstream to 7×10<sup>-14</sup> or better (the quadrature-tolerance change) once the March-April sign bug is excluded, and that bug is in none of the products traced here; the other edits add new code (the FRB DM profile, the slice API) or change bookkeeping (default grid sizes, threading, the positivity floor).</aside>
+
+<h3>4. XGPaint behaviours handled in project code (not XGPaint edits)</h3>
+
+<p>Several problems found during the project live in XGPaint but were deliberately not fixed there, so that the validated tree stays frozen for the tSZ 64k dataset and collaborators. They are handled by project code that calls XGPaint's public pieces. None of the items in this section is an XGPaint edit.</p>
+
+<h4>4.1 The linear-z table grid fails at low redshift</h4>
+
+<p>The tables are tabulated on <code>redshifts = LinRange(z_min, z_max, N_z)</code> with z<sub>min</sub> = 0.001, z<sub>max</sub> = 5 and N<sub>z</sub> = 256 (upstream and fork alike), a node spacing Δz = 0.0196. The interpolator works at fixed θ, but a halo's angular size scales as 1/d<sub>A</sub>, which changes by a factor of 20 inside the first cell (z = 0.001 to 0.0206). At fixed θ the profile value at the two bracketing nodes then refers to radii a factor 20 apart, and the spline in z cannot represent it. The audit's first pass tested z = 0.1-2 only and found the painted tables within 8.9×10<sup>-5</sup> (B12) and 6.0×10<sup>-4</sup> (Lee22) of an independent LOS integral (Figure 6.7). The verifier (an independent re-check of audit A, <code>frb_map_generation/outputs/lee22_tsz_verification_20260929/verify_A_xgpaint_audit/README.md</code>) then extended the test down to z = 0.0022 (11 masses, x = 0.02-3.9) and found the error (Figure 6.5). Below z = 0.01 the interpolated y at x ≥ 1 is too high by 10 % up to a factor of about 35 (|y<sub>itp</sub>/y<sub>direct</sub> − 1| from 0.1 to 34) and by up to 9 % at x = 0.1; at z = 0.01, still inside the first table cell, |y<sub>itp</sub>/y<sub>direct</sub> − 1| at x ≥ 1 reaches 8.5 for Lee22 and 4.0 for B12; between z = 0.02 and 0.05 it is at most 5 % for B12 and 7 % for Lee22 at x ≥ 1, the largest values at x = 3.9 for the most massive halos (M ≥ 10<sup>14.9</sup> M<sub>☉</sub>) (<code>v1c_itp_vs_direct_grid.csv</code>). 850 catalogue halos lie in the first cell, z &lt; 0.0206. The stored tables themselves are correct (within 2.8×10<sup>-8</sup> of an independent integral at their nodes); the error is interpolation between nodes. On the map it shows only at the largest scales (Figure 6.6): compared with re-evaluating the 79,302 halos at z &lt; 0.1 exactly, the stored B12 y power (C<sub>ℓ</sub> averaged over ℓ ± 5 before the ratio is taken) is too high by 16 %, 10 %, 4 %, 1.2 % and 0.08 % at ℓ = 10, 20, 30, 50, 100 and by less than 10<sup>-3</sup> above ℓ = 100 (Lee22: 3.7 %, 2.9 %, 1.0 %, 0.2 % and −0.07 %), and the mean y is too high by 0.54 % (B12) and 0.43 % (Lee22). For the B16 kSZ map (degraded to NSIDE 512, halos at z &lt; 0.05 corrected) the stored-to-corrected power ratio is 1.18 at ℓ = 20-40, 1.04 at ℓ = 41-81 and within 1.1×10<sup>-3</sup> of 1 at ℓ = 82-660 (<code>frb_map_generation/outputs/lee22_ksz_debug_20261002/verify_B1/step4_map_level.txt</code>). NSIDE is the HEALPix resolution parameter; a map has 12 NSIDE<sup>2</sup> pixels.</p>
+
+<figure class="fig"><img src="fig/6_xgpaint/05_lowz_cache_error.png" alt="Relative error of the production y lookup tables against direct XGPaint LOS integration as a function of halo redshift" loading="lazy"><figcaption><strong>Figure 6.5</strong> |y<sub>interpolator</sub>/y<sub>direct LOS</sub> − 1| of the production B12 and Lee22 tables at 10<sup>14</sup> M<sub>☉</sub> for three radii, against halo redshift. The dash-dotted line marks the end of the first table cell in z; grey is the range the first audit tested. Same data and selection as the verifier's two-panel figure, drawn as a separate plot. <span class="src">source: frb_map_generation/outputs/lee22_tsz_verification_20260929/verify_A_xgpaint_audit/v1c_itp_vs_direct_grid.csv (original figure fig_lowz_interpolator_error.png, left panel); plot scripts/xgpaint/make_figures.py</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/6_xgpaint/06_lowz_cl_effect.png" alt="Ratio of the stored y-map power spectrum to the spectrum with low-redshift halos re-evaluated exactly" loading="lazy"><figcaption><strong>Figure 6.6</strong> C<sub>ℓ</sub> of the stored all-z y maps divided by C<sub>ℓ</sub> of the same maps with the 79,302 halos at z &lt; 0.1 re-evaluated without the table (NSIDE 1024, 5-multipole running mean of the ratio). The numbers quoted in the text average C<sub>ℓ</sub> over ℓ ± 5 before taking the ratio (<code>frb_map_generation/lee22_tsz_verification/verify_A_xgpaint_audit/v4b_lowz_impact.py</code> l.68), so at the lowest multipoles they differ somewhat from this curve. <span class="src">source: frb_map_generation/outputs/lee22_tsz_verification_20260929/verify_A_xgpaint_audit/v4b_cl_b12.npz, v4b_cl_lee22.npz (original figure fig_lowz_interpolator_error.png, right panel); plot scripts/xgpaint/make_figures.py</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/6_xgpaint/07_painted_vs_independent.png" alt="Painted interpolator divided by an independent line-of-sight integral minus one, for Battaglia12 and Lee22, at z between 0.1 and 2" loading="lazy"><figcaption><strong>Figure 6.7</strong> Away from low z the painted tables are faithful: interpolator over an independent Python LOS integral (same ρ<sub>crit</sub>), 20 (M, z) combinations per model (log M = 13, 13.5, 14, 14.5, 15 at z = 0.1, 0.5, 1, 2). The four Lee22 outliers (up to 6.0×10<sup>-4</sup>) are the 10<sup>15</sup> M<sub>☉</sub> halos, one table cell (Δlog M = 0.029) above the Lee22 shape clip at 10<sup>14.97</sup> M<sub>☉</sub> (= 10<sup>14.8</sup> h<sup>-1</sup> M<sub>☉</sub>, the top of the Lee22 fit range, above which the wrapper freezes x<sub>c</sub> and β), a kink in log M that the cubic spline smooths over. <span class="src">source: frb_map_generation/outputs/lee22_tsz_verification_20260929/A_xgpaint_audit/painted_profile_vs_independent_los.csv (original figure fig_painted_profile_check.png, right panel); plot scripts/xgpaint/make_figures.py</span></figcaption></figure>
+
+<p>The fix is in the painters, not in XGPaint. For halos below a threshold (z &lt; 0.1) the y painter and the kSZ painter build a radial table for that one halo at its exact mass and redshift with XGPaint's own slice functions (the y painter calls <code>fill_profile_slice!</code>, the function that fills the table nodes; the kSZ painter calls <code>prepare_profile_slice</code>/<code>evaluate_profile_slice</code> directly), and interpolate it in log θ only. Halos at z ≥ 0.1 go through the production tables exactly as before, so those pixels are reproduced bit for bit.</p>
+
+<pre class="code" data-src="frb_map_generation/lee22_tsz_corrected/paint_tsz_variants.jl:L57-L79"><code>"""Per-halo radial table: log-theta nodes from max(theta_min, 1e-5 theta200) to theta_max, step `dlog`."""
+struct ExactTable
+    logtheta::Vector{Float64}
+    y::Vector{Float64}
+end
+
+function ExactTable(model, mass, z, theta_min, theta200, theta_max; dlog=0.02)
+    lo = log(max(theta_min, 1.0e-5 * theta200))
+    hi = log(theta_max) + 1.0e-9
+    n = max(8, ceil(Int, (hi - lo) / dlog) + 1)
+    logtheta = collect(range(lo, hi, length=n))
+    y = zeros(n)
+    XGPaint.fill_profile_slice!(y, model, logtheta, mass, z)
+    return ExactTable(logtheta, y)
+end
+
+function (t::ExactTable)(theta)
+    lt = clamp(log(theta), first(t.logtheta), last(t.logtheta))
+    k = clamp(searchsortedlast(t.logtheta, lt), 1, length(t.logtheta) - 1)
+    f = (lt - t.logtheta[k]) / (t.logtheta[k + 1] - t.logtheta[k])
+    y0, y1 = t.y[k], t.y[k + 1]
+    return (y0 &gt; 0 &amp;&amp; y1 &gt; 0) ? exp((1 - f) * log(y0) + f * log(y1)) : (1 - f) * y0 + f * y1
+end</code></pre>
+<p class="code-note">Nodes every 0.02 in ln θ from max(θ<sub>min</sub>, 10<sup>-5</sup> θ<sub>200c</sub>) to the aperture edge (about 650 nodes for a 4 θ<sub>200c</sub> aperture), filled by XGPaint itself, so the exact table carries no new physics code. The painter's self-test requires agreement with <code>fill_profile_slice!</code> at random angles to 2×10<sup>-3</sup> for 300 low-z halos (<code>paint_tsz_variants.jl</code> l.139-159). The kSZ painter does the same with 400 fixed nodes in <code>_exact_table</code> (<code>ksz/paint_ksz_websky.jl</code> l.88-102).</p>
+
+<p>The tSZ 64k dataset avoids the problem differently: its engine never calls <code>build_interpolator</code> and tabulates z on a logarithmic grid, wrapping the spline so that it is queried in ln z.</p>
+
+<pre class="code" data-src="tSZ_64k_flat_prior_SO_baseline_deproj0/engine/benchmark.jl:L25-L39"><code>"""Vary node counts, never the angular/mass/redshift domain or LOS tolerance."""
+function build_cache(cfg, nodes)
+    model = ChordMeanProfile(build_tsz_model(cfg), 4.)
+    rft = XGPaint.RadialFourierTransform(n=512, pad=cfg.interpolator_pad)
+    lt = LinRange(log(minimum(rft.r)), log(maximum(rft.r)), nodes[1])
+    lz = LinRange(log(.001), log(5.), nodes[2])
+    lm = LinRange(12., cfg.interpolator_logM_max, nodes[3])
+    _, _, _, values = XGPaint.profile_grid(model, lt, exp.(lz), lm)
+    @assert all(isfinite, values) &amp;&amp; minimum(values) &gt;= 0
+    values .= max.(values, 1e-300)
+    interpolator = XGPaint.Interpolations.interpolate(log.(values),
+        XGPaint.BSpline(XGPaint.Cubic(XGPaint.Line(XGPaint.OnGrid()))))
+    scaled = XGPaint.scale(interpolator, lt, lz, lm)
+    return XGPaint.LogInterpolatorProfile(model, LogRedshiftGrid(scaled, (lt, lz, lm)))
+end</code></pre>
+<p class="code-note">This <code>build_cache</code> is the production cache builder: <code>engine/engine.jl</code> includes <code>benchmark.jl</code> and calls it for every case. <code>lz</code> is uniform in ln z from 0.001 to 5. The node counts are chosen per dataset row by the cache audit, which tries (θ, z, M) = (256, 128, 64), (512, 256, 128) and (1024, 512, 256) nodes and keeps the first that passes (<code>engine/engine.jl</code> l.155-172); with the smallest, 128 z nodes, the spacing is Δln z = 0.067, so Δz ≈ 1.3×10<sup>-4</sup> at z = 0.002. The <code>LogRedshiftGrid</code> wrapper (<code>engine/fullsky_test.jl</code> l.11-16) converts z to ln z on each call. The per-row cache audit probes z = 0.00113, 0.0037, 0.0127 and 0.047 among others (<code>engine/engine.jl</code> l.128-153) and accepts a cache only if the relative error against direct chord quadrature is ≤ 0.004 wherever the column exceeds 10<sup>-5</sup> of the halo's central value, and the absolute error is ≤ 0.004 of the central value everywhere; so the low-z regime is tested for every dataset row.</p>
+
+<aside class="xgpaint"><h4>Not an XGPaint edit: low-z tables</h4>
+<p>The behaviour sits in XGPaint <code>src/profiles.jl</code> l.70-76 (<code>LinRange(z_min, z_max, N_z)</code>, z<sub>min</sub> = 10<sup>-3</sup>, N<sub>z</sub> = 256) and l.358 (the spline is evaluated at linear z). It is unchanged from upstream. Handled in project code: exact per-halo tables for z &lt; 0.1 in <code>frb_map_generation/lee22_tsz_corrected/paint_tsz_variants.jl</code> and <code>ksz/paint_ksz_websky.jl</code>; a log-z grid in the tSZ 64k engine. Not handled: the FRB ray generator (<code>generate_halfdome_z1_dm_mass_windows.jl</code> loads a <code>build_interpolator</code> table, or builds one with the defaults at l.911 when asked to overwrite, and re-interpolates it on the table's own linear z axis, l.948 and l.984) and the DM map painters still use the linear-z tables (Section 5).</p></aside>
+
+<h4>4.2 Battaglia16 electron conventions: the 0.9 and the mass per electron</h4>
+
+<p>XGPaint's <code>ne2d</code> turns a gas density into electrons with two numbers: m<sub>per e</sub> = m<sub>e</sub> + 2m<sub>p</sub>/(1+X<sub>H</sub>) (upstream, full ionization of H and He at X<sub>H</sub> = 0.76) and the factor 0.9 (fork, e67a8a1). Neither was changed again. Every place where another convention is needed compensates in project code instead.</p>
+<ul>
+<li><strong>Lee22 density.</strong> Lee22's fit is already an electron density, n<sub>e</sub> = n<sub>0</sub> f(x) n<sub>200</sub> with n<sub>200</sub> = 200 ρ<sub>crit</sub> f<sub>b</sub>/(X<sub>H</sub>m<sub>p</sub>). To pass it through <code>ne2d</code> unchanged, the wrapper sets P<sub>0</sub> = N n<sub>0</sub> 200 m<sub>per e</sub>/(0.9 X<sub>H</sub> m<sub>p</sub>), which cancels both XGPaint numbers exactly (Section 4.5). The earlier production reading, <code>normalization=:xgpaint_ne2d</code> with P<sub>0</sub> = 200 n<sub>0</sub>, let them act and so painted 0.9 X<sub>H</sub>m<sub>p</sub>/m<sub>per e</sub> = 0.6016 times the printed density (<code>frb_map_generation/outputs/lee22_fig5_audit_20260922/REPORT.md</code>).</li>
+<li><strong>WebSky recipe.</strong> The "WebSky-recipe" kSZ variant is a project painter that reproduces the halo-kSZ prescription of the WebSky simulation (Stein et al. 2020). WebSky uses n<sub>e</sub> = (1 − Y<sub>p</sub>/2) ρ<sub>gas</sub>/m<sub>p</sub> with Y<sub>p</sub> = 0.24. The WebSky-recipe kSZ variant multiplies the XGPaint B16 τ by <code>WS_NE / XGP_NE</code> = 0.88/0.7916 = 1.112 (<code>ksz/paint_ksz_websky.jl</code> l.27-28, l.83).</li>
+<li><strong>CLASS-SZ.</strong> The comparisons run class_sz with <code>f_free = 0.9</code> to mirror XGPaint's 0.9. Its B16 gas density agrees with XGPaint's P<sub>0</sub> f(x) f<sub>b</sub> ρ<sub>crit</sub> to 0.4 % at all tested radii, and its fixed μ<sub>e</sub> = 1.14 (mean gas mass per electron in units of m<sub>p</sub>) against XGPaint's 1.137 is a further 0.3 % in τ (<code>truncation_comparison/TSZ_KSZ_TRUNCATION_COMPARISON_20260917.md</code>).</li>
+</ul>
+
+<h4>4.3 The printed Battaglia16 typos</h4>
+
+<p>Battaglia (2016) prints the density fit with two errors: ρ<sub>gas</sub> = ρ<sub>crit</sub> ρ<sub>fit</sub> without f<sub>b</sub>, and the exponent −(β−γ)/α instead of −(β+γ)/α. The paper's own Fig. A1 is reproduced by its Table A1 only with both corrected; Lee22 copied the printed formula, which is why their drawn "Battaglia (2016)" curve is 1/f<sub>b</sub> = 6.4 times too high and tilted (<code>lee22_calibration.html</code> l.95). The kSZ debug run reached the same conclusion by comparing B16's tabulated fit with curves digitized from its Fig. 5: at the profile peak the table-based profile is 0.98-1.07 of the drawn curves with −(β+γ)/α and 0.75-0.83 with the printed −(β−γ)/α (<code>frb_map_generation/outputs/lee22_ksz_debug_20261002/tau_amplitude/b16_fig5_convention_check.txt</code>). The two corrections have different histories in XGPaint. The exponent was already correct in upstream (stored β = −3.83 with (β−γ)/α, Section 3.3); only its bookkeeping was rewritten. The f<sub>b</sub> was missing in upstream and is a fork edit (9f37b1e, Section 3.2). No project code changes either.</p>
+
+<h4>4.4 Projected line of sight against a 3-D sphere: the chord-mean wrapper</h4>
+
+<p>XGPaint integrates each LOS to 10<sup>5</sup> R<sub>200c</sub> and cuts only the disc on the sky. A ray at projected radius x &lt; 4 therefore also collects gas at 3-D radii beyond 4 R<sub>200c</sub>. CLASS-SZ, and the simulation measurements the FRB work compares with, truncate at a sphere. The FRB generator was switched to a chord-limited LOS on 2026-09-16, and on 2026-09-17 the same construction was provided for tSZ and kSZ as a wrapper type, <code>ChordMeanProfile</code>, that plugs into XGPaint's table builder through the slice functions of Section 3.4.</p>
+
+<pre class="code" data-src="truncation_comparison/spherical_truncation_profiles.jl:L106-L128"><code>"""Exact chord factor 2 L_max at angle theta given theta_max = X theta200c."""
+@inline function chord_factor(theta, theta_max, X)
+    ratio = theta / theta_max
+    ratio &gt;= 1 &amp;&amp; return 0.0
+    return 2X * sqrt(1 - ratio^2)
+end
+
+# XGPaint's profile_grid calls prepare_profile_slice once per (M, z) and
+# evaluate_profile_slice per theta; both are extended for this type.
+function XGPaint.prepare_profile_slice(m::ChordMeanProfile, mass, z)
+    inner = m.inner
+    Mu = mass * XGPaint.M_sun
+    par = XGPaint.get_params(inner, Mu, z)
+    θ200 = theta_r200c(inner, mass, z)
+    xc, α, β, γ = Float64(par.xc), Float64(par.α), Float64(par.β), Float64(par.γ)
+    A = projection_amplitude(inner, mass, z, θ200, xc, α, β, γ)
+    return (; θ200, xc, α, β, γ, A, X=m.sphere)
+end
+
+@inline function XGPaint.evaluate_profile_slice(::ChordMeanProfile, p, theta, mass, z)
+    x = Float64(theta) / p.θ200
+    return p.A * chord_mean(x, p.xc, p.α, p.β, p.γ, p.X)
+end</code></pre>
+<p class="code-note">The table stores the chord mean g = (integral along the chord inside the sphere)/(2L), L = √(X<sup>2</sup> − x<sup>2</sup>), which stays positive and smooth up to the sphere edge, so XGPaint's log-spline still works. The painter multiplies g by the exact chord factor 2X√(1 − (θ/θ<sub>max</sub>)<sup>2</sup>), which sends the signal to zero at the edge. The amplitude is taken from XGPaint itself (<code>projection_amplitude</code>, l.91-98: the prepared slice amplitude for B12, XGPaint's own value over its infinite LOS integral for τ), so no normalization is re-derived. Self-test: chord mean times chord factor equals direct chord quadrature to 10<sup>-8</sup>; tables equal direct evaluation to 10<sup>-7</sup>.</p>
+
+<p>At the profile level the sphere keeps 0.81-0.84 of B12's projected y at x = 3 and 0.30-0.33 at x = 3.9, and 0.972-0.991 of the disc-integrated signal; for the shallower B16 density it keeps 0.68-0.74 and 0.23-0.26 at those radii and 0.875-0.935 of the disc. On the full-lightcone maps (Figures 6.8 and 6.9) the fix lowers the y power by at most 1.2 % (ℓ &lt; 50) and by nothing above ℓ ≈ 2000, and lowers the halo kSZ power by 11-13 % below ℓ = 400, 8 % at ℓ ≈ 800, 4 % at ℓ ≈ 2100 and 1.7 % at ℓ ≈ 3400. The tSZ 64k dataset uses the same wrapper (engine copy with a bounded, checked quadrature: <code>tSZ_64k_flat_prior_SO_baseline_deproj0/engine/spherical_truncation_profiles.jl</code>), as do the kSZ products since 2026-09-17.</p>
+
+<figure class="fig"><img src="fig/6_xgpaint/08_ksz_sphere_vs_projected.png" alt="Halo kSZ power spectrum with projected and spherical truncation, ratios to CLASS-SZ and the size of the fix" loading="lazy"><figcaption><strong>Figure 6.8</strong> Halo kSZ (B16, 4 R<sub>200c</sub>) with XGPaint's projected truncation and with the chord-mean wrapper, against CLASS-SZ with a 3-D truncation; bottom panel: the size of the fix, with the catalogue one-halo prediction (dashed). PDF beside the PNG. <span class="src">source: truncation_comparison/spectra/ksz_truncation_comparison.png; numbers truncation_comparison/TSZ_KSZ_TRUNCATION_COMPARISON_20260917.md</span></figcaption></figure>
+
+<figure class="fig"><img src="fig/6_xgpaint/09_tsz_sphere_vs_projected.png" alt="Compton-y power spectrum with projected and spherical truncation and ratios to CLASS-SZ" loading="lazy"><figcaption><strong>Figure 6.9</strong> The same for the Compton-y map (B12): the steeper pressure profile makes the fix immaterial for tSZ. PDF beside the PNG. <span class="src">source: truncation_comparison/spectra/tsz_truncation_comparison.png</span></figcaption></figure>
+
+<aside class="xgpaint"><h4>Not an XGPaint edit: spherical (chord-mean) truncation</h4>
+<p>The behaviour is XGPaint's <code>_nfw_profile_los_quadrature</code> (<code>src/profiles_y.jl</code> l.100-106, <code>zmax=1e5</code>) plus the disc cut <code>compute_θmax</code> (<code>src/profiles.jl</code> l.278-281, <code>mult=4</code>), both unchanged from upstream. The fix is the project module <code>SphericalTruncation</code> in <code>truncation_comparison/spherical_truncation_profiles.jl</code>, which extends <code>XGPaint.prepare_profile_slice</code> and <code>XGPaint.evaluate_profile_slice</code> for its own type; the per-pixel chord factor is applied in each project painter. Numbers: y power −1.2 % at most; kSZ power −11 to −13 % at ℓ &lt; 400; FRB DM: removes the hard DM floor of projected apertures (22 pc cm<sup>-3</sup> at 1 R<sub>200c</sub> for a floor-mass halo; <code>frb_map_generation/LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md</code>).</p></aside>
+
+<h4>4.5 Lee22 through XGPaint: two get_params wrappers</h4>
+
+<p>Lee22's fits use broken power laws in mass (different slopes below and above a pivot mass M<sub>cut</sub>) that a <code>PowerLawParam</code> cannot represent. Rather than editing XGPaint, the project defines new profile types that supply only <code>XGPaint.get_params</code> (and, for tSZ, the slice functions), so XGPaint's LOS integral, <code>rho_2d</code>/<code>ne2d</code>, <code>compute_DM</code>, tables and painter run unchanged.</p>
+
+<pre class="code" data-src="frb_map_generation/lee2022_frb_dm_profile.jl:L799-L815"><code>function XGPaint.get_params(model::Lee2022XGPaintDMProfile{T}, M_200c, z) where {T}
+    mass_msun = Float64(M_200c / XGPaint.M_sun)
+    redshift = Float64(z)
+    pars = lee2022_parameters(model.lee, mass_msun, redshift)
+    beta = pars.alpha * pars.beta_prime - pars.gamma
+    zfac = lee2022_redshift_scaling_factor(model.lee, redshift)
+    if model.lee.normalization == :xgpaint_ne2d
+        # XGPaint-native: the dimensionless Lee22 profile is the gas density in units of 200 f_b rho_cr;
+        # no Lee22-side hydrogen factor, XGPaint's ne2d supplies the electron conversion.
+        p0 = 200 * pars.n0 * zfac
+    else
+        mp_kg = Float64(ustrip(uconvert(u"kg", XGPaint.constants.ProtonMass)))
+        p0 = lee2022_normalization_factor(model.lee) * zfac * pars.n0 * 200 * xgpaint_mass_per_electron_kg() /
+             (XGPAINT_NE2D_GAS_FRACTION * model.lee.hydrogen_mass_fraction * mp_kg)
+    end
+    return (xc=T(pars.x_c), α=T(pars.alpha), β=T(beta), γ=T(pars.gamma), P₀=T(p0))
+end</code></pre>
+<p class="code-note">Two conversions do all the work. β = αβ′ − γ maps Lee22's printed exponent onto XGPaint's −(β+γ)/α (Section 3.3), and P<sub>0</sub> cancels XGPaint's 0.9 and m<sub>per e</sub> and supplies the 1/(X<sub>H</sub>m<sub>p</sub>) of Lee22's n<sub>200</sub>, times the normalization reading N and the redshift-scaling factor (for the final products the derived (h<sub>TNG</sub>(1+z))<sup>3</sup>X<sub>H</sub><sup>2</sup>). The <code>:xgpaint_ne2d</code> branch is the superseded reading that let XGPaint's constants act.</p>
+
+<p>The tSZ wrapper (<code>frb_map_generation/lee2022_tsz_pressure_profile.jl</code> l.47-51) passes P<sub>0</sub>/0.5176 because XGPaint multiplies the thermal pressure by 0.5176 (= μ/μ<sub>e</sub>) to get the electron pressure while Lee22 fits P<sub>e</sub> directly, and β′ + 0.3 for the exponent. The kSZ code reuses the DM wrapper as a τ profile (<code>Lee22TauProfile</code> in <code>ksz/ksz_models.jl</code>). The equivalence was checked at two levels (<code>frb_map_generation/LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md</code> l.46). XGPaint's projected chain (<code>rho_2d</code>, <code>ne2d</code>, <code>compute_DM</code> with its infinite LOS) was exercised by the self-test: <code>compute_DM</code> on the wrapper matches the Lee22 code's projected column to 2×10<sup>-6</sup> and its 3-D density to 10<sup>-9</sup> at five (M, z, x) points for both fits. The FRB histograms of Figure 6.10 were made in spherical mode, where the wrapper's parameters are fed to the project's chord quadrature (<code>Battaglia16DensityDMProfile</code>, <code>generate_halfdome_z1_dm_mass_windows.jl</code> l.200), the same quadrature the Lee22-code products use; there they equal the Lee22-code products in 300 of 300 bins, means to 2×10<sup>-16</sup>. That comparison therefore tests the <code>get_params</code> mapping (β and P<sub>0</sub>), not XGPaint's LOS integral.</p>
+
+<figure class="fig"><img src="fig/6_xgpaint/10_frb_lee22_wrapper_equivalence.png" alt="Halo DM PDFs at z_s = 1 for TNG and Lee22, with Lee22 painted through XGPaint's own pipeline shown as markers on the Lee22-code curves" loading="lazy"><figcaption><strong>Figure 6.10</strong> Halo DM PDFs at z<sub>s</sub> = 1, gas inside R<sub>200c</sub>, in five mass windows (each a separate panel of the original figure, with Δp/p<sub>TNG</sub> below). Black: IllustrisTNG within R<sub>200</sub>; coloured lines: the two Lee22 fits evaluated by the project's own code; markers: the same fits with their parameters taken from the wrapper's <code>XGPaint.get_params</code> (β = αβ′ − γ, P<sub>0</sub> from n<sub>0</sub>) and integrated with the same chord quadrature. The markers sit on the lines in every bin. This figure demonstrates the wrapper; its normalization (the X<sub>H</sub><sup>2</sup> reading of 2026-09-17) is superseded by the final Lee22 correction described in the Lee22 section. Downscaled from 3490 px; SVG beside the original. <span class="src">source: frb_map_generation/outputs/publication_comparison_20260916_sphere_1r200c/plots/halo_pdf_sphere_1r200c_b16_lee22_tng_xgpaint_to_1e14.png; numbers frb_map_generation/LIKE_FOR_LIKE_SPHERICAL_R200C_20260916.md l.46</span></figcaption></figure>
+
+<aside class="xgpaint"><h4>Not an XGPaint edit: Lee22 wrappers</h4>
+<p><code>Lee2022XGPaintDMProfile &lt;: XGPaint.AbstractFRBProfile</code> (<code>frb_map_generation/lee2022_frb_dm_profile.jl</code> l.778-815) and <code>Lee2022ThermalSZProfile &lt;: XGPaint.AbstractGNFW</code> (<code>frb_map_generation/lee2022_tsz_pressure_profile.jl</code> l.22-80) extend XGPaint generic functions for project types. They rely on fork edits: f<sub>b</sub> and the physical column in <code>rho_2d</code> (9f37b1e), which supply the f<sub>b</sub> ρ<sub>crit</sub> of Lee22's n<sub>200</sub>; the exponent convention −(β+γ)/α (9f37b1e), which the β mapping targets; the 0.9 in <code>ne2d</code> (e67a8a1), which P<sub>0</sub> divides out; the <code>AbstractFRBProfile</code> type and <code>compute_DM</code> (e67a8a1) with the unit constant of 71646e2 for the DM wrapper; and the slice API (e67a8a1) for the tSZ wrapper. On upstream XGPaint the DM wrapper would not even load (there is no <code>AbstractFRBProfile</code>), and the β mapping would produce a rising outer profile, because upstream's exponent is (β−γ)/α.</p></aside>
+
+<h4>4.6 kSZ painter threading</h4>
+
+<p>The halo kSZ maps are painted by project code, not by XGPaint's <code>paint!</code>. On 2026-10-04 the painter adopted the scheduling of the accelerated tSZ painter: halos are handed out in blocks of 256 to whichever thread is free through an atomic counter, because the catalogue is sorted by decreasing redshift and the large low-z discs at its end would otherwise pile up on one thread.</p>
+
+<pre class="code" data-src="frb_map_generation/lee22_tsz_corrected/ksz/paint_ksz_websky.jl:L250-L272"><code>"""Greedy block worker: claims the next block of BLOCK halos until none is left; returns its own counters."""
+function paint_worker(c::PaintContext, next::Threads.Atomic{Int}, nblk, m200c, m200m, redshifts, positions, vlos_over_c, sel, mws)
+    n = 0; ncut = 0; nexact = 0; N = length(m200c)
+    while true
+        b = Threads.atomic_add!(next, 1)            # returns the previous value
+        b &gt; nblk &amp;&amp; break
+        for i in (b - 1) * BLOCK + 1:min(b * BLOCK, N)
+            a, s, e = paint_halo!(c, i, m200c, m200m, redshifts, positions, vlos_over_c, sel, mws)
+            n += a; ncut += s; nexact += e
+        end
+    end
+    return (n, ncut, nexact)
+end
+
+function paint_batch!(c::PaintContext, m200c, m200m, redshifts, positions, vlos_over_c, counters, sel, mws)
+    nblk = cld(length(m200c), BLOCK); next = Threads.Atomic{Int}(1)
+    tasks = [Threads.@spawn paint_worker(c, next, nblk, m200c, m200m, redshifts, positions, vlos_over_c, sel, mws)
+             for _ in 1:Threads.nthreads()]
+    for t in tasks
+        n, s, e = fetch(t)::Tuple{Int,Int,Int}
+        counters[1] += n; counters[2] += s; counters[3] += e
+    end
+end</code></pre>
+<p class="code-note"><code>Threads.@spawn</code> workers on a shared <code>Threads.Atomic{Int}</code> block counter emulate <code>@threads :greedy</code>, which idark's Julia 1.6 lacks. Pixel writes are protected by one lock per HEALPix ring inside <code>paint_halo!</code>; only the work allocation and the order of floating-point sums change.</p>
+
+<p>Verification (HalfDome commits 77ac291 and 7f5b73a): single-thread output byte-identical to the previous painter, 16 threads within 3.3×10<sup>-16</sup>, block sizes 1, 256 and 4096 within 1.4×10<sup>-16</sup>. With the Julia 1.12.2 runtime the full lightcone paints in 527 s (idark job 600626) against 5098 s and 8343 s for the two earlier Julia 1.6 runs, with identical counters (7,090,669,884 pixel updates, 79,302 exact low-z halos) and spectra equal to the production run to 7.4×10<sup>-11</sup>.</p>
+
+<aside class="xgpaint"><h4>Not an XGPaint edit: kSZ threading</h4>
+<p>Project code in <code>frb_map_generation/lee22_tsz_corrected/ksz/paint_ksz_websky.jl</code> l.141-272. Besides profile types and cosmology helpers (for example <code>angular_diameter_dist</code>), it uses from XGPaint the HEALPix ring machinery <code>HealpixRingProfileWorkspace</code>, <code>get_relevant_rings</code> and <code>get_ring_disc_ranges</code> (upstream c609849), the raw spline inside each <code>LogInterpolatorProfile</code>, and the slice functions for the exact tables. XGPaint's own table threading (e67a8a1, Section 3.4) is a separate, library-side change.</p></aside>
+
+<h4>4.7 Other unedited XGPaint behaviours worth knowing</h4>
+<ul>
+<li><strong>Radiation in ρ<sub>crit</sub>.</strong> XGPaint's cosmology includes photons and neutrinos, which raises ρ<sub>crit</sub>(z) over the Ω<sub>m</sub>+Ω<sub>Λ</sub> value by 4×10<sup>-5</sup> at z = 0.1, 8×10<sup>-4</sup> at z = 2 and 1.1×10<sup>-3</sup> at z = 3. y and τ scale with it; the audits remove it when comparing with Lee22's convention (audit A README).</li>
+<li><strong>Painter cosmology.</strong> The FRB, Lee22 and tSZ painters build profiles with Ω<sub>b</sub> = 0.049, Ω<sub>c</sub> = 0.261 (Ω<sub>m</sub> = 0.31), h = 0.68, while the HalfDome lightcone has Ω<sub>b</sub> = 0.0486, Ω<sub>c</sub> = 0.2603 (Ω<sub>m</sub> = 0.3089), h = 0.6774. The truncation-comparison maps of 2026-09-17 and 2026-09-19 (Figures 6.3, 6.8, 6.9; <code>truncation_comparison/paint_ksz_fb_comparison_maps.jl</code> l.19) and the WebSky-recipe kSZ painter (<code>ksz/ksz_models_halfdome.jl</code> l.9) use the lightcone values. This is a choice of arguments, not a library issue.</li>
+<li><strong>Table range.</strong> Tables built with the current defaults span 10<sup>12</sup>-10<sup>15.7</sup> M<sub>☉</sub> (the production B12 table 10<sup>11</sup>-10<sup>15.7</sup>) and are not extrapolated; the HalfDome catalogue spans 4.46×10<sup>12</sup>-2.57×10<sup>15</sup> M<sub>☉</sub>/h (<code>TSZ_KSZ_TRUNCATION_COMPARISON_20260917.md</code>), that is 6.6×10<sup>12</sup>-3.8×10<sup>15</sup> M<sub>☉</sub> with h = 0.68, so no halo falls outside. Angles below the first table node are clamped to it (<code>compute_θmin</code>, <code>src/profiles.jl</code> l.284), as every painter here does explicitly.</li>
+</ul>
+
+<h3>5. Open issues</h3>
+
+<aside class="note"><ul>
+<li>The FRB ray generator and the DM map painters still use <code>build_interpolator</code> tables on the linear z grid without exact low-z tables. For y the error is confined to ℓ &lt; 100 and +0.5 % in mean y; for the DM PDFs and the y × DM cross-spectra its size has not been measured in any file read for this appendix.</li>
+<li>The origin of the 0.9 in <code>ne2d</code> (e67a8a1) is not documented. All comparisons account for it, but a reader of the code cannot tell whether it is meant as an ionized fraction, a hot-gas fraction or a calibration.</li>
+<li>The idark copies were not re-read today (ssh timeout). Their equality with 35f79ad rests on the tag message, the PBS comment and commit 7f5b73a, plus one file checksum from 2026-09-14.</li>
+<li>Commit ce1d239 is not on GitHub's <code>main</code> (local main is one ahead of <code>origin/main</code>); the validated tree is on GitHub only via <code>cluster</code> and the tag. <code>julia_env/dev/XGPaint.jl</code> is a stale upstream copy with a hand-edited <code>util.jl</code> that no manifest uses; it could mislead a reader who opens it.</li>
+<li>Upstreaming: Adrian Bayer's τ fix, the B12 conversion comment, the FRB profile, the slice API and the corrected unit constant are candidates for a pull request to WebSky-CITA; the 0.9 and the grid defaults would need a decision first.</li>
+</ul></aside>
+
+</section>

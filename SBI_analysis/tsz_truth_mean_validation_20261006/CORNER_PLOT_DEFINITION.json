@@ -1,0 +1,80 @@
+{
+  "samples": 45000,
+  "parameters": [
+    "P0",
+    "xc",
+    "beta",
+    "alpha_m_P0",
+    "alpha_m_xc",
+    "alpha_m_beta",
+    "alpha_z_P0",
+    "alpha_z_xc",
+    "alpha_z_beta"
+  ],
+  "cases": [
+    {
+      "index": 1217,
+      "held_position": 2435,
+      "design_id": 52397,
+      "truth": [
+        10.463390781544149,
+        3.6569297623820605,
+        15.336888343840837,
+        1.2756787111982706,
+        -0.4384368496015668,
+        -0.08779599405825138,
+        -5.452918514143676,
+        2.942959459964186,
+        0.07202402967959642
+      ],
+      "original_normalized_rmse": 0.24468190572214088,
+      "selection": "seeded random"
+    },
+    {
+      "index": 1095,
+      "held_position": 2191,
+      "design_id": 47096,
+      "truth": [
+        53.36315988190472,
+        0.4073729676194489,
+        7.135248127579689,
+        -0.5407036492601037,
+        -0.24561673812568197,
+        -0.17449830267578365,
+        -2.7470134338364005,
+        2.4975206586532295,
+        -0.030461207032203674
+      ],
+      "original_normalized_rmse": 0.27891188317051474,
+      "selection": "seeded random"
+    },
+    {
+      "index": 724,
+      "held_position": 1449,
+      "design_id": 31157,
+      "truth": [
+        1.4280561031773686,
+        3.774830415099859,
+        15.81521204188466,
+        1.047441944293678,
+        -0.21729720383882523,
+        0.2854218479245902,
+        -1.7000615973956883,
+        -0.7957305056042969,
+        1.8694232385605574
+      ],
+      "original_normalized_rmse": 0.39019762565801247,
+      "selection": "largest original linear mean error"
+    }
+  ],
+  "contours": [
+    0.68,
+    0.95
+  ],
+  "range": "Union of each displayed model central 99.6% range, padded, with truth included",
+  "smoothing": "One histogram bin for display only; all inference uses unsmoothed posterior draws",
+  "mass": "Contour mass referenced to all samples, including samples outside displayed axes",
+  "warning": "Two seeded-random cases and an explicitly selected original-model stress case; not population evidence",
+  "contour_interpretation": "68/95 percent TWO-PARAMETER MARGINAL regions; not nine-dimensional joint HPD",
+  "typography": "Larger labels/ticks; diagonal density tick labels removed; posterior draws unchanged"
+}

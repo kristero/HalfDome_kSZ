@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -N miss_B
+#PBS -q mini2
+#PBS -l select=1:ncpus=56:mem=400gb
+#PBS -l walltime=72:00:00
+#PBS -j oe
+#PBS -o /home/kristero10/tsz64k_missing_20260928/logs/workers_groupB.out
+# Four bundle workers (manage.py run, 14 threads each) on one 56-core mini2 node. Every worker walks the full list of
+# missing batches from its own starting point; the bundle's claims keep two workers off the same batch.
+set -uo pipefail
+cd /home/kristero10/tsz64k_missing_20260928
+LIST=$(cat missing_batches.txt)
+BUNDLE=/home/kristero10/tsz64k_fixbeta_stage/HalfDome_kSZ/tSZ_64k_flat_prior_SO_baseline_deproj0
+echo "host=$(hostname) start=$(date -Is)"
+for w in 0 1 2 3; do
+  ROT=$(/home/anaconda3/bin/python3 -c "l='$LIST'.strip().split(','); k=len(l)*$w//4; print(','.join(l[k:]+l[:k]))")
+  /home/anaconda3/bin/python3 $BUNDLE/pipeline/manage.py --config /home/kristero10/tsz64k_missing_20260928/config_groupB.toml run --batches "$ROT" --threads 14 \
+    > /home/kristero10/tsz64k_missing_20260928/logs/workerB_${PBS_JOBID%%.*}_$w.log 2>&1 &
+done
+wait
+echo "finished=$(date -Is)"

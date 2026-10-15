@@ -1,0 +1,18 @@
+H_sensitivity/prior  -  earlier results relevant to the tSZ / kSZ / FRB-DM sensitivity, fit/cut radius, mass binning
+and B12/B16 / Lee22-style fitting, re-read and reorganised (2026-10-14).  Read-only use of A-G, kernels, stacking_choices.
+Local runs only (light table work, < 1 GB RAM, ~10 s each); nothing heavy, nothing on maas.
+
+Run (halfdome env, LD_LIBRARY_PATH=<env>/lib, python -B), in order:
+  p1_importance.py            radial / mass importance from F's importance_F.npz (35 shells, truth) and the kernels'
+                              67-shell Jacobians (P4/E4 fits); Y/N_e budgets
+  p2_fit_cut_grids.py         R_fit x R_cut grids: F (B12/B16, all gas and A2-ii controls), G (all models, 5x5),
+                              importance-weighted profile RMS; parity check G P0/E0 = F grid a (0.0)
+  p3_cut_support_influence.py Test B: sigma_d vs cut (ALL, A2-ii, CLEAN), influence bands, parameter bootstrap SDs,
+                              observables vs cut
+  p4_lee22_ladder.py          Test G Lee22-style ladder: selected models, named models, concentration cells, observables
+  p5_binning.py               Test B2 stability; stacking-choices mass_binning results (schemes, top bins, assignment)
+  p6_figures.py               figures/prior_*.png|svg
+  p7_key_numbers.py           tables/prior_key_numbers.csv, prior_summary.json (every quoted number with its source)
+
+Outputs: tables/*.csv, p1..p5_summary.json, prior_summary.json, figures/prior_importance_radial, prior_R90_by_mass,
+prior_fit_cut_grids_B12B16, prior_model_comparison_4R.

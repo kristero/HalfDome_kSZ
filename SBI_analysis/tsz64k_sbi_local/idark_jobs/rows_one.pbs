@@ -1,0 +1,13 @@
+#!/bin/bash
+#PBS -j oe
+# posterior_rows.py for one network (--ranks --seed-means, 300,000 B12 draws) into OUT; SPACE=logit|linear.
+#   qsub -q mini_B -N r1_<label> -l select=1:ncpus=16:mem=32gb -l walltime=03:00:00 -v SPEC=<label=merlin:folder:variant>,SPACE=logit,OUT=<dir> rows_one.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+C=${NCPUS:-16}
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1 OMP_NUM_THREADS=$C
+echo "host=$(hostname) ncpus=$C spec=$SPEC space=$SPACE out=$OUT start=$(date -Is)"
+MERLIN_PARAM_SPACE=$SPACE /home/kristero10/envs/sbi27/bin/python posterior_rows.py --out $OUT --threads $C --ranks \
+  --seed-means --b12 --b12-samples 300000 $SPEC
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

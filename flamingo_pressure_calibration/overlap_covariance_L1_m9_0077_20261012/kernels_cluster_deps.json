@@ -1,0 +1,18 @@
+{
+ "engine_dependency_files": [
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/fit_study.py",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/measure.py",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/models.py",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/pilot_physics.py",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/products/study_summary.json",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/projection_model.py",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/analysis_common.py",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/analytic_observables/lightcone_analytic.py",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/lightcone_maps/fine_velocity_histogram.npz",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/fit_parameters.npz",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/profile_shapes.npz",
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/tsz_fit_truncation_L1_m9_0077_20261009/halo_model/compute_halo_terms.py",
+  "/home/cbllover/HalfDome/frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/catalogue/catalogue_hist.npz",
+  "/home/cbllover/HalfDome/frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/class_sz/b12_paint_all.npz"
+ ]
+}

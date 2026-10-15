@@ -1,0 +1,35 @@
+{
+  "simulation_seed": 100,
+  "mask_seed": 12345,
+  "target": "relative_change",
+  "cases": [
+    {
+      "label": "original",
+      "target": "unchanged",
+      "sigma_ell": 0
+    },
+    {
+      "label": "smooth_sigma5",
+      "target": "relative_change",
+      "sigma_ell": 5,
+      "source_control": "smooth_clean_5"
+    },
+    {
+      "label": "smooth_sigma50",
+      "target": "relative_change",
+      "sigma_ell": 50,
+      "source_control": "smooth_clean_50"
+    }
+  ],
+  "original_input_max_error": 0.0,
+  "saved_control_reconstruction_relative_error": [
+    0.0,
+    0.0
+  ],
+  "change_definition": "Mean clean difference of seeds 102..118 at fixed mask 12345 relative to seed100; fractional Gaussian smoothing; baseline SO residual unchanged",
+  "primary_sigma_ell": 5,
+  "secondary_sigma_ell": 50,
+  "kernel": "Gaussian in integer multipole; scipy gaussian_filter1d, nearest edges, default truncate=4",
+  "observation": "Same trained beam correction, noise-only whitening, PCA and asinh standardization",
+  "interpretation": "Diagnostic changed input; the saved model is not retrained or recalibrated."
+}

@@ -1,0 +1,216 @@
+{
+  "halo_rows": 4588,
+  "names": {
+    "owners": [
+      "central_bound",
+      "overlapper_mu0p03_reach1R_own_satellite",
+      "overlapper_mu0p03_reach1R_neighbour",
+      "overlapper_mu0p03_annulus_own_satellite",
+      "overlapper_mu0p03_annulus_neighbour",
+      "overlapper_mu0p1_reach1R_own_satellite",
+      "overlapper_mu0p1_reach1R_neighbour",
+      "overlapper_mu0p1_annulus_own_satellite",
+      "overlapper_mu0p1_annulus_neighbour",
+      "overlapper_mu0p3_reach1R_own_satellite",
+      "overlapper_mu0p3_reach1R_neighbour",
+      "overlapper_mu0p3_annulus_own_satellite",
+      "overlapper_mu0p3_annulus_neighbour",
+      "other_own_satellites",
+      "other_bound_painted",
+      "other_bound_not_painted",
+      "unbound"
+    ],
+    "phases": [
+      "recent_agn",
+      "xray_selected",
+      "other"
+    ],
+    "quantities": [
+      "count",
+      "mass",
+      "volume",
+      "y",
+      "electrons",
+      "electron_kT",
+      "gas_pressure_volume",
+      "mass_pe",
+      "volume_pe2",
+      "mass_t",
+      "volume_t",
+      "mass_rho",
+      "lx_rosat",
+      "lx_pe",
+      "lx_t",
+      "y2"
+    ],
+    "units": {
+      "count": "1",
+      "mass": "Msun",
+      "volume": "Mpc^3 (physical, m/rho)",
+      "y": "Mpc^2",
+      "electrons": "1 (n_e V)",
+      "electron_kT": "J (n_e V k T)",
+      "gas_pressure_volume": "Pa Mpc^3",
+      "mass_pe": "Msun Pa",
+      "volume_pe2": "Mpc^3 Pa^2",
+      "mass_t": "Msun K",
+      "volume_t": "Mpc^3 K",
+      "mass_rho": "Msun^2 Mpc^-3",
+      "lx_rosat": "erg/s",
+      "lx_pe": "erg/s Pa",
+      "lx_t": "erg/s K",
+      "y2": "Mpc^4"
+    },
+    "reduced": [
+      "count",
+      "mass",
+      "volume",
+      "y",
+      "electrons"
+    ],
+    "variants": [
+      "all",
+      "neighbours_only",
+      "placebo_iso",
+      "placebo_nbr"
+    ],
+    "zones": [
+      "s_lt_0p5",
+      "s_0p5_1",
+      "s_1_2",
+      "s_ge_2"
+    ],
+    "members": [
+      "central_bound",
+      "overlapper_bound",
+      "rest"
+    ],
+    "agn": [
+      "not_recent_agn",
+      "recent_agn"
+    ],
+    "partition_owners": [
+      "central",
+      "painted_neighbour"
+    ],
+    "painted_bound": [
+      "not_bound_to_other_painted",
+      "bound_to_other_painted"
+    ],
+    "aux": [
+      "hydrogen_mass",
+      "helium_mass",
+      "fully_ionized_electrons"
+    ],
+    "overlapper_quantities": [
+      "count",
+      "mass",
+      "y",
+      "y_noagn",
+      "electrons",
+      "electron_kT"
+    ],
+    "inertia": [
+      "m",
+      "mx",
+      "my",
+      "mz",
+      "mxx",
+      "myy",
+      "mzz",
+      "mxy",
+      "mxz",
+      "myz"
+    ],
+    "apertures": [
+      "R200c",
+      "R500c",
+      "5R500c",
+      "sphere"
+    ],
+    "aperture_quantities": [
+      "count",
+      "mass",
+      "y",
+      "y_noagn",
+      "lx_rosat",
+      "lx_rosat_noagn",
+      "electrons"
+    ],
+    "diagnostics": [
+      "membership_not_in_soap",
+      "hs200_underflow",
+      "hs200_overflow",
+      "hs500_underflow",
+      "hs500_overflow",
+      "n_in4",
+      "n_in6",
+      "n_sphere",
+      "star_forming_with_nonzero_y",
+      "star_forming"
+    ]
+  },
+  "arrays": {
+    "measurements_legacy.npz:sums": [
+      4588,
+      4,
+      11,
+      36
+    ],
+    "measurements_owner.npz:owner200": [
+      4588,
+      17,
+      3,
+      16,
+      67
+    ],
+    "measurements_owner.npz:owner500": [
+      4588,
+      17,
+      3,
+      16,
+      40
+    ],
+    "measurements_owner.npz:aux200": [
+      4588,
+      2,
+      3,
+      67
+    ],
+    "measurements_owner.npz:hs200": [
+      4588,
+      67,
+      384
+    ],
+    "measurements_excision.npz:excision": [
+      4588,
+      4,
+      4,
+      3,
+      2,
+      5,
+      67
+    ],
+    "measurements_partition.npz:partition": [
+      4588,
+      2,
+      2,
+      2,
+      5,
+      67
+    ],
+    "apertures.npz:apertures": [
+      4588,
+      4,
+      2,
+      7
+    ],
+    "apertures.npz:overlapper (rows follow overlap_tables ov_ptr)": [
+      6518,
+      2,
+      2,
+      6
+    ]
+  },
+  "contract": "Per-halo accumulators of the overlap/covariance particle pass (plan Step 1.2).\n\naccumulate() takes the gas of ONE (halo, cell) pair, already clipped to the halo's extraction sphere\nr <= r_ext = max(4 R200c, 6 R500c) by the exact periodic test, in the radii234 units (Coordinates and\nSmoothingLengths comoving Mpc; Masses Msun; Densities Msun/Mpc^3; ComptonYParameters Mpc^2;\nElectronNumberDensities Mpc^-3; Temperatures K; Pressures Pa) plus StarFormationRates (only the sign\nis used) and XrayRosat [erg/s, XrayLuminosities column 2]. Every block is a linear sum, so blocks merge\nby addition across cells and files.\n\nlegacy_sums() is the sums path of the frozen measure.accumulate, verbatim: the caller applies it to the\nradii234 legacy subset (the same (halo, cell) pairs and the same exact 4 R200c test) and the result is\nbit-identical to radii234 (gates G5, G7).\n\nBlocks returned by accumulate() (shapes per halo; N200 = 67, N500 = 40, NH = 384):\n  owner200 [17 OWNERS, 3 PHASES, 16 QUANTITIES, N200] float64  (x200 grid; same particle set as legacy)\n  owner500 [17, 3, 16, N500] float64                           (x500 = r/R500c <= 6)\n  excision [4 VARIANTS, 4 ZONES, 3 MEMBERS, 2 AGN, 5 REDUCED, N200] float64\n  partition [2 PARTITION_OWNERS, 2 PAINTED_BOUND, 2 AGN, 5 REDUCED, N200] float64\n  aux200 [2 AGN, 3 AUX, N200], aux500 [2, 3, N500] float64\n  hs200 [N200, NH], hs500 [N500, NH] uint32       (h a / R200c and h a / R500c histograms, HS_EDGES)\n  overlapper [n_ov, 2 (own bound, group bound), 2 (x200 <= 2, whole sphere), 6 OVERLAPPER_QUANTITIES]\n  inertia [2 (all gas, central bound), 10 INERTIA] float64      (x200 <= 1, positions in R200c units)\n  apertures [4 APERTURES, 2 (all gas, central bound), 7 APERTURE_QUANTITIES] float64\n  id_hash [2 (4 R200c legacy rule, whole sphere), 2 (sum, xor)] uint64 of splitmix64(ParticleIDs)\n  id_count [2] int64, diagnostics [len(DIAGNOSTICS)] int64\nplus 'in4' (bool mask of the legacy 4 R200c rule; not stored).\n"
+}

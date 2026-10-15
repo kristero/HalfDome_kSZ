@@ -1,0 +1,100 @@
+## Stacking core (`stacking_choices_20261014/core/`)
+
+Import it with `sys.path.insert(0, OUT + '/core'); import stackcore as sc`. Run Python with `-B` and `LD_LIBRARY_PATH=<halfdome env>/lib`.
+
+### Cache (built by `core/build_cache.py`, 64 s)
+- **Per-halo arrays.** 722 arrays of shape [4588, S], float64, uncompressed .npy, so they can be memory-mapped.
+  - Rows follow STUDY/selected_halos.npz order. This is the same order as B_covariance `orig_row`, F `halo_rows` and `halo_table.npz` `row`.
+- **Key format.** `field|estimator|agn|selection|phase|grid|norm`.
+  - field: P, E, G, E_fullion, T_M, T_V, T_X, T_e, K, C_rho, C_P.
+  - estimator: geometric, Q_V, Q_V_y, Q_M, Q_X, nT_X; `weighted` for temperatures, entropy and clumping.
+  - agn: removed (default), kept, only (only the recently AGN-heated phase).
+  - selection: all, central_bound, no_other, no_satellites_or_other, host_bound, rm_ov_mu0.1, rm_ov_mu0.1_keepsat, rm_ov_mu0.03, rm_ov_mu0.3, rm_ov_mu0.1_reach1R, A2i, A2ii, A2ii_A2i, exc_all_k0.5, exc_all_k1, exc_all_k2, exc_nbr_k1.
+  - phase: all, xray (SFR<=0, T>=1e5 K, not AGN), cold_sf (star-forming or T<1e5 K, not AGN).
+  - grid: x200 (67 shells to 4 R200c), fit (35 shells, identical to Test F's F grid and B's fit grid), lee22 (27 shells, 0.04-1.34), old (36 radii234 shells), x500 (40 shells to 6 R500c), b24 (30 shells, 0.01-3 R500c).
+  - norm: P200, rhoc_fb (E: n_e mu_XGP/(rho_c f_b); G: rho/(rho_c f_b)), B24, A10, self_similar_500, T200, T500, K200, K500, none.
+- **Same variants on every grid.** The x200, fit, lee22 and old grids each carry the same 145 variants; x500 and b24 each carry the same 71.
+  - So every key listed in `variant_keys` with `fit` also exists with x200, lee22 and old; every key with `x500` also exists with b24.
+- **index.json.** Holds, for each key: file, field, estimator, agn, selection, selection_spec (the library call), selection_label, phase, grid, base, norm, units, edges_file, shape, finite_fraction, nan/negative/zero halo-shell counts, library_call and description.
+  - It also has a `conventions` block that defines every token, the softening (0.0057 Mpc), f_b (0.158823) and h (0.681).
+- **Resolution inputs.**
+  - `counts_<grid>.npy`: gas-particle count per shell, all owners and phases.
+  - `hsml_<grid>.npy`: upper-median h a/R per shell, from the rebinned hs200/hs500 histograms; NaN where the shell is empty.
+  - `retained__<exc sel>__<grid>.npy`: retained volume fraction of the excision variants.
+- **halo_table.npz.** One entry per halo:
+  - identity and position: row, soap_row, halo_index, centre_mpc, centre_cmpc, block (4^3 jackknife blocks), fold (F's 8 spatial CV folds), block_fold;
+  - masses and radii: m200c, r200c, m500c, r500c, logm200c, logm500c;
+  - sampling: weight, inclusion_probability, mass_bin, mass_edges, class_main, class_mu0p03, class_mu0p3, class_neighbours_mu0p1, role, census_max_mu;
+  - structure: concentration_200c, dm_concentration_200c, mass_fraction_satellites_200c, nearest_massive_distance_mpc;
+  - scales: T200_K, T500_K, p200_pa, p500_B24_pa, p500_A10_pa, p500_ss_pa, ne200_SS_m3, ne500_B24_m3, eps_over_r200c, eps_over_r500c;
+  - own integrals: Y200_own_mpc2, Y200_own_agnkept_mpc2, Y500_own_mpc2, Y4R_own_mpc2, Ne200_own, Ne4R_own, plus the SOAP values y200_soap_noagn_mpc2 and y500_soap_noagn_mpc2.
+
+### Functions in `stackcore`
+**Access**
+- `load_index()` returns the index.json dict. `variant(key)` returns one key's metadata.
+- `variant_keys(**tokens)` filters keys by token, e.g. `variant_keys(field='P', grid='fit')`.
+- `make_key(field, estimator='geometric', agn='removed', selection='all', phase='all', grid='fit', norm=None)`. With norm=None it uses the field's default normalisation for the grid.
+- `halo_table()` returns a dict of arrays.
+- `edges(grid)` returns the edges in units of R200c (x200/fit/lee22/old) or R500c (x500/b24). `grid_radius(grid)` names that radius.
+- `per_halo(key)` returns a read-only memory map [4588, S].
+- `counts(grid)`, `hsml_x(grid)` and `retained(sel, grid)` return memory maps.
+- `shell_volumes(grid)` returns 4pi/3 Δx³.
+- `integral(values, grid, upto)` returns Σ F_s 4pi/3 Δx³ over shells whose outer edge is <= upto, with NaN counted as 0.
+- `y200(rows)` returns the own Y(<R200c) in Mpc² (all gas, recent AGN removed).
+
+**Mass bins**
+- `mass_bins(scheme)` returns a list of non-empty bins. Each bin is a dict with: scheme, label, index, lo, hi, variable, units, rows, weights, mean_log_mass (inclusion-weighted, of the scheme variable), mean_logm200c, mean_logm500c, N, N_eff, sum_weight and strata (mass_bin*3 + class_main).
+- Schemes (`sc.SCHEMES`):
+  - `M200c_0.2`: the 15 stored stratification bins, 12.5-15.5;
+  - `M200c_0.1`, `M200c_0.3`, `M200c_0.5`: 12.5-15.5 (no partial bin is needed);
+  - `M500c_0.2`: 12.5-15.5 in M500c. It is complete because M200c >= M500c. 242 haloes with M500c < 10^12.5 fall outside it;
+  - `M500c_0.5`: 13.0-15.5 in M500c, B24-like;
+  - `Lee22_h`: 0.2 dex in h⁻¹ Msun from 13.0 to 15.4, with h = 0.681.
+- `find_bin(scheme, label)` returns one bin. `scheme_definition(scheme)` returns its variable and edges.
+
+**Resolution**
+- `resolution_mask(rows, grid, rule='strict', min_count=20, softening_factor=4.0, hsml_factor=2.0, min_edge=0.04, **extra)`. `extra` can set diagnostic_total_count=200 and diagnostic_nonzero_fraction=0.5.
+  - 'strict' and 'diagnostic' return a shell mask [S] with exactly the semantics of `analysis.masks.resolution_masks`.
+  - 'per_halo' returns [n, S] booleans.
+  - 'none' returns all True.
+- `resolution_detail(rows, grid, **opts)` returns geometric, resolved, strict, diagnostic, resolved_fraction and the options used.
+
+**Stacking**
+- `stack(values[n,S], weights[n], statistic, halo_shell_mask=None|[S]|[n,S], n_boot=200, seed=20261012, strata=None, y200=None, trim=0.05, return_boot=False)`.
+- Statistics:
+  - 'mean': inclusion-weighted, NaN halo-shells skipped;
+  - 'unweighted_mean';
+  - 'median': weighted inverse CDF; ties are averaged, so equal weights reproduce np.median;
+  - 'geomean': exp of the weighted mean of ln F over F > 0;
+  - 'y_weighted_mean': weight × own Y200, which must be passed as `y200`;
+  - 'trimmed_mean': removes exactly 5% of the weight at each end per shell.
+- It returns a dict with:
+  - `value` [S];
+  - `err`: bootstrap SD of the statistic over halo resamples, stratified if `strata` is given;
+  - `boot_q16`, `boot_q84`;
+  - `sd`: reliability-weighted SD of the per-halo F, with the same maths as `analysis.stacking.weighted_stack`;
+  - `sd_ln`: the same SD of ln F;
+  - `q16`, `q84`: weighted per-halo percentiles;
+  - `n_used` [S], `n_eff` [S], n_total, plus `boot` [n_boot, S] if return_boot is set.
+- The same n, seed and strata give the same resamples, so bootstrap replicates are paired across variants.
+
+**Convenience drivers**
+- `stack_bin(key, bin_dict, statistic='mean', rule='strict', n_boot=200, seed=None, stratified=True, resolution_options=None, return_boot=False)`.
+  - The default seed is 20261012 + 1000 × bin index, the same for every variant, so variants are paired.
+  - Bootstrap resampling is stratified by the design strata.
+  - With 'strict', 'diagnostic' or 'none', every halo enters every shell and `resolved` [S] flags the shells that pass. With 'per_halo', unresolved halo-shells are dropped.
+- `stack_bins(key, scheme, statistic, rule, n_boot=200, stratified=True, labels=None, resolution_options=None, sig=4, as_records=True)` returns a list of JSON-ready records, one per bin.
+
+**Observables**
+- `observable_impact(dlnF, field)`:
+  - Input: dlnF of the stacked mean, [10 calibrated bins 13.5-15.5, 35 fit shells]; [15|16, 35] is also accepted.
+  - Method: dO/O = k Σ imp[b,s] (exp(dlnF) − 1), and dlnO = ln(1 + dO/O). `imp` is `imp__*` from F_observables/results/importance_F.npz (scatter-inclusive Jacobians). k = 2 for quadratic observables, 1 for linear ones.
+  - Output per observable: dlnO, dO_over_O, k, per_bin, calibrated_share, missing_share (NaN cells count as no change).
+  - Observables for P: tSZ_yy_total_ell100/1000/3000, tSZ_yy_1h_ell100/1000/3000, y_mean, tSZxDM_total_ell1000_P.
+  - Observables for E: kSZ_1h_ell100/1000/3000, DM_mean, DM_var, DM_Cl_total_ell1000, DM_q16/q50/q84, tSZxDM_total_ell1000_E.
+- `impact_from_stacks(F_variant[10,35], F_reference[10,35], field)` runs the same propagation from two stacks.
+- `impact_cross(dlnP, dlnE)` gives the y×DM cross spectrum at ell = 1000, summing both sides.
+
+**Records**
+- `record(variant_id, field, scheme, bin_label, x_edges, result, N, N_eff, extra=None, sig=4)` returns a compact JSON dict. Numbers are rounded to 4 significant digits and NaN becomes null.
+- Keys: variant, field, scheme, bin, x_edges, value, err, q16, q84, n_used, N, N_eff, sd, sd_ln, n_eff, plus any extras such as statistic, rule, mean_log_mass and resolved.

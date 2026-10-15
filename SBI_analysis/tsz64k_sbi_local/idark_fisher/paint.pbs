@@ -1,0 +1,23 @@
+#!/bin/bash
+#PBS -N fb12
+#PBS -j oe
+# Fisher forecast at B12: SO mocks with the frozen tSZ_64k engine (paint_mocks.jl, production fidelity), one
+# catalogue pass per job (make_tasks.py: noise/n<k> = B12 with 50 new noise pairs, deriv/d<k> = B12 +- 2h).
+# Staged Julia 1.12.2, depot, bundle and catalogue in $HOME (any node).
+#   cd <job folder>; qsub -q mini_B -l select=1:ncpus=10:mem=40gb -l walltime=06:00:00 ../../paint.pbs
+set -uo pipefail
+cd "${PBS_O_WORKDIR:?}"
+exec > "paint_${PBS_JOBID%%.*}.log" 2>&1
+STAGE=$HOME/tsz64k_fixbeta_stage
+JROOT=$STAGE/julia_tsz64k
+export HALFDOME_REPO=$STAGE/HalfDome_kSZ
+export HALFDOME_CATALOGUE=$STAGE/lightcone_100.hdf5
+export JULIA_DEPOT_PATH="$HOME/tsz64k_fixbeta_20260928/depot:$JROOT/depot"
+export LD_LIBRARY_PATH="$JROOT/julia-1.12.2/lib/julia${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+N=${NCPUS:-10}
+echo "host=$(hostname) ncpus=$N start=$(date -Is)"
+/usr/bin/time -v -o task.time "$JROOT/julia-1.12.2/bin/julia" --startup-file=no \
+  --project="$HALFDOME_REPO/tSZ_64k_flat_prior_SO_baseline_deproj0/julia_env" --threads="$N" ../../paint_mocks.jl task.toml
+code=$?
+echo "finished=$(date -Is) code=$code"
+exit $code

@@ -1,0 +1,65 @@
+{
+ "doc": "I0b (local, light): inputs of the per-halo resolution-rule test (maas run 3, i_perhalo.py), from the validated\nstacking cache (stacking_choices_20261014/core/stackcore.py, read-only) -> inputs/i0_perhalo_x200.npz (+ .json).\n\nWhy: in runs 1-2 the I5 variant 'perhalo' (A2-ii stacked with the per-halo resolution rule) was fitted on the STRICT\nresolved shells only (i_g35.stage_fits35 ANDs every 0.2-dex variant's mask with Test G's base_mask; stage_lvariants\nwith strict_mask).  On those shells every halo is resolved, so its stack equals A2-ii exactly and the variant was the\nreference by construction.  Run 3 refits it on its OWN resolved shells and also paints the per-halo-rule stack itself.\n\nResolution rules (stackcore.resolution_detail; x = r/R200c, shell s = [x_s, x_{s+1}]):\n  halo-shell resolved  x_s >= max(0.04, 4 eps / R200c)  and  N_gas(shell) >= 20  and  x_s >= 2 h_med / R200c\n                       (eps = 0.0057 Mpc softening; N_gas = gas particles of all owners and phases in the shell;\n                       h_med = upper-median SPH smoothing length of the shell's gas, comoving -> physical)\n  strict               a shell is used for the bin only if EVERY halo of the bin resolves it; all haloes enter\n  per-halo             each halo enters only the shells it resolves itself; a shell is 'resolved' for the bin if at\n                       least one halo resolves it (n_used > 0)\nFor every calibrated bin c (M200c 0.2-dex bins 13.5-15.5, log10 Msun) and field f in {P, E}:\n  mean_strict_<f>   [10, 67]  inclusion-weighted A2-ii mean on the fine x200 grid, strict rule (all haloes in every\n                              shell; must equal Test H's / Test I's A2-ii stack 'mstack' = the painting target)\n  mean_perhalo_<f>  [10, 67]  the same with the per-halo rule (NaN where n_used = 0)\n  nused_perhalo_<f> [10, 67]  number of haloes entering each shell under the per-halo rule\n  wfrac_perhalo_<f> [10, 67]  their share of the bin's inclusion weight\n  strict_<f>, own_<f> [10, 67] resolved shells of the two rules\n  nused_fit_<f>, wfrac_fit_<f>, own_fit_<f>, strict_fit_<f> [10, 35]  the same on the 35-shell fit grid\n  N [10], x_edges_x200 [68], x_edges_fit [36], bins [10, 2]\nUnits: P = P_e / P200, E = n_e mu_XGP / (rho_c f_b) (dimensionless; the cache's 'P200' / 'rhoc_fb' normalisations).\n  python -B i_perhalo_inputs.py\n",
+ "keys": {
+  "P": "P|geometric|removed|A2ii|all|x200|P200",
+  "P_fit": "P|geometric|removed|A2ii|all|fit|P200",
+  "E": "E|geometric|removed|A2ii|all|x200|rhoc_fb",
+  "E_fit": "E|geometric|removed|A2ii|all|fit|rhoc_fb"
+ },
+ "strict_x200_vs_mstack_P_max_rel": 1.5543122344752192e-15,
+ "perhalo_eq_strict_on_strict_shells_P_max_rel": 0.0,
+ "perhalo_fit_vs_i0_variants_P_max_rel": 0.0,
+ "own_fit_equals_i0_res_perhalo_P": true,
+ "n_shells_own_x200_P": [
+  44,
+  50,
+  59,
+  57,
+  60,
+  61,
+  61,
+  62,
+  61,
+  63
+ ],
+ "n_shells_strict_x200_P": [
+  28,
+  33,
+  40,
+  41,
+  44,
+  47,
+  54,
+  56,
+  60,
+  61
+ ],
+ "strict_x200_vs_mstack_E_max_rel": 1.3322676295501878e-15,
+ "perhalo_eq_strict_on_strict_shells_E_max_rel": 0.0,
+ "perhalo_fit_vs_i0_variants_E_max_rel": 0.0,
+ "own_fit_equals_i0_res_perhalo_E": true,
+ "n_shells_own_x200_E": [
+  44,
+  50,
+  59,
+  57,
+  60,
+  61,
+  61,
+  62,
+  61,
+  63
+ ],
+ "n_shells_strict_x200_E": [
+  28,
+  33,
+  40,
+  41,
+  44,
+  47,
+  54,
+  56,
+  60,
+  61
+ ]
+}

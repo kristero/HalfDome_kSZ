@@ -1,0 +1,144 @@
+{
+  "simulation": "L1_m9",
+  "snapshot": 77,
+  "data_root": "/net/hypernova/data2/FLAMINGO",
+  "run": "L1000N1800/HYDRO_FIDUCIAL",
+  "snapshot_rel": "L1000N1800/HYDRO_FIDUCIAL/snapshots/flamingo_0077/flamingo_0077.hdf5",
+  "soap_rel": "L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/halo_properties_0077.hdf5",
+  "membership_rel": "L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077",
+  "mass_edges_log10_Msun": [
+    12.5,
+    12.7,
+    12.9,
+    13.1,
+    13.3,
+    13.5,
+    13.7,
+    13.9,
+    14.1,
+    14.3,
+    14.5,
+    14.7,
+    14.9,
+    15.1,
+    15.3,
+    15.5
+  ],
+  "old_sample": {
+    "source": "inputs/radii234_selected_halos.npz",
+    "rows": [
+      0,
+      4375
+    ],
+    "order": "radii234 selected_halos.npz row order (sorted SOAP row), unchanged",
+    "random_centrals_per_lower_bin": 300,
+    "all_centrals_above_logmass": 14.5,
+    "seed": 20261008
+  },
+  "main_definition": {
+    "mu": 0.1,
+    "f": 2
+  },
+  "mu_classes": [
+    0.03,
+    0.1,
+    0.3
+  ],
+  "reach_f": [
+    1,
+    2
+  ],
+  "kappa": [
+    0.5,
+    1,
+    2
+  ],
+  "enlargement": {
+    "apply": true,
+    "below_log10_msun": 14.5,
+    "classes": [
+      "clean",
+      "cont_reach1R",
+      "cont_annulus_only"
+    ],
+    "class_definition": "main_definition (mu >= 0.1, f = 2); reach1R = some such overlapper has d < R200c + R_j",
+    "target_per_class": 50,
+    "seed": 20261012,
+    "read_budget_bytes": 488000000000,
+    "weights": "inclusion probability n_selected/N of the (bin, class) stratum; old sample alone: 300/N_bin below 14.5, 1 above",
+    "decision": "Checkpoint 1 (2026-10-12): user chose \"Run with enlargement\"; census proposes 213 annulus-only additions, 307.8 GB logical read"
+  },
+  "excision": {
+    "mu_min": 0.1,
+    "reach_f": 2,
+    "zone_edges_kappa": [
+      0.5,
+      1,
+      2
+    ],
+    "variants": [
+      "all",
+      "neighbours_only",
+      "placebo_iso",
+      "placebo_nbr"
+    ],
+    "placebo_seed": 20261013,
+    "placebo_direction_neighbour_mu": 0.1
+  },
+  "painting_threshold_msun": 6600000000000.0,
+  "census": {
+    "mass_floor_msun": 94000000000.0,
+    "mass_floor_note": "plan quotes 9.5e10 = 0.03 x 10^12.5 rounded up; 9.4e10 keeps every mu >= 0.03 overlapper of a 10^12.5 central",
+    "kdtree_workers": 2,
+    "g3_seed": 20261014
+  },
+  "extraction": {
+    "r200c_multiple": 4,
+    "r500c_multiple": 6,
+    "cell_padding_fraction": 0.1,
+    "bytes_per_particle": 140,
+    "bytes_per_particle_note": "radii234 112 (fields + 8 B membership) + StarFormationRates 4 + XrayLuminosities float64[3] 24",
+    "read_budget_bytes": 488000000000,
+    "xray_source": "chunks",
+    "xray_column": 2,
+    "xray_column_names": [
+      "erosita_low",
+      "erosita_high",
+      "ROSAT"
+    ],
+    "xray_selected_temperature_min_k": 100000.0,
+    "star_forming": "StarFormationRates > 0 (dataset description: positive = SFR, negative = -last SF scale factor, 0 = never)"
+  },
+  "workers": 6,
+  "RLIMIT_AS_GiB": 8,
+  "RSS_stop_GiB": 48,
+  "wall_limit_minutes": 300,
+  "chunk_cache_MiB": 40,
+  "gate_file": 56,
+  "remote_python": "/home/nagainis/HalfDome/flamingo_pressure_calibration/profile_test_L1_m9_0077_20261007/venv/bin/python",
+  "politeness": {
+    "note": "maas is a shared host without a scheduler: read-only access to /net/hypernova; all writes inside this study directory; every remote job runs at nice 19 and best-effort I/O priority 7; the particle pass sizes its pool from the live load",
+    "nice": 19,
+    "ionice_class": "best-effort",
+    "ionice_level": 7,
+    "max_load_fraction": 0.75,
+    "min_workers": 2,
+    "min_available_GiB_start": {
+      "census": 16,
+      "prepare": 16,
+      "gate": 16,
+      "gate_file": 16,
+      "launch": 64
+    },
+    "min_available_fraction_running": 0.12,
+    "min_available_GiB_running_floor": 4
+  },
+  "RLIMIT_AS_note": "virtual address-space cap per worker; G6 (file 56, reopen every 16 cells, fixed mmap threshold) peaked at 1.52 GiB RSS / 1.90 GiB VMS, so 8 GiB is a 4x backstop; resident memory is guarded by RSS_stop_GiB and the system free-memory floor",
+  "chunk_cache_note": "largest dataset chunk is 36 MiB (SmoothedElementMassFractions); 80 MiB raised the open-file footprint",
+  "reopen_every_cells": 16,
+  "malloc_env": {
+    "MALLOC_MMAP_THRESHOLD_": "4194304",
+    "MALLOC_TRIM_THRESHOLD_": "33554432"
+  },
+  "malloc_env_note": "fixed mmap threshold: freed HDF5 decompression buffers return to the OS; with it, a worker drops to 0.7 GiB after closing a file versus 1.5 GiB without (memory_diagnostic.json)"
+}

@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N fb_fisher
+#PBS -j oe
+# Fisher forecast at B12 (fisher_forecast_b12.py) from the local inputs and the idark noise / derivative mocks.
+#   cd $HOME/tsz64k_fisher_b12_20261002
+#   qsub -q mini_B -l select=1:ncpus=8:mem=48gb -l walltime=02:00:00 [-v OUT=results,LAGS=64,HALF=25] fisher.pbs
+set -uo pipefail
+R=$HOME/tsz64k_fisher_b12_20261002; cd $R
+OUT=${OUT:-results}
+exec > logs/fisher_${OUT}_${PBS_JOBID%%.*}.log 2>&1
+C=${NCPUS:-8}
+export OMP_NUM_THREADS=$C OPENBLAS_NUM_THREADS=$C MKL_NUM_THREADS=$C PYTHONUNBUFFERED=1
+echo "host=$(hostname) ncpus=$C start=$(date -Is) lags=${LAGS:-64} half=${HALF:-25}"
+/home/kristero10/envs/sbi27/bin/python fisher_forecast_b12.py --inputs inputs --root $R --out $OUT \
+  --lags ${LAGS:-64} --half ${HALF:-25}
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

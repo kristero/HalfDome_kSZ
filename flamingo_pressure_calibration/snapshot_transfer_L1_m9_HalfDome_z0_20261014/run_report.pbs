@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N gas_transfer_pdf
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mem=32gb
+#PBS -l walltime=00:30:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/snapshot_transfer_L1_m9_HalfDome_z0_20261014
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+export PYTHONPATH="$PWD/report_deps${PYTHONPATH:+:$PYTHONPATH}"
+/usr/bin/time -v python3 -u make_reports.py > report_build.log 2>&1
+mkdir -p tmp/pdfs/summary_render tmp/pdfs/detail_render
+pdftoppm -r 65 -png output/pdf/FLAMINGO_HalfDome_z0_summary.pdf tmp/pdfs/summary_render/page
+pdftoppm -r 50 -png output/pdf/FLAMINGO_HalfDome_z0_detailed_report.pdf tmp/pdfs/detail_render/page
+python3 bundle_idark.py > bundle.log

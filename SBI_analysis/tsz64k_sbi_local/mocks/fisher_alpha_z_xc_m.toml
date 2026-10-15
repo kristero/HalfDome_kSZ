@@ -1,0 +1,5 @@
+out = "/home/cbllover/HalfDome/SBI_analysis/tsz64k_sbi_local/mocks/fisher_b12"
+
+[[cases]]
+label = "alpha_z_xc_m"
+theta = [18.1, 0.497, 4.35, 0.154, -0.00865, 0.0393, -0.758, 0.7085, 0.415]

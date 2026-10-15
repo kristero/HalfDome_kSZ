@@ -1,0 +1,10 @@
+out = "/home/kristero10/tsz64k_flamingo_fit_mock_20261001/out"
+
+# FLAMINGO L2p8_m9 preliminary joint pressure-profile fit (+ SOAP shells), as painted on 2026-09-27
+# (flamingo_pressure_calibration/halfdome_tsz_comparison/flamingo_joint_fit.toml): the same nine XGPaint
+# Battaglia16ThermalSZProfile coefficients (alpha 1, gamma -0.3, M200c in physical Msun), in the engine's order.
+# alpha_z_P0 = 0.568 lies above the 64k prior's upper edge (0.5); the engine paints it all the same.
+[[cases]]
+label = "FLAMINGO_L2p8_fit"
+theta = [4.255329379619701, 1.3377910707221534, 6.029207007048246, 0.6398160485222005, -0.16438043008778933, 0.05281626430871426, 0.5684515143587939, 0.07623000158582573, 0.30633510789892787]
+seeds = [[39001001, 39001002]]

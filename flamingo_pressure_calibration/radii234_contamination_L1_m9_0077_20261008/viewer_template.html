@@ -1,0 +1,51 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>FLAMINGO radius comparison</title>
+<style>
+body{font:17px system-ui,sans-serif;margin:20px;color:#17324b}h1{font-size:25px}
+.controls,.parameters{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:14px 0}
+select,button{font:inherit;padding:6px}input[type=range]{width:210px}.plots{display:grid;grid-template-columns:1fr 1fr}
+#radial,#sphere{height:600px;min-width:0}.note,#status{font-size:15px;max-width:1300px}
+@media(max-width:950px){.plots{display:block}}
+</style></head><body><h1>FLAMINGO: 2, 3 and 4 R200c fits</h1>
+<div class="controls"><label>Mass bin <select id="bin"></select></label>
+<label>Field <select id="field"><option value="pressure">Electron pressure</option><option value="electrons">Effective electron density</option></select></label>
+<label>Fit radius <select id="radius"><option value="0">2 R200c</option><option value="1">3 R200c</option><option value="2" selected>4 R200c</option></select></label>
+<label>Reconstruction <select id="source"><option value="stack">Measured radial stack</option><option value="model">Adjustable gNFW</option></select></label>
+<button id="reset">Reset fit</button><button id="draw">Draw joint halo coefficients</button></div>
+<div class="parameters"><label><span id="name0">P0</span>: <output id="value0"></output><br><input id="parameter0" type="range" min="0" max="1000"></label>
+<label><span id="name1">xc</span>: <output id="value1"></output><br><input id="parameter1" type="range" min="0" max="1000"></label>
+<label>beta: <output id="value2"></output><br><input id="parameter2" type="range" min="0" max="1000"></label></div>
+<p id="status"></p><div class="plots"><div id="radial"></div><div id="sphere"></div></div>
+<p class="note">Gray band: halo 16-84% range. Black error bars: halo standard deviation, not the uncertainty on the mean.
+The rotatable 3D image reconstructs a spherical field from the radial stack; it does not retain satellites or merger asymmetry.
+Joint draws preserve pressure-density coefficient correlations for accepted resolved halos. They describe a selected subset, not a calibrated intrinsic-scatter model.
+Diagnostic bins are unresolved at the requested fitting scale. The selected radius changes the fit and finite reconstruction boundary; all radial measurements remain visible to 4 R200c.</p>
+<script>__PLOTLY__</script><script>const DATA=__DATA__;
+const $=id=>document.getElementById(id), limits=[[.001,1e4],[.01,10],[.5,20]];
+let parameters=[12,.6,4.8],joint=null,jointID=null;
+for(let b=0;b<DATA.length;b++){let o=document.createElement('option');o.value=b;o.text=DATA[b].label;$('bin').append(o)}
+function state(){let c=DATA[+$('bin').value],f=$('field').value,ri=+$('radius').value;return {c,f,ri,d:c[f],r:ri+2}}
+function shape(x,p,f){let q=x/(f==='pressure'?p[1]:.5);return f==='pressure'?.5176*p[0]*Math.pow(q,-.3)*Math.pow(1+q,-p[2]):p[0]*Math.pow(q,-.2)*Math.pow(1+Math.pow(q,p[1]),-(p[2]-.2)/p[1])}
+function shellModel(lo,hi,p,f){let sum=0,n=80;for(let i=0;i<n;i++){let x=lo+(i+.5)*(hi-lo)/n;sum+=shape(x,p,f)*3*x*x*(hi-lo)/n/(hi**3-lo**3)}return sum}
+function controls(){let {f}=state();$('name0').textContent=f==='pressure'?'P0':'rho0';$('name1').textContent=f==='pressure'?'xc':'alpha';let bounds=f==='pressure'?limits:[[.1,1e7],[.1,10],[.5,20]];for(let k=0;k<3;k++){$('value'+k).textContent=parameters[k].toPrecision(4);$('parameter'+k).value=1000*Math.log(parameters[k]/bounds[k][0])/Math.log(bounds[k][1]/bounds[k][0])}}
+function reset(){let {d,ri,f}=state();parameters=d.fits[ri].fit?.parameters.slice()||(f==='pressure'?[12,.6,4.8]:[3500,.8,4]);joint=null;jointID=null;controls();render()}
+function render(){let {c,d,f,ri,r}=state(),x=c.edges.slice(1).map((hi,i)=>Math.cbrt((hi**3+c.edges[i]**3)/2));
+let model=x.map((_,i)=>shellModel(c.edges[i],c.edges[i+1],parameters,f));
+let traces=[{x,y:d.p[0],line:{width:0},showlegend:false,hoverinfo:'skip'},
+{x,y:d.p[2],line:{width:0},fill:'tonexty',fillcolor:'rgba(130,140,150,.2)',name:'halo 16-84%'},
+{x,y:d.mean,mode:'markers',marker:{color:'black',size:5},error_y:{type:'data',array:d.std,visible:true,thickness:.7},name:'stack + halo SD'},
+{x,y:d.reference,line:{dash:'dot',color:'#555'},name:f==='pressure'?'published B12':'published B16'},
+{x,y:model,line:{color:'#0072B2',width:3},name:'adjustable fit'}];
+let ylabel=f==='pressure'?'Pe / P200':'rho_tau / (fb rho_c)';
+Plotly.react('radial',traces,{margin:{l:80,r:20,t:35,b:65},font:{size:16},xaxis:{type:'log',title:{text:'r / R200c'},range:[Math.log10(.025),Math.log10(4.1)],dtick:1},yaxis:{type:'log',title:{text:ylabel},dtick:1},legend:{orientation:'h',y:1.12},shapes:[{type:'line',x0:r,x1:r,y0:0,y1:1,yref:'paper',line:{dash:'dash',color:'#888'}}]},{responsive:true});
+let first=c.mask.findIndex(Boolean),inner=first<0?.04:Math.max(.04,c.edges[first]),xx=[],yy=[],zz=[],vv=[];
+let positive=d.mean.filter(v=>v>0),floor=Math.log10(Math.min(...positive))-1,ceiling=Math.log10(Math.max(...positive));
+for(let ix=0;ix<25;ix++)for(let iy=0;iy<25;iy++)for(let iz=0;iz<25;iz++){let a=-r+2*r*ix/24,b=-r+2*r*iy/24,e=-r+2*r*iz/24,rad=Math.hypot(a,b,e);xx.push(a);yy.push(b);zz.push(e);let value=floor;
+if(rad>=inner&&rad<=r){if($('source').value==='model')value=Math.log10(shape(rad,parameters,f));else{let k=c.edges.findIndex(v=>v>rad)-1;k=Math.max(0,Math.min(k,d.mean.length-1));if(d.mean[k]>0)value=Math.log10(d.mean[k])}}vv.push(value)}
+Plotly.react('sphere',[{type:'isosurface',x:xx,y:yy,z:zz,value:vv,isomin:floor+1,isomax:ceiling,opacity:.1,surface:{count:10},caps:{x:{show:false},y:{show:false},z:{show:false}},colorscale:'Viridis',colorbar:{title:{text:'log10 field'}}}],{margin:{l:0,r:20,t:30,b:20},font:{size:15},scene:{uirevision:'camera',aspectmode:'cube',camera:{eye:{x:1.8,y:1.8,z:1.5}},xaxis:{title:{text:'x / R200c'}},yaxis:{title:{text:'y / R200c'}},zaxis:{title:{text:'z / R200c'}}}},{responsive:true});
+let fitStatus=!d.fits[ri].fit?'insufficient eligible shells: adjustable coefficients are illustrative':c.supported?'common resolved stack fit':'diagnostic fit: strict resolution support absent';
+$('status').textContent=`N=${c.count}; ${fitStatus}; ${r} R200c; joint accepted samples=${c.samples[ri].length}`+(jointID!==null?`; sampled halo ID=${jointID}`:'');$('draw').disabled=c.samples[ri].length===0;controls()}
+for(let id of ['bin','radius'])$(id).onchange=reset;
+$('field').onchange=()=>{if(joint){let f=$('field').value;parameters=joint.slice(f==='pressure'?0:3,f==='pressure'?3:6);render()}else reset()};$('source').onchange=render;$('reset').onclick=reset;
+$('draw').onclick=()=>{let {c,ri,f}=state(),j=Math.floor(Math.random()*c.samples[ri].length);joint=c.samples[ri][j];jointID=c.ids[ri][j];parameters=joint.slice(f==='pressure'?0:3,f==='pressure'?3:6);render()};
+for(let k=0;k<3;k++)$('parameter'+k).oninput=()=>{let {f}=state(),bounds=f==='pressure'?limits:[[.1,1e7],[.1,10],[.5,20]];parameters[k]=bounds[k][0]*Math.pow(bounds[k][1]/bounds[k][0],+$('parameter'+k).value/1000);joint=null;jointID=null;render()};reset();
+</script></body></html>

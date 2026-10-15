@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -N miss_repro
+#PBS -q mini2
+#PBS -l select=1:ncpus=56:mem=120gb
+#PBS -l walltime=03:00:00
+#PBS -j oe
+#PBS -o /home/kristero10/tsz64k_missing_20260928/logs/repro.out
+# Gate for this run_root: the bundle's reproduction check (reference rows 0-3) in the mini2 (GroupB) environment.
+set -euo pipefail
+cd /home/kristero10/tsz64k_missing_20260928
+echo "host=$(hostname) start=$(date -Is)"
+/home/anaconda3/bin/python3 /home/kristero10/tsz64k_fixbeta_stage/HalfDome_kSZ/tSZ_64k_flat_prior_SO_baseline_deproj0/pipeline/manage.py \
+  --config /home/kristero10/tsz64k_missing_20260928/config_groupB.toml repro-check --run --threads 56
+echo "finished=$(date -Is)"

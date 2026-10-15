@@ -1,0 +1,26 @@
+#!/bin/bash
+#PBS -j oe
+# Merlin / PCA on the beam-consistent spectra (asinh inputs, logit space, early stop 30 / lr patience 10), the first $N
+# pool rows: results_merlin_unbinned_beam_asinh_p30_N$N (N = 61440: results_merlin_unbinned_beam_asinh_p30 itself).
+#   qsub -q mini_B -N bsize_<N> -l select=1:ncpus=10:mem=32gb -l walltime=06:00:00 -v N=<rows> beam_size.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+PY=/home/kristero10/envs/sbi27/bin/python; C=${NCPUS:-10}
+export MERLIN_PATIENCE=30 MERLIN_LR_PATIENCE=10 MPLBACKEND=Agg PYTHONUNBUFFERED=1
+if [ "$N" = 61440 ]; then
+  export MERLIN_TAG=_beam_asinh_p30
+else
+  export MERLIN_TAG=_beam_asinh_p30_N$N MERLIN_TRAIN_ROWS=$N
+  O=results_merlin_unbinned$MERLIN_TAG; mkdir -p $O
+  for f in features_merlin.npz features_moped.npz prepare.json; do ln -sfn ../results_merlin_unbinned_beam_asinh_p30/$f $O/$f; done
+fi
+echo "host=$(hostname) ncpus=$C N=$N start=$(date -Is)"
+T=$(( (C - 3) / 3 )); [ $T -lt 1 ] && T=1
+OMP_NUM_THREADS=$T $PY merlin_compression.py train --variants merlin --seeds 1 2 3 --workers 3 --threads $T & m=$!
+OMP_NUM_THREADS=1 $PY merlin_compression.py train --variants pca --seeds 1 2 3 --workers 3 --threads 1 & p=$!
+wait $m; c1=$?; wait $p; c2=$?
+echo "trained=$(date -Is) codes=$c1,$c2"
+code=1
+[ $c1 -eq 0 ] && [ $c2 -eq 0 ] && OMP_NUM_THREADS=$C $PY merlin_compression.py evaluate --variants merlin pca --threads $C && code=0
+echo "finished=$(date -Is) code=$code"; exit $code

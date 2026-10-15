@@ -1,0 +1,15 @@
+#!/bin/bash
+#PBS -N miss_A
+#PBS -l select=1:ncpus=26:mem=64gb
+#PBS -l walltime=48:00:00
+#PBS -j oe
+# One bundle worker (manage.py run, 26 threads) on a GroupA node, /lustre environment of the repro test; random start.
+set -uo pipefail
+cd /home/kristero10/tsz64k_missing_20260928
+LIST=$(cat missing_batches.txt)
+K=$(( RANDOM % 274 ))
+ROT=$(/home/anaconda3/bin/python3 -c "l='$LIST'.strip().split(','); print(','.join(l[$K:]+l[:$K]))")
+echo "host=$(hostname) start=$(date -Is) offset=$K"
+/home/anaconda3/bin/python3 /lustre/work/kristero10/tsz64k_repro_test_20260924/HalfDome_kSZ/tSZ_64k_flat_prior_SO_baseline_deproj0/pipeline/manage.py \
+  --config /home/kristero10/tsz64k_missing_20260928/config_groupA.toml run --batches "$ROT" --threads 26
+echo "finished=$(date -Is)"

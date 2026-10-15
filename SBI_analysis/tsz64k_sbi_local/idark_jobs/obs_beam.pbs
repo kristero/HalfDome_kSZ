@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -j oe
+# FLAMINGO L1_m9 posteriors (as observed and without the pixel window) from the beam-consistent Merlin / PCA networks,
+# B12 and noise-only whitening, bounded then unbounded: obs_beam_posteriors.py -> obs_posteriors_beam/.
+#   qsub -q mini_B -N obs_beam -l select=1:ncpus=16:mem=32gb -l walltime=03:00:00 obs_beam.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+PY=/home/kristero10/envs/sbi27/bin/python; C=${NCPUS:-16}
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1 OMP_NUM_THREADS=$C
+echo "host=$(hostname) ncpus=$C start=$(date -Is)"
+MERLIN_PARAM_SPACE=logit $PY obs_beam_posteriors.py --threads $C && \
+MERLIN_PARAM_SPACE=linear $PY obs_beam_posteriors.py --threads $C
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

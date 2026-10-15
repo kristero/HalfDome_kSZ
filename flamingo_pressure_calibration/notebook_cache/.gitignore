@@ -1,0 +1,4 @@
+# streamed FLAMINGO caches (rebuildable); keep the small redshift table
+*
+!.gitignore
+!L2p8_m9_output_redshifts.json

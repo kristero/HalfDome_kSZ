@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -N merlin_m2eval
+#PBS -q mini2
+#PBS -l select=1:ncpus=32:mem=64gb
+#PBS -l walltime=12:00:00
+#PBS -j oe
+# Test-row metrics, Battaglia12 posteriors, corner plots and the comparison table, after all nine networks exist.
+set -uo pipefail
+cd /home/kristero10/merlin_unbinned_20260929
+export OMP_NUM_THREADS=32 MKL_NUM_THREADS=32 MPLBACKEND=Agg
+echo "host=$(hostname) start=$(date -Is)"
+/home/kristero10/envs/sbi27/bin/python merlin_compression.py evaluate --threads 32 && \
+/home/kristero10/envs/sbi27/bin/python merlin_compression.py plot
+echo "finished=$(date -Is) code=$?"

@@ -1,0 +1,29 @@
+#!/bin/bash
+#PBS -j oe
+# posterior_rows.py on the 3,000 test rows (--ranks --seed-means) and 300,000 B12 posterior draws for the networks
+# that exist already: Merlin / PCA in logit space (bounded) on the four input sets, and the unbounded networks on the
+# production noise with B12 whitening (results_merlin_unbinned_asinh_p30_lin, also --truncate); into
+# posterior_rows_whitening/<set>_<bounded|unbounded>_<variant>. PART=bounded: the eight logit-space networks;
+# PART=unbounded: the two linear-space ones.
+#   qsub -q mini_B -N wrows_<part> -l select=1:ncpus=16:mem=32gb -l walltime=06:00:00 -v PART=<part> whiten_rows.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+PY=/home/kristero10/envs/sbi27/bin/python; C=${NCPUS:-16}
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1 OMP_NUM_THREADS=$C
+echo "host=$(hostname) ncpus=$C part=$PART start=$(date -Is)"
+OUT="--out posterior_rows_whitening --threads $C --ranks --seed-means --b12 --b12-samples 300000"
+specs=""
+for pair in prod_b12:results_merlin_unbinned_asinh_p30 prod_nn:results_merlin_unbinned_nnwhite_asinh_p30 \
+            beam_b12:results_merlin_unbinned_beam_asinh_p30 beam_nn:results_merlin_unbinned_beam_nnwhite_asinh_p30; do
+  name=${pair%%:*}; folder=${pair#*:}
+  specs="$specs ${name}_bounded_merlin=merlin:$folder:merlin ${name}_bounded_pca=merlin:$folder:pca"
+done
+case $PART in
+  bounded) MERLIN_PARAM_SPACE=logit $PY posterior_rows.py $OUT $specs ;;
+  unbounded) MERLIN_PARAM_SPACE=linear $PY posterior_rows.py $OUT --truncate \
+               prod_b12_unbounded_merlin=merlin:results_merlin_unbinned_asinh_p30_lin:merlin \
+               prod_b12_unbounded_pca=merlin:results_merlin_unbinned_asinh_p30_lin:pca ;;
+  *) echo "PART must be bounded or unbounded"; false ;;
+esac
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

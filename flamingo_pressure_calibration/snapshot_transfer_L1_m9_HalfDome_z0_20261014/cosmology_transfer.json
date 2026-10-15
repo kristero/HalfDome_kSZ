@@ -1,0 +1,22 @@
+{
+  "source": {
+    "h": 0.681,
+    "omega_m": 0.3060000794316215,
+    "omega_b": 0.0486,
+    "neutrino_mass_ev": 0.06
+  },
+  "target": {
+    "h": 0.6774,
+    "omega_m": 0.3089,
+    "omega_b": 0.0486,
+    "neutrino_mass_ev": 0.0
+  },
+  "ratios": {
+    "radius": 1.0035398276210346,
+    "pressure": 0.9767089753556346,
+    "electrons": 0.980166356764311,
+    "projected_y": 0.980166356764311,
+    "tau_and_dm": 0.9836359767071939,
+    "integrated_Y": 0.9871178785065855
+  }
+}

@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -N gas_transfer_prepare
+#PBS -q mini
+#PBS -l select=1:ncpus=26:mem=32gb
+#PBS -l walltime=08:00:00
+#PBS -j oe
+set -euo pipefail
+cd /lustre/work/kristero10/snapshot_transfer_L1_m9_HalfDome_z0_20261014
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1
+/usr/bin/time -v python3 -u prepare_idark.py --workers 26 > prepare.log 2>&1

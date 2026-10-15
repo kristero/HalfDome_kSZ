@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -j oe
+# Merlin inputs from the beam-consistent spectra at every multipole: merlin_beam_prepare.py.
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+export PYTHONUNBUFFERED=1 OMP_NUM_THREADS=${NCPUS:-16} OPENBLAS_NUM_THREADS=${NCPUS:-16} MKL_NUM_THREADS=${NCPUS:-16}
+echo "host=$(hostname) start=$(date -Is)"
+/home/kristero10/envs/sbi27/bin/python merlin_beam_prepare.py
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

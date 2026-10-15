@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N merlin_eval
+#PBS -l walltime=12:00:00
+#PBS -j oe
+# After the nine trainings: test-row metrics, Battaglia12 posteriors, corner plots and the comparison table.
+set -uo pipefail
+cd /lustre/work/kristero10/merlin_unbinned_20260929
+export OMP_NUM_THREADS=8 MKL_NUM_THREADS=8 MPLBACKEND=Agg
+echo "host=$(hostname) start=$(date -Is)"
+/home/kristero10/envs/sbi27/bin/python merlin_compression.py evaluate --threads 8 && \
+/home/kristero10/envs/sbi27/bin/python merlin_compression.py plot
+echo "finished=$(date -Is) code=$?"

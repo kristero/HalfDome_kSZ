@@ -1,0 +1,1528 @@
+{
+  "simulation": "L1_m9",
+  "snapshot": 77,
+  "redshift": 0.0,
+  "scale_factor": 1.0,
+  "snapshot_path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/snapshots/flamingo_0077/flamingo_0077.hdf5",
+  "soap_path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/halo_properties_0077.hdf5",
+  "halo_count": 4375,
+  "sample_per_bin": [
+    300,
+    300,
+    300,
+    300,
+    300,
+    300,
+    300,
+    300,
+    300,
+    300,
+    895,
+    326,
+    127,
+    21,
+    6
+  ],
+  "population_per_bin": [
+    156466,
+    97982,
+    61956,
+    40038,
+    25741,
+    16389,
+    10217,
+    6302,
+    3561,
+    1841,
+    895,
+    326,
+    127,
+    21,
+    6
+  ],
+  "mass_edges_log10_msun": [
+    12.5,
+    12.7,
+    12.9,
+    13.1,
+    13.3,
+    13.5,
+    13.7,
+    13.9,
+    14.1,
+    14.3,
+    14.5,
+    14.7,
+    14.9,
+    15.1,
+    15.3,
+    15.5
+  ],
+  "selected_cells": 9924,
+  "selected_candidate_rows": 2139833158,
+  "candidate_halo_particle_comparisons": 3200237007,
+  "bytes_per_particle_with_membership": 112,
+  "logical_bytes_one_direct_pass": 239661313696,
+  "swift_check_indices": [
+    107,
+    161,
+    208,
+    253,
+    384,
+    387,
+    400,
+    477,
+    555,
+    756,
+    904,
+    978,
+    1046,
+    1077,
+    1255,
+    1290,
+    1474,
+    1492,
+    1648,
+    1689,
+    1807,
+    1979,
+    1980,
+    2095,
+    2165,
+    2185,
+    2312,
+    2414,
+    2584,
+    2934,
+    2996,
+    3476,
+    3510,
+    3550,
+    3705,
+    3778,
+    3900,
+    4065,
+    4168,
+    4232,
+    4253,
+    4264,
+    4333,
+    4362,
+    4366
+  ],
+  "swift_check_rows": [
+    303296,
+    556491,
+    2013561,
+    697167,
+    167876,
+    1110267,
+    339708,
+    2287643,
+    1418398,
+    1447534,
+    850489,
+    260116,
+    2137921,
+    877659,
+    253567,
+    1536370,
+    485905,
+    1442139,
+    444162,
+    1565180,
+    229504,
+    1898034,
+    747979,
+    158768,
+    137336,
+    698402,
+    226945,
+    1078315,
+    1425645,
+    512534,
+    3158627,
+    618608,
+    1053315,
+    177594,
+    440621,
+    943443,
+    114579,
+    210582,
+    200473,
+    1398735,
+    826256,
+    1593655,
+    484961,
+    2476849,
+    683163
+  ],
+  "swift_logical_bytes_upper_bound": 4502560176,
+  "header": {
+    "BoxSize": [
+      1000.0000004828763,
+      1000.0000004828763,
+      1000.0000004828763
+    ],
+    "Code": "SWIFT",
+    "Dimension": [
+      3
+    ],
+    "Flag_Entropy_ICs": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "InitialMassTable": [
+      0.10725887951524993,
+      0.5650091901421623,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.01787961646914482
+    ],
+    "MassTable": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "NumFilesPerSnapshot": [
+      1
+    ],
+    "NumPartTypes": [
+      7
+    ],
+    "NumPart_ThisFile": [
+      5271821058,
+      5832000000,
+      0,
+      0,
+      541631305,
+      12150814,
+      1000000000
+    ],
+    "NumPart_Total": [
+      976853762,
+      1537032704,
+      0,
+      0,
+      541631305,
+      12150814,
+      1000000000
+    ],
+    "NumPart_Total_HighWord": [
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "OutputType": "FullVolume",
+    "Redshift": [
+      0.0
+    ],
+    "RunName": "FLAMINGO-L1000N1800-HYDRO-FIDUCIAL",
+    "Scale-factor": [
+      1.0
+    ],
+    "SelectOutput": "Default",
+    "SnapshotDate": "06:49:30 2022-01-08 GMT",
+    "System": "m8161.pri.cosma7.alces.network",
+    "ThisFile": [
+      0
+    ],
+    "Time": [
+      0.014073763029629052
+    ],
+    "TimeBase_dloga": [
+      2.4048373728489437e-17
+    ],
+    "TimeBase_dt": [
+      3.531332909292427e-19
+    ],
+    "Virtual": [
+      1
+    ]
+  },
+  "cosmology": {
+    "Cosmological run": [
+      1
+    ],
+    "Critical density [internal units]": [
+      12.871065523187008
+    ],
+    "H [internal units]": [
+      68.09999996711613
+    ],
+    "H0 [internal units]": [
+      68.09999996711613
+    ],
+    "Hubble time [internal units]": [
+      0.014684287819131808
+    ],
+    "Lookback time [internal units]": [
+      9.020562075079397e-16
+    ],
+    "M_nu_eV": [
+      0.06
+    ],
+    "N_eff": [
+      3.0440016274835076
+    ],
+    "N_nu": [
+      1.0
+    ],
+    "N_ur": [
+      2.0308
+    ],
+    "Omega_b": [
+      0.0486
+    ],
+    "Omega_cdm": [
+      0.256011
+    ],
+    "Omega_g": [
+      5.332434871909157e-05
+    ],
+    "Omega_k": [
+      2.5212782972516834e-09
+    ],
+    "Omega_lambda": [
+      0.693922
+    ],
+    "Omega_m": [
+      0.30461099999999997
+    ],
+    "Omega_nu": [
+      0.0013890794316214667
+    ],
+    "Omega_nu_0": [
+      0.0013890794316214667
+    ],
+    "Omega_r": [
+      7.791804710018577e-05
+    ],
+    "Omega_ur": [
+      2.459369838109419e-05
+    ],
+    "Redshift": [
+      0.0
+    ],
+    "Scale-factor": [
+      1.0
+    ],
+    "T_CMB_0 [K]": [
+      2.7255
+    ],
+    "T_CMB_0 [internal units]": [
+      2.7255
+    ],
+    "T_nu_0 [eV]": [
+      0.0001681894745267796
+    ],
+    "T_nu_0 [internal units]": [
+      1.951757805
+    ],
+    "Universe age [internal units]": [
+      0.014073763029629052
+    ],
+    "a_beg": [
+      0.03125
+    ],
+    "a_end": [
+      1.0
+    ],
+    "deg_nu": [
+      1.0
+    ],
+    "deg_nu_tot": [
+      1.0
+    ],
+    "h": [
+      0.681
+    ],
+    "time_beg [internal units]": [
+      9.662961221985618e-05
+    ],
+    "time_end [internal units]": [
+      0.014073763029629052
+    ],
+    "w": [
+      -1.0
+    ],
+    "w_0": [
+      -1.0
+    ],
+    "w_a": [
+      0.0
+    ]
+  },
+  "field_schema": {
+    "Coordinates": {
+      "dtype": "float64",
+      "shape": [
+        80335481,
+        3
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          3.08567758e+24
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          3.08567758e+24
+        ],
+        "Description": "Co-moving positions of the particles",
+        "Expression for physical CGS units": "a U_L  [ cm ]",
+        "Lossy compression filter": "DScale5",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          1.0
+        ],
+        "U_M exponent": [
+          0.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          1.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 24
+    },
+    "SmoothingLengths": {
+      "dtype": "float32",
+      "shape": [
+        80335481
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          3.08567758e+24
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          3.08567758e+24
+        ],
+        "Description": "Co-moving smoothing lengths (FWHM of the kernel) of the particles",
+        "Expression for physical CGS units": "a U_L  [ cm ]",
+        "Lossy compression filter": "None",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          1.0
+        ],
+        "U_M exponent": [
+          0.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          1.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 4
+    },
+    "Masses": {
+      "dtype": "float32",
+      "shape": [
+        80335481
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          1.98841e+43
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          1.98841e+43
+        ],
+        "Description": "Masses of the particles",
+        "Expression for physical CGS units": "U_M  [ g ]",
+        "Lossy compression filter": "None",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          0.0
+        ],
+        "U_M exponent": [
+          1.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          0.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 4
+    },
+    "Densities": {
+      "dtype": "float32",
+      "shape": [
+        80335481
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          6.767905773162602e-31
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          6.767905773162602e-31
+        ],
+        "Description": "Co-moving mass densities of the particles",
+        "Expression for physical CGS units": "a^-3 U_M U_L^-3  [ g cm^-3 ]",
+        "Lossy compression filter": "FMantissa9",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          -3.0
+        ],
+        "U_M exponent": [
+          1.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          -3.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 4
+    },
+    "ComptonYParameters": {
+      "dtype": "float32",
+      "shape": [
+        80335481
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          9.521406127714655e+48
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          9.521406127714655e+48
+        ],
+        "Description": "Compton y parameters in the physical frame computed based on the cooling tables. This is 0 for star-forming particles.",
+        "Expression for physical CGS units": "U_L^2  [ cm^2 ]",
+        "Lossy compression filter": "FMantissa9",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          2.0
+        ],
+        "U_M exponent": [
+          0.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          0.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 4
+    },
+    "ElectronNumberDensities": {
+      "dtype": "float64",
+      "shape": [
+        80335481
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          3.403677195931725e-74
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          3.403677195931725e-74
+        ],
+        "Description": "Electron number densities in the physical frame computed based on the cooling tables. This is 0 for star-forming particles.",
+        "Expression for physical CGS units": "U_L^-3  [ cm^-3 ]",
+        "Lossy compression filter": "DMantissa9",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          -3.0
+        ],
+        "U_M exponent": [
+          0.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          0.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 8
+    },
+    "Temperatures": {
+      "dtype": "float32",
+      "shape": [
+        80335481
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          1.0
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          1.0
+        ],
+        "Description": "Temperatures of the gas particles",
+        "Expression for physical CGS units": "U_T  [ K ]",
+        "Lossy compression filter": "FMantissa9",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          0.0
+        ],
+        "U_M exponent": [
+          0.0
+        ],
+        "U_T exponent": [
+          1.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          0.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 4
+    },
+    "LastAGNFeedbackScaleFactors": {
+      "dtype": "float32",
+      "shape": [
+        80335481
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          1.0
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          1.0
+        ],
+        "Description": "Scale-factors at which the particles were last hit by AGN feedback. -1 if a particle has never been hit by feedback",
+        "Expression for physical CGS units": "[ - ] ",
+        "Lossy compression filter": "HalfFloat",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          0.0
+        ],
+        "U_M exponent": [
+          0.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          0.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 4
+    },
+    "ParticleIDs": {
+      "dtype": "uint64",
+      "shape": [
+        80335481
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          1.0
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          1.0
+        ],
+        "Description": "Unique IDs of the particles",
+        "Expression for physical CGS units": "[ - ] ",
+        "Lossy compression filter": "None",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          0.0
+        ],
+        "U_M exponent": [
+          0.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          0.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 8
+    },
+    "SmoothedElementMassFractions": {
+      "dtype": "float32",
+      "shape": [
+        80335481,
+        9
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          1.0
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          1.0
+        ],
+        "Description": "Smoothed fractions of the particles' masses that are in the given element",
+        "Expression for physical CGS units": "[ - ] ",
+        "Lossy compression filter": "FMantissa9",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          0.0
+        ],
+        "U_M exponent": [
+          0.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          0.0
+        ],
+        "a-scale exponent": [
+          0.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 36
+    },
+    "Pressures": {
+      "dtype": "float32",
+      "shape": [
+        80335481
+      ],
+      "attributes": {
+        "Conversion factor to CGS (not including cosmological corrections)": [
+          6.7679057731626005e-21
+        ],
+        "Conversion factor to physical CGS (including cosmological corrections)": [
+          6.7679057731626005e-21
+        ],
+        "Description": "Co-moving pressures of the particles",
+        "Expression for physical CGS units": "a^-5 U_M U_L^-1 U_t^-2  [ g cm^-1 s^-2 ]",
+        "Lossy compression filter": "FMantissa9",
+        "U_I exponent": [
+          0.0
+        ],
+        "U_L exponent": [
+          -1.0
+        ],
+        "U_M exponent": [
+          1.0
+        ],
+        "U_T exponent": [
+          0.0
+        ],
+        "U_t exponent": [
+          -2.0
+        ],
+        "a-scale exponent": [
+          -5.0
+        ],
+        "h-scale exponent": [
+          0.0
+        ]
+      },
+      "bytes_per_particle": 4
+    }
+  },
+  "baryon_fraction": 0.15882348818429023,
+  "softening_physical_mpc": 0.0057,
+  "recent_agn_filter": {
+    "a_limit": 0.9989555948537917,
+    "tmin_k": 8801441.971770002,
+    "tmax_k": 175611854.8365807,
+    "delta_time_myr": 15.0
+  },
+  "rotation_matrices": [
+    [
+      [
+        1.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.0
+      ]
+    ],
+    [
+      [
+        0.0,
+        1.0,
+        0.0
+      ],
+      [
+        -0.9,
+        0.0,
+        0.4358898943540673
+      ],
+      [
+        0.4358898943540673,
+        0.0,
+        0.9
+      ]
+    ],
+    [
+      [
+        -0.5161582146548238,
+        0.4728432059830666,
+        -0.7141428428542851
+      ],
+      [
+        -0.6754902942615238,
+        -0.7373688780783197,
+        4.3728637331774576e-17
+      ],
+      [
+        -0.5265867068231259,
+        0.48239655906440215,
+        0.7
+      ]
+    ],
+    [
+      [
+        -0.9961710408648278,
+        -0.08742572471695993,
+        -1.0605752387249068e-16
+      ],
+      [
+        0.04371286235848006,
+        -0.4980855204324139,
+        -0.8660254037844386
+      ],
+      [
+        0.07571289854915235,
+        -0.8627094279033269,
+        0.5
+      ]
+    ],
+    [
+      [
+        -0.1825316582936587,
+        -0.23808022538750892,
+        0.9539392014169457
+      ],
+      [
+        0.7936007512916959,
+        -0.6084388609788627,
+        -1.752357884394667e-16
+      ],
+      [
+        0.5804136811532122,
+        0.7570468669310886,
+        0.30000000000000004
+      ]
+    ],
+    [
+      [
+        0.17418195037931164,
+        -0.9847134853154287,
+        0.0
+      ],
+      [
+        0.09847134853154285,
+        0.01741819503793116,
+        0.99498743710662
+      ],
+      [
+        -0.9797775470383256,
+        -0.17330885239814375,
+        0.09999999999999998
+      ]
+    ],
+    [
+      [
+        -0.08437552948123968,
+        0.05367280526263251,
+        -0.9949874371066201
+      ],
+      [
+        0.5367280526263242,
+        0.8437552948123963,
+        6.092540900222253e-17
+      ],
+      [
+        0.8395259183305268,
+        -0.5340376695058934,
+        -0.10000000000000009
+      ]
+    ],
+    [
+      [
+        0.9657150743757783,
+        0.2596043049014885,
+        -1.1682385895964448e-16
+      ],
+      [
+        0.07788129147044645,
+        -0.2897145223127336,
+        -0.9539392014169457
+      ],
+      [
+        -0.24764672330212728,
+        0.9212334668463362,
+        -0.30000000000000004
+      ]
+    ],
+    [
+      [
+        -0.23045351235668637,
+        -0.4437242146226264,
+        0.8660254037844386
+      ],
+      [
+        -0.887448429245253,
+        0.46090702471337247,
+        -1.5908628580873602e-16
+      ],
+      [
+        -0.39915719218448253,
+        -0.7685528842749859,
+        -0.5
+      ]
+    ],
+    [
+      [
+        -0.343038630874102,
+        0.9393212963241181,
+        0.0
+      ],
+      [
+        0.6575249074268826,
+        0.2401270416118714,
+        0.7141428428542851
+      ],
+      [
+        0.6708095809104779,
+        0.2449785830612729,
+        -0.7
+      ]
+    ],
+    [
+      [
+        0.3815564084749364,
+        0.9243455561378048,
+        -5.3381116390138675e-17
+      ],
+      [
+        0.8319110005240242,
+        -0.3434007676274427,
+        -0.43588989435406755
+      ],
+      [
+        -0.40291288681155957,
+        0.16631658258025742,
+        -0.8999999999999999
+      ]
+    ]
+  ],
+  "membership_sources": [
+    {
+      "file": 0,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.0.hdf5",
+      "shape": [
+        80335481
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 1,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.1.hdf5",
+      "shape": [
+        82336907
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 2,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.2.hdf5",
+      "shape": [
+        82285096
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 3,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.3.hdf5",
+      "shape": [
+        82726281
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 4,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.4.hdf5",
+      "shape": [
+        83391569
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 5,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.5.hdf5",
+      "shape": [
+        80331036
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 6,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.6.hdf5",
+      "shape": [
+        82069384
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 7,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.7.hdf5",
+      "shape": [
+        83707196
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 8,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.8.hdf5",
+      "shape": [
+        80198185
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 9,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.9.hdf5",
+      "shape": [
+        82816603
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 10,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.10.hdf5",
+      "shape": [
+        81827020
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 11,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.11.hdf5",
+      "shape": [
+        80634568
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 12,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.12.hdf5",
+      "shape": [
+        82326870
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 13,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.13.hdf5",
+      "shape": [
+        82699353
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 14,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.14.hdf5",
+      "shape": [
+        84038514
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 15,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.15.hdf5",
+      "shape": [
+        82418956
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 16,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.16.hdf5",
+      "shape": [
+        81554165
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 17,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.17.hdf5",
+      "shape": [
+        82410038
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 18,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.18.hdf5",
+      "shape": [
+        81125544
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 19,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.19.hdf5",
+      "shape": [
+        85344038
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 20,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.20.hdf5",
+      "shape": [
+        81249972
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 21,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.21.hdf5",
+      "shape": [
+        83523273
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 22,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.22.hdf5",
+      "shape": [
+        81944473
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 23,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.23.hdf5",
+      "shape": [
+        82294781
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 24,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.24.hdf5",
+      "shape": [
+        80747063
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 25,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.25.hdf5",
+      "shape": [
+        82338742
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 26,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.26.hdf5",
+      "shape": [
+        81828265
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 27,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.27.hdf5",
+      "shape": [
+        82296157
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 28,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.28.hdf5",
+      "shape": [
+        81764878
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 29,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.29.hdf5",
+      "shape": [
+        82797645
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 30,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.30.hdf5",
+      "shape": [
+        81111900
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 31,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.31.hdf5",
+      "shape": [
+        84052414
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 32,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.32.hdf5",
+      "shape": [
+        80113624
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 33,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.33.hdf5",
+      "shape": [
+        84798383
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 34,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.34.hdf5",
+      "shape": [
+        84096305
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 35,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.35.hdf5",
+      "shape": [
+        82698964
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 36,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.36.hdf5",
+      "shape": [
+        81470163
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 37,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.37.hdf5",
+      "shape": [
+        82884678
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 38,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.38.hdf5",
+      "shape": [
+        84089844
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 39,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.39.hdf5",
+      "shape": [
+        82755437
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 40,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.40.hdf5",
+      "shape": [
+        80702436
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 41,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.41.hdf5",
+      "shape": [
+        83262098
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 42,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.42.hdf5",
+      "shape": [
+        83223145
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 43,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.43.hdf5",
+      "shape": [
+        81919907
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 44,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.44.hdf5",
+      "shape": [
+        81010384
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 45,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.45.hdf5",
+      "shape": [
+        83177190
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 46,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.46.hdf5",
+      "shape": [
+        82301400
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 47,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.47.hdf5",
+      "shape": [
+        82164925
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 48,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.48.hdf5",
+      "shape": [
+        82936455
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 49,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.49.hdf5",
+      "shape": [
+        82745433
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 50,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.50.hdf5",
+      "shape": [
+        81731234
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 51,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.51.hdf5",
+      "shape": [
+        80597629
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 52,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.52.hdf5",
+      "shape": [
+        82063812
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 53,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.53.hdf5",
+      "shape": [
+        82130013
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 54,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.54.hdf5",
+      "shape": [
+        84240252
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 55,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.55.hdf5",
+      "shape": [
+        83098266
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 56,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.56.hdf5",
+      "shape": [
+        85066287
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 57,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.57.hdf5",
+      "shape": [
+        82313045
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 58,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.58.hdf5",
+      "shape": [
+        83471255
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 59,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.59.hdf5",
+      "shape": [
+        81586003
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 60,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.60.hdf5",
+      "shape": [
+        78694585
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 61,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.61.hdf5",
+      "shape": [
+        84641336
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 62,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.62.hdf5",
+      "shape": [
+        82844576
+      ],
+      "dtype": "int64"
+    },
+    {
+      "file": 63,
+      "path": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/membership_0077/membership_0077.63.hdf5",
+      "shape": [
+        82465627
+      ],
+      "dtype": "int64"
+    }
+  ],
+  "membership_order_contract": "SOAP flamingo-hbt group_membership.py writes original snapshot file/order; GroupNr_bound equals InputHalos/HaloCatalogueIndex, not SOAP row",
+  "disturbed_proxy": "max bound satellite/central mass ratio within 2R >=0.25 OR bound-central COM offset/R >0.07; snapshot proxy, not a measured merger history",
+  "particle_values_read": false,
+  "wall_seconds": 75.87899028509855,
+  "resources": {
+    "available_memory_GiB": 178.62458038330078,
+    "load": [
+      24.78,
+      24.26,
+      24.1
+    ],
+    "host": "maas.strw.leidenuniv.nl"
+  }
+}

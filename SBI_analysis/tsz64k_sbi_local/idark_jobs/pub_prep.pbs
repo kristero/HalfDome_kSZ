@@ -1,0 +1,10 @@
+#!/bin/bash
+#PBS -j oe
+# Noise-level MOPED features for the unbounded (MERLIN_PARAM_SPACE=linear) runs: moped_noise_features.py.
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+export PYTHONUNBUFFERED=1 OMP_NUM_THREADS=${NCPUS:-4}
+echo "host=$(hostname) start=$(date -Is)"
+/home/kristero10/envs/sbi27/bin/python moped_noise_features.py results_merlin_unbinned_asinh_p30_lin
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

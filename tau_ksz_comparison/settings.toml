@@ -1,0 +1,56 @@
+# HalfDome seed 100. All valid catalogue halos are included: no mass/redshift cut.
+catalog = "/home/cbllover/HalfDome/lightcone_100.hdf5"
+output = "/home/cbllover/HalfDome/tau_ksz_comparison/outputs/nside4096"
+xgpaint = "/home/kn18001/.julia/dev/XGPaint"
+julia = "/home/kn18001/.juliaup/bin/julia"
+julia_project = "/home/kn18001/.julia/environments/v1.12"
+threads = 20
+chunk_size = 250000
+nside = 4096
+lmax = 12287
+anafast_iterations = 3
+aperture_r200c = 4.0
+catalog_masses_msun_h = true
+# HalfDome Velocity is peculiar velocity in km/s, with no factor of a or h.
+velocity_to_kms = 1.0
+
+[cosmology]
+# HalfDome simulation cosmology (arXiv:2407.17462), massless neutrinos.
+h = 0.6774
+Omega_b = 0.0486
+Omega_c = 0.2603
+sigma8 = 0.8159
+n_s = 0.9667
+
+[interpolation]
+# Table uses log(theta/theta200c), log(1+z), log10(M200c/Msun).
+# Redshift and mass bounds are measured from the complete catalogue.
+n_radius = 256
+n_redshift = 128
+n_mass = 128
+radius_min = 1e-7
+validation_rtol = 0.01
+
+[class_sz]
+# B16 AGN coefficients and f_free match the existing local XGPaint defaults.
+gas_profile = "B16"
+gas_profile_mode = "agn"
+mass_function = "T08M200c"
+concentration_parameter = "D08"
+delta_for_electron_density = "200c"
+delta_for_matter_density = "200c"
+f_free = 0.9
+"x_out_truncated_density_profile (electrons)" = 4.0
+ell_min = 10.0
+dell = 0.0
+dlogell = 0.025
+ndim_masses = 200
+ndim_redshifts = 100
+n_m_density_profile = 100
+n_z_density_profile = 100
+N_samp_fftw = 4096
+use_fft_for_profiles_transform = 1
+redshift_epsabs = 1e-40
+redshift_epsrel = 0.001
+mass_epsabs = 1e-40
+mass_epsrel = 0.001

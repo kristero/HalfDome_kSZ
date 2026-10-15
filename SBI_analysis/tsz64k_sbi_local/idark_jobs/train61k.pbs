@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -j oe
+# Merlin / PCA (logit space, asinh inputs, early stop 30 / lr patience 10) on the 61,440-row pool of one prepared input
+# set: MERLIN_TAG=$TAG, i.e. results_merlin_unbinned$TAG (written by merlin_beam_prepare.py).
+#   qsub -q mini_B -N t61_<name> -l select=1:ncpus=16:mem=32gb -l walltime=06:00:00 -v TAG=<tag> train61k.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+PY=/home/kristero10/envs/sbi27/bin/python; C=${NCPUS:-16}
+export MERLIN_TAG=$TAG MERLIN_PATIENCE=30 MERLIN_LR_PATIENCE=10 MPLBACKEND=Agg PYTHONUNBUFFERED=1
+echo "host=$(hostname) ncpus=$C tag=$TAG start=$(date -Is)"
+OMP_NUM_THREADS=4 $PY merlin_compression.py train --variants merlin --seeds 1 2 3 --workers 3 --threads 4 & m=$!
+OMP_NUM_THREADS=1 $PY merlin_compression.py train --variants pca --seeds 1 2 3 --workers 3 --threads 1 & p=$!
+wait $m; c1=$?; wait $p; c2=$?
+echo "trained=$(date -Is) codes=$c1,$c2"
+code=1
+[ $c1 -eq 0 ] && [ $c2 -eq 0 ] && OMP_NUM_THREADS=$C $PY merlin_compression.py evaluate --variants merlin pca --threads $C && code=0
+echo "finished=$(date -Is) code=$code"; exit $code

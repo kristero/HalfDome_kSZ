@@ -1,0 +1,38 @@
+{
+  "pressure": {
+    "supported_bins_with_holdout": 10,
+    "median_heldout_inner_RMS_percent": [
+      5.381510089698031,
+      6.230346174522859,
+      8.953760586340174
+    ],
+    "median_heldout_4R_RMS_percent": [
+      20.35568065689459,
+      18.132032532857643,
+      15.610801307914926
+    ],
+    "full_4R_wins": [
+      0,
+      1,
+      9
+    ]
+  },
+  "electrons": {
+    "supported_bins_with_holdout": 10,
+    "median_heldout_inner_RMS_percent": [
+      4.533355383242898,
+      5.901018307302461,
+      7.425342319193646
+    ],
+    "median_heldout_4R_RMS_percent": [
+      17.50176088622036,
+      13.028743317104965,
+      11.516395332088148
+    ],
+    "full_4R_wins": [
+      0,
+      2,
+      8
+    ]
+  }
+}

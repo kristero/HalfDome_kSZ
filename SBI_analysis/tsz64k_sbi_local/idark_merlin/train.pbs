@@ -1,0 +1,12 @@
+#!/bin/bash
+#PBS -N merlin
+#PBS -l walltime=24:00:00
+#PBS -j oe
+# One variant and seed of the Merlin / PCA / MOPED comparison on all multipoles (merlin_compression.py train).
+# Submit with -v VARIANT=merlin,SEED=1,THREADS=8 and select=1:ncpus=$THREADS.
+set -uo pipefail
+cd /lustre/work/kristero10/merlin_unbinned_20260929
+export OMP_NUM_THREADS=$THREADS MKL_NUM_THREADS=$THREADS
+echo "host=$(hostname) start=$(date -Is) variant=$VARIANT seed=$SEED threads=$THREADS"
+/home/kristero10/envs/sbi27/bin/python merlin_compression.py train --variants $VARIANT --seeds $SEED --workers 1 --threads $THREADS
+echo "finished=$(date -Is) code=$?"

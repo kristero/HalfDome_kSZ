@@ -1,0 +1,16 @@
+#!/bin/bash
+#PBS -N truth_mean
+#PBS -l select=1:ncpus=26:mpiprocs=1:mem=16gb
+#PBS -l walltime=02:00:00
+#PBS -j oe
+#PBS -S /bin/bash
+set -euo pipefail
+ROOT=/lustre/work/kristero10/tsz_truth_mean_validation_20261006
+cd "$ROOT"
+exec > "logs/truth_mean_${PBS_JOBID%%.*}.log" 2>&1
+export OMP_NUM_THREADS=26 OPENBLAS_NUM_THREADS=26 MKL_NUM_THREADS=26 MPLBACKEND=Agg
+unset MERLIN_TRAIN_ROWS || true
+echo "host=$(hostname) start=$(date -Is)"
+/usr/bin/time -v -o "logs/resources_${PBS_JOBID%%.*}.txt" \
+ /home/kristero10/envs/sbi27/bin/python evaluate_truth_mean.py --root "$ROOT" --threads 26
+echo "finished=$(date -Is)"

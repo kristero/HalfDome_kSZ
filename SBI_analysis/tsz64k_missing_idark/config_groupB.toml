@@ -1,0 +1,13 @@
+# idark mini2 nodes (GroupB, no /lustre): rsync copy of the repro-test Julia 1.12.2 + depot and catalogue in $HOME,
+# plus a depot with caches compiled for this CPU stacked in front.
+[paths]
+julia = "/home/kristero10/tsz64k_fixbeta_stage/julia_tsz64k/julia-1.12.2/bin/julia"
+julia_depot = "/home/kristero10/tsz64k_fixbeta_20260928/depot:/home/kristero10/tsz64k_fixbeta_stage/julia_tsz64k/depot"
+halfdome_catalogue = "/home/kristero10/tsz64k_fixbeta_stage/lightcone_100.hdf5"
+run_root = "/home/kristero10/tsz64k_missing_20260928/run_root"
+
+[run]
+threads = 14
+audit_threads = 6
+batch_size = 4
+audit_rows_per_task = 256

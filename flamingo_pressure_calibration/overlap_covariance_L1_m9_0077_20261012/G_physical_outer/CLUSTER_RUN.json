@@ -1,0 +1,655 @@
+{
+ "purpose": "Test G (physical outer components, per-field calibration, Lee22-style parametrisation ladder): full run on STRW maas; compute stages only (figures and report tables are made locally)",
+ "command": "cd $STUDY_ROOT && STUDY_ROOT=$STUDY_ROOT nice -n 19 python -B G_physical_outer/run_test_g.py --full --workers 8   (through cluster_tests.py run G --workers 8 --rss-stop 32, which adds nice 19, ionice and the load/memory guards)",
+ "maas_runs": [
+  {
+   "attempt": 1,
+   "workers": 4,
+   "rss_stop_GiB": 24,
+   "launched": "2026-10-13 14:11 EEST",
+   "stages": "all",
+   "outcome": "stopped on request (user: use 8 workers) at 14:35 EEST during evaluate (PDF pass p2 64/274); inputs, kernels (504 s), prepare, parity (exact) and fits (162 s) completed and were kept in results/, with the evaluate p1 PDF checkpoint (work/pdf_eval_p1.npz)",
+   "archived": "G_physical_outer/attempts/attempt1_4workers_20261013/ (receipt, log, failed.json, run_manifest)"
+  },
+  {
+   "attempt": 2,
+   "workers": 8,
+   "rss_stop_GiB": 32,
+   "launched": "2026-10-13 14:36 EEST",
+   "stages": "evaluate,selection,cv (python -B cluster_tests.py run G --workers 8 --rss-stop 32 --driver-args=\"--stages evaluate,selection,cv\")",
+   "load_at_launch": "25.4 / 27.1 (1/5 min) on os.cpu_count() = 48; 178.6 GiB available",
+   "note": "evaluate reuses the p1 checkpoint (same specification digest); results/run_manifest.json gets a second invocation record"
+  }
+ ],
+ "STUDY_ROOT_on_maas": "/home/nagainis/HalfDome_runtime/overlap_covariance_tests/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012",
+ "smoke_command": "cd $STUDY_ROOT/G_physical_outer && python -B run_test_g.py --smoke   (local, 1 worker)",
+ "stages": "inputs, kernels, prepare, parity, fits, evaluate, selection, cv (default all, in order); --stages a,b,... reruns some; each stage reads the earlier stages' outputs from results/",
+ "exit_status": "0 = completed; 1 = a stage raised (traceback in results/run_manifest.json, later stages still attempted); 2 = completed but the parity gate failed (results/parity.json)",
+ "code_to_deploy": [
+  "G_physical_outer/g_common.py",
+  "G_physical_outer/g_physics.py",
+  "G_physical_outer/g_models.py",
+  "G_physical_outer/g_fit.py",
+  "G_physical_outer/g_prepare.py",
+  "G_physical_outer/g_parity.py",
+  "G_physical_outer/g_pdf.py",
+  "G_physical_outer/g_fits.py",
+  "G_physical_outer/g_evaluate.py",
+  "G_physical_outer/g_selection.py",
+  "G_physical_outer/g_cv.py",
+  "G_physical_outer/run_test_g.py"
+ ],
+ "reads_test_F_modules": "F_observables/f_common.py, f_fit.py, f_methods.py, f_basis.py, f_kernels.py, f_pdf.py, f2_run.py (+ f0_profiles.py, f1_truth.py, f1_importance.py in --smoke) - imported read-only; their outputs go to G_physical_outer/results/f_base",
+ "writes": "G_physical_outer/results/ only (compact npz/csv/json; big intermediates in results/work and results/f_base/work - the rebuilt Test F basis, ~0.1 GB, not copied back)",
+ "layout_requirement": "as Test F (CLUSTER_RUN.json there): STUDY_ROOT/{analysis,kernels,F_observables,B_covariance,G_physical_outer}, the earlier studies one level up, frb_map_generation two levels up (engine inputs)",
+ "inputs": [
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/B_covariance/results/halo_table.npz",
+   "relative_to_STUDY_ROOT": "B_covariance/results/halo_table.npz",
+   "bytes": 264936,
+   "sha256": "202c73073cfd8d64562c784de05da506076c866cd05c9f64518c0233aaab3a90",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/B_covariance/results/profiles_fit.npz",
+   "relative_to_STUDY_ROOT": "B_covariance/results/profiles_fit.npz",
+   "bytes": 36669733,
+   "sha256": "7a597e13081039df873771253a3633c8fe5f8491c6c9b1ac790610ec284fa682",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f0_profiles.py",
+   "relative_to_STUDY_ROOT": "F_observables/f0_profiles.py",
+   "bytes": 7430,
+   "sha256": "6edee0b6aee6528db19a4ce81ba73d814b9e10185adf82ecf05165acae8181be",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f1_importance.py",
+   "relative_to_STUDY_ROOT": "F_observables/f1_importance.py",
+   "bytes": 10173,
+   "sha256": "08a38f23b179d3c750722987b820a8e38692c4c078d62d0d13fffd6da59958d9",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f1_truth.py",
+   "relative_to_STUDY_ROOT": "F_observables/f1_truth.py",
+   "bytes": 9198,
+   "sha256": "d45193174d433e5cb9a25151b6b65d3d15b2ce90978da5e173b630ce6405a4e3",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f1_validate.py",
+   "relative_to_STUDY_ROOT": "F_observables/f1_validate.py",
+   "bytes": 9005,
+   "sha256": "c3dae047da03df665effd0bd813b451a5d8828bf9923f88200e1b1c3d6f27d4f",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f2_run.py",
+   "relative_to_STUDY_ROOT": "F_observables/f2_run.py",
+   "bytes": 11951,
+   "sha256": "91f9956a2014fb0e2922531bc0044fab44aeecc0ef351e421404150a7a8dc08d",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f4_engine_check.py",
+   "relative_to_STUDY_ROOT": "F_observables/f4_engine_check.py",
+   "bytes": 7958,
+   "sha256": "a31e50bb7f2e927c196627683e345ce506e76fde234ac27ce923cb049a8cdcf1",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f5_cv.py",
+   "relative_to_STUDY_ROOT": "F_observables/f5_cv.py",
+   "bytes": 14101,
+   "sha256": "682a7b79f6dc89baac4bea79ee4c318c7f894a504fce03f09217daed7fda320e",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_basis.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_basis.py",
+   "bytes": 7997,
+   "sha256": "3ed996ed4c6a98a3a3a747840f1df3ab1d2af9ca1415c1da2ec10693b2f4f944",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_common.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_common.py",
+   "bytes": 12491,
+   "sha256": "1477084c1f44797be188f8868f7e21e175ff3a2b36b41c2392fa7c1551f86b8b",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_fit.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_fit.py",
+   "bytes": 16925,
+   "sha256": "78497a983613eeb2fd09d8af1f182f17d978572937769674f02b2e8e93cc2f7e",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_kernels.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_kernels.py",
+   "bytes": 18749,
+   "sha256": "964a4b5abefda8b3f438394f0e37de08577c29341a4cbe72e1a1f7e3d0208b38",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_methods.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_methods.py",
+   "bytes": 23739,
+   "sha256": "74b4f6787051e935402a15aa89ac80b2ab45c38fdb6dfa0d1bc80afaf89b2b35",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_pdf.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_pdf.py",
+   "bytes": 11873,
+   "sha256": "8d4f24781a12396ec94ccb6229fc3cff24a63cee88ae7c672a8b472580037bde",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/results/importance_F.npz",
+   "relative_to_STUDY_ROOT": "F_observables/results/importance_F.npz",
+   "bytes": 4445163,
+   "sha256": "b3f5b04b0c19075861271f3f7e025ae3ecfdce913d3bd19eb462482c9b8c7127",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/results/models_main.npz",
+   "relative_to_STUDY_ROOT": "F_observables/results/models_main.npz",
+   "bytes": 671956,
+   "sha256": "c077ef4cbc4469e8c32343b0e2fb5e902eeeecb0c221641453e9de992fa861ae",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/results/profiles.npz",
+   "relative_to_STUDY_ROOT": "F_observables/results/profiles.npz",
+   "bytes": 11379072,
+   "sha256": "70019d5ac22d0430809046b1c31f796b09e9a8c35c18ac04ea333fe5edba20ff",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/results/truth.npz",
+   "relative_to_STUDY_ROOT": "F_observables/results/truth.npz",
+   "bytes": 7967203,
+   "sha256": "e26ceaafe1d0af6f25c54e70eb48ab3aabf83c60fa91903c808f7d3e310da207",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/results/truth_summary.json",
+   "relative_to_STUDY_ROOT": "F_observables/results/truth_summary.json",
+   "bytes": 38754,
+   "sha256": "7bcabf83d51c25407c25acda2ac606bacb99474dc7db5b7edc3dbcdd64d59e8b",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/run_test_f.py",
+   "relative_to_STUDY_ROOT": "F_observables/run_test_f.py",
+   "bytes": 8452,
+   "sha256": "be583f7222848873d5dad0c60518fe8602cb12cb79df5253bc3a0fd0124748cc",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/G_physical_outer/inputs/xi_bias_z0.npz",
+   "relative_to_STUDY_ROOT": "G_physical_outer/inputs/xi_bias_z0.npz",
+   "bytes": 159476,
+   "sha256": "ac0edcc7cdbe7f4cc32314488762f2b5189c418f3fee5ea9fb515a2b58588ff1",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/__init__.py",
+   "relative_to_STUDY_ROOT": "analysis/__init__.py",
+   "bytes": 1251,
+   "sha256": "4bca4b9f966d376abb7e6379343e640f46343c385327f4b99d148059a4114bd0",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/_legacy.py",
+   "relative_to_STUDY_ROOT": "analysis/_legacy.py",
+   "bytes": 4292,
+   "sha256": "313a60d209debea298f7fc4121d43066dd556b7deab94b3461d00d83d9d9417c",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/covariance.py",
+   "relative_to_STUDY_ROOT": "analysis/covariance.py",
+   "bytes": 17439,
+   "sha256": "e588c3ed078f14ac9d245c7e0ecdb3a125c9ac0c81027098dc6129bc1c256f7b",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/families.py",
+   "relative_to_STUDY_ROOT": "analysis/families.py",
+   "bytes": 9347,
+   "sha256": "664a0d0d5c1ced384e43ceb806879edc53d11fcf74948d72b6d5b0b0296b4b42",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/fitting.py",
+   "relative_to_STUDY_ROOT": "analysis/fitting.py",
+   "bytes": 31335,
+   "sha256": "78f58bb5ab657ee53af5257f9c0c3e811c9250674701254e7be6e2fc1a384b48",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/io.py",
+   "relative_to_STUDY_ROOT": "analysis/io.py",
+   "bytes": 14667,
+   "sha256": "7c088a326fd8c1569e5a2ac22b664ea381816ec4f4aea6a5202885d080266f85",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/masks.py",
+   "relative_to_STUDY_ROOT": "analysis/masks.py",
+   "bytes": 3290,
+   "sha256": "aa7ceef967bcf8d4555b37cc97d736db1222ff4b8450f54017e58858f144a20d",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/newdata.py",
+   "relative_to_STUDY_ROOT": "analysis/newdata.py",
+   "bytes": 17399,
+   "sha256": "d2e92870d914f732715f9ab20d0ee7dfbe9ec1192a5e006cf5ffc1ecf5f8df4d",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/pipeline.py",
+   "relative_to_STUDY_ROOT": "analysis/pipeline.py",
+   "bytes": 8760,
+   "sha256": "99da1c768a842598e2c85d5ed176fadc34b4e9706c079cd6093bf5d653fc0ecd",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/stability.py",
+   "relative_to_STUDY_ROOT": "analysis/stability.py",
+   "bytes": 5153,
+   "sha256": "eb06be98bff03a32f9e858dac680f5210b689d563f1d8f6cba109b637f527ba6",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/stacking.py",
+   "relative_to_STUDY_ROOT": "analysis/stacking.py",
+   "bytes": 4618,
+   "sha256": "8b7ea260b8dd073afa1a977a716b1af43b4feae9d5cfa4befadf36e22530296e",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/variants.py",
+   "relative_to_STUDY_ROOT": "analysis/variants.py",
+   "bytes": 34027,
+   "sha256": "75e743b1716a3b9ee0df9ff7fd7edc00316b26b5bb3a54c9b8834eafde252a3f",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/census_population.npz",
+   "relative_to_STUDY_ROOT": "census_population.npz",
+   "bytes": 58398507,
+   "sha256": "e80950526c3b345ea666c5ee31b6a02dd1e4304966ebdf4c6eb004ad5068401d",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/geometry.py",
+   "relative_to_STUDY_ROOT": "geometry.py",
+   "bytes": 8474,
+   "sha256": "c3a68811edf20e30b21eeab67100dcdc2f677507c99a5dbf934992a7a5daada4",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/grids.py",
+   "relative_to_STUDY_ROOT": "grids.py",
+   "bytes": 3024,
+   "sha256": "3848b35ab4445004851eed65fe5c80d3188d7409ae891447df61d8f657911112",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/kernels/engine.py",
+   "relative_to_STUDY_ROOT": "kernels/engine.py",
+   "bytes": 47115,
+   "sha256": "37f086ac56c08621a5038c921f2ab8aacebc4023b991b69824765ebc43438aaf",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/kernels/importance.npz",
+   "relative_to_STUDY_ROOT": "kernels/importance.npz",
+   "bytes": 302235,
+   "sha256": "2c7158a9ec31028aeb55606cb57e88ed9f9339a5e59f267a44a38d7d55d6cdb6",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/kernels/jacobians.npz",
+   "relative_to_STUDY_ROOT": "kernels/jacobians.npz",
+   "bytes": 24835613,
+   "sha256": "c8af5618d70fb8496be30addaf1dcc46d21275b7728fe2b5ab3c2dff70d07cf8",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/kernels/velocity.py",
+   "relative_to_STUDY_ROOT": "kernels/velocity.py",
+   "bytes": 5113,
+   "sha256": "fd17392cc134d26209e9a743c216491a59c904b48124015ba7f77b16190f7aab",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/measure.py",
+   "relative_to_STUDY_ROOT": "measure.py",
+   "bytes": 5327,
+   "sha256": "82602e5022f7df8ea2ed6a321bc0a6e223eb09e303bce1a2e87cb984d4d2eaba",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/measure_overlap.py",
+   "relative_to_STUDY_ROOT": "measure_overlap.py",
+   "bytes": 16968,
+   "sha256": "a2923d47a77196ebd05bfc5f78d2e9ed0e614a4f278a87f2eddb09700630b7b9",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/measurements_owner.npz",
+   "relative_to_STUDY_ROOT": "measurements_owner.npz",
+   "bytes": 157538479,
+   "sha256": "495dfab88b3f0a2a0022cef23b827dee2a68daa851fff78133f696bed3b4581a",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/measurements_partition.npz",
+   "relative_to_STUDY_ROOT": "measurements_partition.npz",
+   "bytes": 9772086,
+   "sha256": "0fd69a61a4fd04d952d15c2624910c34474384be1a9fc00e4098295f57e034cd",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/metadata_plan.json",
+   "relative_to_STUDY_ROOT": "metadata_plan.json",
+   "bytes": 34195,
+   "sha256": "e0fb04793fe702168fa63033aaa55b53e999c3bcb8476ca69ac142a94ebe0915",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/overlap_tables.npz",
+   "relative_to_STUDY_ROOT": "overlap_tables.npz",
+   "bytes": 4023023,
+   "sha256": "87cf1e0927cfb10cda8ae7970f403eb2899c925dca956d6a67482e08436933f1",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/pilot_physics.py",
+   "relative_to_STUDY_ROOT": "pilot_physics.py",
+   "bytes": 8364,
+   "sha256": "5826641c6117fcf4a4d155f649f41ee0915ee19881899b5d06485003c51221c0",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/schema.json",
+   "relative_to_STUDY_ROOT": "schema.json",
+   "bytes": 6003,
+   "sha256": "7d341347c0d5bc473023f17219833937a93b8e283ddabfb4015a0d0e46162b10",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/selected_halos.npz",
+   "relative_to_STUDY_ROOT": "selected_halos.npz",
+   "bytes": 1154251,
+   "sha256": "8213a60ae93b8c781288633860e006db15106a8d69531e0440f14f75f7f252cd",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/study_config.json",
+   "relative_to_STUDY_ROOT": "study_config.json",
+   "bytes": 4502,
+   "sha256": "0c415565e43082a56f4a53f6520b355d7a0205371aa91c90565edb25f903b2e8",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/fit_study.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/fit_study.py",
+   "bytes": 20781,
+   "sha256": "8171078248f564a8efb9a4a2173864d8a58e37e3331fa6cdb243020924501b69",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/measure.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/measure.py",
+   "bytes": 5327,
+   "sha256": "82602e5022f7df8ea2ed6a321bc0a6e223eb09e303bce1a2e87cb984d4d2eaba",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/models.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/models.py",
+   "bytes": 3737,
+   "sha256": "df190ed06209b3f4f8849052223bbb17d7d2ba6bcd159491f8dfa33338979f1a",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/pilot_physics.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/pilot_physics.py",
+   "bytes": 8364,
+   "sha256": "5826641c6117fcf4a4d155f649f41ee0915ee19881899b5d06485003c51221c0",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/products/study_summary.json",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/products/study_summary.json",
+   "bytes": 3227504,
+   "sha256": "4c1a6da7d766d1988b53033ebd6fe1c176e0f9d426793a3b009c63d497ed2ebb",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/projection_model.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/projection_model.py",
+   "bytes": 1662,
+   "sha256": "ab770da5c89f9a5237d0553118d3b84207cfa453e032d1da6b1ededd4ab81e8c",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/analysis_common.py",
+   "relative_to_STUDY_ROOT": "../sensitivity_projects_L1_m9_0077_20261009/analysis_common.py",
+   "bytes": 6808,
+   "sha256": "a980f090515425309145f91b9845a90e471202b6deb984e783ef5abb9c760df7",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/analytic_observables/lightcone_analytic.py",
+   "relative_to_STUDY_ROOT": "../sensitivity_projects_L1_m9_0077_20261009/analytic_observables/lightcone_analytic.py",
+   "bytes": 22580,
+   "sha256": "db32357d93be173f0f37e1517cd2cff9b63ab61b579f36f5768cb9c889dea908",
+   "read_in_smoke": false,
+   "listed_via_test_F_or_engine_deps": true,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/lightcone_maps/fine_velocity_histogram.npz",
+   "relative_to_STUDY_ROOT": "../sensitivity_projects_L1_m9_0077_20261009/lightcone_maps/fine_velocity_histogram.npz",
+   "bytes": 455693,
+   "sha256": "f9fea8353ecd9c14b9dcb8c92444bad41d80b8ae43e18f491714c77a99a03bda",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/fit_parameters.npz",
+   "relative_to_STUDY_ROOT": "../tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/fit_parameters.npz",
+   "bytes": 177671,
+   "sha256": "d8549bc4c28f86d05cddf3396d16f54af02843c5ac87ac2eda5c29b4c74dddec",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/profile_shapes.npz",
+   "relative_to_STUDY_ROOT": "../tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/profile_shapes.npz",
+   "bytes": 9802302,
+   "sha256": "5ea2dd60556846031b5496d27c8399ab9f2bfd7740febb9c55644d3cd7455e6b",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/tsz_fit_truncation_L1_m9_0077_20261009/halo_model/compute_halo_terms.py",
+   "relative_to_STUDY_ROOT": "../tsz_fit_truncation_L1_m9_0077_20261009/halo_model/compute_halo_terms.py",
+   "bytes": 23781,
+   "sha256": "4e946fe4c0edb0b63652fa432a155359f353605a2a0370d26ec80375b73b6ffb",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/catalogue/catalogue_hist.npz",
+   "relative_to_STUDY_ROOT": "../../frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/catalogue/catalogue_hist.npz",
+   "bytes": 103875,
+   "sha256": "a3676c97f1c901df3a576047d37d6b14d1f41e0946628438134cbf505eb4189f",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/class_sz/b12_paint_all.npz",
+   "relative_to_STUDY_ROOT": "../../frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/class_sz/b12_paint_all.npz",
+   "bytes": 757214,
+   "sha256": "b4e2700367e52fc33523002823841caec5a90941ec188eee7a8d5f975dd7c53e",
+   "read_in_smoke": true,
+   "listed_via_test_F_or_engine_deps": false,
+   "particle_product_symlinked_on_maas": false
+  }
+ ],
+ "inputs_total_MB": 332.7,
+ "expected_resources_workers_4": {
+  "wall_minutes_by_stage_local_estimate_4_workers": {
+   "inputs": 0.1,
+   "kernels": 5,
+   "prepare": 0.3,
+   "parity": 1,
+   "fits": 1.5,
+   "evaluate": 15,
+   "selection": 7,
+   "cv": 3
+  },
+  "maas_attempt1_4_workers_minutes": {
+   "kernels": 8.4,
+   "prepare": 0.03,
+   "parity": 0.5,
+   "fits": 2.7,
+   "evaluate_p1_pdf": 5.1
+  },
+  "wall_total": "about 50 min locally; allow 1.5-2 h at nice 19 on maas",
+  "peak_memory_GB": "attempt 1 (4 workers): peak tree RSS 4.67 GiB; 8 workers: about 3 + 8 x 1.5 GB at most (rss-stop 32 GiB); keep >= 10 GB available"
+ },
+ "copy_back": "G_physical_outer/results/ without work/ and f_base/work/ (cluster_tests.py fetch G)"
+}

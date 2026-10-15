@@ -1,0 +1,84 @@
+{
+ "frozen_sources": {
+  "pilot_physics.py": {
+   "sha256": "5826641c6117fcf4a4d155f649f41ee0915ee19881899b5d06485003c51221c0",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  },
+  "measure.py": {
+   "sha256": "82602e5022f7df8ea2ed6a321bc0a6e223eb09e303bce1a2e87cb984d4d2eaba",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  },
+  "models.py": {
+   "sha256": "df190ed06209b3f4f8849052223bbb17d7d2ba6bcd159491f8dfa33338979f1a",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  },
+  "projection_model.py": {
+   "sha256": "ab770da5c89f9a5237d0553118d3b84207cfa453e032d1da6b1ededd4ab81e8c",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  },
+  "swift_reader.py": {
+   "sha256": "003214fcc3b1b3de453484e49685f87b3aa8406880adfa930c7a02119e56fb97",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  },
+  "check_fresh_mask.py": {
+   "sha256": "adf1120f9bd7a6a0fdaf0c1d7097e8bca302670242ffd5702fa0b479f052fb66",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  },
+  "remote_control.py": {
+   "sha256": "20025c03ec642abf9d440fd2d0f43489593fe5060625e59ed6fce6433e51f787",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  },
+  "dependencies/common.py": {
+   "sha256": "afb677d837231dde4ab2537e51b552c338afd5e3fda09751a9ac6f998fdcce30",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  },
+  "dependencies/flamingo_io.py": {
+   "sha256": "46d9c71615d8d6089228d4697685cdc9dcab4c773cf66684cd88db1577f2a0be",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  },
+  "dependencies/catalogue_stage.py": {
+   "sha256": "52996e99cc36cf16bf4d7780b05ac73d3f3ad4f9a4162911bfacc4c441dff1db",
+   "equals_radii234_executed": true,
+   "equals_radii234_final": true
+  }
+ },
+ "inputs": {
+  "inputs/radii234_selected_halos.npz": {
+   "sha256": "a004b3bc708270fd2a0fcf372562b7d24e5b809e8d2b86fb5e87449aba930714",
+   "equals_radii234_original": true
+  },
+  "inputs/radii234_metadata_plan.json": {
+   "sha256": "d3b7e8bfd91dd48803ae309b4eda3a6e44c92154b86d2bd17145f031afc4acd5",
+   "equals_radii234_original": true
+  },
+  "inputs/radii234_particle_hashes.json": {
+   "sha256": "9b2ff0ebb2517f155b6e59d48a58d978aa5fbee399a1b3f890344774e272ca48",
+   "equals_radii234_original": true
+  }
+ },
+ "new_sources": {
+  "study_config.json": "0c415565e43082a56f4a53f6520b355d7a0205371aa91c90565edb25f903b2e8",
+  "grids.py": "3848b35ab4445004851eed65fe5c80d3188d7409ae891447df61d8f657911112",
+  "census.py": "2538dcadbda1ae7022e978d7c30d8a31b1e9c94b0ea66228312da2f17be549a7",
+  "prepare_study.py": "49b84022304cc5a14120a6de5da7671b2d798190705d67fb9e17c479531e9d7c",
+  "measure_overlap.py": "a2923d47a77196ebd05bfc5f78d2e9ed0e614a4f278a87f2eddb09700630b7b9",
+  "extract_study.py": "8390db0c1b5144d3bc0b4f6aab8b635fb053e976aeb6c6a75e7173f45bdff112",
+  "geometry.py": "ba6d3ec7eff8d3f2268b97dda195cece1052b9e66bb859c4ee8c8047d7fa2129",
+  "verify_study.py": "285554c66de1120f5fe3de9a9ae346970c6741543f19b716eb220f8a84f80e00",
+  "control.py": "5e749ee562df11aff5f7cbb9e0eb7ba4a82893899d75d70ebd87bcaf7a3eda13",
+  "probe_g4.py": "1e77682c42adc0f04e83faafe139234ac5d326f5b1768a3c5ae93013ae5829f2"
+ },
+ "dry_run_catalogue": {
+  "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/flamingo_centrals_metadata.npz": "f9b4d8409a55bf51f936931ea57b612948c6493a74212b6bebfdcfbfbe7b7c48"
+ },
+ "passed": true
+}

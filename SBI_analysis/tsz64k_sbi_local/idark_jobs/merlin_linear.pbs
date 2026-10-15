@@ -1,0 +1,28 @@
+#!/bin/bash
+#PBS -j oe
+# Merlin / PCA with asinh inputs trained without the prior box (MERLIN_PARAM_SPACE=linear: the flow models
+# u = (theta - low) / (high - low), not its logit; early stop 30, lr patience 10, 61,440 rows), their evaluation and
+# observation posteriors (obs_posteriors_lin/); then the logit-space observation posteriors of all five models again,
+# now with the full Lee22 map (obs_posteriors/).
+#   qsub -q mini_B -N merlin_lin -l select=1:ncpus=20:mem=48gb -l walltime=06:00:00 merlin_linear.pbs
+set -uo pipefail
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $HOME/sbi_reruns_20261001/logs/${PBS_JOBNAME}_${PBS_JOBID%%.*}.log 2>&1
+PY=/home/kristero10/envs/sbi27/bin/python; C=${NCPUS:-20}
+export MPLBACKEND=Agg PYTHONUNBUFFERED=1
+O=results_merlin_unbinned_asinh_p30_lin; mkdir -p $O
+for f in features_merlin.npz features_moped.npz prepare.json; do ln -sfn ../results_merlin_unbinned_asinh_p30/$f $O/$f; done
+echo "host=$(hostname) ncpus=$C start=$(date -Is)"
+LIN="MERLIN_TAG=_asinh_p30_lin MERLIN_PARAM_SPACE=linear MERLIN_PATIENCE=30 MERLIN_LR_PATIENCE=10"
+env $LIN OMP_NUM_THREADS=4 $PY merlin_compression.py train --variants merlin --seeds 1 2 3 --workers 3 --threads 4 & m=$!
+env $LIN OMP_NUM_THREADS=1 $PY merlin_compression.py train --variants pca --seeds 1 2 3 --workers 3 --threads 1 & p=$!
+wait $m; c1=$?; wait $p; c2=$?
+echo "trained=$(date -Is) codes=$c1,$c2"
+code=1
+if [ $c1 -eq 0 ] && [ $c2 -eq 0 ]; then
+  env $LIN OMP_NUM_THREADS=$C $PY merlin_compression.py evaluate --variants merlin pca --threads $C && \
+  env $LIN OMP_NUM_THREADS=$C $PY obs_posteriors.py --models Merlin PCA --merlin-folder $O --out obs_posteriors_lin --threads $C && \
+  OMP_NUM_THREADS=$C $PY obs_posteriors.py --threads $C
+  code=$?
+fi
+echo "finished=$(date -Is) code=$code"; exit $code

@@ -1,0 +1,122 @@
+<title>HalfDome Analysis Dossier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+<style>
+/* Layout: a technical dossier. Sticky contents rail on wide screens, one reading column (~68ch) whose figures and code may run wider. */
+:root {
+  --bg: #f3f5f6; --surface: #ffffff; --fg: #172026; --muted: #56646e; --rule: #d3dbe0;
+  --accent: #1d5f7a; --accent-soft: #e2eef3;
+  --xg: #9a520e; --xg-bg: #fbf0e2; --note-bg: #edf1f4; --key: #23704f; --key-bg: #e5f2ec;
+  --code-bg: #eceff1; --code-fg: #1b2830;
+  --f-body: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --f-head: "IBM Plex Sans Condensed", "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --step--1: 0.84rem; --step-0: 1.02rem; --step-1: 1.22rem; --step-2: 1.5rem; --step-3: 2.05rem; --step-4: 2.7rem;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #10151a; --surface: #161e24; --fg: #e2e8ec; --muted: #9aa9b3; --rule: #2a3741;
+  --accent: #72b8d6; --accent-soft: #1a2c36;
+  --xg: #eaa45f; --xg-bg: #2a2016; --note-bg: #1a242b; --key: #84d1aa; --key-bg: #15271f;
+  --code-bg: #0c1114; --code-fg: #d4dde3; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #10151a; --surface: #161e24; --fg: #e2e8ec; --muted: #9aa9b3; --rule: #2a3741;
+  --accent: #72b8d6; --accent-soft: #1a2c36;
+  --xg: #eaa45f; --xg-bg: #2a2016; --note-bg: #1a242b; --key: #84d1aa; --key-bg: #15271f;
+  --code-bg: #0c1114; --code-fg: #d4dde3; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 400 var(--step-0)/1.62 var(--f-body); }
+.wrap { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2.5rem; max-width: 84rem; margin: 0 auto; padding-inline: 18px; padding-block: 2rem 5rem; }
+@media (min-width: 1100px) { .wrap { grid-template-columns: 17rem minmax(0, 1fr); } }
+main { min-width: 0; max-width: 60rem; }
+main p, main li, .lede { max-width: 70ch; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { grid-column: 1 / -1; border-bottom: 1px solid var(--rule); padding-bottom: 1.4rem; }
+header.top .eyebrow { font: 600 var(--step--1)/1.3 var(--f-head); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+header.top h1 { font: 700 var(--step-4)/1.08 var(--f-head); margin: 0.3rem 0 0.6rem; text-wrap: balance; }
+header.top p { max-width: 72ch; color: var(--muted); margin: 0.3rem 0; }
+.qmap { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 0.6rem 1.2rem; margin-top: 1.1rem; padding: 0; list-style: none; }
+.qmap li { font: 500 0.95rem/1.35 var(--f-head); border-top: 2px solid var(--rule); padding-top: 0.45rem; min-width: 0; }
+.qmap li span { display: block; color: var(--muted); font-weight: 500; font-size: var(--step--1); }
+
+nav.toc { font: 500 0.92rem/1.35 var(--f-head); }
+@media (min-width: 1100px) { nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 1rem); max-height: calc(100vh - 2rem); overflow-y: auto; } }
+nav.toc > details > summary { cursor: pointer; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: var(--step--1); color: var(--muted); margin-bottom: 0.5rem; }
+nav.toc ol { list-style: none; padding-left: 0; margin: 0; }
+nav.toc > details > ol > li { margin: 0.55rem 0 0.2rem; }
+nav.toc > details > ol > li > a { font-weight: 700; color: var(--fg); text-decoration: none; }
+nav.toc ol ol { padding-left: 0.8rem; border-left: 1px solid var(--rule); margin-top: 0.25rem; }
+nav.toc ol ol li { margin: 0.18rem 0; }
+nav.toc ol ol a { color: var(--muted); text-decoration: none; font-weight: 500; }
+nav.toc a:hover { color: var(--accent); }
+
+section.topic { border-top: 3px solid var(--fg); padding-top: 1.4rem; margin-top: 3.6rem; }
+section.topic:first-of-type { margin-top: 0.5rem; }
+section.topic h2 { font: 700 var(--step-3)/1.12 var(--f-head); margin: 0 0 0.9rem; text-wrap: balance; }
+section.topic h3 { font: 600 var(--step-2)/1.2 var(--f-head); margin: 2.4rem 0 0.6rem; text-wrap: balance; scroll-margin-top: 1rem; }
+section.topic h4 { font: 600 var(--step-1)/1.25 var(--f-head); margin: 1.6rem 0 0.4rem; }
+.lede { font-size: var(--step-1); line-height: 1.5; color: var(--fg); margin-bottom: 1.2rem; }
+code { font: 0.86em/1.4 var(--f-mono); background: var(--code-bg); color: var(--code-fg); padding: 0.06em 0.3em; border-radius: 3px; overflow-wrap: anywhere; }
+.eq { font: italic 1.08rem/1.6 var(--f-body); background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 0.7rem 1rem; margin: 1rem 0; overflow-x: auto; max-width: 100%; }
+
+figure.fig { margin: 1.6rem 0; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 0.8rem; }
+figure.fig img { display: block; width: 100%; height: auto; max-width: 100%; border-radius: 3px; background: #ffffff; }
+figure.fig figcaption { font: 400 0.92rem/1.45 var(--f-body); color: var(--muted); margin-top: 0.6rem; }
+figure.fig figcaption strong { color: var(--fg); font-family: var(--f-head); }
+.src { display: block; font: 0.78rem/1.4 var(--f-mono); color: var(--muted); margin-top: 0.3rem; overflow-wrap: anywhere; }
+
+pre.code { position: relative; background: var(--code-bg); color: var(--code-fg); border-radius: 6px; padding: 2.1rem 1rem 0.9rem; margin: 1.2rem 0 0.4rem; overflow-x: auto; max-width: 100%; font: 0.82rem/1.5 var(--f-mono); }
+pre.code::before { content: attr(data-src); position: absolute; top: 0; left: 0; right: 0; padding: 0.35rem 1rem; font: 500 0.74rem/1.3 var(--f-mono); color: var(--muted); border-bottom: 1px solid var(--rule); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+pre.code code { background: none; padding: 0; font-size: inherit; overflow-wrap: normal; }
+.code-note { font-size: 0.93rem; color: var(--muted); margin-top: 0.2rem; }
+p.path { font: 0.84rem/1.45 var(--f-mono); color: var(--muted); overflow-wrap: anywhere; }
+
+aside { border-radius: 6px; padding: 0.9rem 1.1rem; margin: 1.4rem 0; max-width: 72ch; }
+aside > :first-child { margin-top: 0; }
+aside > :last-child { margin-bottom: 0; }
+aside.xgpaint { background: var(--xg-bg); border-left: 5px solid var(--xg); max-width: 100%; }
+aside.xgpaint h4 { color: var(--xg); font-size: var(--step-0); text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 0.5rem; }
+aside.note { background: var(--note-bg); border-left: 3px solid var(--muted); }
+aside.key { background: var(--key-bg); border-left: 5px solid var(--key); font-size: 1.04rem; }
+aside.key::before { content: "Key result"; display: block; font: 700 var(--step--1)/1.3 var(--f-head); letter-spacing: 0.08em; text-transform: uppercase; color: var(--key); margin-bottom: 0.3rem; }
+
+table.data { display: block; overflow-x: auto; max-width: 100%; border-collapse: collapse; margin: 1.2rem 0; font: 0.9rem/1.4 var(--f-head); }
+table.data th, table.data td { border-bottom: 1px solid var(--rule); padding: 0.4rem 0.7rem; text-align: left; vertical-align: top; }
+table.data thead th { border-bottom: 2px solid var(--fg); font-weight: 700; white-space: nowrap; }
+table.data td.num, table.data th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--f-mono); font-size: 0.84rem; }
+
+details.figindex { margin-top: 4rem; border-top: 1px solid var(--rule); padding-top: 1rem; }
+details.figindex summary { cursor: pointer; font: 700 var(--step-1)/1.3 var(--f-head); }
+details.figindex table { font-size: 0.82rem; }
+footer { color: var(--muted); font-size: var(--step--1); margin-top: 3rem; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">HalfDome · status of the analysis · October 2026</div>
+    <h1>HalfDome Analysis Dossier</h1>
+    <p>Five questions, answered from the reports, figures, logs and code already produced, with the code excerpts that do the work and every change made to XGPaint marked in amber.</p>
+    <ul class="qmap">
+      <li><a href="#lee22">1. Lee22 profile corrections</a><span>every fix to the Lee et al. 2022 density and pressure fits</span></li>
+      <li><a href="#frb">2. FRB DM PDFs and tSZ × FRB</a><span>dispersion-measure distributions and the cross-correlation</span></li>
+      <li><a href="#sbi64k">3. 64k SBI results</a><span>correlations, corner plots, SBC and TARP</span></li>
+      <li><a href="#seedmask">4. Seed, mask and simulation impact</a><span>what changes when the sky or the mask changes</span></li>
+      <li><a href="#merlin">5. Merlin and 50-multipole bands</a><span>the implementation and the Δℓ = 50 smoothing</span></li>
+      <li><a href="#xgpaint">Appendix: XGPaint edits</a><span>every change to the painting library</span></li>
+    </ul>
+  </header>
+  <nav class="toc" aria-label="Contents"><details open><summary>Contents</summary><!--NAV--></details></nav>
+  <main>
+<!--SECTIONS-->
+    <details class="figindex">
+      <summary>Separate plot files (<!--NFIG-->)</summary>
+      <p>Every figure is also saved as its own file (PNG, with the PDF beside it where one exists) in <code>reports/halfdome_overview_20261007/fig/</code> of the HalfDome repository.</p>
+      <table class="data"><thead><tr><th>Section</th><th>File</th></tr></thead><tbody><!--FIGINDEX--></tbody></table>
+    </details>
+    <footer>Built from the HalfDome repository (branch <code>cluster</code>). Code excerpts are copied verbatim from the files and line ranges shown above each block.</footer>
+  </main>
+</div>

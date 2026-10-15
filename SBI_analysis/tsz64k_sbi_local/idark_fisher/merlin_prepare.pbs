@@ -1,0 +1,14 @@
+#!/bin/bash
+#PBS -N fb_mprep
+#PBS -j oe
+# Merlin inputs from the beam-consistent spectra with the 420-draw B12 whitening (merlin_w420_prepare.py).
+#   qsub -q mini_B -l select=1:ncpus=8:mem=48gb -l walltime=02:00:00 merlin_prepare.pbs
+set -uo pipefail
+R=$HOME/tsz64k_fisher_b12_20261002
+L=$HOME/sbi_reruns_20261001/SBI_analysis/tsz64k_sbi_local; cd $L
+exec > $R/logs/merlin_prepare_${PBS_JOBID%%.*}.log 2>&1
+C=${NCPUS:-8}
+export OMP_NUM_THREADS=$C OPENBLAS_NUM_THREADS=$C MKL_NUM_THREADS=$C PYTHONUNBUFFERED=1 MPLBACKEND=Agg
+echo "host=$(hostname) ncpus=$C start=$(date -Is)"
+/home/kristero10/envs/sbi27/bin/python merlin_w420_prepare.py
+code=$?; echo "finished=$(date -Is) code=$code"; exit $code

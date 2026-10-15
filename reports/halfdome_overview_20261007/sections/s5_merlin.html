@@ -1,0 +1,866 @@
+<section id="merlin" class="topic">
+<h2>5. Merlin and 50-multipole bands</h2>
+<div class="lede">This section takes the compression that gave the best marginal constraints in the 64k tSZ
+simulation-based inference (SBI) analysis, called Merlin, apart step by step: from the 7,900 measured multipoles,
+through noise whitening, principal components, an asinh rescaling and a learned compression head, to the posterior.
+It then explains the 50-multipole-band variant ("band50") that was built so that the inference does not jump when
+the halo realisation or the sky mask changes. The short version: Merlin beats whitened PCA, MOPED and 40 band powers
+on point accuracy (mean Pearson r 0.729 against 0.590 for 40 bands, beam-consistent noise), but the evidence
+indicates that much of that lead comes from structure finer than 50 multipoles that belongs to the one HalfDome sky
+the network was trained on. Averaging it away (band50) removes most of the sky sensitivity, costs about 46 % in
+posterior width over the prior and brings the accuracy back to the 40-band level.</div>
+<h3>5.1 What "Merlin" means in this project</h3>
+<p>Merlin is the name of a published data-compression method, not a person or a machine. The project's
+implementation, <code>merlin_compression.py</code>, cites Wernersson, Franco-Abellan and Cañas-Herrera (2026),
+<a href="https://arxiv.org/abs/2609.24946">arXiv:2609.24946</a>, Section 3.3, and two modules of their code,
+<code>merlin/preprocessing.py</code> and <code>merlin/network.py</code>. Neither the paper nor the original code is
+stored on this machine (a file-system search found only the project's own files), so this section describes the
+re-implementation exactly as the code and its docstrings define it. Where the text says what the original does,
+the statement comes from the docstring of <code>merlin_compression.py</code> (lines 1 to 33; the noise redraw is stated on line 31).</p>
+<p>The idea in one sentence: whiten the full-resolution spectrum with a noise covariance, project it onto the
+leading principal components of the whitened noise-free training spectra, and let a neural network learn two summary
+numbers per parameter from these components, trained together with the posterior estimator. The method sits between
+two simpler compressions that were already in the analysis. <strong>40 bins</strong> averages the 7,900 multipoles
+into 40 band powers of width 200 (the last one 100 wide), each multipole weighted by its 2ℓ + 1 modes, and feeds them to the posterior network. <strong>MOPED</strong> (Massively Optimised
+Parameter Estimation and Data compression, Heavens, Jimenez and Lahav 2000,
+<a href="https://arxiv.org/abs/astro-ph/9911102">astro-ph/9911102</a>) projects the data onto nine fixed
+directions, one per parameter, built from the derivatives of the mean spectrum at the Battaglia et al. (2012) point
+(B12) and a noise covariance; it is optimal only for a Gaussian likelihood near that point. <strong>Whitened PCA</strong>
+(principal component analysis) is Merlin without the learned head: the same components go straight into the
+posterior network.</p>
+<p>All variants end in the same density estimator, so that only the compression differs. The estimator is neural
+posterior estimation (NPE): a conditional normalising flow q(θ | x) is trained on pairs (θ, x) drawn from the prior
+and the simulator to maximise the mean log density of the true parameters, which makes q approach the posterior for
+every x at once. The flow is a masked autoregressive flow (MAF) from the <code>sbi</code> package with 5 transforms of
+128 hidden units, applied to transformed parameters u (section 5.8).</p>
+<table class="data"><thead><tr><th>element</th><th>original Merlin (per the docstring)</th><th>this project</th></tr></thead>
+<tbody>
+<tr><td>whitening</td><td>x̃ = L<sup>−1</sup>x, C = LL<sup>T</sup> a noise covariance</td><td>same; three covariances tried (20 B12 draws, 61,440 noise-only realisations, a 420-draw lag model)</td></tr>
+<tr><td>PCA</td><td><code>torch.pca_lowrank(q=500, center=True)</code>, keep 100 S/ΣS &gt; 0.001</td><td>same cut, computed exactly from the 7,900 × 7,900 covariance of the whitened clean pool</td></tr>
+<tr><td>input scaling</td><td>swyft's online standardising layer</td><td>noise-level asinh followed by a z-score (added 2026-10-01); the head's standardisation is then the identity</td></tr>
+<tr><td>head</td><td>standardise → Linear 2048 → ReLU → Linear 512 → ReLU → Linear 9 × N<sub>feat</sub> → BatchNorm1d</td><td>same, N<sub>feat</sub> = 2, so 18 learned features</td></tr>
+<tr><td>what trains the head</td><td>marginal ratio estimators (swyft)</td><td>the posterior flow itself (the head is the flow's embedding network)</td></tr>
+<tr><td>noise in training</td><td>Gaussian noise redrawn every epoch</td><td>one fixed noise realisation per simulation</td></tr>
+<tr><td>optimiser</td><td>AdamW, learning rate 5×10<sup>−4</sup>, batch 256, ReduceLROnPlateau ×0.1 after 3 epochs, early stop after 5, 20 % validation</td><td>same, with the two patiences raised to 10 and 30 epochs (environment variables)</td></tr>
+<tr><td>ensemble</td><td>not stated</td><td>3 training seeds, equal-weight mixture</td></tr>
+</tbody></table>
+<p class="path">Code lives in SBI_analysis/tsz64k_sbi_local/: merlin_unbinned_prepare.py (whitening and PCA, production
+noise), merlin_beam_prepare.py (beam-consistent and noise-only sets), merlin_w420_prepare.py (420-draw whitening),
+merlin_compression.py (asinh inputs, head, training, evaluation, plots), fisher_forecast_b12.py (Fisher forecast and
+the covariance model); cluster job scripts in idark_merlin/, idark_jobs/ and idark_fisher/. Results are in
+results_merlin_unbinned&lt;TAG&gt;/ with TAG = _asinh_p30, _asinh_p30_lin, _beam_asinh_p30, _nnwhite_asinh_p30,
+_beam_nnwhite_asinh_p30, _beam_w420_asinh_p30 and their _lin and _N&lt;size&gt; variants.</p>
+<h3>5.2 The data vector: 7,900 unbinned multipoles with beam-consistent noise</h3>
+<p>Each simulation row is a parameter vector θ of the nine generalised NFW (gNFW, the generalised
+Navarro-Frenk-White pressure profile) parameters: the pressure amplitude P<sub>0</sub>, the core scale
+x<sub>c</sub> and the outer slope β, each with a mass slope α<sub>m</sub> and a redshift slope α<sub>z</sub>. They are
+drawn from a flat prior box (P<sub>0</sub> 1 to 60, x<sub>c</sub> 0.025 to 4, β 2.8 to 16, α<sub>m</sub><sup>P0</sup>
+−0.6 to 1.5, α<sub>m</sub><sup>xc</sup> −1 to 0.4, α<sub>m</sub><sup>β</sup> −0.2 to 0.4, α<sub>z</sub><sup>P0</sup>
+−6 to 0.5, α<sub>z</sub><sup>xc</sup> −1.5 to 3, α<sub>z</sub><sup>β</sup> −0.5 to 2; <code>fisher_forecast_b12.py</code>
+lines 63 to 64). The frozen engine paints a Compton-y map on the HalfDome lightcone, smooths it with a 2′ beam, applies
+an apodised cap mask with f<sub>sky</sub> = 0.4, adds two independent Simons Observatory (SO) noise splits and stores
+the signed cross spectrum of the two splits. Merlin works on</p>
+<div class="eq">D<sub>ℓ</sub> = ℓ(ℓ+1) C<sub>ℓ</sub> / 2π, &nbsp; ℓ = 80, 81, …, 7979 &nbsp; (7,900 numbers per simulation)</div>
+<p>with no binning. The collaborator's file of these spectra (65,536 rows × 7,900 multipoles, float64, 4.1 GB) was
+streamed in chunks of 2,048 rows. Every pass checks that averaging the per-multipole spectra into the 40 analysis bands
+reproduces both the collaborator's and our own 40-band files to a relative 10<sup>−9</sup>, and that the raw MOPED
+projections agree (<code>merlin_unbinned_prepare.py</code> lines 194 to 212). Of the 65,536 design rows, 64,440 were
+analysed; a fixed permutation sets aside 3,000 test rows, and the remaining 61,440 form the training pool, whose
+first N rows are the nested training sets of the size series.</p>
+<p>From 2026-10-02 on, the Merlin inputs use beam-consistent spectra. The production engine beamed the signal but
+added the beam-deconvolved SO noise without the beam, which overstates the noise × noise term by 1/B<sub>ℓ</sub><sup>2</sup>
+and the signal × noise term by 1/B<sub>ℓ</sub>. Instead of repainting, the noise cross spectrum C<sup>nn</sup> of every
+row was regenerated from its stored seeds, and each noise term was given the beam:</p>
+<div class="eq">C<sup>beam</sup><sub>ℓ</sub> = C<sup>ss</sup><sub>ℓ</sub> + B<sub>ℓ</sub> (C<sup>noisy</sup><sub>ℓ</sub> − C<sup>ss</sup><sub>ℓ</sub> − C<sup>nn</sup><sub>ℓ</sub>) + B<sub>ℓ</sub><sup>2</sup> C<sup>nn</sup><sub>ℓ</sub></div>
+<p>(<code>merlin_beam_prepare.py</code> lines 71 to 73), with C<sup>ss</sup> the noise-free (beamed, masked) signal spectrum,
+C<sup>noisy</sup> the stored production cross spectrum of the two splits, C<sup>nn</sup> the cross spectrum of the two noise
+splits alone and B<sub>ℓ</sub> the transfer function of the 2′ beam. Two checks guard the inputs
+(<code>results_merlin_unbinned_beam/inputs/prepare_whitening.json</code>, "checks"; code in
+<code>merlin_beam_prepare.py</code> lines 150 to 166): the uploaded per-multipole production and noise-free spectra
+rebin to the stored 40-band values with a largest difference of 2.6×10<sup>−15</sup> (noisy) and
+1.7×10<sup>−15</sup> (clean) of each row's largest band power, and the rebuilt beam-consistent spectra equal the
+staged beam-fix run's own 40-band and per-multipole spectra exactly ("beam40" and "beam_unbinned" both 0). The beam fix itself is documented on the
+explainer page (its section 3, <code>results_doc/index.html</code>); here it only defines the input, and section 5.9
+shows that it changed almost nothing in the SBI metrics.</p>
+<h3>5.3 Step 1: whitening, from 20 draws to a 420-draw lag model</h3>
+<p>Whitening transforms the spectrum so that its noise has unit variance and no correlation between multipoles:
+with a noise covariance C = LL<sup>T</sup> (L its lower-triangular Cholesky factor), x̃ = L<sup>−1</sup>x. Two features
+of the raw spectrum make this necessary. The noise standard deviation per multipole spans more than a factor 30
+(6.4×10<sup>−15</sup> to 2.3×10<sup>−13</sup> in D<sub>ℓ</sub> units for the production noise, <code>prepare.json</code>
+of results_merlin_unbinned), so an unweighted PCA would be dominated by the noisiest multipoles. And the apodised mask
+couples neighbouring multipoles: in the 420-draw covariance model below, the noise correlation between ℓ and ℓ+1 is
+0.551. After whitening, a distance in the PCA step is a distance in noise units. Three covariances were used, in this
+order.</p>
+<h4>(a) The 20 B12 noise draws, shrunk with OAS</h4>
+<p>The first Merlin inputs (2026-09-29 to 2026-10-01) used the 21 stored SO noise draws of the B12 mock, leaving out the
+draw of the B12 observation itself (noise seeds 39001001 and 39001002) so that the observation's noise is not part of
+its own whitening. With 20 draws and 7,900 multipoles the sample covariance is singular, so it is regularised with
+Oracle Approximating Shrinkage (OAS, Chen et al. 2010): the sample matrix S is shrunk towards a scaled identity with a
+weight ρ computed from the data. The project applies OAS to the correlation matrix of the standardised draws, renormalises
+it to a unit diagonal and multiplies back the measured variances, so the variances are kept as measured. Written out
+(the explicit form is in <code>fisher_forecast_b12.py</code> lines 219 to 224):</p>
+<div class="eq">S<sub>z</sub> = Z<sup>T</sup>Z / n (Z the n × p matrix of standardised draws), &nbsp; R̂ = (1 − ρ) S<sub>z</sub> + ρ μ I, &nbsp; μ = tr S<sub>z</sub> / p, &nbsp; ρ = min{ (α + μ<sup>2</sup>) / [(n + 1)(α − μ<sup>2</sup>/p)], 1 }, &nbsp; α = mean of the squared entries of S<sub>z</sub></div>
+<div class="eq">R̃<sub>ℓℓ′</sub> = R̂<sub>ℓℓ′</sub> / (R̂<sub>ℓℓ</sub> R̂<sub>ℓ′ℓ′</sub>)<sup>1/2</sup> (unit diagonal), &nbsp; C = D R̃ D, &nbsp; D = diag(σ<sub>ℓ</sub>), &nbsp; n = 20 draws, p = 7,900 multipoles</div>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/merlin_unbinned_prepare.py:105-127"><code>def whitener():
+    """Noise covariance of the unbinned spectra and its Cholesky factor.
+
+    so_nine_fisher.conditional_covariance, computed through sklearn's _oas: sklearn.covariance.oas is the same
+    estimate but also forms the pseudo-inverse of the 7,900 x 7,900 matrix, which takes hours and is not needed.
+    Uses the 20 draws of mocks/pass1_B12/B12 other than B12_FITTED.
+    Returns (L, info): L (7900, 7900) lower triangular with L L^T = C, in D_ell units; info the dict stored as
+    'covariance' in clean.json (draws, oas_correlation_shrinkage, diag_sd_range = [min, max] of sqrt(diag C))."""
+    from sklearn.covariance._shrunk_covariance import _oas
+    draws = _b12_draws([p for p in sorted(B12_MOCKS.glob('noisy_cross_*.npy')) if p != B12_FITTED])
+    std = draws.std(axis=0, ddof=1)
+    assert np.all(std &gt; 0), 'zero ensemble variance'
+    # shrink the correlation of the standardised draws, not the covariance: the variances are kept as measured
+    standardised = (draws - draws.mean(axis=0)) / std
+    correlation, shrinkage = _oas(standardised, assume_centered=True)
+    # OAS normalises by n, the standardisation by n - 1: rescale to a unit diagonal
+    correlation /= np.sqrt(np.outer(np.diag(correlation), np.diag(correlation)))
+    C = correlation * np.outer(std, std)
+    L = np.linalg.cholesky(C)
+    diag_sd = np.sqrt(C.diagonal())
+    info = dict(draws=len(draws), oas_correlation_shrinkage=shrinkage,
+                diag_sd_range=[float(diag_sd.min()), float(diag_sd.max())])
+    return L, info</code></pre>
+<p class="code-note">The estimator works on the correlation of the standardised draws, so the measured per-multipole variances (<code>std</code>) survive the shrinkage exactly; the renormalisation line corrects the n versus n − 1 convention of sklearn's private <code>_oas</code>. With 20 draws the result is ρ = 0.9517 (<code>oas_correlation_shrinkage</code> in prepare.json): the correlation matrix is 95 % identity, so this whitening is in practice a variance-only, diagonal one.</p>
+<p>Two weaknesses follow. The 20 draws cannot resolve the mask correlation (their shrunk correlation between ℓ and
+ℓ+1 is near zero, Figure 5.1b), and because they are draws of the B12 sky the covariance contains the B12 signal × noise
+term, so it depends on a fiducial model.</p>
+<h4>(b) Noise-only whitening from 61,440 realisations</h4>
+<p>The beam fix produced, as a by-product, the regenerated noise × noise spectrum C<sup>nn</sup> of every row: 61,440
+noise realisations in the training pool, with no signal term. <code>merlin_beam_prepare.py</code> builds the covariance
+of these with the same OAS recipe, multiplies it by B<sub>ℓ</sub><sup>2</sup>B<sub>ℓ′</sub><sup>2</sup> for the
+beam-consistent set (the beam-consistent noise term is B<sub>ℓ</sub><sup>2</sup>C<sup>nn</sup>), and leaves the test
+rows' noise out. With 61,440 realisations the shrinkage drops to ρ = 0.173 and the mean lag-1 correlation is resolved at
+0.455; from the first 1,000 realisations only, ρ = 0.927 and the lag-1 correlation is 0.040, while the standard deviations agree
+to a median 1.5 % (<code>prepare_whitening.json</code>, "estimate_from_1000_rows", median of |sd<sub>1000</sub>/sd<sub>61440</sub> − 1|). The correlations, not the variances, need tens of
+thousands of realisations.</p>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/merlin_beam_prepare.py:214-233"><code>    for name, (kind, whitening, features, inputs_dir) in SETS.items():
+        if only and name not in only.split(','):
+            continue
+        spectra, draws = data[kind]
+        if whitening == 'b12':
+            C, cov_info = b12_covariance(np.delete(draws, k_obs, axis=0))
+        else:
+            weight = bl ** 2 if kind == 'beam' else np.ones(7900)
+            C = cov_nn * np.outer(weight, weight)              # the noise-only crosses of this set's noise
+            cov_info = dict(nn_info, rows=int(len(order)),
+                            estimator='OAS-shrunk correlation x measured variances of the regenerated C_nn of the pool'
+                            + (', times B_ell^2 B_ell^2' if kind == 'beam' else ''))
+        L, jitter = cholesky(C)
+        cov_info.update(jitter=jitter, diag_sd_range=[float(np.sqrt(C.diagonal().min())),
+                                                      float(np.sqrt(C.diagonal().max()))])
+        V, top, kept, mean_white = pca(L, clean, order)
+        s_clean = np.concatenate([white(L, clean[i:i + CHUNK]) @ V for i in range(0, n, CHUNK)])
+        s_noisy = np.concatenate([white(L, spectra[i:i + CHUNK]) @ V for i in range(0, n, CHUNK)])
+        s_draws = white(L, draws) @ V
+        s_obs = s_draws[k_obs:k_obs + 1]</code></pre>
+<p class="code-note">One loop builds the three input sets. <code>b12</code> sets reuse the 20-draw OAS covariance; <code>nn</code> sets use <code>cov_nn</code>, the OAS covariance of the 61,440 pool C<sup>nn</sup>, weighted by B<sub>ℓ</sub><sup>2</sup>B<sub>ℓ′</sub><sup>2</sup> for beam-consistent data. Everything after the Cholesky factor (PCA on the whitened clean pool, projections of noisy, clean, observation and draws) is identical for all sets, so the sets differ only in the metric.</p>
+<p>The noise-only covariance lacks the signal × noise term. How large that term is can be read off the ratio of the
+B12 draws' scatter to the noise-only scatter: 1.47, 1.66, 1.19, 1.13 and 1.26 at ℓ = 100, 300, 1000, 2000 and 3000
+(<code>prepare_whitening.json</code>, "b12_sd_over_noise_only_sd"), consistent with the expected √(1 + 2S/N) excess
+where the B12 signal is a noticeable fraction of the noise. Here S is the signal power and N the noise power of one
+split at that multipole: across draws of one fixed signal map the cross spectrum scatters through the two
+signal × noise terms (variance ∝ 2SN) and the noise × noise term (∝ N<sup>2</sup>), and the S<sup>2</sup> term of a varying sky
+is absent. The single-multipole values 0.83 and 0.86 at ℓ = 5000 and 7000 are 20-draw scatter (the sampling error
+of a standard deviation from 20 draws is about 16 %); in 100-multipole bands the ratio lies between 0.96 and 1.06
+above ℓ = 6000, with mean 1.00 (<code>results_merlin_unbinned_beam/inputs/noise_scatter_bands.json</code>,
+"noisy_over_nn"; Figure 5.7d).</p>
+<h4>(c) The 420-draw lag covariance with a white floor</h4>
+<p>For the Fisher forecast (2026-10-02, idark root <code>~/tsz64k_fisher_b12_20261002</code>), 400 further B12 noise
+realisations of the noise on the B12 sky were painted (split-seed pairs 950001/950002 to 950799/950800,
+<code>idark_fisher/make_tasks.py</code>) and their C<sup>nn</sup> regenerated, so the B12 sky has 420
+beam-consistent noise residuals r = x − x<sup>clean</sup> besides the observation. Twenty draws cannot fill a
+7,900 × 7,900 matrix, but 420 can estimate a model with few parameters: a smooth variance and a correlation that depends
+only on the lag ℓ′ − ℓ.</p>
+<div class="eq">C = diag(s) R diag(s), &nbsp; s<sub>ℓ</sub><sup>2</sup> = running mean of ⟨r<sub>ℓ</sub><sup>2</sup>⟩ over ℓ ± 25, &nbsp;
+R<sub>ℓℓ′</sub> = ρ<sub>|ℓ−ℓ′|</sub> (Toeplitz, lags &lt; 64), &nbsp; then C<sub>ℓℓ</sub> → C<sub>ℓℓ</sub> + 10<sup>−3</sup> s<sub>ℓ</sub><sup>2</sup></div>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/fisher_forecast_b12.py:163-185"><code>def welch_acf(z, lags):
+    """Autocorrelation of the rows of z at lags 0..lags-1: Hann segments of length `lags` (half overlap, plus one
+    segment ending at the last multipole), averaged over segments and rows. It is the Fourier series of the average
+    windowed periodogram, a non-negative spectral density, so its Toeplitz matrices are positive semi-definite."""
+    w = np.hanning(lags + 2)[1:-1]
+    starts = sorted(set(range(0, z.shape[1] - lags + 1, lags // 2)) | {z.shape[1] - lags})
+    acc = np.zeros(lags)
+    norm = 0.0
+    for s in starts:
+        f = np.fft.rfft(z[:, s:s + lags] * w, n=2 * lags, axis=1)
+        acc += np.fft.irfft(np.abs(f) ** 2, n=2 * lags, axis=1)[:, :lags].sum(0)
+        norm += len(z) * np.sum(w ** 2)
+    return acc / norm
+
+
+def covariance_model(r, lags, half):
+    """C = diag(s) R diag(s) from residuals r (n, 7900) of known zero mean. Returns C, s (7900,), rho (lags,)."""
+    s = np.sqrt(running_mean(np.mean(r ** 2, 0), half))
+    acf = welch_acf(r / s, lags)
+    rho = acf / acf[0]
+    column = np.zeros(P)
+    column[:lags] = rho
+    return toeplitz(column) * np.outer(s, s), s, rho</code></pre>
+<p class="code-note">The lag correlation ρ<sub>k</sub> is the Welch estimate: Hann-windowed (raised-cosine tapered) segments of 64 multipoles with half overlap, averaged periodograms, inverse FFT. Because it is the Fourier series of a non-negative spectral density, the Toeplitz matrix is positive semi-definite by construction, which a raw sample autocorrelation would not guarantee.</p>
+<p>The model gives ρ<sub>1..5</sub> = 0.551, 0.049, 0.032, 0.026, 0.005 (<code>prepare.json</code> of
+results_merlin_unbinned_beam_w420_asinh_p30). The spectral density of the lag correlation, S(ω) = 1 + 2Σ<sub>k</sub>ρ<sub>k</sub>cos(kω), gives the noise
+variance (in units of the per-multipole variance) of a pattern that oscillates with frequency ω in ℓ, and the
+eigenvalues of a large Toeplitz matrix fill the range of S(ω). At the alternating frequency, S(π) = 1 + 2Σ<sub>k</sub>(−1)<sup>k</sup>ρ<sub>k</sub>
+= 7.7×10<sup>−7</sup>; at ω = 0 it is S(0) = 2.41 (<code>results_fisher_b12_beam/fisher_forecast_b12.json</code>, "covariance"): a pattern that
+flips sign from one multipole to the next carries almost no noise, because the mask correlates neighbours positively.
+Whitening divides each direction by the square root of its noise, so this one poorly known direction would be amplified
+by about 1/√(7.7×10<sup>−7</sup>) ≈ 1,100. The white floor of 10<sup>−3</sup> of the variance lifts the smallest
+eigenvalue of R to 0.00100 ("min_eigenvalue_R") and limits the amplification to about 32.</p>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/merlin_w420_prepare.py:127-146"><code>def main():
+    t0 = time.time()
+    bl = np.load(MBP.BEAMFIX / 'beam_bl.npy')[MBP.ELL]
+    pairs, beam21, clean_b12, residuals400, checks = b12_draws(bl)
+    print('B12 draws:', checks, flush=True)
+    k_obs = pairs.index(OBS_PAIR)
+    r_fit = np.concatenate([np.delete(beam21, k_obs, axis=0) - clean_b12, residuals400])    # 420 realizations
+    C, s, rho = covariance_model(r_fit, LAGS, HALF)
+    C[np.diag_indices_from(C)] += FLOOR * s ** 2
+    R = C / np.outer(s, s)
+    eig_min = float(np.linalg.eigvalsh(R).min())
+    del R
+    clean, beam, row_checks = gather_rows(bl)
+    L, jitter = MBP.cholesky(C)
+    order = np.load(HERE / 'results_final' / 'split.npz')['order']
+    V, top, kept, mean_white = MBP.pca(L, clean, order)
+    chunk = MBP.CHUNK
+    s_clean = np.concatenate([MBP.white(L, clean[i:i + chunk]) @ V for i in range(0, len(clean), chunk)])
+    s_noisy = np.concatenate([MBP.white(L, beam[i:i + chunk]) @ V for i in range(0, len(beam), chunk)])
+    s_draws = MBP.white(L, beam21) @ V</code></pre>
+<p class="code-note">The 420 realisations are the 20 old draws (observation left out) and the 400 new ones, all as residuals about the noise-free B12 spectrum. Line 135 adds the floor before the Cholesky factor; the rest repeats the PCA and projections of merlin_beam_prepare.py (imported as <code>MBP</code>).</p>
+<p>A remark that follows from the estimator's definition rather than from a separate run: OAS also acts as a
+floor. Since R̂ = (1 − ρ)S<sub>z</sub> + ρμI with μ close to 1, the smallest eigenvalue of R̂ is at least about ρ, so the
+noise-only whitening (ρ = 0.173) can amplify a direction by at most about 1/√0.173 ≈ 2.4, while the 20-draw whitening
+(ρ = 0.952) hardly changes the shape at all. The three whitenings therefore span "variance only" (a), "correlation
+resolved but heavily floored" (b) and "correlation modelled, lightly floored" (c).</p>
+<figure class="fig"><img src="fig/5_merlin/01_whitening_20draw_vs_noiseonly.png" alt="Noise standard deviation per multipole, lag correlation, whitened noise histogram and two 40 by 40 correlation blocks for the 20-draw and noise-only covariances" loading="lazy"><figcaption><strong>Figure 5.1</strong> (a) Noise standard deviation per multipole for the 20-draw B12 covariance (purple) and the 61,440-realisation noise-only covariance (red), beam-consistent noise. (b) Mean correlation between ℓ and ℓ+k: the 20 draws, after OAS, show essentially none; 61,440 realisations resolve 0.455 at lag 1. (c) The whitened noise of the B12 mock against a unit Gaussian. (d, e) A 40 × 40 block (ℓ = 2000 to 2039) of each correlation matrix. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/step_whitening.png (doc_figures.py)</span></figcaption></figure>
+<h3>5.4 Step 2: principal components of the whitened noise-free spectra</h3>
+<p>PCA finds the orthogonal directions along which a set of vectors varies most. Here the vectors are the whitened
+noise-free spectra w<sub>j</sub> = L<sup>−1</sup>x<sub>j</sub><sup>clean</sup> of the 61,440 training rows. The
+4.1 GB file does not fit in memory, so the 7,900 × 7,900 covariance of the w<sub>j</sub> is accumulated chunk by chunk
+and diagonalised; its eigenvectors are the principal axes and the singular values of the centred data matrix are
+S<sub>k</sub> = √(nλ<sub>k</sub>). Following the original code, of the top 500 components those whose share of the
+summed singular values exceeds 0.001 % are kept, and every spectrum (noisy, clean, the B12 observation and its draws) is
+projected as s = (L<sup>−1</sup>x)V.</p>
+<div class="eq">Σ<sub>w</sub> = (1/n) Σ<sub>j</sub> w<sub>j</sub>w<sub>j</sub><sup>T</sup> − w̄ w̄<sup>T</sup> = U Λ U<sup>T</sup>, &nbsp;
+keep k ≤ 500 if 100 S<sub>k</sub> / Σ<sub>k′≤500</sub> S<sub>k′</sub> &gt; 10<sup>−3</sup>, &nbsp; s = (L<sup>−1</sup>x) V</div>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/merlin_unbinned_prepare.py:213-228"><code>    # covariance of the whitened pool spectra from the accumulated moments: E[w w^T] - E[w] E[w]^T
+    train_mean_white = white_sum / n_train
+    cov = gram / n_train - np.outer(train_mean_white, train_mean_white)
+    # the eigenvectors of the covariance are the right singular vectors of the centred training matrix, whose
+    # singular values are sqrt(n_train * eigenvalue); round-off negatives are set to zero
+    eigenvalues, eigenvectors = np.linalg.eigh(cov)
+    descending = np.argsort(eigenvalues)[::-1]
+    eigenvalues = np.maximum(eigenvalues[descending], 0)
+    eigenvectors = eigenvectors[:, descending]
+    singular_values = np.sqrt(eigenvalues * n_train)
+    top = singular_values[:Q]
+    # merlin's cut: a component's share of the summed top-q singular values (not of the variance)
+    kept = top / top.sum() * 100 &gt; EPS_PERCENT
+    V = eigenvectors[:, :Q][:, kept]
+    print(f'PCA: {kept.sum()} of the top {Q} components kept; '
+          f'first fractions (%) {np.round(100 * top[:6] / top.sum(), 3).tolist()}', flush=True)</code></pre>
+<p class="code-note">Note the cut is on the share of summed singular values, not of the variance (a singular value is the square root of a variance), exactly as in the original <code>(S / S.sum()) * 100 &gt; 0.001</code>. The number kept depends on the whitening: 75 for the 20-draw covariance (production or beam-consistent), 82 for production noise with noise-only whitening, 83 for beam-consistent noise-only, 86 for the 420-draw model.</p>
+<p>For the production set the first components carry 72.8, 11.6, 8.2 and 3.4 % of the summed singular values and
+the 75 kept components hold a fraction 0.9999999969 of the variance of the whitened clean spectra (<code>prepare.json</code>,
+"pca"). That sounds like everything, but variance across the prior is not the same as information about θ near a given
+point. The first components describe the amplitude and broad shape of the spectrum, which change by orders of magnitude
+over the prior. A small, rapidly varying change of the spectrum with θ has almost no variance across the prior and
+falls below the cut. The Fisher forecast quantifies this: at B12, with beam-consistent noise, the geometric mean over
+the nine parameters of the marginal Fisher standard deviation is 0.15 prior widths if every multipole is used, 0.59 for
+Merlin's 86 PCA inputs and 1.66 for the 40 bands (Figure 5.11; <code>results_fisher_b12_beam/fisher_forecast_b12.json</code>,
+whose key still says "Merlin 75 PCA inputs" but checks n_pca = 86). Measured by these marginal widths, the PCA inputs
+constrain the parameters 2.8 times better than the 40 bands and 4 times worse than the full spectrum at this point.</p>
+<figure class="fig"><img src="fig/5_merlin/02_pca_components.png" alt="Share of summed singular values per component with the 0.001 percent cut, and the first six principal components as functions of multipole" loading="lazy"><figcaption><strong>Figure 5.2</strong> (a) Share of the summed singular values per component for the 20-draw (75 kept) and noise-only (83 kept) whitenings, with the 0.001 % cut. (b) The first six principal components V<sub>1..6</sub> as functions of ℓ (noise-only whitening): broad patterns whose structure lies mostly below ℓ ≈ 1000; V<sub>2</sub> also varies slowly across the whole range and V<sub>6</sub> is noisy below ℓ ≈ 700. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/step_pca.png</span></figcaption></figure>
+<h3>5.5 Step 3: the asinh rescaling and its scale</h3>
+<p>The projections s still span many decades across the flat prior: B12 sits at the 29th percentile of tSZ power
+at ℓ ≈ 1980 and the prior covers more than ten decades (explainer page, section 1). A linear z-score (subtract the pool
+mean, divide by the pool standard deviation) is then set by the brightest rows and leaves most rows, B12 included,
+within about 10<sup>−3</sup> standard deviations of each other. The first Merlin runs used such linear inputs. From
+2026-10-01 every component is first passed through an inverse hyperbolic sine at the noise level:</p>
+<div class="eq">x<sub>j</sub> = [ asinh((s<sub>j</sub> − m<sub>j</sub>) / c<sub>j</sub>) − z̄<sub>j</sub> ] / σ<sub>z,j</sub>, &nbsp;
+m<sub>j</sub> = pool median of s<sub>j</sub>, &nbsp; c<sub>j</sub> = 1.4826 · median |r<sub>j</sub> − median r<sub>j</sub>|, &nbsp; r = s<sup>noisy</sup> − s<sup>clean</sup></div>
+<p>asinh(y) ≈ y for |y| &lt; 1 and ≈ sign(y) ln(2|y|) beyond, so the transform is linear within one noise unit of the
+centre and logarithmic across the decades of the prior. The scale c<sub>j</sub> is the noise in component j, measured
+robustly: 1.4826 times the median absolute deviation (MAD) equals the standard deviation for a Gaussian, and unlike the
+sample standard deviation it is not pulled up by the bright rows, whose noise is larger because of the signal × noise
+term. The parameters are fitted on the training pool and frozen; test rows and observations use the same values.</p>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/merlin_compression.py:152-178"><code>def fit_asinh(s_noisy, s_clean):
+    """Parameters of the asinh input transform, fitted on the training pool.
+
+    s_noisy, s_clean: (rows, n_pca) projections of the whitened noisy and noise-free training spectra.
+    Returns a dict of (n_pca,) float64 arrays: s_center (pool median of s_noisy), s_scale (noise scale), and
+    z_mean, z_sd (pool mean and sd of z = arcsinh((s_noisy - s_center) / s_scale)).
+    """
+    # noise scale: the sd of the noise part r = s_noisy - s_clean, from its median absolute deviation, which is not
+    # pulled up by the bright rows (their sample variance is large)
+    residual = s_noisy - s_clean
+    scale = MAD_TO_SD * np.median(np.abs(residual - np.median(residual, axis=0)), axis=0)
+    if not np.all(scale &gt; 0):
+        raise ValueError('zero noise scale in a PCA component')
+    center = np.median(s_noisy, axis=0)
+    # arcsinh(y) ~ y for |y| &lt; 1 and ~ sign(y) log(2|y|) beyond: linear within a noise unit of the centre,
+    # logarithmic across the decades of the prior
+    z = np.arcsinh((s_noisy - center) / scale)
+    return dict(s_center=center, s_scale=scale, z_mean=z.mean(0), z_sd=z.std(0))
+
+
+def asinh_standardize(s, params):
+    """The asinh inputs of projections s (rows, n_pca): (arcsinh((s - s_center) / s_scale) - z_mean) / z_sd.
+
+    params: the dict of fit_asinh. Returns float64 of the shape of s, of pool mean 0 and sd 1 per component.
+    """
+    z = np.arcsinh((s - params['s_center']) / params['s_scale'])
+    return (z - params['z_mean']) / params['z_sd']</code></pre>
+<p class="code-note">The noise part r = s<sub>noisy</sub> − s<sub>clean</sub> exists only in simulations, which is why the scale is learned from the pool and stored. The scale ranges over components from 4.10 to 6.94 (production, 20-draw whitening), 3.27 to 6.20 (beam-consistent noise-only) and 2.23 to 4.77 (420-draw); if a row's noise had exactly the whitening covariance, its projected noise would have unit standard deviation in every component (whitened noise is white, V has orthonormal columns), so c<sub>j</sub> = 1. Values of 2 to 7 mean that the typical training row is noisier than the whitening covariance in these directions. Two effects can do this (an inference, not a separate test): the signal × noise term, which grows with the brightness of the sky (the pool median is about 14 × B12) and which the noise-only covariance does not contain at all and the 20-draw and 420-draw covariances contain only at B12 brightness; and, for the 20-draw whitening, the neighbour correlation that OAS shrank away, which by itself inflates the noise of a smooth direction by up to √S(0) ≈ 1.6 (S(0) = 2.41, <code>results_fisher_b12_beam/fisher_forecast_b12.json</code>, "covariance").</p>
+<p>The effect was large. With the same patience of 30 epochs, test log p (the mean log posterior density of the true parameters over the
+3,000 test rows, in natural-log units, nats; section 5.9) of the Merlin ensemble went from −5.01
+(linear inputs, <code>results_merlin_unbinned_p30</code>) to −3.38 ± 0.06 (asinh, <code>results_merlin_unbinned_asinh_p30</code>),
+PCA from −8.73 to −4.67 and the B12 truth log p of Merlin from −8.70 to −4.12. The flat posteriors of the first runs were
+mostly an input-scaling problem.</p>
+<p>The transform has a known weakness. It is centred on the pool median, which is a sky about 14 times brighter than B12
+at ℓ ≈ 1980. A sky much fainter than B12 has projections close to zero, about 1,300 and 2,100 noise units below the
+centre in the first two components, deep in the logarithmic branch. There a tenfold change in a faint sky moves the
+input by a few thousandths of its unit scale (0.01 to 0.1 × B12) and by about 10<sup>−5</sup> below 0.01 × B12
+(explainer page, section 7). The ordering survives, because asinh is monotonic, but the differences become tiny, and
+on those rows Merlin and PCA stay close to the flat-prior log p of −12.9 (section 5.9). The 40-band asinh is centred on
+zero and does not have this problem. A zero-centred asinh for the PCA inputs has not been tried.</p>
+<figure class="fig"><img src="fig/5_merlin/03_asinh_inputs.png" alt="Histograms of network inputs for three PCA components with linear z-score and asinh standardisation, and the transform curve" loading="lazy"><figcaption><strong>Figure 5.3</strong> Network inputs for PCA components 1, 3 and 6 over 4,000 training rows (beam-consistent noise, noise-only whitening): a linear z-score (grey) leaves most rows in one spike, the asinh standardisation (colour) spreads them over order one. (d) The transform of component 1: linear within one noise unit of the pool median (grey band), logarithmic beyond; the faint skies sit near −1,300 noise units and pile up near −1 after the transform. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/step_asinh.png</span></figcaption></figure>
+<h3>5.6 Step 4: the learned head and the flow</h3>
+<p>The standardised components enter the head, a fully connected network with two hidden layers of 2048 and 512
+ReLU units and a linear output of 9 × 2 = 18 features followed by batch normalisation (BatchNorm1d keeps the features at
+unit scale for the flow). The 18 features are the condition of the MAF. Head and flow are one network: the head is
+passed to <code>sbi</code> as <code>embedding_net</code>, so the gradient of the posterior loss trains both. This is the
+main departure from the original, which trains the head with marginal ratio estimators.</p>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/merlin_compression.py:341-379"><code>            self.register_buffer('mean', torch.as_tensor(mean, dtype=torch.float32))
+            self.register_buffer('sd', torch.as_tensor(sd, dtype=torch.float32))
+            layers = []
+            width = n_in
+            for units in SETTINGS['head']:
+                layers += [nn.Linear(width, units), nn.ReLU()]
+                width = units
+            # the final BatchNorm1d keeps the learned features at unit scale for the flow
+            layers += [nn.Linear(width, 9 * N_FEAT), nn.BatchNorm1d(9 * N_FEAT)]
+            self.net = nn.Sequential(*layers)
+
+        def forward(self, x):
+            """(batch, n_in) inputs -&gt; (batch, 9 x N_FEAT) features."""
+            return self.net((x - self.mean) / self.sd)
+
+    # eval mode, because sbi probes the embedding with one sample (BatchNorm1d needs two in train mode);
+    # train_one switches to train mode for the epochs
+    return Head().eval()
+
+
+def build(name, f):
+    """The untrained density estimator of one variant: an sbi MAF of theta in logit space u (as train_ensemble.py),
+    or in the linear u of MERLIN_PARAM_SPACE=linear.
+
+    name: 'merlin' (the compression head as embedding net), 'pca' or 'moped'; f: the dict of load_features. The
+    estimator models u (rows, 9) given the inputs (rows, n_in); sbi z-scores u, the inputs arrive standardized.
+    """
+    import torch
+    from sbi.neural_nets import posterior_nn
+    from train_ensemble import to_u
+    u = torch.as_tensor(to_u(f['theta_pool'], f['low'], f['high']), dtype=torch.float32)
+    x = torch.as_tensor(f['x_pool'], dtype=torch.float32)
+    extra = {}
+    if name in ('merlin', 'raw'):
+        # raw: the same head on the 7,900 asinh-standardized multipoles instead of the 75 whitened PCA components
+        extra['embedding_net'] = make_head(x.shape[1], f['s_mean'], f['s_sd'])
+    builder = posterior_nn(model='maf', hidden_features=SETTINGS['hidden'], num_transforms=SETTINGS['transforms'],
+                           z_score_x='none', z_score_theta='independent', **extra)
+    return builder(u, x)</code></pre>
+<p class="code-note">The registered buffers <code>mean</code> and <code>sd</code> stand in for swyft's online standardisation; for asinh inputs they are 0 and 1. In <code>build</code>, <code>z_score_x='none'</code> because the inputs are already standardised, and <code>z_score_theta='independent'</code> standardises u. The PCA variant is the same call without <code>embedding_net</code>; the "raw" variant feeds all 7,900 asinh-standardised multipoles to the same head.</p>
+<p>The head makes Merlin a much larger network: 1,409,296 trainable parameters with 75 inputs, 1,425,680 with 83 and
+1,431,824 with 86, against 231,770 and 236,890 for the PCA flow with 75 and 83 inputs (the <code>parameters</code> field
+of the training records <code>*_seed1.json</code>). What the head learns can be seen by correlating each of the 18
+features with the nine parameters over the test rows (Figure 5.4). The features are not tied to single parameters:
+most mix several, and no correlation exceeds about 0.6. The head hands the flow a compact nonlinear summary and the
+flow separates the parameters.</p>
+<p>The head on its own is not what helps. Feeding all 7,900 asinh-scaled multipoles to the same head ("raw", no
+whitening or PCA) gave the worst result of all compressions at 32,000 training rows: test log p −7.21 and mean r 0.542,
+against −4.60 and 0.709 for Merlin at the same size (<code>results_corrected_inputs/summary.md</code>). The whitening and
+PCA reduce the input to a basis in which a network of this size can learn.</p>
+<figure class="fig"><img src="fig/5_merlin/04_head_feature_correlations.png" alt="Heat map of correlations between the 18 learned Merlin features and the nine parameters" loading="lazy"><figcaption><strong>Figure 5.4</strong> Correlation of each of the 18 learned head features (rows, grouped by the parameter they follow most) with each parameter (columns) over the 3,000 test rows; beam-consistent noise, noise-only whitening, seed 1. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/merlin_features.png</span></figcaption></figure>
+<h3>5.7 Training recipe: AdamW, patience 30/10, three seeds</h3>
+<p>Each (variant, seed) is trained by <code>merlin_compression.train_one</code>. A seed-dependent permutation puts
+20 % of the training pool into validation. AdamW (Adam with decoupled weight decay) minimises the mean −log q(u | x)
+over mini-batches of 256. PyTorch's ReduceLROnPlateau (default settings apart from the factor) divides the learning rate by 10 once the
+validation loss has failed to improve by a relative 10<sup>−4</sup> for more than <code>lr_patience</code> epochs, that is at the
+11th such epoch for <code>lr_patience</code> = 10 (the explainer page, section 10, quotes it as "×0.1 after 11 epochs");
+training stops after <code>patience</code> epochs without an absolute improvement larger than 10<sup>−6</sup>
+(<code>MIN_GAIN</code>); the best validation state is restored and saved.</p>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/merlin_compression.py:398-435"><code>    perm = torch.from_numpy(np.random.default_rng(seed).permutation(len(u)))
+    n_val = int(SETTINGS['val_fraction'] * len(u))
+    val, fit = perm[:n_val], perm[n_val:]
+    optimizer = torch.optim.AdamW(net.parameters(), lr=SETTINGS['lr'])
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=SETTINGS['lr_factor'],
+                                                           patience=SETTINGS['lr_patience'])
+    best_loss = np.inf
+    best_state = None
+    epochs_without_gain = 0
+    history = []
+    start = time.monotonic()
+    for epoch in range(SETTINGS['max_epochs']):
+        net.train()
+        shuffled = fit[torch.randperm(len(fit))]
+        for i in range(0, len(shuffled), SETTINGS['batch']):
+            batch = shuffled[i:i + SETTINGS['batch']]
+            if len(batch) &lt; 2:                       # BatchNorm1d needs two rows in train mode
+                continue
+            optimizer.zero_grad()
+            loss = net.loss(u[batch], condition=x[batch]).mean()
+            loss.backward()
+            optimizer.step()
+        net.eval()
+        with torch.no_grad():
+            chunks = [net.loss(u[val[i:i + VAL_CHUNK]], condition=x[val[i:i + VAL_CHUNK]])
+                      for i in range(0, len(val), VAL_CHUNK)]
+            val_loss = float(torch.cat(chunks).mean())
+        scheduler.step(val_loss)
+        history.append(dict(epoch=epoch + 1, val_loss=val_loss, lr=optimizer.param_groups[0]['lr']))
+        if val_loss &lt; best_loss - MIN_GAIN:
+            best_loss = val_loss
+            epochs_without_gain = 0
+            best_state = {k: t.detach().clone() for k, t in net.state_dict().items()}
+        else:
+            epochs_without_gain += 1
+            if epochs_without_gain &gt;= SETTINGS['patience']:
+                break
+    net.load_state_dict(best_state)</code></pre>
+<p class="code-note">BatchNorm needs two rows in training mode, hence the guard on a final one-row batch. Validation runs in 4,096-row chunks in evaluation mode. The best state is kept separately, so the overfitting after the best epoch (Figure 5.5) does not reach the saved network.</p>
+<p>The original recipe stops after 5 epochs without gain and drops the learning rate after 3. On this problem that
+stopped training too early: with linear inputs, Merlin's test log p improved from −6.77 (patience 5,
+<code>results_merlin_unbinned</code>) to −5.01 (patience 30, <code>results_merlin_unbinned_p30</code>), and MOPED from
+−6.38 to −5.14. All later runs use <code>MERLIN_PATIENCE=30 MERLIN_LR_PATIENCE=10</code>, set in the PBS scripts
+(<code>idark_jobs/train61k.pbs</code>, <code>idark_fisher/merlin_train.pbs</code>). With these settings the Merlin
+networks at 61,440 rows train for 83 to 102 epochs (production, 20-draw whitening; 349 to 433 s per seed) and 73 to 104
+epochs (420-draw whitening). The 40-band networks are trained differently, with <code>sbi</code>'s own trainer (Adam,
+learning rate 7×10<sup>−4</sup>, batch 512, 10 % validation, gradient clipping), for about 340 to 500 epochs (explainer
+page, section 10), so the two families are not on a matched training recipe.</p>
+<p>Three seeds (1, 2, 3) are trained for every configuration and combined as an equal-weight mixture,
+q<sub>ens</sub> = (1/3) Σ<sub>k</sub> q<sub>k</sub>, evaluated as a log-sum-exp of the seed log densities minus ln 3
+(<code>train_ensemble.py</code> lines 359 to 376). The mixture is 0.7 to 1.1 nats better in test log p than a single
+Merlin seed (explainer page, section 10), because a truth in the tail of one seed still has density under the others.
+Errors quoted as "± " on test log p below are the standard deviation over the three seeds' own mean log p divided by √3.</p>
+<figure class="fig"><img src="fig/5_merlin/05_training_curves.png" alt="Validation loss against epoch for three Merlin seeds and three PCA seeds" loading="lazy"><figcaption><strong>Figure 5.5</strong> Validation loss (mean −log q in u) per epoch for the three seeds of Merlin (a) and PCA (b), beam-consistent noise, noise-only whitening. Dots mark the kept best epoch, faint vertical lines the learning-rate drops. Both overfit after the best epoch; early stopping keeps the best state. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/step_training.png</span></figcaption></figure>
+<h3>5.8 Bounded (logit) and unbounded (linear) parameter spaces</h3>
+<p>The flow does not model θ directly. By default each parameter is mapped to its position t in the prior range and
+then through the logit, u = ln[t/(1 − t)]. The flat prior becomes a logistic distribution on the real line and every
+sample maps back inside the box: these are the <strong>bounded</strong> networks. Densities in θ need the Jacobian of
+the map:</p>
+<div class="eq">t = (θ − θ<sub>min</sub>) / w, &nbsp; u = ln[t / (1 − t)], &nbsp;
+ln p(θ | x) = ln q(u | x) − Σ<sub>i</sub> ln |dθ<sub>i</sub>/du<sub>i</sub>|, &nbsp; dθ/du = w σ(u) σ(−u)</div>
+<p>(<code>train_ensemble.py</code> lines 60 to 83, σ the logistic function). Setting <code>MERLIN_PARAM_SPACE=linear</code>
+uses u = t instead, with a constant Jacobian, so the flow is free to put mass outside the box: the
+<strong>unbounded</strong> networks. They were first trained on 2026-10-01 (<code>results_merlin_unbinned_asinh_p30_lin</code>) because the logit space confines a
+posterior to the box by construction; in linear space, mass beyond a bound is the flow's continuation of the posterior
+past the edge, where there are no training simulations (<code>merlin_compression.py</code> docstring, lines 53 to 55). They
+show where an observation would pull if the box were not there.</p>
+<pre class="code" data-src="SBI_analysis/tsz64k_sbi_local/merlin_compression.py:97-118"><code>PARAM_SPACE = os.environ.get('MERLIN_PARAM_SPACE', 'logit')            # 'logit' (prior box) or 'linear' (unbounded)
+SETTINGS['param_space'] = PARAM_SPACE
+if PARAM_SPACE == 'linear':
+    import train_ensemble as _train_ensemble
+
+    def _to_u_linear(theta, low, high):
+        """u = (theta - low) / (high - low), float64, unbounded (the linear counterpart of train_ensemble.to_u)."""
+        return (np.asarray(theta, dtype=np.float64) - low) / (high - low)
+
+    def _from_u_linear(u, low, high):
+        """theta = low + (high - low) u, float64 of the shape of u (inverse of _to_u_linear)."""
+        return low + (high - low) * np.asarray(u, dtype=np.float64)
+
+    def _log_jacobian_linear(u, low, high):
+        """log |d theta / d u| = sum log (high - low), constant, of shape u.shape[:-1]."""
+        return np.full(np.shape(u)[:-1], float(np.sum(np.log(np.asarray(high) - np.asarray(low)))))
+
+    # every consumer imports these names from train_ensemble at call time (Ensemble.posterior / hpd_level,
+    # sbi_final.row_metrics, build, train_one, evaluate), so replacing the module attributes switches all of them
+    _train_ensemble.to_u = _to_u_linear
+    _train_ensemble.from_u = _from_u_linear
+    _train_ensemble.log_jacobian_theta_per_u = _log_jacobian_linear</code></pre>
+<p class="code-note">The switch replaces three functions of the <code>train_ensemble</code> module for the whole process, so every consumer (training, sampling, the metrics) uses the same space. Each seed records <code>settings.param_space</code>, and <code>ensemble()</code> refuses to load a network trained in the other space (lines 471 to 473). Later studies therefore evaluate linear and logit networks in separate interpreters.</p>
+<p>The unbounded networks look better at first sight (narrower intervals) but are overconfident. On the 3,000 test
+rows the mean Pearson r and RMSE are the same, the widths shrink, and the marginal 68 % coverage (fraction of test rows
+whose true value lies in the central 68 % interval; calibrated means 0.68) drops below its target:</p>
+<table class="data"><thead><tr><th>Merlin input set</th><th>space</th><th>test log p</th><th>mean r</th><th>width / flat</th><th>68 % coverage</th><th>TARP 68 / 95</th></tr></thead>
+<tbody>
+<tr><td>production, 20-draw</td><td>bounded</td><td class="num">−3.38 ± 0.06</td><td class="num">0.720</td><td class="num">0.561</td><td class="num">0.678</td><td class="num">0.674 / 0.948</td></tr>
+<tr><td></td><td>unbounded</td><td class="num">−3.59 ± 0.03</td><td class="num">0.721</td><td class="num">0.502</td><td class="num">0.631</td><td class="num">0.642 / 0.957</td></tr>
+<tr><td>beam, noise-only</td><td>bounded</td><td class="num">−2.96 ± 0.05</td><td class="num">0.729</td><td class="num">0.551</td><td class="num">0.675</td><td class="num">0.675 / 0.952</td></tr>
+<tr><td></td><td>unbounded</td><td class="num">−3.14 ± 0.05</td><td class="num">0.729</td><td class="num">0.490</td><td class="num">0.627</td><td class="num">0.635 / 0.953</td></tr>
+<tr><td>beam, 420-draw</td><td>bounded</td><td class="num">−2.82 ± 0.08</td><td class="num">0.728</td><td class="num">0.547</td><td class="num">0.674</td><td class="num">0.672 / 0.953</td></tr>
+<tr><td></td><td>unbounded</td><td class="num">−2.95 ± 0.05</td><td class="num">0.729</td><td class="num">0.497</td><td class="num">0.629</td><td class="num">0.635 / 0.956</td></tr>
+</tbody></table>
+<p class="path">Numbers from metrics_merlin.json in results_merlin_unbinned_asinh_p30[_lin], _beam_nnwhite_asinh_p30[_lin]
+and _beam_w420_asinh_p30[_lin] (fields mean_log_prob_theta, test_log_prob_err, pearson_r, median_width68_over_flat,
+marginal_coverage68, tarp68, tarp95).</p>
+<p>TARP (Tests of Accuracy with Random Points, Lemos et al. 2023, <a href="https://arxiv.org/abs/2302.03026">arXiv:2302.03026</a>)
+checks the joint nine-dimensional posterior: for each test row a reference point is drawn uniformly within the range of
+the test truths, and one records the fraction of posterior samples closer to it than the truth (Euclidean distance after
+scaling each parameter to that range); for a calibrated posterior these fractions are uniform, so the expected coverage
+at credibility 0.68 is 0.68. With 3,000 test rows the 95 % binomial range of a calibrated 68 % coverage is ±0.017
+(explainer page, section 11.4), so the unbounded values of 0.627 to 0.631 are clearly low. The cause has not been
+isolated. One reading is that a flow in linear space has no edge to stop at: where the data push a parameter against a
+bound, the flow continues the posterior past it (about a third of the unbounded probability lies outside the prior box,
+33 to 34 % for Merlin, explainer page section 9; 0.329 in the truth-mean test of section 5.13), and the part left inside
+the box is narrower than the true posterior. This is a hypothesis, not a tested mechanism. The explainer page uses the
+bounded networks for all comparisons (section 9). The seed/mask and band50 studies (sections 5.10 to 5.13)
+nevertheless declared the unbounded network primary (<code>tsz_seed_mask_variation_20261002/README.md</code>, first
+paragraph) and reported bounded companions; their coverage numbers must be read with this table in mind.</p>
+<figure class="fig"><img src="fig/5_merlin/06_bounded_logit_space.png" alt="The logit map and its log Jacobian, a bounded posterior in u against the logistic prior, and bounded versus unbounded marginals in theta" loading="lazy"><figcaption><strong>Figure 5.6</strong> (a) The logit map u(t) and the log-Jacobian, which diverges at the box edges. (b) The bounded Merlin posterior of α<sub>m</sub><sup>P0</sup> for the B12 mock in u, against the logistic prior. (c) The same marginal in θ for the bounded and the unbounded network; dotted lines are the prior bounds, the dashed line the input value (95 % of this unbounded marginal lies inside the bounds). Beam-consistent noise, noise-only whitening. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/step_logit.png</span></figcaption></figure>
+<h3>5.9 Results: Merlin against PCA, MOPED and 40 bins</h3>
+<p>The metrics are computed on the same 3,000 test rows for every network (definitions in section 3.4 and on the
+explainer page, section 11). <em>Test log p</em> is the mean log posterior density of the true parameters in θ units, a proper score
+for the full nine-dimensional posterior; a flat posterior scores −12.90. <em>Pearson r</em> is the correlation, across
+test rows, between the true value of a parameter and its posterior mean; it measures point accuracy and ignores the
+width. <em>Width / flat</em> is the median 68 % interval divided by that of a flat posterior. The history of the Merlin
+inputs, all at 61,440 training rows, bounded:</p>
+<table class="data"><thead><tr><th>run (folder suffix)</th><th>inputs</th><th>test log p</th><th>TARP 68 / 95</th><th>mean r</th><th>B12 log p(truth)</th></tr></thead>
+<tbody>
+<tr><td>(none), 2026-09-30</td><td>production, 20-draw, linear inputs, patience 5</td><td class="num">−6.77</td><td class="num">0.701 / 0.964</td><td class="num">0.635</td><td class="num">−10.23</td></tr>
+<tr><td>_p30</td><td>same, patience 30</td><td class="num">−5.01</td><td class="num">0.695 / 0.961</td><td class="num">0.662</td><td class="num">−8.70</td></tr>
+<tr><td>_asinh_p30, 2026-10-01</td><td>asinh inputs</td><td class="num">−3.38 ± 0.06</td><td class="num">0.674 / 0.948</td><td class="num">0.720</td><td class="num">−4.12 ± 0.37</td></tr>
+<tr><td>_nnwhite_asinh_p30</td><td>production, noise-only</td><td class="num">−3.19 ± 0.09</td><td class="num">0.664 / 0.949</td><td class="num">0.723</td><td class="num">−2.34 ± 0.56</td></tr>
+<tr><td>_beam_asinh_p30, 2026-10-02</td><td>beam-consistent, 20-draw</td><td class="num">−3.28 ± 0.05</td><td class="num">0.675 / 0.953</td><td class="num">0.721</td><td class="num">−4.81 ± 0.32</td></tr>
+<tr><td>_beam_nnwhite_asinh_p30</td><td>beam-consistent, noise-only</td><td class="num">−2.96 ± 0.05</td><td class="num">0.675 / 0.952</td><td class="num">0.729</td><td class="num">−1.41 ± 0.26</td></tr>
+<tr><td>_beam_w420_asinh_p30</td><td>beam-consistent, 420-draw</td><td class="num">−2.82 ± 0.08</td><td class="num">0.672 / 0.953</td><td class="num">0.728</td><td class="num">−1.81 ± 0.37</td></tr>
+</tbody></table>
+<p class="path">From comparison.md and metrics_merlin.json of each results_merlin_unbinned&lt;suffix&gt;/; the first two runs
+predate the per-seed error fields.</p>
+<p>Three things stand out. The asinh inputs gave the largest single gain. Among the whitenings, noise-only and the
+420-draw model are better than the 20-draw covariance by 0.3 to 0.5 nats with beam-consistent noise (0.2 with production
+noise), but single-seed means differ by 0.17 to 0.28 nats from training noise alone (<code>test_log_prob_seeds</code>), so the ranking within that range is not significant; the paired test of section 11.8 of
+the explainer page finds Merlin's mean r higher with noise-only than with 20-draw whitening by +0.0080 ± 0.0018 (beam,
+bounded), positive for all nine parameters. And the beam fix itself (production versus beam-consistent at the same
+whitening) moves test log p by 0.10 nats with the 20-draw whitening (−3.381 to −3.276) and 0.22 with noise-only whitening
+(−3.185 to −2.964), and leaves the Merlin size series unchanged (Figure 5.7c): the analysis is limited by the number of
+simulations, not by the noise model.</p>
+<p>The B12 truth log p, the density of the true B12 parameters under the posterior of the one fitted B12 mock, improves
+from −4.12 (production, 20-draw) to −1.81 (beam, 420-draw) for the bounded networks. It is a single observation, its
+seed error is 0.26 to 0.56 nats for these bounded runs, and the noise-only set is higher still (−1.41), so it confirms the direction but cannot
+rank the whitenings.</p>
+<figure class="fig"><img src="fig/5_merlin/07_whitening_test_logp.png" alt="Test log p for Merlin and PCA with B12 and noise-only whitening, bounded and unbounded, the size series for production and beam noise, and the ratio of B12-draw scatter to noise-only scatter" loading="lazy"><figcaption><strong>Figure 5.7</strong> Effect of the noise model and the whitening. (a, b) Test log p for the four input sets, bounded and unbounded; light dashes are the unbounded posteriors truncated to the prior box. (c) Test log p against training-set size, production (solid) and beam-consistent (dashed) noise, 20-draw whitening: indistinguishable for Merlin at every size and for PCA up to 32,000 rows; only PCA at 61,440 rows differs (−4.33 against −4.67). (d) Scatter of the B12 noise draws over the noise-only scatter in bands: the total-noise ratio (solid) shows an excess at low ℓ, the signal × noise term that the B12 covariance contains, while the noise × noise part of the same draws (dashed) stays at 1. A vector PDF of the same figure is next to the PNG. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_publication/fig_pub_merlin_beam_whitening.png (whitening_comparison.py)</span></figcaption></figure>
+<p>Against the other compressions, on beam-consistent noise with noise-only whitening for Merlin and PCA (explainer
+page headline table, computed by <code>doc_build.py</code> from the metrics files):</p>
+<table class="data"><thead><tr><th>compression</th><th>test log p</th><th>mean r</th><th>RMSE / prior</th><th>width / flat</th><th>68 % coverage</th><th>TARP 68 / 95</th><th>interval score</th></tr></thead>
+<tbody>
+<tr><td>Merlin</td><td class="num">−2.96 ± 0.05</td><td class="num">0.729</td><td class="num">0.663</td><td class="num">0.551</td><td class="num">0.675</td><td class="num">0.675 / 0.952</td><td class="num">0.526</td></tr>
+<tr><td>whitened PCA</td><td class="num">−4.56 ± 0.20</td><td class="num">0.684</td><td class="num">0.712</td><td class="num">0.673</td><td class="num">0.721</td><td class="num">0.697 / 0.959</td><td class="num">0.580</td></tr>
+<tr><td>40 bins</td><td class="num">−2.35</td><td class="num">0.590</td><td class="num">0.787</td><td class="num">0.777</td><td class="num">0.721</td><td class="num">0.726 / 0.963</td><td class="num">0.656</td></tr>
+</tbody></table>
+<p>The interval score adds to the width of the 68 % interval a penalty proportional to how far the truth falls outside;
+lower is better. Paired on the same test rows (bootstrap of rows plus seed scatter), Merlin minus 40 bins is
++0.139 ± 0.004 in mean r, −0.130 ± 0.003 in interval score and −0.61 ± 0.16 in test log p; Merlin minus PCA is
++0.046 ± 0.003 in r and +1.60 ± 0.21 in log p. Merlin wins every marginal measure and loses the joint log p to the 40-band
+network. Split by sky brightness, the 40-band network gains on faint skies (below 0.1 × B12 Merlin stays near the prior,
+−11.17 and −10.17 nats against −9.93 and −6.14 in the two faintest bins) and on 0.1 to 1 × B12 skies, where it follows the
+narrow nine-parameter degeneracies more closely; Merlin wins clearly at 10 to 1000 × B12 and is overconfident above
+1000 × B12 (68 % coverage 64 %). These are observations from the explainer page, section 12, not established causes;
+the training recipes also differ.</p>
+<figure class="fig"><img src="fig/5_merlin/08_size_series_beam.png" alt="Test log p, mean Pearson r, RMSE and width against number of training simulations for 40 bins, PCA and Merlin" loading="lazy"><figcaption><strong>Figure 5.8</strong> Metrics against the number of training simulations, beam-consistent noise (Merlin and PCA with 20-draw whitening; squares: noise-only whitening at 61,440). Merlin has the best r, RMSE and width at every size, and the Merlin and PCA curves are still rising at 61,440 rows (the 40-band log p changes little between its last two sizes). With production noise, Merlin at 2,000 rows (r 0.582) already matches the 40-band network at 61,440 rows (0.584). <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_doc/compare_sizes_beam.png; production numbers from results_merlin_unbinned_asinh_p30_N2000/metrics_merlin.json and results_corrected_inputs/summary.md</span></figcaption></figure>
+<p>A Fisher forecast puts the B12 posterior in context (Figure 5.9). The Fisher matrix F = J<sup>T</sup>C<sup>−1</sup>J,
+with J the derivatives of the mean spectrum at B12 and C the noise covariance, gives the Gaussian approximation to the
+posterior of a perfect analysis of the same data; here it is multiplied by the prior box. For all multipoles the
+figure uses the cross-fitted ("calibrated") Fisher matrix. It guards against an error in the covariance model: the
+model fitted on one half of the idark noise draws compresses the held-out residuals r of the other half to nine numbers
+t = J<sup>T</sup>C<sup>−1</sup>r, their covariance is measured directly (with the Hartlap-type factor (n − 10)/n that
+removes the bias of inverting a covariance estimated from n draws of 9 numbers with known zero mean), and
+F<sub>cal</sub> = M Cov(t)<sup>−1</sup> M with M = J<sup>T</sup>C<sup>−1</sup>J. F<sub>cal</sub> equals M if the
+model is right and is a lower bound on the information otherwise (<code>fisher_forecast_b12.py</code> docstring, lines
+20 to 24). Its marginal widths are about 8 % larger than the model's (geometric mean 0.159 against 0.146 prior widths,
+<code>results_fisher_b12_beam/fisher_forecast_b12.json</code>); for Merlin's PCA inputs the figure uses the model Fisher
+matrix (<code>publication_figures.py</code> lines 353 to 358). With beam-consistent noise
+the mean 68 % width over the prior range is 0.231 for all 7,900 multipoles and 0.288 for Merlin's own 86 PCA inputs,
+against 0.461 for the bounded and 0.432 for the unbounded Merlin posterior (420-draw whitening) of the B12 mock
+(<code>results_publication/publication_numbers_fisher.json</code>, entry "beam_w420"). Merlin is therefore not limited by its compression
+alone; it is further from its own inputs' Fisher bound than those inputs are from the full spectrum, as expected for
+a network trained on 61,440 simulations whose curves are still rising. The Fisher matrix is a local Gaussian
+approximation around B12, so this comparison is indicative, not a strict bound for a single noisy mock.</p>
+<figure class="fig"><img src="fig/5_merlin/09_corner_b12_fisher_vs_merlin_w420.png" alt="Corner plot of the B12 mock posterior: Fisher forecast times prior against bounded and unbounded Merlin with 420-draw whitening" loading="lazy"><figcaption><strong>Figure 5.9</strong> B12 mock, beam-consistent noise: the calibrated Fisher forecast of all multipoles, centred on the input values, times the prior box (grey filled) against the Merlin posteriors with 420-draw whitening, bounded (purple) and unbounded (red). Star: input values; dotted: prior bounds. A vector PDF of the same figure is next to the PNG. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_publication/fig_pub_corner_B12_fisher_merlin_beam.png (publication_figures.py --only fisher)</span></figcaption></figure>
+<aside class="key">With asinh inputs, patience 30 and beam-consistent noise, Merlin (whitened PCA → learned head
+→ MAF, three seeds, bounded) gives the best point accuracy and the narrowest calibrated marginals of all compressions:
+mean r 0.729, width 0.551 of flat, 68 % coverage 0.675 (noise-only whitening), and test log p −2.82 with the 420-draw
+whitening. The 40-band network keeps the best joint log p (−2.35).</aside>
+<h3>5.10 Why 50-multipole bands: the fixed-sky fingerprint</h3>
+<p>Every one of the 64,440 training spectra was painted on the same HalfDome lightcone (realisation 100) and seen
+through the same mask (seed 12345). Training varies θ and the SO noise, never the halos or the window, so the network
+learns p(θ | D, H<sub>100</sub>, W<sub>12345</sub>), the posterior conditional on that one sky. Section 4 describes the
+tests in which B12 maps were painted on nine other lightcones (seeds 102 to 118) and seen through nine other masks,
+all with the same noise pair. The original unbounded Merlin, which places the seed-100 B12 sky at P<sub>0</sub> = 12.23
+and β = 9.66, moves the B12 maps of the nine other lightcones (seen through the training mask) to
+P<sub>0</sub> = 49.89 ± 2.32 and β = 13.01 ± 0.21 (scatter of the posterior medians across the nine skies, not a
+posterior uncertainty; truth 18.1 and 4.35), and in the later 10 × 10 robustness grid excludes the truth from its 95 %
+joint region on every held-out sky
+(<code>tsz_seed_offset_diagnosis_20261005/REPORT.md</code>; <code>tsz_robustness_methods_20261004/final_results/INTERPRETATION.md</code>).</p>
+<p>The spectra of the other skies are not very different. Relative to seed 100 they differ by 10.7 % (simulations) and
+15.0 % (masks) below ℓ ≈ 580 and by less than 0.7 % above ℓ ≈ 2980 (INTERPRETATION.md). A pure amplitude change of
++0.742 % in clean power barely moves P<sub>0</sub> (12.43). The controlled perturbations of the seed-offset diagnosis
+locate the cause: smoothing the fractional clean-signal change of the other skies with a Gaussian of σ<sub>ℓ</sub> = 5
+before adding it to the seed-100 spectrum brings all nine back to P<sub>0</sub> between 12.13 and 15.46, while the
+removed fine residual alone keeps the shift (P<sub>0</sub> = 40.09 for σ<sub>ℓ</sub> = 5 and 42.43 for σ<sub>ℓ</sub> = 50).
+The network reads structure that varies over a few multipoles.</p>
+<figure class="fig"><img src="fig/5_merlin/10_seed_offset_smooth_vs_fine.png" alt="Posterior medians and 68 percent intervals of P0, beta and alpha_m_P0 for actual, clean-only, smooth and fine perturbations, for simulations, masks and both" loading="lazy"><figcaption><strong>Figure 5.10</strong> Original unbounded Merlin, seed-100 observation perturbed by the mean change of the other skies: the actual change, only its clean-signal part, its smooth part (σ<sub>ℓ</sub> = 5) and its fine residual, for other simulations, other masks and both. Dashed: truth; dotted: the seed-100 result. The smooth part leaves the seed-100 answer nearly unchanged; the fine part carries most of the offset. A vector PDF of the same figure is next to the PNG. <span class="src">source: SBI_analysis/tsz_seed_offset_diagnosis_20261005/plots/mechanism_summary.png (make_report.py)</span></figcaption></figure>
+<p>The Fisher forecast shows the same thing from the information side (Figure 5.11). Its derivatives contain fine
+structure in ℓ that is identical whether computed with a step of 0.5 % or 1 % of the prior width: the correlation of the
+high-passed derivatives at the two step sizes is 1.000 for all eight non-amplitude parameters
+(<code>results_fisher_b12_beam/fisher_forecast_b12.json</code>, "derivative_check"). It is deterministic, not numerical
+noise: when a pressure parameter changes, the contribution of each individual halo of the fixed catalogue to each
+multipole changes in a fixed way. And it carries most of the local information. Low-passing the noise-scaled derivatives
+so that only periods above 50 multipoles survive raises the geometric-mean marginal Fisher width from 0.15 to 0.56 prior
+widths; averaging the data into bands of 50 raises it to 0.81 (bands of 2, 5, 10, 20 and 100 give 0.20, 0.29, 0.37, 0.52
+and 1.18). Most of what a per-multipole method can learn at B12 is in structure finer than 50 multipoles, and that
+structure is, by the argument above, a fingerprint of the halos and mask of the training sky. It is real information
+about θ on that sky, but it does not carry over to another sky, where a network that relies on it is pulled off the
+truth (the fine-residual controls above). The derivatives were computed on the training sky only, so the statement
+that their fine structure differs from sky to sky is inferred from the data-side controls, not measured on the
+derivatives themselves.</p>
+<figure class="fig"><img src="fig/5_merlin/11_fisher_vs_band_width.png" alt="Fisher marginal standard deviation over prior width against averaging scale for uniform bands and low-pass cuts, with references for every multipole, Merlin PCA inputs and 40 bands" loading="lazy"><figcaption><strong>Figure 5.11</strong> Geometric mean over the nine parameters of the marginal Fisher standard deviation (prior widths) at B12, beam-consistent noise, against the averaging scale: uniform bands of width Δℓ with 2ℓ+1 weights (blue; the open point is the 40 SBI bands of 200) and derivatives low-passed to periods above P multipoles (orange). Dashed references: every multipole and Merlin's 86 whitened PCA inputs. Plotted from saved numbers only; the script is in the report folder. <span class="src">source: SBI_analysis/tsz64k_sbi_local/results_fisher_b12_beam/fisher_forecast_b12.json via reports/halfdome_overview_20261007/scripts/merlin/fisher_band_scale.py</span></figcaption></figure>
+<p>Merlin is the compression most exposed to this, because its input is per-multipole and its PCA basis is fitted on
+the same sky. The 40 bands of width 200 average the fingerprint away. The question behind band50 was whether a
+compression that keeps the whole multipole range but discards structure finer than a chosen scale can keep most of
+Merlin's precision and lose the sky dependence.</p>
+<h3>5.11 band50: definition and construction</h3>
+<p>band50 replaces the 7,900 multipoles by 158 contiguous bands of 50 multipoles each, 80 to 129, 130 to 179, …,
+7930 to 7979, every multipole entering exactly one band. Within a band the spectrum is averaged with weights 2ℓ + 1, the
+number of harmonic modes of each multipole on a full sky:</p>
+<div class="eq">D<sub>b</sub> = Σ<sub>ℓ∈b</sub> (2ℓ+1) D<sub>ℓ</sub> / Σ<sub>ℓ∈b</sub> (2ℓ+1) = (A D)<sub>b</sub>, &nbsp; A ∈ ℝ<sup>158×7900</sup>, &nbsp; C<sub>band</sub> = A C A<sup>T</sup></div>
+<p>The 2ℓ + 1 weight is a prescription, not inverse-covariance weighting under the actual mask, and it is not Gaussian
+smoothing with σ<sub>ℓ</sub> = 50, nor an average over 50 simulations (<code>tsz_truth_mean_validation_20261006/README.md</code>,
+"What band50 means"). Widths 25, 50 and 100 would give 316, 158 and 79 band powers; only 50 was trained. No band-width
+sweep was run, so 50 is a practical choice, not an optimised scale.</p>
+<pre class="code" data-src="SBI_analysis/tsz_robustness_methods_20261004/common.py:48-66"><code>def band_operator():
+    a = np.zeros((158, 7900))
+    for i, (lo, hi) in enumerate(zip(EDGES[:-1], EDGES[1:])):
+        m = (ELL &gt;= lo) &amp; (ELL &lt; hi)
+        a[i, m] = (2 * ELL[m] + 1) / np.sum(2 * ELL[m] + 1)
+    assert np.allclose(a.sum(1), 1)
+    return a
+
+
+def noise_covariance(sd, rho, operator):
+    """Band the saved beam-consistent SO covariance, preserving all fitted lag correlations."""
+    diagonals, offsets = [sd**2], [0]
+    for lag in range(1, len(rho)):
+        values = rho[lag] * sd[lag:] * sd[:-lag]
+        diagonals.extend([values, values]); offsets.extend([lag, -lag])
+    cov = diags(diagonals, offsets, shape=(7900, 7900), format='csr')
+    a = csr_matrix(operator)
+    result = (a @ cov @ a.T).toarray()
+    return (result + result.T) / 2</code></pre>
+<p class="code-note">The operator rows sum to one (asserted). <code>noise_covariance</code> rebuilds the saved 420-draw lag model (standard deviations <code>sd</code> and lag correlations <code>rho</code> from the Fisher run) as a sparse banded matrix and forms A C A<sup>T</sup>, so the mask correlation between neighbouring bands is kept. This covariance serves the MOPED candidates; the Merlin candidate uses the noise-only one (next excerpt).</p>
+<figure class="fig"><img src="fig/5_merlin/12_band_operator_25_50_100.png" alt="A saved noisy and clean spectrum between multipoles 1100 and 1580 with 25, 50 and 100 multipole band averages" loading="lazy"><figcaption><strong>Figure 5.12</strong> The band operator applied to a saved noisy seed-100/mask-12345 spectrum (grey) and its clean spectrum (black), ℓ = 1080 to 1580, with the 2ℓ+1-weighted band averages of the noisy spectrum for widths 25, 50 and 100 (orange steps). The clean spectrum has visible structure on scales of a few multipoles, the fixed-sky fingerprint, which the bands remove. Illustration only; widths 25 and 100 were not trained. A vector PDF of the same figure is next to the PNG. <span class="src">source: SBI_analysis/tsz_truth_mean_validation_20261006/figures/band_width_illustration.png (plot_truth_mean.py)</span></figcaption></figure>
+<p>The band50 Merlin model was built and trained inside the robustness study of 2026-10-04 (idark root
+<code>/lustre/work/kristero10/tsz_robustness_methods_20261004</code>, candidate <code>merlin_band50_full</code>), one of 17
+candidates in <code>common.recipes()</code>, later joined by six matched Merlin controls (<code>merlin_checks.py</code>),
+for 24 methods including the original. The construction, in <code>pipeline.py</code>:</p>
+<ol>
+<li><strong>Bands of the beam-consistent spectra.</strong> <code>band_training_data</code> reads the uploaded clean and
+production spectra of all 64,440 rows once, rebuilds the beam-consistent spectrum (or takes the staged one) and stores
+only A·D (158 values). An audit reprojects 32 randomly chosen full-resolution rows plus the first four rows of each staged beam-fix batch (lines 40 to
+42) through the original whitening, PCA and
+asinh and requires the saved original Merlin inputs to within 10<sup>−4</sup> (lines 78 to 84), which checks that
+the spectra are the ones the original Merlin was trained on.</li>
+<li><strong>Normalisation by the fiducial.</strong> Bands are divided by the noise-free B12 band powers
+(<code>fid</code>). Because the covariance is divided by the same outer product, this is a no-op after whitening: the
+Cholesky factor of DCD (D diagonal and positive) is DL, so (DL)<sup>−1</sup>Dx = L<sup>−1</sup>x. It only helps
+numerical conditioning.</li>
+<li><strong>Noise-only whitening of the bands.</strong> The band covariance is the exact banding of the original noise-only
+covariance: with L the saved Cholesky factor of the beam-consistent noise-only covariance (the 83-component "original"
+model), C<sub>nn,band</sub> = (AL)(AL)<sup>T</sup> (lines 127 to 129). The recipe's <code>covariance='total_noise'</code>
+entry is not used for the Merlin branch (comment, line 165).</li>
+<li><strong>No PCA.</strong> All 158 whitened bands go to the network; 158 inputs are few enough.</li>
+<li><strong>Same asinh, head, flow and training.</strong> <code>fit_transform</code> is the Merlin asinh (pool median
+centre, 1.4826 MAD noise scale, z-score), fitted on the training rows only; the network is
+<code>merlin_compression</code>'s head and MAF with the same 61,440-row pool, 3,000 test rows, three seeds and patience
+30/10, trained in linear space (primary) by <code>pipeline.train_one</code> (lines 207 to 220) and in logit space as the
+bounded companion by <code>bounded.py</code>.</li>
+</ol>
+<pre class="code" data-src="SBI_analysis/tsz_robustness_methods_20261004/pipeline.py:164-185"><code>        if recipe['network']=='merlin':
+            # Keep the original noise-only whitening convention for the Merlin band control.
+            l,jitter=safe_cholesky(nn_cov[np.ix_(keep,keep)])
+            partial=solve_triangular(l.T,np.eye(len(l)),lower=False)
+            audit=dict(jitter=jitter,directions=len(l),compression='whitened bands, learned Merlin head')
+        else:
+            partial,audit=moped_weights(derivatives[keep],c,design['high']-design['low'])
+        weights=np.zeros((158,partial.shape[1]));weights[keep]=partial
+        training_noisy=noisy
+        if recipe.get('augmentation'):
+            choice=np.random.default_rng(20261004).integers(len(ratios),size=len(noisy))
+            training_noisy=add_sky_variation(clean,noisy,ratios,choice)
+        projected_clean=clean@weights;projected_noisy=training_noisy@weights
+        params=fit_transform(projected_noisy,projected_clean,pool)
+        x=transform(projected_noisy,params)
+        obs=transform((noisy_grid/fid)@weights,params)
+        fixed_test=transform(noisy[held]@weights,params)
+        np.savez(folder/f"features_{recipe['network']}.npz",x_pool=x[pool],x_held=x[held],
+                 x_obs=obs,x_draws=obs[:1],theta_pool=design['theta'][pool],
+                 theta_held=design['theta'][held],pool=pool,held=held,low=design['low'],high=design['high'],
+                 s_mean=np.zeros(x.shape[1]),s_sd=np.ones(x.shape[1]),input_transform=np.array('asinh'),**params)
+        np.save(folder/'fixed_sky_test.npy',fixed_test)</code></pre>
+<p class="code-note">For the Merlin network the weights are W = L<sub>band</sub><sup>−T</sup>, so <code>noisy @ weights</code> is the whitened band vector (L<sup>−1</sup>d)<sup>T</sup>; for MOPED they are the nine QR-orthonormalised score directions. The same transform is applied to the 100 seed/mask observations (<code>obs</code>) and to the held-out parameter rows (<code>fixed_test</code>), and <code>compression.npz</code> stores everything needed to rebuild any input from a band-power vector.</p>
+<p>The ℓ ≥ 580 control (<code>merlin_lmin580</code>) uses the same construction on the bands 580–629 to 7930–7979:
+148 of 158 bands, 7,400 of the 7,900 multipoles (6.33 % of the entries removed, not 6.33 % of the information). It
+removes the largest angular scales, where the sky-to-sky scatter is largest; ℓ = 580 corresponds to roughly π/ℓ ≈ 19
+arcmin. Its bounded companion was never trained.</p>
+<p>When the band50 networks were re-evaluated on 2026-10-06, every tested band50 and ℓ ≥ 580 input was rebuilt from its
+saved noisy band powers and the frozen transform and compared with the stored network input:</p>
+<pre class="code" data-src="SBI_analysis/tsz_truth_mean_validation_20261006/evaluate_truth_mean.py:94-103"><code>    if method != 'original':
+        # Reconstruct every tested banded feature from its saved noisy spectrum,
+        # not just its theta label. Use the frozen training-only transform.
+        noisy = np.load(PARENT/'data/noisy_bands.npy', mmap_mode='r')
+        with np.load(folder_for(method, 'linear')/'compression.npz') as c:
+            projected = (noisy[ids]/c['fid'])@c['weights']
+            reproduced = ((np.arcsinh((projected-c['s_center'])/c['s_scale'])
+                           - c['z_mean'])/c['z_sd']).astype(np.float32)
+        feature_error = float(np.max(np.abs(reproduced-x)))
+        np.testing.assert_allclose(reproduced, x, rtol=1e-6, atol=1e-5)</code></pre>
+<p class="code-note">This recomputes x = [asinh(((d/fid)<sup>T</sup>W − m)/c) − z̄]/σ<sub>z</sub>, with d the saved noisy band powers, fid the noise-free B12 band powers, W the stored weights and m, c, z̄, σ<sub>z</sub> the frozen asinh parameters, for all 1,500 reserved test rows. The largest difference recorded is exactly 0.0 for both band models (<code>all_test_banded_features_max_abs_error</code> in metrics_band50_*.json and metrics_lmin580_linear.json).</p>
+<h3>5.12 band50 results: the sky test</h3>
+<p>The robustness study crossed ten lightcones (100, 102, …, 118) with ten masks (12345 to 12354), all painted at the
+B12 parameters with the same noise pair, and compared 23 alternative compressions with the original unbounded Merlin (24 tested methods in all). Six
+simulations × five masks were used for selection ("discovery"); four held-out simulations at the training mask, five
+held-out masks on simulation 100 and their 4 × 5 intersection were used for validation. Two discrepancy measures were
+defined in units of h<sub>i</sub>, half the original model's 68 % width on the baseline sky, which is held fixed so
+that broadening a posterior cannot make it look better:</p>
+<div class="eq">T = √⟨[(m<sub>ci</sub> − θ<sub>i</sub><sup>*</sup>)/h<sub>i</sub>]<sup>2</sup>⟩<sub>c,i</sub> (truth displacement), &nbsp;
+A = √⟨[(m<sub>ci</sub> − m̄<sub>i</sub>)/h<sub>i</sub>]<sup>2</sup>⟩<sub>c,i</sub> (sky scatter), &nbsp;
+W = exp⟨ln(w<sub>ci</sub>/w<sub>ci</sub><sup>orig</sup>)⟩<sub>c,i</sub> (width ratio)</div>
+<p>with m<sub>ci</sub> the posterior median for sky c and parameter i and w the 68 % width. The selection rule, under
+the 25 % average-width budget confirmed by the user, was: among candidates that lower both T and A on the discovery
+skies and pass marginal and joint calibration screens, take the lowest √(T<sup>2</sup> + A<sup>2</sup>) with W ≤ 1.25
+(INTERPRETATION.md, "Metric definitions"). band50 Merlin won in all three arms.
+On the discovery skies (combined arm) it moved T from 1.560 to 1.134 and A from 0.498 to 0.077 at W = 1.199; the
+ℓ ≥ 580 control reached 1.175 and 0.147 at W = 1.250, just over the cap, and failed the joint calibration screen in the
+mask and combined arms (<code>final_results/report/discovery_ranking.csv</code>).</p>
+<figure class="fig"><img src="fig/5_merlin/13_robustness_tradeoff_combined.png" alt="Truth and sky discrepancy against geometric mean width ratio for MOPED and Merlin candidates, original and recommended" loading="lazy"><figcaption><strong>Figure 5.13</strong> Discovery skies, combined arm: √(T<sup>2</sup> + A<sup>2</sup>) against the width ratio W for the MOPED (blue) and Merlin (green) candidates; black: original Merlin; star: the recommended band50 Merlin; dashed: the 25 % width cap. No candidate keeps the original's width; the candidates lie between width ratios of about 1.2 and 1.36. A vector PDF of the same figure is next to the PNG. <span class="src">source: SBI_analysis/tsz_robustness_methods_20261004/final_results/report/tradeoff_combined.png (publication_plots.py)</span></figcaption></figure>
+<table class="data"><thead><tr><th>held-out comparison</th><th>skies</th><th>truth-RMS reduction</th><th>median-scatter reduction</th><th>mean width increase</th><th>worst parameter</th></tr></thead>
+<tbody>
+<tr><td>simulations</td><td class="num">4</td><td class="num">33.0 %</td><td class="num">68.2 %</td><td class="num">24.7 %</td><td class="num">59.1 %</td></tr>
+<tr><td>masks</td><td class="num">5</td><td class="num">18.1 %</td><td class="num">78.7 %</td><td class="num">17.9 %</td><td class="num">55.4 %</td></tr>
+<tr><td>combined</td><td class="num">20</td><td class="num">30.0 %</td><td class="num">71.5 %</td><td class="num">22.6 %</td><td class="num">74.4 %</td></tr>
+</tbody></table>
+<p class="path">band50 Merlin (unbounded) against the original unbounded Merlin on held-out skies;
+SBI_analysis/tsz_robustness_methods_20261004/final_results/INTERPRETATION.md.</p>
+<p>The joint truth test asks how much posterior mass has a higher density than the density at the true parameter
+vector, with densities in θ including the Jacobian; a value below 0.68 means the truth lies inside the 68 %
+highest-density region (HPD), the smallest region holding 68 % of the mass. The true B12 vector lies inside band50's
+68 % joint HPD region on all 100 skies, in both parameter spaces, while marginal medians of x<sub>c</sub> and β stay displaced and their truths stay outside the 68 % marginal
+intervals. On the seed-offset perturbations band50 does not react to the fine residual: P<sub>0</sub> stays near 32.7 for
+the baseline and 32.8 for the mean new observation (REPORT.md). That median is itself above the truth of 18.1: band50
+removes the sky dependence, not the displacement of the marginal medians. The balanced decomposition of median variation shifts
+from 26.3 % simulation, 31.8 % mask and 41.9 % interaction for the original to 12.4 %, 73.1 % and 14.4 % for band50: what
+remains is mostly the mask, which changes the low-ℓ spectrum by 15 %. Because the masks overlap on one sky, these are
+descriptive fractions. The bounded companion gives held-out width increases of 27.0, 17.1 and 25.9 % against the original
+bounded model.</p>
+<h3>5.13 band50 results: what it costs across the prior</h3>
+<p>The sky test is at one parameter point. The cost of band50 over the whole prior was measured on 2026-10-06 on the
+1,500 odd-indexed rows of the 3,000 held-out test rows, which had been reserved and not used in method selection
+(the even rows served the selection screen). The frozen ensembles of the original Merlin (beam-consistent, noise-only,
+83 PCA inputs), band50 Merlin and the ℓ ≥ 580 control were evaluated with 9,000 posterior draws per row, in fresh
+interpreters for linear and logit networks (job 600740 on idark). The primary metric is the Pearson correlation between
+truth and posterior mean across rows, per parameter. It differs from the correlations between parameters within one
+posterior that the joint report of 2026-10-05 had computed; the fixed-truth sky grid cannot measure it because its truth
+is constant.</p>
+<table class="data"><thead><tr><th>parameter</th><th>original</th><th>band50</th><th>band50, ℓ ≥ 580</th><th>band50 − original (95 % interval)</th><th>band50 width ratio</th></tr></thead>
+<tbody>
+<tr><td>P<sub>0</sub></td><td class="num">0.733</td><td class="num">0.537</td><td class="num">0.508</td><td class="num">−0.195 (−0.227, −0.165)</td><td class="num">1.71</td></tr>
+<tr><td>x<sub>c</sub></td><td class="num">0.790</td><td class="num">0.694</td><td class="num">0.645</td><td class="num">−0.095 (−0.114, −0.077)</td><td class="num">1.30</td></tr>
+<tr><td>β</td><td class="num">0.696</td><td class="num">0.478</td><td class="num">0.390</td><td class="num">−0.218 (−0.252, −0.187)</td><td class="num">1.44</td></tr>
+<tr><td>α<sub>m</sub><sup>P0</sup></td><td class="num">0.858</td><td class="num">0.639</td><td class="num">0.567</td><td class="num">−0.219 (−0.242, −0.196)</td><td class="num">2.35</td></tr>
+<tr><td>α<sub>m</sub><sup>xc</sup></td><td class="num">0.817</td><td class="num">0.637</td><td class="num">0.513</td><td class="num">−0.180 (−0.205, −0.156)</td><td class="num">1.51</td></tr>
+<tr><td>α<sub>m</sub><sup>β</sup></td><td class="num">0.514</td><td class="num">0.335</td><td class="num">0.263</td><td class="num">−0.179 (−0.215, −0.144)</td><td class="num">1.22</td></tr>
+<tr><td>α<sub>z</sub><sup>P0</sup></td><td class="num">0.859</td><td class="num">0.778</td><td class="num">0.766</td><td class="num">−0.081 (−0.094, −0.069)</td><td class="num">1.66</td></tr>
+<tr><td>α<sub>z</sub><sup>xc</sup></td><td class="num">0.768</td><td class="num">0.710</td><td class="num">0.664</td><td class="num">−0.058 (−0.075, −0.042)</td><td class="num">1.15</td></tr>
+<tr><td>α<sub>z</sub><sup>β</sup></td><td class="num">0.539</td><td class="num">0.451</td><td class="num">0.421</td><td class="num">−0.088 (−0.112, −0.064)</td><td class="num">1.12</td></tr>
+<tr><td>mean / geometric mean</td><td class="num">0.730</td><td class="num">0.584</td><td class="num">0.526</td><td class="num"></td><td class="num">1.456</td></tr>
+</tbody></table>
+<p class="path">Unbounded networks, 1,500 reserved rows; SBI_analysis/tsz_truth_mean_validation_20261006/data/truth_mean_metrics.csv,
+data/paired_pearson_changes.csv (paired row bootstrap) and TRUTH_MEAN_SUMMARY.json (width68_ratio_geomean,
+width68_ratio_all_parameters). Bounded: band50 − original changes agree within 0.01.</p>
+<p>All nine correlations drop with band50, in both spaces. The geometric-mean 68 % width increases by 45.6 % (unbounded),
+46.4 % (bounded) and 56.5 % for ℓ ≥ 580. They are larger than the 18 to 29 % width costs of the sky test; the README attributes the
+difference to the different observations and parameter points over which the widths are averaged (the prior here,
+the B12 point there). The mean log density of the truth drops from −3.01 to −5.48 (unbounded;
+−2.87 to −5.48 bounded) and to −6.28 for ℓ ≥ 580. Calibration: band50's unbounded 68 % coverage spans 0.632 to 0.668 and
+its bounded companion 0.683 to 0.730, against 0.607 to 0.665 and 0.637 to 0.714 for the original; the unbounded networks
+put 39 % (band50) and 33 % (original) of their mass outside the prior box. The Monte Carlo error from the finite number of
+draws is small: Pearson r computed from the posterior means of the first and second 4,500 draws differs by at most
+0.0025 (<code>half_sample_pearson_difference</code>). The robustness report quotes slightly different band50 coverage
+ranges for the same 1,500 rows (63.3 to 66.9 % unbounded, 68.8 to 72.7 % bounded, INTERPRETATION.md) from its own
+earlier evaluation; the 2026-10-06 numbers above are the later, dedicated run.</p>
+<figure class="fig"><img src="fig/5_merlin/14_truth_mean_pearson.png" alt="Truth versus posterior-mean Pearson r per parameter for original and band50, bounded and unbounded, and the ell above 580 control" loading="lazy"><figcaption><strong>Figure 5.14</strong> Truth-versus-posterior-mean Pearson r per parameter, 1,500 reserved rows, with paired bootstrap intervals: original (blue, teal), band50 (orange, purple) and band50 with ℓ ≥ 580 (grey). A vector PDF of the same figure is next to the PNG. <span class="src">source: SBI_analysis/tsz_truth_mean_validation_20261006/figures/pearson.png (plot_truth_mean.py)</span></figcaption></figure>
+<figure class="fig"><img src="fig/5_merlin/15_width68_ratio.png" alt="Geometric mean 68 percent width ratio per parameter relative to the matching original model" loading="lazy"><figcaption><strong>Figure 5.15</strong> Geometric mean over rows of the 68 % width relative to the matching original model, per parameter. The largest cost is α<sub>m</sub><sup>P0</sup> (2.35 unbounded); the redshift slopes of x<sub>c</sub> and β cost 12 to 15 %. A vector PDF of the same figure is next to the PNG. <span class="src">source: SBI_analysis/tsz_truth_mean_validation_20261006/figures/width68_ratio_geomean.png</span></figcaption></figure>
+<figure class="fig"><img src="fig/5_merlin/16_truth_vs_posterior_mean_unbounded.png" alt="Scatter of posterior mean against truth for nine parameters, original and band50, unbounded" loading="lazy"><figcaption><strong>Figure 5.16</strong> Posterior mean against truth for the nine parameters, original (blue) and band50 (orange), unbounded, 1,500 reserved rows; dashed: identity. band50 has many more rows whose posterior mean sits at a constant value near the prior centre (horizontal streaks, for example near 0.45 for α<sub>m</sub><sup>P0</sup> and near −0.3 for α<sub>m</sub><sup>xc</sup>), rows on which the banded input carries almost nothing about that parameter. A vector PDF of the same figure is next to the PNG. <span class="src">source: SBI_analysis/tsz_truth_mean_validation_20261006/figures/truth_mean_linear.png (downscaled to 1700 px)</span></figcaption></figure>
+<p>Two cross-checks make the size of the loss understandable. First, the band50 correlations are almost those of the
+40-band network: per parameter 0.537, 0.694, 0.478, 0.639, 0.637, 0.335, 0.778, 0.710, 0.451 against 0.51, 0.69, 0.48,
+0.65, 0.65, 0.32, 0.79, 0.72, 0.45 for 40 bins (production noise, all 3,000 test rows,
+<code>results_corrected_inputs/summary.md</code>), with the same mean 0.584 (0.590 for 40 bins with beam-consistent noise,
+the noise band50 was trained on). Once structure finer than 50 multipoles is
+averaged away, Merlin's head extracts about what 40 bands of 200 carry; the row subsets differ (1,500 against 3,000), so
+the match is approximate. Its joint log p (−5.48 on the 1,500 reserved rows) is much worse than the 40-band network's
+(−2.35 to −2.39 on all 3,000 test rows, bounded); the original Merlin scores −3.01 (unbounded) and −2.87 (bounded) on
+the 1,500 rows against −2.96 on all 3,000, so the change of row subset is small next to this gap. A plausible
+cause is that band50 shares Merlin's median-centred asinh (<code>common.fit_transform</code>, section 5.5); that has
+not been tested. Second, the local Fisher widths
+predict a loss of the right size: bands of 50 against Merlin's PCA inputs is 0.81 against 0.59 in the geometric-mean
+marginal Fisher width, a ratio of 1.37, against the measured posterior width ratio of 1.46. The per-parameter pattern
+does not follow the Fisher ratios (1.27 for α<sub>m</sub><sup>P0</sup> against a measured 2.35), so this is a consistency
+check at the level of the mean, made with the 420-draw Fisher inputs rather than the exact 83-component model.</p>
+<p>A note on a similarly named control. The joint report of 2026-10-05 (<code>tsz_joint_report_20261005</code>) used a
+"smooth_clean_50" input: the seed-100 observation plus the fractional mean clean difference of simulations 102 to 118
+smoothed with a Gaussian of σ<sub>ℓ</sub> = 50 (<code>control_definition.json</code>), fed to the original frozen
+Merlin. It is a counterfactual input, not band50 and not a retrained model. Its posterior parameter-pair correlations
+stay close to the original (P<sub>0</sub>–β −0.317 against −0.337, mean 68 % width ratio 0.999), confirming that the
+smooth part of the sky change does not matter to the original network.</p>
+<aside class="key">band50 makes the posterior insensitive to the halo realisation and mask (held-out truth displacement
+−30 %, sky scatter −72 %, truth inside the 68 % joint region on all 100 skies) at a cost of about 46 % in posterior width
+across the prior and a drop in mean truth-mean Pearson r from 0.730 to 0.584, the level of 40 band powers. The evidence
+(this drop, the Fisher information by scale and the smooth/fine controls) indicates that most of Merlin's lead over 40
+bands is information tied to the training sky.</aside>
+<h3>5.14 Conclusions and open issues</h3>
+<p>The Merlin chain as implemented is sound and fully checked: every input can be rebuilt from a spectrum (the B12
+observation through obs_beam_posteriors.py reproduces its stored network input exactly, maximum difference 0.0 in
+<code>obs_posteriors_beam/summary_bounded.json</code>, "checks"; the band models reconstruct with
+zero error), the whitening and PCA follow the original code's rules, and the bounded ensembles are calibrated to within
+a few per cent in marginal and TARP coverage. Of the steps, the asinh input scale and the training patience mattered
+most for the metrics; the whitening mattered at the 0.2 to 0.5 nat level and through which components survive PCA; the
+beam fix did not matter. The head adds about 0.05 in r and 1.6 nats in log p over plain whitened PCA.</p>
+<p>The deeper result is about what Merlin's advantage consists of. Per-multipole inputs let it use the fine structure
+that the fixed HalfDome catalogue and mask imprint on the spectrum, which is real information about θ conditional on
+that sky but does not transfer to another HalfDome sky (measured, sections 5.10 and 5.12) and is not expected to
+transfer to FLAMINGO or to the real sky (not tested). band50 shows the trade-off directly: it
+removes most of the sky sensitivity and the accuracy drops to the 40-band level. For inference on any sky other than
+the training one, band50 (or 40 bands) is the defensible choice; the original Merlin numbers hold conditional on the
+training sky and are optimistic for any other.</p>
+<aside class="note"><strong>Open issues.</strong> (1) The principled fix is to vary halo catalogues and masks across the
+training rows and test on whole held-out skies; band50 only avoids the fingerprint. (2) No band-width sweep: 25 and 100
+were only illustrated, so the best scale between robustness and precision is unknown. (3) A zero-centred asinh for
+PCA and band inputs (the faint-sky compression) and a training recipe matched to the 40-band networks are untested.
+(4) The ℓ ≥ 580 control has no bounded companion. (5) band50 changes three things at once relative to the original
+(no PCA, banded whitening, retraining), so the measured cost is not the cost of averaging alone. (6) The B12 truth log p
+is one observation with seed errors of 0.05 to 0.98 nats and must not be used to rank methods. (7) Any transfer test on
+FLAMINGO maps needs the pixel-window treatment: the FLAMINGO map is a pixel average while the training signal is
+point-sampled, which obs_beam_posteriors.py handles only approximately with its L1_m9_pixwin variant (explainer page,
+section 13).</aside>
+<aside class="xgpaint"><h4>XGPaint edit: none in this topic</h4>
+<p>Merlin and band50 are Python post-processing of stored spectra (whitening, PCA, asinh, sbi networks); nothing in
+this section changes or works around XGPaint. The training spectra come from the frozen 64k engine, which pins
+kristero/XGPaint.jl at tag <code>validated-tsz256-20260922</code>, git tree 3b57cacb5f82… (<code>tSZ_64k_flat_prior_SO_baseline_deproj0/julia_env/Manifest.toml</code>
+lines 1976 to 1982). In the dev checkout <code>/home/kn18001/.julia/dev/XGPaint</code> this tree is identical for commit
+ce1d239 ("local changes") and for 35f79ad, the commit the tag points to, so the painting code is the same as in the
+256-row validation test. Two engine behaviours that matter here are project-side, not XGPaint: the noise splits are
+added to the beamed signal without a beam (<code>tSZ_64k_flat_prior_SO_baseline_deproj0/engine/engine.jl</code> lines 31 to 51, recorded as
+<code>"noise_beam_applied"=&gt;false</code>), which the beam fix of section 5.2 corrects at the spectrum level; and the
+4 R<sub>200c</sub> spherical truncation is the project wrapper <code>ChordMeanProfile &lt;: XGPaint.AbstractGNFW</code>
+(<code>tSZ_64k_flat_prior_SO_baseline_deproj0/engine/spherical_truncation_profiles.jl</code> line 22, a subtype of
+XGPaint's <code>AbstractGNFW</code> defined in project code). So no XGPaint change is behind any number in this section.
+The unbeamed noise does change numbers: the production-noise rows of the tables carry it, and the beam-consistent rows
+are the corrected ones (section 5.2; the effect on the metrics is small, section 5.9). The truncation is the same for
+every training row and observation. The fixed-sky fingerprint of section 5.10 is a property of the single HalfDome
+catalogue and mask, not of the painter.</p></aside>
+</section>

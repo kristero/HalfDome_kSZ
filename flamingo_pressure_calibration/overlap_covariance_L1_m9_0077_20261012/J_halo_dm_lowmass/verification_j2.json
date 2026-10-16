@@ -1,0 +1,523 @@
+{
+ "all_passed": true,
+ "gates": {
+  "G0_inputs": {
+   "passed": true,
+   "P_a2ii_35_vs_G_f35_max_rel": 1.1102230246251565e-15,
+   "P_a2ii_35_zero_pattern_equal_G": true,
+   "E_a2ii_35_vs_G_f35_max_rel": 1.1102230246251565e-15,
+   "E_a2ii_35_zero_pattern_equal_G": true,
+   "x_h_equal_J1": true,
+   "softening_equal_J1": 0.0,
+   "stacked_counts_equal_J1": true,
+   "hb_count_rule_binds_above_13.5": 0,
+   "groups_E_a2ii_1_equal_J1": true,
+   "groups_E_hb_1_equal_J1": true,
+   "groups_E_a2ii_2_equal_J1": true,
+   "groups_E_hb_2_equal_J1": true,
+   "groups_E_a2ii_3_equal_J1": true,
+   "groups_E_hb_3_equal_J1": true,
+   "groups_E_a2ii_4_equal_J1": true,
+   "groups_E_hb_4_equal_J1": true,
+   "DM_weight_maps_D0_n_obs": 7,
+   "DM_weight_maps_D1_n_obs": 6,
+   "DM_weight_maps_D2_n_obs": 7,
+   "DM_weight_maps_D3_n_obs": 7,
+   "abs_importance_sum_quantile_maps_D0": {
+    "dm_q16": 1.0052933454466653,
+    "dm_q50": 1.0064712357873844,
+    "dm_q84": 1.002834423720172,
+    "dm_q975": 0.9986601022485964,
+    "dm_q999": 1.0325805874185359
+   },
+   "abs_importance_sum_quantile_maps_D1": {
+    "dm_q16": 0.0005475345982404178,
+    "dm_q50": 1.0134084755856554,
+    "dm_q84": 0.9859206893813717,
+    "dm_q975": 0.9905826629160615,
+    "dm_q999": 1.0521104183185823
+   },
+   "abs_importance_sum_quantile_maps_D2": {
+    "dm_q16": 0.9971112426749276,
+    "dm_q50": 1.0067812253674568,
+    "dm_q84": 0.9993819697453692,
+    "dm_q975": 0.9958936570147634,
+    "dm_q999": 1.0375002632971935
+   },
+   "abs_importance_sum_quantile_maps_D3": {
+    "dm_q16": 1.0095499688517406,
+    "dm_q50": 1.0010938533104952,
+    "dm_q84": 0.993964039048401,
+    "dm_q975": 0.990638261323411,
+    "dm_q999": 1.0456354131849337
+   }
+  },
+  "G1_remote_provenance": {
+   "passed": true,
+   "pre_run_all_equal": true,
+   "pre_run_checked_utc": "2026-10-16T00:53:29Z",
+   "n_files_checked": 68,
+   "manifest_inputs_equal_local": {
+    "J_halo_dm_lowmass/inputs/j2_fitdata.npz": true,
+    "J_halo_dm_lowmass/inputs/j0_profiles_x200.npz": true,
+    "J_halo_dm_lowmass/results/truth_summary.json": true,
+    "J_halo_dm_lowmass/results/sens.npz": true,
+    "J_halo_dm_lowmass/results/stacks.npz": true,
+    "I_fitting_a2ii/results/fits35.json": true,
+    "I_fitting_a2ii/results/tables/I2_ladder_models.csv": true,
+    "G_physical_outer/results/f_base/profiles.npz": true,
+    "G_physical_outer/results/prepare.npz": true
+   },
+   "manifest_compute_code_equal_local": {
+    "j2_common.py": true,
+    "j2_fits.py": true,
+    "j2_eval.py": true,
+    "run_test_j2.py": true,
+    "run_test_j.py": true,
+    "j_common.py": true,
+    "j_prepare.py": true,
+    "j_basis.py": true,
+    "j_fallback.py": true,
+    "j_obs.py": true,
+    "j_pdf.py": true
+   }
+  },
+  "G2_j1_rebuild": {
+   "passed": true,
+   "fallback_parity_passed": true,
+   "stacks_keys_compared": 82,
+   "stacks_keys_differing": [],
+   "fallback_JA_max_abs_over_max": 1.0922624034833091e-16,
+   "fallback_JB_max_abs_over_max": 1.0922624034833091e-16
+  },
+  "G3_fit_parity_test_I": {
+   "passed": true,
+   "max_rel_parameter_difference_vs_TestI_fits35": {
+    "D0|a|2": 2.6645352591003757e-15,
+    "D0|a|3": 5.329070518200751e-15,
+    "D0|a|4": 4.1744385725905886e-14,
+    "D0|L|2": 5.551115123125783e-15,
+    "D0|L|3": 8.992806499463768e-15,
+    "D0|L|4": 1.7763568394002505e-14,
+    "D1|a|1": 8.881784197001252e-15,
+    "D1|a|1.34": 2.3314683517128287e-15,
+    "D2|a|1.34": 2.3314683517128287e-15,
+    "D2|a|2": 2.6645352591003757e-15,
+    "D2|a|3": 5.329070518200751e-15,
+    "P|a|4": 6.661338147750939e-16
+   },
+   "max_overall": 4.1744385725905886e-14,
+   "note": "J2 'D*|a|R' on bins 13.5-15.5 = Test I 'E|a|R' (same 35-shell A2-ii data, strict mask, objective)",
+   "scope": "D0|a, D0|L, D1|a, D2|a, P|a at every R_fit; the dI fits are NOT covered (their weights come from J1's C14 maps, Test I's from Test H's C10 maps; J2_summary.json dI_vs_TestI)"
+  },
+  "G4_ladder_parity_test_I": {
+   "passed": true,
+   "max_rel_converged_fits": {
+    "floor": 0.0,
+    "stat": 3.7273223455286205e-08,
+    "L22": 0.0,
+    "sigma_floor": 6.539136987696668e-09,
+    "cv_chi2": 5.302410865366041e-07
+   },
+   "models_compared": 78,
+   "skipped_not_converged_in_either_run": [
+    "mass|BPLs+O0|stat",
+    "mass|PB+O0|L22",
+    "mass|BPLall+O1|stat",
+    "mass|PL3g+O1|floor",
+    "mass|BPLs+O1|stat",
+    "mass|BPLs_L22+O1|floor",
+    "mass|BPLs_L22+O1|L22",
+    "mass|PL3gM+O1|floor",
+    "mass|PL3gM+O1|stat",
+    "mass|BPLall_L22+O1|floor",
+    "mass|BPLall_L22+O1|stat",
+    "mass|PB+O1|floor",
+    "mass|PB+O1|stat",
+    "mass|PB+O1|L22",
+    "mass|PB+O2|stat",
+    "massc|L22best_L22+O0|stat",
+    "massc|PL2+O1|stat",
+    "massc|BPLs+O0|stat",
+    "massc|PL3+O1|stat",
+    "massc|PL1+O1|stat",
+    "massc|PB+O0|L22",
+    "massc|PL1cA+O1|stat",
+    "massc|BPLs_L22+O1|floor",
+    "massc|BPLs_L22+O1|stat",
+    "massc|BPLs+O1|stat",
+    "massc|PL3g+O1|floor",
+    "massc|PL3g+O1|stat",
+    "massc|PL3cA+O1|stat",
+    "mass|PL3gM+O2|floor",
+    "mass|PL3gM+O2|stat",
+    "massc|PL3c3+O1|stat",
+    "massc|L22best_L22+O1|stat",
+    "massc|PB+O1|floor",
+    "massc|PB+O1|stat",
+    "massc|PB+O1|L22",
+    "massc|PBcell+O0|L22",
+    "massc|PL3g+O2|stat",
+    "massc|PL3c3+O2|stat",
+    "massc|PB+O2|stat",
+    "massc|L22best_L22+O2|stat",
+    "massc|L22best+O2|stat",
+    "massc|PBcell+O1|floor",
+    "massc|PBcell+O1|stat",
+    "massc|PBcell+O1|L22",
+    "massc|PBcell+O2|floor",
+    "massc|PBcell+O2|stat",
+    "massc|PBcell+O2|L22"
+   ],
+   "all_fits_max_rel_including_unconverged": {
+    "chi2_floor": 2.820091200561592e-07,
+    "chi2_stat": 0.1097331523785885,
+    "chi2_L22": 0.0021422878518980726,
+    "sigma_floor": 6.539137009653473e-09,
+    "cv_chi2": 5.30241086593719e-07
+   },
+   "selected_equal": true,
+   "selected_J2": {
+    "E|mass|4": {
+     "model": "PL3g+O0",
+     "k": 7,
+     "dBIC": 0.0,
+     "chi2nu_floor": 0.9798410971435083,
+     "rule_satisfied": true,
+     "best_BIC": "PL3g+O0",
+     "best_CV": "PL3g+O0"
+    },
+    "E|massc|4": {
+     "model": "L22best+O0",
+     "k": 12,
+     "dBIC": 0.0,
+     "chi2nu_floor": 1.2209628652801012,
+     "rule_satisfied": false,
+     "best_BIC": "L22best+O0",
+     "best_CV": "PBcell+O0"
+    }
+   }
+  },
+  "G5_eval_parity_truth_mean": {
+   "passed": true,
+   "D0": {
+    "max_rel_all": 0.0,
+    "max_rel_moments": 0.0,
+    "max_rel_quantiles": 0.0,
+    "worst_key": "yy1h_100"
+   },
+   "D1": {
+    "max_rel_all": 0.0,
+    "max_rel_moments": 0.0,
+    "max_rel_quantiles": 0.0,
+    "worst_key": "yy1h_100"
+   },
+   "D2": {
+    "max_rel_all": 0.0,
+    "max_rel_moments": 0.0,
+    "max_rel_quantiles": 0.0,
+    "worst_key": "yy1h_100"
+   },
+   "D3": {
+    "max_rel_all": 0.0,
+    "max_rel_moments": 0.0,
+    "max_rel_quantiles": 0.0,
+    "worst_key": "yy1h_100"
+   }
+  },
+  "G6_pdf_vs_moments": {
+   "passed": true,
+   "max_rel_mean": 1.469400519038544e-06,
+   "max_rel_variance": 0.00016421856553650027,
+   "max_rel_variance_others": 3.411435746814018e-05,
+   "n_paintings": 406,
+   "variance_deviation_above_1e-4_explained_by_tail": [
+    {
+     "painting": "l|D0|PL3g+O2|mass|Rf4|det",
+     "rel_dev_variance": -0.00014448406183287243,
+     "mass_beyond_grid": 2.9942430646023865e-08,
+     "variance_deficit": 2.3554677769807313,
+     "deficit_lower_bound_from_tail": 1.9019212045348024,
+     "deficit_lower_bound_rel": 0.0001166635789301483
+    },
+    {
+     "painting": "l|D0|PL3g+O2|mass|Rf4|S1",
+     "rel_dev_variance": -0.00016421856553650027,
+     "mass_beyond_grid": 3.4959600547779246e-08,
+     "variance_deficit": 2.761278369864158,
+     "deficit_lower_bound_from_tail": 2.2206081520211276,
+     "deficit_lower_bound_rel": 0.00013206386191385273
+    }
+   ],
+   "unexplained": [],
+   "rule": "mean <= 1e-5; variance <= 1e-4, or a deficit at least the lower bound (1 - mass_on_grid)(8192 - <DM>)^2 of the probability beyond the PDF grid"
+  },
+  "G7_completeness": {
+   "passed": true,
+   "n_items": 203,
+   "incomplete": [],
+   "missing_quantiles": [],
+   "fits_without_result": [
+    "D0|L|2|13",
+    "D0|L|2|14",
+    "D0|L|3|13",
+    "D0|L|3|14",
+    "D0|L|4|13",
+    "D0|L|4|14",
+    "D1|L|1|1",
+    "D1|L|1|2",
+    "D1|L|1|13",
+    "D1|L|1|14",
+    "D1|L|1.34|1",
+    "D1|L|1.34|13",
+    "D1|L|1.34|14",
+    "D2|L|1.34|1",
+    "D2|L|1.34|13",
+    "D2|L|1.34|14",
+    "D2|L|2|13",
+    "D2|L|2|14",
+    "D2|L|3|13",
+    "D2|L|3|14",
+    "D3|L|1.34|1",
+    "D3|L|1.34|2",
+    "D3|L|1.34|5",
+    "D3|L|1.34|13",
+    "D3|L|1.34|14",
+    "D3|L|2|1",
+    "D3|L|2|2",
+    "D3|L|2|5",
+    "D3|L|2|13",
+    "D3|L|2|14",
+    "D3|L|3|1",
+    "D3|L|3|2",
+    "D3|L|3|5",
+    "D3|L|3|13",
+    "D3|L|3|14",
+    "D3|L|4|1",
+    "D3|L|4|2",
+    "D3|L|4|5",
+    "D3|L|4|13",
+    "D3|L|4|14"
+   ],
+   "rc_fits_without_result": [
+    "D1|a|1|1",
+    "D1|d|1|1"
+   ],
+   "L_star_substituted_bins": {
+    "a|D0|B16|L|Rf2": [
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D0|B16|L|Rf3": [
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D0|B16|L|Rf4": [
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D1|B16|L|Rf1": [
+     "12.7-12.9",
+     "12.9-13.1",
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D1|B16|L|Rf1.34": [
+     "12.7-12.9",
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D2|B16|L|Rf1.34": [
+     "12.7-12.9",
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D2|B16|L|Rf2": [
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D2|B16|L|Rf3": [
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D3|B16|L|Rf1.34": [
+     "12.7-12.9",
+     "12.9-13.1",
+     "13.5-13.7",
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D3|B16|L|Rf2": [
+     "12.7-12.9",
+     "12.9-13.1",
+     "13.5-13.7",
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D3|B16|L|Rf3": [
+     "12.7-12.9",
+     "12.9-13.1",
+     "13.5-13.7",
+     "15.1-15.3",
+     "15.3-15.5"
+    ],
+    "a|D3|B16|L|Rf4": [
+     "12.7-12.9",
+     "12.9-13.1",
+     "13.5-13.7",
+     "15.1-15.3",
+     "15.3-15.5"
+    ]
+   },
+   "rc_items_bins_with_S400_fit": {
+    "rc|D1|B16|a|Rf1": [
+     "12.7-12.9"
+    ],
+    "rc|D1|B16|d|Rf1": [
+     "12.7-12.9"
+    ]
+   }
+  },
+  "G8_results_checksums": {
+   "passed": true,
+   "n_files": 34,
+   "bad": []
+  },
+  "G9_stack_scores_zero": {
+   "passed": true,
+   "n_values": 86,
+   "max_abs": 0.0
+  },
+  "G10_scratch_deleted": {
+   "passed": true,
+   "records": [
+    "2026-10-15 20:10:29 EEST: /tmp/nagainis_halfdome_testJ removed on maas after the final fetch (2,199,775,869 bytes: basis_JA/JB(10).npz, fallback_j.npz); exists_after = false",
+    "2026-10-15 23:50:05 EEST: /tmp/nagainis_halfdome_testJ removed on maas after the final fetch of Test J (2,199,775,869 bytes); exists_after = false",
+    "2026-10-16 05:02:53 EEST: /tmp/nagainis_halfdome_testJ removed on maas after the final fetch of run 3 (2,199,775,869 bytes); exists_after = false"
+   ],
+   "n_runs": 3
+  },
+  "G11_report_numbers": {
+   "passed": true,
+   "n_numbers": 1823,
+   "n_in_report": 1823,
+   "max_rel_deviation": 0.0,
+   "problems": []
+  },
+  "G12_L_substitutions": {
+   "passed": true,
+   "rule_vs_fits_json_mismatches": [],
+   "painting_vs_rule_differences": [],
+   "p_min": 6
+  },
+  "G13_ladder_complete": {
+   "passed": true,
+   "per_radius": {
+    "D0|Rf4": {
+     "n_fitted": 39,
+     "n_painted": 39,
+     "missing": []
+    },
+    "D1|Rf1": {
+     "n_fitted": 13,
+     "n_painted": 13,
+     "missing": []
+    },
+    "D2|Rf2": {
+     "n_fitted": 13,
+     "n_painted": 13,
+     "missing": []
+    },
+    "D3|Rf2": {
+     "n_fitted": 39,
+     "n_painted": 39,
+     "missing": []
+    },
+    "D3|Rf4": {
+     "n_fitted": 39,
+     "n_painted": 39,
+     "missing": []
+    }
+   }
+  },
+  "G14_dIT_construction": {
+   "passed": true,
+   "problems": [],
+   "max_rel_shell_difference": 3.3306690738754696e-15,
+   "note": "parameters compared bitwise; shells relative (floating point of the two call paths of the same exact shell average)"
+  },
+  "G15_run1_reproduced": {
+   "passed": true,
+   "n_run1_rows": 186,
+   "n_values_compared": 38316,
+   "max_rel_difference": 0.0,
+   "worst": null,
+   "missing_rows": [],
+   "n_arrays_compared": 292,
+   "arrays_differing": []
+  },
+  "G17_run2_reproduced": {
+   "passed": true,
+   "n_items": 203,
+   "n_unchanged_items": 182,
+   "n_changed_items": 21,
+   "changed_items": [
+    "a|D0|B16|dIT|Rf4",
+    "a|D0|B16|dI|Rf3",
+    "a|D0|B16|dI|Rf4",
+    "a|D0|B16|d|Rf2",
+    "a|D0|B16|d|Rf3",
+    "a|D0|B16|d|Rf4",
+    "a|D1|B16|d|Rf1",
+    "a|D2|B16|d|Rf1.34",
+    "a|D2|B16|d|Rf2",
+    "a|D3|B16|d|Rf1.34",
+    "a|D3|B16|d|Rf2",
+    "a|D3|B16|d|Rf3",
+    "a|D3|B16|d|Rf4",
+    "lm|C10|B12a+B16dI",
+    "lm|C10|B12a+B16dIT",
+    "lm|C14|B12a+B16dI",
+    "lm|C14|B12a+B16dIT",
+    "rc|D0|B16|d|Rf4",
+    "rc|D1|B16|d|Rf1",
+    "rc|D2|B16|d|Rf2",
+    "rc|D3|B16|d|Rf4"
+   ],
+   "n_values_compared": 74984,
+   "max_rel_difference_unchanged": 0.0,
+   "worst": null,
+   "problems": [],
+   "fits_changed_with_weights": 183,
+   "fits_changed_other_objectives": []
+  },
+  "G16_checksum_manifests": {
+   "passed": true,
+   "J1_SHA256SUMS_lines": 181,
+   "J1_SHA256SUMS_failing": [],
+   "J1_lines_updated_for_shared_files": [
+    "CLUSTER_RUN.json",
+    "run_test_j.py"
+   ],
+   "shared_files": [
+    "CLUSTER_RUN.json",
+    "run_test_j.py"
+   ],
+   "updates_log": [
+    {
+     "time": "2026-10-15 23:52:52 EEST",
+     "changed": [
+      {
+       "file": "CLUSTER_RUN.json",
+       "old": "e28cfa270bd6ea085b0e684100df2fa31a6eaf0d7458f628ad493886d40e0a24",
+       "new": "9b64a21c6074a429b974aa6435ed9a79707d3481a192d436c772175a13a69c37"
+      }
+     ]
+    }
+   ],
+   "note": "J1's SHA256SUMS covers two files that J2 shares and changed: run_test_j.py (the '--j2' hook, added 2026-10-15 19:20 EEST before J2's first maas run; J1 itself ran with sha 719caec..., post/remote_code_check.json; the line was regenerated at 20:28 EEST by the J2 session) and CLUSTER_RUN.json (J2's run records j2_maas_runs appended).  Only these lines are updated; every other line of J1's manifest is J1's original digest.",
+   "J1_revision_log": "post/sums_update_j1.json (j_sums.py: J1's manifest re-hashed by J1's 2026-10-16 revision)",
+   "SHA256SUMS_J2": "written last by j2_sums.py j2 (after this gate), verified with sha256sum -c"
+  }
+ }
+}

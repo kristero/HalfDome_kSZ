@@ -1,0 +1,9 @@
+{
+ "description": "Recommended fits of Test K run 3, chosen after reading results/k3_fits.json and report/report_numbers.json: lowest sigma_d among the XGPaint-paintable laws of range R3 that extrapolate sensibly (pressure: brk_amp, since free puts x_c beyond the data at low mass; gas: free, the lowest sigma_d, with its large-alpha caveat stated in the report and the smooth alternatives brk_all (not an XGPaint type) and orig). Read by k_compare.py (snippet), make_figures.py and report/write_narrative.py; all numbers quoted come from the results files.",
+ "tSZ": {"key": "P|R3|brk_amp", "xgpaint": "XGPaint BreakModel"},
+ "tSZ_alt": {"key": "P|R3|free"},
+ "kSZ_DM": {"key": "G|R3|free", "xgpaint": "XGPaint BattagliaTauProfilePhysical"},
+ "kSZ_DM_alt": {"key": "G|R3|brk_all"},
+ "snippet": {"tSZ_recommended": "P|R3|brk_amp", "tSZ_published_form": "P|R3|orig", "gas_recommended": "G|R3|free",
+             "gas_published_form": "G|R3|orig", "gas_smooth_alternative": "G|R3|brk_all"}
+}

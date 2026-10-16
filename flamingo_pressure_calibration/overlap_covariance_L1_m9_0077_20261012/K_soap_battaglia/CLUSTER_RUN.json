@@ -1,0 +1,283 @@
+{
+ "purpose": "Test K (Battaglia B12 pressure / B16 gas-density laws refitted to FLAMINGO L1_m9 HYDRO_FIDUCIAL SOAP-HBT aperture integrals at all 71 outputs, forward-modelled at every halo's own radii): reads (K0, K1) and fits (K2, K3) on STRW maas; comparisons, parity checks, figures and the report are made locally from the fetched results",
+ "command": "cd $STUDY_ROOT && nice -n 19 python -B K_soap_battaglia/run_test_k.py --full --workers 8 --scratch /tmp/nagainis_halfdome_testK [--stages k0,k1,k2,k3]   (through cluster_tests.py run K --workers 8 --rss-stop 24 --driver-args=\"--scratch /tmp/nagainis_halfdome_testK\", which adds nice 19, ionice 7 and the load/memory guards)",
+ "smoke_command": "maas: cluster_tests.py run K --workers 2 --driver-args=\"--smoke --scratch /tmp/nagainis_halfdome_testK_smoke --results K_soap_battaglia/results_smoke\" (outputs 0077 and 0037, first 3,000,000 rows); local without data: python -B run_test_k.py --smoke --synthetic --workers 2 --results results_smoke_syn",
+ "scratch": "/tmp/nagainis_halfdome_testK (maas node-local /tmp): per-halo arrays halo_<snap>.npz (float32) of the selected centrals, for re-reduction without re-reading; ours; deleted after the final fetch (recorded in maas_runs)",
+ "STUDY_ROOT_on_maas": "/home/nagainis/HalfDome_runtime/overlap_covariance_tests/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012",
+ "stages": "k0 inventory, k1 reads + per-cell reduction (one worker per output), k2 per-cell fits, k3 global fits + bootstrap (default all, in order)",
+ "run3_commands": [
+  "cluster_tests.py run K --workers 3 --driver-args=\"--stages k1 --snaps 77,37,8 --results K_soap_battaglia/results_k1check --keep-halo 0\"  (K1 provenance check with the final code; compared with results/cells by k1_check_compare.py)",
+  "cluster_tests.py run K --workers 8 --rss-stop 24 --driver-args=\"--stages k2,k3 --boot 100,20,10 --starts K_soap_battaglia/k_starts_run2.json --scratch /tmp/nagainis_halfdome_testK/full\""
+ ],
+ "exit_status": "0 = completed; 1 = a stage raised (traceback in results/run_manifest.json); 3 = an output failed in k1",
+ "code_to_deploy": [
+  "K_soap_battaglia/k_common.py",
+  "K_soap_battaglia/k_fit_core.py",
+  "K_soap_battaglia/k_read.py",
+  "K_soap_battaglia/k_fits.py",
+  "K_soap_battaglia/k_selftest.py",
+  "K_soap_battaglia/run_test_k.py",
+  "K_soap_battaglia/k_starts_run2.json"
+ ],
+ "code_sha256": {
+  "k_common.py": "5c97e9d0a9e5794fe69aecb56312050714b9d287195f8a993a6f1108adbba38a",
+  "k_fit_core.py": "3f3036a6f5ff625c24f9f3c9d7abfe6ec92ba9b171bc42db77beedbd61e513cb",
+  "k_read.py": "de4df13e197702b1f20f062e8d0a3fbb25940fac73361538ac5c2a79dedaf39a",
+  "k_fits.py": "e2ec25821375c9657f9e26a268b9068385329e1a9c185df5eabe8f7ef21addb2",
+  "k_selftest.py": "dd5dd463015293cd3b986aed7f10dd7dfd0e708a5101668a6525d5c786fc5ac5",
+  "run_test_k.py": "d7e17caefd7fade872712d774a048b3ad9c0a47a0c417b17b32b1df67bde66de",
+  "k_starts_run2.json": "c21128a5614ff88fef1954dbd0af67c62c0b4f925bbbf43c425079b8f2abda2b"
+ },
+ "reads_on_maas_read_only": {
+  "SOAP-HBT": "/net/hypernova/data2/FLAMINGO/L1000N1800/HYDRO_FIDUCIAL/SOAP-HBT/halo_properties_00{07..77}.hdf5 (columns of k_common.COLUMNS over the row span of the selected centrals)",
+  "study haloes (z = 0 parity rows)": "selected_halos.npz (study product symlink, soap_row only)"
+ },
+ "writes": "K_soap_battaglia/results/ (cells/cells_<snap>.npz|json, k0_inventory.json, k1_status.json, k2_cell_fits.json, k3_fits.json, k3_boot.npz, k3_predictions.npz, k_params.json, z0_study_rows.npz, run_manifest.json, SHA256SUMS; work/ = per-fit json, not fetched) and the scratch directory",
+ "budget": "reduced results < 300 MB (expected ~100 MB); remote home quota 3.9 GB shared with Test J: per-halo arrays only in /tmp",
+ "maas_runs": [
+  {
+   "attempt": 0,
+   "kind": "smoke",
+   "launched": "2026-10-15 13:44:52 EEST",
+   "wrapper_pid": 3603577,
+   "workers": 2,
+   "rss_stop_GiB": 16,
+   "nice": 19,
+   "driver_args": "--smoke --scratch /tmp/nagainis_halfdome_testK/smoke --results K_soap_battaglia/results_smoke",
+   "stages": "k0,k1,k2,k3 on outputs 0077 and 0037, first 3,000,000 rows",
+   "load_at_launch": [
+    24.2,
+    24.06,
+    24.02
+   ],
+   "outcome": "returncode 0, wall 206 s, peak tree RSS 0.39 GiB, min machine available 178.4 GiB (attempts/run1_k0k1_20261015/test_K_done_0.json); fetched with k_maas.py fetchdir --dir results_smoke (14 files, 2.61 MiB)",
+   "findings": "rho200/200rho_c(z) = 1.00004 (z = 2) and 1.000004 (z = 0): SORadius conversion physical; f_b(header) = 0.158823; inner spheres (30-50 kpc) dominated by central-galaxy gas -> spheres enter the gas fit only at mean x >= 0.1 (later also >= 100 kpc); quadrature 4 x 4 -> 4 x 8 nodes"
+  },
+  {
+   "attempt": 1,
+   "kind": "full (k0, k1, k2, k3 nominal fits)",
+   "launched": "2026-10-15 13:56:24 EEST",
+   "wrapper_pid": 3623429,
+   "workers": 3,
+   "workers_note": "requested 8; the wrapper capped to 3 from the live load (32.2 on 48 cores at launch; Test J running)",
+   "rss_stop_GiB": 24,
+   "nice": 19,
+   "driver_args": "--scratch /tmp/nagainis_halfdome_testK/full",
+   "load_at_launch": [
+    32.18,
+    29.11,
+    26.36
+   ],
+   "stage_walls_s": {
+    "k0": 52,
+    "k1": 6379,
+    "k2": 370,
+    "k3_nominal": 1652
+   },
+   "outcome": "stopped by us (cluster_tests.py stop K) at 2026-10-15 16:19 EEST during the K3 bootstrap (estimated 4-5 h at 3 workers with 100/40/20 refits): returncode -15, wall 8544 s, peak tree RSS 2.50 GiB, min machine available 165.2 GiB (attempts/run1_k0k1_20261015/test_K_failed_3.json, test_K_3.log). K0/K1/K2 products and the nominal fits were kept; its run_manifest entry was not written (killed) - stage times above are from the log.",
+   "products_kept": "results/k0_inventory.json, results/k1_status.json, results/cells/*, results/z0_study_rows.npz, the P / Pagn / Gcore nominal fits in results/work/ (re-used by attempt 2); the G nominal fits were deleted on maas and recomputed after the gas-sphere change"
+  },
+  {
+   "attempt": 2,
+   "kind": "full (k2, k3 resumed)",
+   "launched": "2026-10-15 16:22:18 EEST",
+   "wrapper_pid": 3691700,
+   "workers": 8,
+   "rss_stop_GiB": 24,
+   "nice": 19,
+   "driver_args": "--stages k2,k3 --resume --boot 100,12,10 --scratch /tmp/nagainis_halfdome_testK/full",
+   "load_at_launch": [
+    24.34,
+    25.38,
+    28.31
+   ],
+   "changes_before_launch": "gas (G) fit spheres need radius >= 100 kpc and mean x >= 0.1 (k_common.MIN_R_KPC_GAS; first full fit had mean ln(SOAP/law) = +0.51 at 30 kpc); fit_global max_nfev 300 -> 600; K3 resume (nominal fits and bootstrap chunks in results/work/); bootstrap refits 100 (orig P, G) / 12 (brk_amp, brk_all, free) / 10 (Pagn, Gcore checks)",
+   "stage_walls_s": {
+    "k2": 244,
+    "k3": 4706
+   },
+   "outcome": "returncode 0, wall 4952 s, peak tree RSS 3.26 GiB, min machine available 177.4 GiB (results/test_K_done.json, results/run_manifest.json); fetched 2026-10-15 18:30 EEST with cluster_tests.py fetch K (152 files, 56.4 MiB, SHA256 checked; results/SHA256SUMS OK)",
+   "scratch": "/tmp/nagainis_halfdome_testK (per-halo arrays of all 71 outputs + the smoke scratch) deleted 2026-10-15 18:35 EEST with k_maas.py scratch --delete; afterwards k_maas.py scratch reports exists_after = false. Its size was not captured (the printed line was lost); estimate 4.0 GB = 8,663,524 halo entries x 461 bytes"
+  },
+  {
+   "attempt": "3a",
+   "kind": "K1 provenance check (k1 on outputs 0077, 0037, 0008 with the run-3 code, --keep-halo 0, results_k1check/)",
+   "launched": 1792082470.0465014,
+   "workers_requested": 3,
+   "workers": 3,
+   "load_at_launch": [
+    28.63,
+    28.92,
+    27.37
+   ],
+   "command": [
+    "/home/nagainis/HalfDome/flamingo_pressure_calibration/profile_test_L1_m9_0077_20261007/venv/bin/python",
+    "-B",
+    "K_soap_battaglia/run_test_k.py",
+    "--full",
+    "--workers",
+    "3",
+    "--stages",
+    "k1",
+    "--snaps",
+    "77,37,8",
+    "--results",
+    "K_soap_battaglia/results_k1check",
+    "--keep-halo",
+    "0"
+   ],
+   "nice": 19,
+   "outcome": "returncode 0, wall 283 s, peak tree RSS 1.05 GiB, min machine available 173.5 GiB",
+   "note": "all arrays of the three cell files identical to results/cells except the comp_err_* diagnostics (<= 1.1e-15); superseded by 3e (same check with the final k_fit_core.py)",
+   "receipts": [
+    "attempts/run3_20261015/test_K_receipt_9.json",
+    "attempts/run3_20261015/test_K_done_9.json",
+    "attempts/run3_20261015/test_K_9.log"
+   ]
+  },
+  {
+   "attempt": "3b",
+   "kind": "k2, k3 (first launch of the corrected fits)",
+   "launched": 1792082834.9165635,
+   "workers_requested": 8,
+   "workers": 8,
+   "load_at_launch": [
+    27.3,
+    28.7,
+    27.8
+   ],
+   "command": [
+    "/home/nagainis/HalfDome/flamingo_pressure_calibration/profile_test_L1_m9_0077_20261007/venv/bin/python",
+    "-B",
+    "K_soap_battaglia/run_test_k.py",
+    "--full",
+    "--workers",
+    "8",
+    "--stages",
+    "k2,k3",
+    "--boot",
+    "100,20,10",
+    "--starts",
+    "K_soap_battaglia/k_starts_run2.json",
+    "--scratch",
+    "/tmp/nagainis_halfdome_testK/full"
+   ],
+   "nice": 19,
+   "outcome": "returncode -15, wall 322 s, peak tree RSS 1.94 GiB, min machine available 175.3 GiB",
+   "note": "stopped by us after 5 min: the free laws can reach gamma <= -3 at extreme nodes (run-2 G|R1|free: -3.22), where the aperture integral diverges; k_fit_core.cumulative now returns +inf there",
+   "receipts": [
+    "attempts/run3_20261015/test_K_receipt_12.json",
+    "attempts/run3_20261015/test_K_failed_12.json",
+    "attempts/run3_20261015/test_K_12.log"
+   ]
+  },
+  {
+   "attempt": "3c",
+   "kind": "k2, k3 (relaunch with the gamma guard)",
+   "launched": 1792083324.539996,
+   "workers_requested": 8,
+   "workers": 3,
+   "load_at_launch": [
+    32.34,
+    32.46,
+    30.25
+   ],
+   "command": [
+    "/home/nagainis/HalfDome/flamingo_pressure_calibration/profile_test_L1_m9_0077_20261007/venv/bin/python",
+    "-B",
+    "K_soap_battaglia/run_test_k.py",
+    "--full",
+    "--workers",
+    "3",
+    "--stages",
+    "k2,k3",
+    "--boot",
+    "100,20,10",
+    "--starts",
+    "K_soap_battaglia/k_starts_run2.json",
+    "--scratch",
+    "/tmp/nagainis_halfdome_testK/full"
+   ],
+   "nice": 19,
+   "outcome": "returncode -15, wall 783 s, peak tree RSS 1.45 GiB, min machine available 175.3 GiB",
+   "note": "stopped by us after 13 min (k2 done): the wrapper had capped it to 3 workers while Test J ran; relaunched with 8 workers once J had finished, with corrected docstrings in k_fit_core.py (no functional change)",
+   "receipts": [
+    "attempts/run3_20261015/test_K_receipt_15.json",
+    "attempts/run3_20261015/test_K_failed_15.json",
+    "attempts/run3_20261015/test_K_15.log"
+   ]
+  },
+  {
+   "attempt": "3d",
+   "kind": "k2, k3 (final fits)",
+   "launched": 1792084163.7337937,
+   "workers_requested": 8,
+   "workers": 8,
+   "load_at_launch": [
+    25.74,
+    30.15,
+    31.13
+   ],
+   "command": [
+    "/home/nagainis/HalfDome/flamingo_pressure_calibration/profile_test_L1_m9_0077_20261007/venv/bin/python",
+    "-B",
+    "K_soap_battaglia/run_test_k.py",
+    "--full",
+    "--workers",
+    "8",
+    "--stages",
+    "k2,k3",
+    "--boot",
+    "100,20,10",
+    "--starts",
+    "K_soap_battaglia/k_starts_run2.json",
+    "--scratch",
+    "/tmp/nagainis_halfdome_testK/full"
+   ],
+   "nice": 19,
+   "outcome": "returncode 0, wall 6163 s, peak tree RSS 3.41 GiB, min machine available 177.0 GiB",
+   "note": "final fits of this report (k2 440 s, k3 5721 s: nominal fits 2659 s, bootstrap 100/20/10 refits); fetched 2026-10-15 22:24 EEST with cluster_tests.py fetch K (152 files, 56.4 MiB, SHA256 checked; results/SHA256SUMS OK). STRW gateway unreachable 21:16-22:23 EEST (polls failed), the job was unaffected. No per-halo scratch was written in run 3 (k2/k3 only; the K1 checks used --keep-halo 0): /tmp/nagainis_halfdome_testK did not exist at 22:30 EEST (k_maas.py scratch: exists_after false)",
+   "receipts": [
+    "results/test_K_receipt.json",
+    "results/test_K_done.json",
+    "results/test_K.log"
+   ]
+  },
+  {
+   "attempt": "3e",
+   "kind": "K1 provenance check with the final code (k1 on 0077, 0037, 0008, --keep-halo 0)",
+   "launched": 1792092295.8030846,
+   "workers_requested": 3,
+   "workers": 3,
+   "load_at_launch": [
+    24.42,
+    24.12,
+    24.42
+   ],
+   "command": [
+    "/home/nagainis/HalfDome/flamingo_pressure_calibration/profile_test_L1_m9_0077_20261007/venv/bin/python",
+    "-B",
+    "K_soap_battaglia/run_test_k.py",
+    "--full",
+    "--workers",
+    "3",
+    "--stages",
+    "k1",
+    "--snaps",
+    "77,37,8",
+    "--results",
+    "K_soap_battaglia/results_k1check",
+    "--keep-halo",
+    "0"
+   ],
+   "nice": 19,
+   "outcome": "returncode 0, wall 264 s, peak tree RSS 1.06 GiB, min machine available 176.2 GiB",
+   "note": "compared by k1_check_compare.py -> results/k1_provenance_check.json",
+   "receipts": [
+    "attempts/run3_20261015/test_K_receipt_3e.json",
+    "attempts/run3_20261015/test_K_done_3e.json",
+    "attempts/run3_20261015/test_K_3e.log"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,805 @@
+{
+ "purpose": "Test J1 (halo component of FRB DM under three definitions + low-mass calibration 12.7-13.5 + exact bound-only kSZ): full run on STRW maas; compute stages only (J0 export, figures, report tables and verification are made locally)",
+ "command": "cd $STUDY_ROOT && STUDY_ROOT=$STUDY_ROOT nice -n 19 python -B J_halo_dm_lowmass/run_test_j.py --full --workers 8 --scratch /tmp/nagainis_halfdome_testJ [--stages ...]   (through cluster_tests.py run J --workers 8 --rss-stop 32 --driver-args=\"--scratch /tmp/nagainis_halfdome_testJ\", which adds nice 19, ionice 7 and the load/memory guards)",
+ "scratch": "/tmp/nagainis_halfdome_testJ (maas node-local /tmp, 20 GB): the two 14-bin fine bases (~1.0 GB each), their C10 f_pdf files and the fallback pieces (~0.1 GB); results/work/g/f_base/work is a symlink to it. It is ours and is deleted after the final fetch of Test J (record in maas_runs)",
+ "maas_runs": [
+  {
+   "attempt": 1,
+   "workers": 8,
+   "rss_stop_GiB": 32,
+   "nice": 19,
+   "ionice": "best-effort 7",
+   "launched": "2026-10-15 13:51:51 EEST",
+   "stages": "all (prepare, basis, fallback, truth, sens)",
+   "scratch": "/tmp/nagainis_halfdome_testJ",
+   "load_at_launch": [
+    24.47,
+    24.75,
+    24.44
+   ],
+   "available_GiB_at_launch": 178.5,
+   "command": "python -B cluster_tests.py run J --workers 8 --rss-stop 32 --driver-args=\"--scratch /tmp/nagainis_halfdome_testJ\"",
+   "wrapper_pid": 3620783,
+   "finished": "2026-10-15 16:02:21 EEST (15:02:21 CEST on maas)",
+   "outcome": "completed, returncode 0, wrapper wall 7828 s (driver 7825 s, exit 0); peak tree RSS 11.40 GiB (guard sum, below the 32 GiB stop), min machine available 164.7 GiB; stage walls (s) from results/run_manifest.json: prepare 4.9, basis 371.0 (parent peak 6.67 GiB, largest child 1.97 GiB), fallback 202.1 (parity 1.1e-16), truth 5173.3 (Test H parity: moments 1.3e-15, DM PDF 4.7e-14), sens 2073.2",
+   "polling": "poll_maas.py every 5 minutes (cluster_poll.txt); DONE seen 16:03:40 EEST",
+   "fetched": "2026-10-15 16:04 EEST, cluster_tests.py fetch J (an early partial fetch at 15:34 EEST copied the truth-stage files); results/SHA256SUMS verified locally (all OK)",
+   "scratch_deleted": "2026-10-15 16:04:55 EEST: /tmp/nagainis_halfdome_testJ removed on maas after the final fetch (2.20 GB: basis_JA/JB(10).npz, fallback_j.npz); results/work/g/f_base/work in the runtime tree is now a dangling symlink (a rerun of fallback/truth/sens needs the basis stage again, ~6 min)"
+  }
+ ],
+ "mirror_attempts": [
+  {
+   "attempt": 1,
+   "started": "2026-10-15 10:50 EEST",
+   "command": "python -B cluster_tests.py mirror (TESTS now includes J)",
+   "outcome": "FAILED after 25.6 min: remote_control.remote raised RuntimeError Connection timed out during banner exchange (ssh.exe strw-maas) while uploading the 12 MB staging chunks; 163.6 MB of the staging tarball had reached RUNTIME/staging.tar.gz (partial; the next mirror truncates it); the extraction step never ran, so the runtime tree is unchanged",
+   "network": "from 11:16 EEST the STRW gateway ssh.strw.leidenuniv.nl:22 and www.strw.leidenuniv.nl:443 time out from this machine (other sites reachable); probed every 3 min"
+  },
+  {
+   "attempt": 2,
+   "started": "2026-10-15 13:47 EEST",
+   "command": "python -B J_halo_dm_lowmass/j_upload.py (targeted, SHA256-verified upload, as Tests I and K did)",
+   "outcome": "ok: 85 files needed by Test J checked on maas; 64 already identical (Test F/G/H inputs, engine dependencies, analysis package); 21 uploaded (10.36 MB: J_halo_dm_lowmass/*.py, CLUSTER_RUN.json, inputs/j0_*), each SHA256-checked on maas; a second dry run found all 85 identical (post/upload_J.json)",
+   "note": "outbound ssh from this machine was blocked 11:16-13:45 EEST"
+  }
+ ],
+ "STUDY_ROOT_on_maas": "/home/nagainis/HalfDome_runtime/overlap_covariance_tests/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012",
+ "smoke_command": "cd $STUDY_ROOT/J_halo_dm_lowmass && python -B run_test_j.py --smoke   (local, 1 worker, ~3 min)",
+ "local_preparation": "python -B J_halo_dm_lowmass/j_inputs.py   (J0: export from stacking_choices_20261014/cache and the particle-pass owned counts into J_halo_dm_lowmass/inputs/, mirrored to maas)",
+ "stages": "prepare, basis, fallback, truth, sens (default all, in order); --stages a,b,... reruns some",
+ "exit_status": "0 = completed; 1 = a stage raised (traceback in results/run_manifest.json); 2 = completed but a parity gate failed (results/parity.json, results/fallback_parity.json)",
+ "code_to_deploy": [
+  "J_halo_dm_lowmass/j_common.py",
+  "J_halo_dm_lowmass/j_prepare.py",
+  "J_halo_dm_lowmass/j_basis.py",
+  "J_halo_dm_lowmass/j_fallback.py",
+  "J_halo_dm_lowmass/j_obs.py",
+  "J_halo_dm_lowmass/j_pdf.py",
+  "J_halo_dm_lowmass/j_truth.py",
+  "J_halo_dm_lowmass/j_sens.py",
+  "J_halo_dm_lowmass/run_test_j.py"
+ ],
+ "reads_test_F_and_G_modules": "F_observables/f_common.py, f_basis.py, f_kernels.py, f_pdf.py, f1_importance.py (+ f_fit, f_methods); G_physical_outer/g_common.py (constants), g_pdf.py (fast deposit) - imported read-only, configured through environment variables (F_RESULTS / G_RESULTS under J_halo_dm_lowmass/results/work/g); the fine grid and the calibrated support are set on the imported f_common module object in the J process only; f_kernels.basis_grid is wrapped during DM-PDF passes to cut the fallback haloes at 1/2/4 R200c",
+ "writes": "J_halo_dm_lowmass/results/ (compact npz/csv/json; per-halo profiles in results/work/, not copied back) and /tmp/nagainis_halfdome_testJ",
+ "inputs": [
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f0_profiles.py",
+   "relative_to_STUDY_ROOT": "F_observables/f0_profiles.py",
+   "bytes": 7430,
+   "sha256": "6edee0b6aee6528db19a4ce81ba73d814b9e10185adf82ecf05165acae8181be",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f1_importance.py",
+   "relative_to_STUDY_ROOT": "F_observables/f1_importance.py",
+   "bytes": 10173,
+   "sha256": "08a38f23b179d3c750722987b820a8e38692c4c078d62d0d13fffd6da59958d9",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f1_truth.py",
+   "relative_to_STUDY_ROOT": "F_observables/f1_truth.py",
+   "bytes": 9198,
+   "sha256": "d45193174d433e5cb9a25151b6b65d3d15b2ce90978da5e173b630ce6405a4e3",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f1_validate.py",
+   "relative_to_STUDY_ROOT": "F_observables/f1_validate.py",
+   "bytes": 9005,
+   "sha256": "c3dae047da03df665effd0bd813b451a5d8828bf9923f88200e1b1c3d6f27d4f",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f2_run.py",
+   "relative_to_STUDY_ROOT": "F_observables/f2_run.py",
+   "bytes": 11951,
+   "sha256": "91f9956a2014fb0e2922531bc0044fab44aeecc0ef351e421404150a7a8dc08d",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f4_engine_check.py",
+   "relative_to_STUDY_ROOT": "F_observables/f4_engine_check.py",
+   "bytes": 7958,
+   "sha256": "a31e50bb7f2e927c196627683e345ce506e76fde234ac27ce923cb049a8cdcf1",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f5_cv.py",
+   "relative_to_STUDY_ROOT": "F_observables/f5_cv.py",
+   "bytes": 14101,
+   "sha256": "682a7b79f6dc89baac4bea79ee4c318c7f894a504fce03f09217daed7fda320e",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_basis.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_basis.py",
+   "bytes": 7997,
+   "sha256": "3ed996ed4c6a98a3a3a747840f1df3ab1d2af9ca1415c1da2ec10693b2f4f944",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_common.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_common.py",
+   "bytes": 12491,
+   "sha256": "1477084c1f44797be188f8868f7e21e175ff3a2b36b41c2392fa7c1551f86b8b",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_fit.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_fit.py",
+   "bytes": 16925,
+   "sha256": "78497a983613eeb2fd09d8af1f182f17d978572937769674f02b2e8e93cc2f7e",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_kernels.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_kernels.py",
+   "bytes": 18749,
+   "sha256": "964a4b5abefda8b3f438394f0e37de08577c29341a4cbe72e1a1f7e3d0208b38",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_methods.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_methods.py",
+   "bytes": 23739,
+   "sha256": "74b4f6787051e935402a15aa89ac80b2ab45c38fdb6dfa0d1bc80afaf89b2b35",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/f_pdf.py",
+   "relative_to_STUDY_ROOT": "F_observables/f_pdf.py",
+   "bytes": 11873,
+   "sha256": "8d4f24781a12396ec94ccb6229fc3cff24a63cee88ae7c672a8b472580037bde",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/results/profiles.npz",
+   "relative_to_STUDY_ROOT": "F_observables/results/profiles.npz",
+   "bytes": 11379072,
+   "sha256": "70019d5ac22d0430809046b1c31f796b09e9a8c35c18ac04ea333fe5edba20ff",
+   "read_in_smoke": true,
+   "full_only": true,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/F_observables/run_test_f.py",
+   "relative_to_STUDY_ROOT": "F_observables/run_test_f.py",
+   "bytes": 8452,
+   "sha256": "be583f7222848873d5dad0c60518fe8602cb12cb79df5253bc3a0fd0124748cc",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/G_physical_outer/g_common.py",
+   "relative_to_STUDY_ROOT": "G_physical_outer/g_common.py",
+   "bytes": 6558,
+   "sha256": "13333fe3caf209befc1b15f90a1c753674d11279410bb72e2a79e5e01bebcebd",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/G_physical_outer/g_pdf.py",
+   "relative_to_STUDY_ROOT": "G_physical_outer/g_pdf.py",
+   "bytes": 5800,
+   "sha256": "b464b5891fc27ed4cb2ab243faf4dcd7743938cf7e316e93a666d79620b494cd",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/G_physical_outer/g_physics.py",
+   "relative_to_STUDY_ROOT": "G_physical_outer/g_physics.py",
+   "bytes": 15181,
+   "sha256": "453db5bd67fef5854deb68f546a01f7689e85be0f798b096268d7cb11cef3a73",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/H_sensitivity/results/truth.npz",
+   "relative_to_STUDY_ROOT": "H_sensitivity/results/truth.npz",
+   "bytes": 1900506,
+   "sha256": "0f926105069e296e02380e2852c8da14792816b984980d41da00311de00b6b31",
+   "read_in_smoke": false,
+   "full_only": true,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/H_sensitivity/results/truth_summary.json",
+   "relative_to_STUDY_ROOT": "H_sensitivity/results/truth_summary.json",
+   "bytes": 25570,
+   "sha256": "d3caafb5960bfe72592eeaef5cd32daed06a626c08844ac45aa47a108f5e7e5b",
+   "read_in_smoke": false,
+   "full_only": true,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/J_halo_dm_lowmass/inputs/j0_meta.json",
+   "relative_to_STUDY_ROOT": "J_halo_dm_lowmass/inputs/j0_meta.json",
+   "bytes": 4797,
+   "sha256": "f25d89bdcbd1767b2a46f3008afc46cd2c7a0915900d26932b35d18120d82ef9",
+   "read_in_smoke": false,
+   "full_only": true,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/J_halo_dm_lowmass/inputs/j0_profiles_x200.npz",
+   "relative_to_STUDY_ROOT": "J_halo_dm_lowmass/inputs/j0_profiles_x200.npz",
+   "bytes": 10116152,
+   "sha256": "f159daed8326cf92a50425a99446579598e9f0049e3d191097020382b0dd94ba",
+   "read_in_smoke": false,
+   "full_only": true,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/__init__.py",
+   "relative_to_STUDY_ROOT": "analysis/__init__.py",
+   "bytes": 1251,
+   "sha256": "4bca4b9f966d376abb7e6379343e640f46343c385327f4b99d148059a4114bd0",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/_legacy.py",
+   "relative_to_STUDY_ROOT": "analysis/_legacy.py",
+   "bytes": 4292,
+   "sha256": "313a60d209debea298f7fc4121d43066dd556b7deab94b3461d00d83d9d9417c",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/covariance.py",
+   "relative_to_STUDY_ROOT": "analysis/covariance.py",
+   "bytes": 17439,
+   "sha256": "e588c3ed078f14ac9d245c7e0ecdb3a125c9ac0c81027098dc6129bc1c256f7b",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/families.py",
+   "relative_to_STUDY_ROOT": "analysis/families.py",
+   "bytes": 9347,
+   "sha256": "664a0d0d5c1ced384e43ceb806879edc53d11fcf74948d72b6d5b0b0296b4b42",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/fitting.py",
+   "relative_to_STUDY_ROOT": "analysis/fitting.py",
+   "bytes": 31335,
+   "sha256": "78f58bb5ab657ee53af5257f9c0c3e811c9250674701254e7be6e2fc1a384b48",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/io.py",
+   "relative_to_STUDY_ROOT": "analysis/io.py",
+   "bytes": 14667,
+   "sha256": "7c088a326fd8c1569e5a2ac22b664ea381816ec4f4aea6a5202885d080266f85",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/masks.py",
+   "relative_to_STUDY_ROOT": "analysis/masks.py",
+   "bytes": 3290,
+   "sha256": "aa7ceef967bcf8d4555b37cc97d736db1222ff4b8450f54017e58858f144a20d",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/newdata.py",
+   "relative_to_STUDY_ROOT": "analysis/newdata.py",
+   "bytes": 17399,
+   "sha256": "d2e92870d914f732715f9ab20d0ee7dfbe9ec1192a5e006cf5ffc1ecf5f8df4d",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/pipeline.py",
+   "relative_to_STUDY_ROOT": "analysis/pipeline.py",
+   "bytes": 8760,
+   "sha256": "99da1c768a842598e2c85d5ed176fadc34b4e9706c079cd6093bf5d653fc0ecd",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/stability.py",
+   "relative_to_STUDY_ROOT": "analysis/stability.py",
+   "bytes": 5153,
+   "sha256": "eb06be98bff03a32f9e858dac680f5210b689d563f1d8f6cba109b637f527ba6",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/stacking.py",
+   "relative_to_STUDY_ROOT": "analysis/stacking.py",
+   "bytes": 4618,
+   "sha256": "8b7ea260b8dd073afa1a977a716b1af43b4feae9d5cfa4befadf36e22530296e",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/analysis/variants.py",
+   "relative_to_STUDY_ROOT": "analysis/variants.py",
+   "bytes": 34027,
+   "sha256": "75e743b1716a3b9ee0df9ff7fd7edc00316b26b5bb3a54c9b8834eafde252a3f",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/census_population.npz",
+   "relative_to_STUDY_ROOT": "census_population.npz",
+   "bytes": 58398507,
+   "sha256": "e80950526c3b345ea666c5ee31b6a02dd1e4304966ebdf4c6eb004ad5068401d",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/geometry.py",
+   "relative_to_STUDY_ROOT": "geometry.py",
+   "bytes": 8474,
+   "sha256": "c3a68811edf20e30b21eeab67100dcdc2f677507c99a5dbf934992a7a5daada4",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/grids.py",
+   "relative_to_STUDY_ROOT": "grids.py",
+   "bytes": 3024,
+   "sha256": "3848b35ab4445004851eed65fe5c80d3188d7409ae891447df61d8f657911112",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/kernels/engine.py",
+   "relative_to_STUDY_ROOT": "kernels/engine.py",
+   "bytes": 47115,
+   "sha256": "37f086ac56c08621a5038c921f2ab8aacebc4023b991b69824765ebc43438aaf",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/kernels/importance.npz",
+   "relative_to_STUDY_ROOT": "kernels/importance.npz",
+   "bytes": 302235,
+   "sha256": "2c7158a9ec31028aeb55606cb57e88ed9f9339a5e59f267a44a38d7d55d6cdb6",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/kernels/jacobians.npz",
+   "relative_to_STUDY_ROOT": "kernels/jacobians.npz",
+   "bytes": 24835613,
+   "sha256": "c8af5618d70fb8496be30addaf1dcc46d21275b7728fe2b5ab3c2dff70d07cf8",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/kernels/velocity.py",
+   "relative_to_STUDY_ROOT": "kernels/velocity.py",
+   "bytes": 5113,
+   "sha256": "fd17392cc134d26209e9a743c216491a59c904b48124015ba7f77b16190f7aab",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/measure.py",
+   "relative_to_STUDY_ROOT": "measure.py",
+   "bytes": 5327,
+   "sha256": "82602e5022f7df8ea2ed6a321bc0a6e223eb09e303bce1a2e87cb984d4d2eaba",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/measure_overlap.py",
+   "relative_to_STUDY_ROOT": "measure_overlap.py",
+   "bytes": 16968,
+   "sha256": "a2923d47a77196ebd05bfc5f78d2e9ed0e614a4f278a87f2eddb09700630b7b9",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/measurements_owner.npz",
+   "relative_to_STUDY_ROOT": "measurements_owner.npz",
+   "bytes": 157538479,
+   "sha256": "495dfab88b3f0a2a0022cef23b827dee2a68daa851fff78133f696bed3b4581a",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/measurements_partition.npz",
+   "relative_to_STUDY_ROOT": "measurements_partition.npz",
+   "bytes": 9772086,
+   "sha256": "0fd69a61a4fd04d952d15c2624910c34474384be1a9fc00e4098295f57e034cd",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/metadata_plan.json",
+   "relative_to_STUDY_ROOT": "metadata_plan.json",
+   "bytes": 34195,
+   "sha256": "e0fb04793fe702168fa63033aaa55b53e999c3bcb8476ca69ac142a94ebe0915",
+   "read_in_smoke": true,
+   "full_only": true,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/overlap_tables.npz",
+   "relative_to_STUDY_ROOT": "overlap_tables.npz",
+   "bytes": 4023023,
+   "sha256": "87cf1e0927cfb10cda8ae7970f403eb2899c925dca956d6a67482e08436933f1",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/pilot_physics.py",
+   "relative_to_STUDY_ROOT": "pilot_physics.py",
+   "bytes": 8364,
+   "sha256": "5826641c6117fcf4a4d155f649f41ee0915ee19881899b5d06485003c51221c0",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/schema.json",
+   "relative_to_STUDY_ROOT": "schema.json",
+   "bytes": 6003,
+   "sha256": "7d341347c0d5bc473023f17219833937a93b8e283ddabfb4015a0d0e46162b10",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/selected_halos.npz",
+   "relative_to_STUDY_ROOT": "selected_halos.npz",
+   "bytes": 1154251,
+   "sha256": "8213a60ae93b8c781288633860e006db15106a8d69531e0440f14f75f7f252cd",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/study_config.json",
+   "relative_to_STUDY_ROOT": "study_config.json",
+   "bytes": 4502,
+   "sha256": "0c415565e43082a56f4a53f6520b355d7a0205371aa91c90565edb25f903b2e8",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/fit_study.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/fit_study.py",
+   "bytes": 20781,
+   "sha256": "8171078248f564a8efb9a4a2173864d8a58e37e3331fa6cdb243020924501b69",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/measure.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/measure.py",
+   "bytes": 5327,
+   "sha256": "82602e5022f7df8ea2ed6a321bc0a6e223eb09e303bce1a2e87cb984d4d2eaba",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/models.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/models.py",
+   "bytes": 3737,
+   "sha256": "df190ed06209b3f4f8849052223bbb17d7d2ba6bcd159491f8dfa33338979f1a",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/pilot_physics.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/pilot_physics.py",
+   "bytes": 8364,
+   "sha256": "5826641c6117fcf4a4d155f649f41ee0915ee19881899b5d06485003c51221c0",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/products/study_summary.json",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/products/study_summary.json",
+   "bytes": 3227504,
+   "sha256": "4c1a6da7d766d1988b53033ebd6fe1c176e0f9d426793a3b009c63d497ed2ebb",
+   "read_in_smoke": false,
+   "full_only": false,
+   "via_test_F_or_engine_deps": true
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/radii234_contamination_L1_m9_0077_20261008/projection_model.py",
+   "relative_to_STUDY_ROOT": "../radii234_contamination_L1_m9_0077_20261008/projection_model.py",
+   "bytes": 1662,
+   "sha256": "ab770da5c89f9a5237d0553118d3b84207cfa453e032d1da6b1ededd4ab81e8c",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/analysis_common.py",
+   "relative_to_STUDY_ROOT": "../sensitivity_projects_L1_m9_0077_20261009/analysis_common.py",
+   "bytes": 6808,
+   "sha256": "a980f090515425309145f91b9845a90e471202b6deb984e783ef5abb9c760df7",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/analytic_observables/lightcone_analytic.py",
+   "relative_to_STUDY_ROOT": "../sensitivity_projects_L1_m9_0077_20261009/analytic_observables/lightcone_analytic.py",
+   "bytes": 22580,
+   "sha256": "db32357d93be173f0f37e1517cd2cff9b63ab61b579f36f5768cb9c889dea908",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/sensitivity_projects_L1_m9_0077_20261009/lightcone_maps/fine_velocity_histogram.npz",
+   "relative_to_STUDY_ROOT": "../sensitivity_projects_L1_m9_0077_20261009/lightcone_maps/fine_velocity_histogram.npz",
+   "bytes": 455693,
+   "sha256": "f9fea8353ecd9c14b9dcb8c92444bad41d80b8ae43e18f491714c77a99a03bda",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/fit_parameters.npz",
+   "relative_to_STUDY_ROOT": "../tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/fit_parameters.npz",
+   "bytes": 177671,
+   "sha256": "d8549bc4c28f86d05cddf3396d16f54af02843c5ac87ac2eda5c29b4c74dddec",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/profile_shapes.npz",
+   "relative_to_STUDY_ROOT": "../tsz_fit_truncation_L1_m9_0077_20261009/fit_inputs/profile_shapes.npz",
+   "bytes": 9802302,
+   "sha256": "5ea2dd60556846031b5496d27c8399ab9f2bfd7740febb9c55644d3cd7455e6b",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/tsz_fit_truncation_L1_m9_0077_20261009/halo_model/compute_halo_terms.py",
+   "relative_to_STUDY_ROOT": "../tsz_fit_truncation_L1_m9_0077_20261009/halo_model/compute_halo_terms.py",
+   "bytes": 23781,
+   "sha256": "4e946fe4c0edb0b63652fa432a155359f353605a2a0370d26ec80375b73b6ffb",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/catalogue/catalogue_hist.npz",
+   "relative_to_STUDY_ROOT": "../../frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/catalogue/catalogue_hist.npz",
+   "bytes": 103875,
+   "sha256": "a3676c97f1c901df3a576047d37d6b14d1f41e0946628438134cbf505eb4189f",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  },
+  {
+   "path": "/home/cbllover/HalfDome/frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/class_sz/b12_paint_all.npz",
+   "relative_to_STUDY_ROOT": "../../frb_map_generation/outputs/lee22_tsz_verification_20260929/B_class_sz/class_sz/b12_paint_all.npz",
+   "bytes": 757214,
+   "sha256": "b4e2700367e52fc33523002823841caec5a90941ec188eee7a8d5f975dd7c53e",
+   "read_in_smoke": true,
+   "full_only": false,
+   "via_test_F_or_engine_deps": false
+  }
+ ],
+ "inputs_total_MB": 294.6,
+ "expected_resources_workers_8": {
+  "basis": "2 sets x 14 bins (Test H: 3 sets x 10 bins, 371 s, parent 12.5 GiB, child 2.1 GiB); running sums keep the parent at ~2.5 GiB",
+  "dm_pdf": "about 0.035 s per per-halo entry (8 workers; Test H 15,130 entries in 641 s) plus ~100 s per pass: truth ~1.5 h (incl. 4 Mecke passes), sens ~0.5 h",
+  "wall_total": "about 2.5-3 h at nice 19 with 8 workers",
+  "rss": "tree RSS at the DM-PDF forks ~ 9 x parent (<= 0.5 GiB) + 8 x ~1 GiB; basis build the largest; rss-stop 32 GiB (Test H attempt 2's basis stage passed under 32 GiB)"
+ },
+ "copy_back": "J_halo_dm_lowmass/results/ without work/ (cluster_tests.py fetch J)",
+ "j2_maas_runs": [
+  {
+   "attempt": 1,
+   "test": "J2 (fits of D0-D3 and of the low-mass bins)",
+   "launched": "2026-10-15 19:28:47 EEST",
+   "command": "python -B cluster_tests.py run J --workers 8 --rss-stop 24 --driver-args=\"--j2 --scratch /tmp/nagainis_halfdome_testJ\"",
+   "driver": "run_test_j.py --full --workers {WORKERS} --j2 --scratch /tmp/nagainis_halfdome_testJ -> run_test_j2.main (stages j1base, fits, ladder, eval)",
+   "wrapper_pid": 3738961,
+   "workers": 8,
+   "rss_stop_GiB": 24,
+   "nice": 19,
+   "ionice": "best-effort 7",
+   "load_at_launch": [
+    24.08,
+    24.02,
+    24.01
+   ],
+   "ncpu": 48,
+   "home_quota_used_MB_at_launch": 2785,
+   "home_quota_MB": 3906,
+   "tmp_free_GB_at_launch": 20.5,
+   "scratch": "/tmp/nagainis_halfdome_testJ (node-local; J2 bases basis_JA/JB(10).npz and fallback_j.npz; ours; deleted after the final fetch)",
+   "upload": "j2_cluster.py upload (post_j2/upload_J2.json), then j2_cluster.py check: all remote inputs and code equal (post_j2/remote_check.json)",
+   "polling": "j2_poll.py every 5 min (cluster_poll_j2.txt); DONE seen 20:09:28 EEST",
+   "finished": "2026-10-15 20:06:37 EEST (19:06:37 CEST on maas)",
+   "outcome": "completed, wrapper returncode 0, wall 2267 s; peak tree RSS 11.31 GiB (below the 24 GiB stop); min machine available 163.8 GiB; stage walls (s) in results_j2/run_manifest.json",
+   "fetched": "2026-10-15 20:09:53 EEST, j2_cluster.py fetch (results_j2/ without work/; job records test_J_*.json, test_J.log); results_j2/SHA256SUMS verified locally (all OK)",
+   "scratch_deleted": "2026-10-15 20:10:29 EEST: /tmp/nagainis_halfdome_testJ removed on maas after the final fetch (2,199,775,869 bytes: basis_JA/JB(10).npz, fallback_j.npz); exists_after = false",
+   "scratch_bytes_deleted": 2199775869
+  },
+  {
+   "attempt": 2,
+   "test": "J2 run 2 (verifier round 2: complete mass-cell ladder painted; exact dIT painting = Test I's published fits in 13.5-15.5 + J2's fits in 12.7-13.5)",
+   "launched": "2026-10-15 22:52:28 EEST",
+   "command": "python -B cluster_tests.py run J --workers 8 --rss-stop 24 --driver-args=\"--j2 --stages j1base,eval --scratch /tmp/nagainis_halfdome_testJ\"",
+   "driver": "run_test_j.py --full --workers {WORKERS} --j2 --stages j1base,eval --scratch /tmp/nagainis_halfdome_testJ -> run_test_j2.main (stages j1base, eval; fits.json and the ladder of run 1 re-used unchanged, remote SHA256 equal to the local copies before launch)",
+   "wrapper_pid": 3812379,
+   "workers": 8,
+   "rss_stop_GiB": 24,
+   "nice": 19,
+   "ionice": "best-effort 7",
+   "load_at_launch": [
+    25.0,
+    24.93,
+    24.94
+   ],
+   "ncpu": 48,
+   "other_user_processes_at_launch": "process_flamingo_maps.py (another study, ~11 GB RSS); machine available 168.8 GiB",
+   "home_quota_used_MB_at_launch": 2842,
+   "home_quota_MB": 3906,
+   "tmp_free_GB_at_launch": 20.5,
+   "scratch": "/tmp/nagainis_halfdome_testJ (node-local; rebuilt bases basis_JA/JB(10).npz and fallback_j.npz; ours; deleted after the final fetch)",
+   "upload": "j2_cluster.py upload (post_j2/upload_J2.json: j2_eval.py changed; local-only scripts added), then j2_cluster.py check: all remote inputs and code equal (post_j2/remote_check.json); run 1's records kept in results_j2_run1/",
+   "polling": "j2_poll.py every 5 min (cluster_poll_j2.txt, after the 'run 2' note line); DONE seen 23:48:32 EEST",
+   "finished": "2026-10-15 23:46:15 EEST (22:46:15 CEST on maas)",
+   "outcome": "completed, wrapper returncode 0, wall 3225 s (j1base 666 s, eval 2558 s); peak tree RSS 11.80 GiB (below the 24 GiB stop); min machine available 145.5 GiB",
+   "fetched": "2026-10-15 23:49:55 EEST, j2_cluster.py fetch (38 files, 10 changed); results_j2/SHA256SUMS verified locally (34 files, all OK)",
+   "scratch_deleted": "2026-10-15 23:50:05 EEST: /tmp/nagainis_halfdome_testJ removed on maas after the final fetch of Test J (2,199,775,869 bytes); exists_after = false",
+   "scratch_bytes_deleted": 2199775869
+  },
+  {
+   "attempt": 3,
+   "test": "J2 run 3 (J1 revision 2026-10-16: DM-family weights from J1's whole-atom Mecke maps; every per-bin fit refitted, every painting re-evaluated) + J1 stage mecke_checks",
+   "launched": "2026-10-16 03:53:40 EEST",
+   "command": "python -B cluster_tests.py run J --workers 8 --rss-stop 24 --driver-args=\"--j2 --stages j1base,fits,eval,mecke_checks --mecke-out J_halo_dm_lowmass/results_mecke_checks --scratch /tmp/nagainis_halfdome_testJ\"",
+   "driver": "run_test_j.py --full --workers {WORKERS} --j2 --stages j1base,fits,eval,mecke_checks ... -> run_test_j2.main (ladder of run 1 re-used; remote ladder_*.npz, ladder_summary.json, ladder_parity.json checked equal (SHA256) to the local copies before launch)",
+   "wrapper_pid": 3902396,
+   "workers": 8,
+   "rss_stop_GiB": 24,
+   "nice": 19,
+   "ionice": "best-effort 7",
+   "load_at_launch": [
+    24.36,
+    24.59,
+    27.03
+   ],
+   "ncpu": 48,
+   "tmp_free_GB_at_launch": 20.5,
+   "scratch": "/tmp/nagainis_halfdome_testJ (node-local; rebuilt bases; ours; deleted after the final fetch)",
+   "upload": "j2_cluster.py upload (inputs/j2_fitdata.npz rebuilt by j2_inputs.py from J1's whole-atom sens.npz; results/sens.npz uploaded separately), then j2_cluster.py check: all remote inputs and code equal (post_j2/remote_check.json); run 2's records kept in results_j2_run2/",
+   "polling": "j2_poll.py every 5 min (cluster_poll_j2.txt, after the 'run 3' note line)",
+   "stage_stopped": "the J1 stage mecke_checks (j_mecke_atom.py --checks, after eval) was stopped at 2026-10-16 04:57:47 EEST (SIGTERM to that stage's process and its 8 pool workers only): its finite-difference part had finished, but its first version of the noise part (one f_pdf Mecke set per subsampled halo) would have taken hours; it was rewritten (noise_pass) and re-run as run 4 (CLUSTER_RUN.json j1_mecke_runs[1])",
+   "finished": "2026-10-16 04:57:51 EEST (03:57:51 CEST on maas)",
+   "outcome": "wrapper returncode 1 (driver exit 1 because the stopped stage mecke_checks returned -15); the J2 stages completed: j1base 584 s, fits 8 s, eval 2369 s (returncode 0 each, eval parity passed); wall 3848 s; peak tree RSS 11.58 GiB (below the 24 GiB stop); min machine available 165.0 GiB",
+   "fetched": "2026-10-16 05:01 EEST, j2_cluster.py fetch (38 files, 12 changed); results_j2/SHA256SUMS verified locally (all OK); the stale run-2 copy of results_j2/test_J_done.json removed locally (run 3 wrote test_J_failed.json; run 2's records are in results_j2_run2/)",
+   "scratch_deleted": "2026-10-16 05:02:53 EEST: /tmp/nagainis_halfdome_testJ removed on maas after the final fetch of run 3 (2,199,775,869 bytes); exists_after = false",
+   "scratch_bytes_deleted": 2199775869
+  }
+ ],
+ "j1_mecke_runs": [
+  {
+   "attempt": 1,
+   "test": "J1 revision 2026-10-16: Mecke DM-quantile Jacobians with the whole DM = 0 atom (j_mecke_atom.py), D0-D3, C14, T1",
+   "launched": "2026-10-16 02:35:45 EEST",
+   "command": "python -B cluster_tests.py run J --workers 8 --rss-stop 24 --driver-args=\"--j2 --results J_halo_dm_lowmass/results_mecke --stages j1base,mecke --scratch /tmp/nagainis_halfdome_testJ\"",
+   "driver": "run_test_j.py --full --workers {WORKERS} --j2 ... -> run_test_j2.main (stage j1base: run_test_j.py prepare,basis,fallback into results_mecke/j1base; stage mecke: j_mecke_atom.py, MECKE_OUT = results_mecke)",
+   "wrapper_pid": 3874171,
+   "workers": 8,
+   "rss_stop_GiB": 24,
+   "nice": 19,
+   "ionice": "best-effort 7",
+   "load_at_launch": [
+    24.31,
+    24.12,
+    24.04
+   ],
+   "ncpu": 48,
+   "tmp_free_GB_at_launch": 20.5,
+   "scratch": "/tmp/nagainis_halfdome_testJ (node-local; rebuilt bases basis_JA/JB(10).npz and fallback pieces; ours; deleted after the final fetch)",
+   "upload": "j2_cluster.py upload (post/upload_mecke.json: j_mecke_atom.py added, run_test_j2.py with the stage 'mecke'), then j2_cluster.py check --out post/remote_check_mecke.json: all remote inputs and code equal",
+   "polling": "j2_poll.py --log cluster_poll_mecke.txt every 5 min; DONE seen 2026-10-16 03:41:48 EEST",
+   "finished": "2026-10-16 03:38:39 EEST (02:38:39 CEST on maas)",
+   "outcome": "completed, wrapper returncode 0, wall 3770 s (j1base 583 s, mecke 3187 s); peak tree RSS 11.78 GiB (below the 24 GiB stop); min machine available 164.4 GiB; mecke_parity passed (reference PDFs and half-atom Jacobians bitwise equal to J1's)",
+   "fetched": "2026-10-16 03:42 EEST, j2_cluster.py fetch --dir results_mecke (12 files); results_mecke/SHA256SUMS verified locally (all OK)",
+   "scratch_deleted": "2026-10-16 03:43:16 EEST: /tmp/nagainis_halfdome_testJ removed on maas after the final fetch of this run (2,199,775,861 bytes); exists_after = false",
+   "scratch_bytes_deleted": 2199775861
+  },
+  {
+   "attempt": 2,
+   "test": "J1 revision 2026-10-16, run 4: checks of the whole-atom Mecke maps (j_mecke_atom.py --checks): finite differences per radial band of the truth-mean quantiles (D0-D3) and the bootstrap noise of the per-halo subsample maps (per-halo scalar Mecke sums, noise_pass)",
+   "launched": "2026-10-16 05:04:01 EEST",
+   "command": "python -B cluster_tests.py run J --workers 8 --rss-stop 24 --driver-args=\"--j2 --results J_halo_dm_lowmass/results_mecke_checks --stages j1base,mecke_checks --mecke-out J_halo_dm_lowmass/results_mecke_checks --scratch /tmp/nagainis_halfdome_testJ\"",
+   "driver": "run_test_j.py --full --workers {WORKERS} --j2 ... -> run_test_j2.main (stage j1base: J1's prepare,basis,fallback into results_mecke_checks/j1base; stage mecke_checks: j_mecke_atom.py --checks, MECKE_OUT = results_mecke_checks)",
+   "why": "the same stage in J2's run 3 (j2_maas_runs[2]) was stopped at 04:57:47 EEST: its first noise version (one f_pdf Mecke set per subsampled halo) costs ~30 times a normal Mecke pass; rewritten as noise_pass (scalar per-halo sums, same column construction as f_pdf._zshell; local smoke test equal to the slow version to 3e-15)",
+   "wrapper_pid": 3923521,
+   "workers": 8,
+   "rss_stop_GiB": 24,
+   "nice": 19,
+   "ionice": "best-effort 7",
+   "load_at_launch": [
+    25.19,
+    26.67,
+    29.4
+   ],
+   "ncpu": 48,
+   "tmp_free_GB_at_launch": 20.5,
+   "scratch": "/tmp/nagainis_halfdome_testJ (node-local; rebuilt bases; ours; deleted after the final fetch)",
+   "upload": "j2_cluster.py upload (post/upload_mecke_checks.json: j_mecke_atom.py with noise_pass), then j2_cluster.py check --out post/remote_check_mecke_checks.json: all remote inputs and code equal",
+   "polling": "j2_poll.py --interval 180 --log cluster_poll_mecke.txt; DONE seen 2026-10-16 05:28:47 EEST",
+   "finished": "2026-10-16 05:25:58 EEST (04:25:58 CEST on maas)",
+   "outcome": "completed, wrapper returncode 0, wall 1313 s (j1base 588 s, mecke_checks 725 s); peak tree RSS 11.99 GiB (below the 24 GiB stop); min machine available 163.8 GiB",
+   "fetched": "2026-10-16 05:29 EEST, j2_cluster.py fetch --dir results_mecke_checks (12 files); results_mecke_checks/SHA256SUMS verified locally (all OK)",
+   "scratch_deleted": "2026-10-16 05:30:04 EEST: /tmp/nagainis_halfdome_testJ removed on maas after the final fetch of run 4 (2,199,775,813 bytes); exists_after = false",
+   "scratch_bytes_deleted": 2199775813
+  }
+ ]
+}

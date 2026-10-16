@@ -1,0 +1,51 @@
+{
+ "snippet": "report/xgpaint_refit_snippet.jl",
+ "julia": "/home/kn18001/.julia/juliaup/julia-1.12.2+0.x64.linux.gnu/bin/julia",
+ "xgpaint": "/home/kn18001/.julia/dev/XGPaint (branch cluster)",
+ "returncode": 0,
+ "runs": true,
+ "stderr_tail": "",
+ "models": {
+  "model_gas_published_form": {
+   "fit": "G|R3|orig",
+   "max_rel_diff": 4.778875073441213e-10,
+   "n": 80
+  },
+  "model_gas_recommended": {
+   "fit": "G|R3|free",
+   "max_rel_diff": 1.256035719876536e-09,
+   "n": 80
+  },
+  "model_tSZ_published_form": {
+   "fit": "P|R3|orig",
+   "max_rel_diff": 1.4426835281966532e-09,
+   "n": 80
+  },
+  "model_tSZ_recommended": {
+   "fit": "P|R3|brk_amp",
+   "max_rel_diff": 5.210788467380212e-10,
+   "n": 80
+  }
+ },
+ "max_rel_diff": 1.4426835281966532e-09,
+ "masses": [
+  6309573444801.942,
+  31622776601683.793,
+  100000000000000.0,
+  1000000000000000.0
+ ],
+ "redshifts": [
+  0.0,
+  0.5,
+  1.0,
+  2.0
+ ],
+ "x": [
+  0.1,
+  0.5,
+  1.0,
+  2.0,
+  3.0
+ ],
+ "passed": true
+}

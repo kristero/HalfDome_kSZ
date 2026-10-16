@@ -1,0 +1,127 @@
+{
+ "all_passed": true,
+ "mode": "full",
+ "gates": {
+  "G0_inputs": {
+   "passed": true,
+   "detail": {
+    "P_library_a2ii_equals_cache": 0.0,
+    "P_all_eq_a2ii_p10_p11_max_rel": 6.50950077398746e-16,
+    "P_min_a2ii_minus_a2iia2i": 0.0,
+    "P_complement_inside_R200c_max": 0.0,
+    "E_library_a2ii_equals_cache": 0.0,
+    "E_all_eq_a2ii_p10_p11_max_rel": 1.2170280115610346e-14,
+    "E_min_a2ii_minus_a2iia2i": 0.0,
+    "E_complement_inside_R200c_max": 0.0,
+    "G_library_a2ii_equals_cache": 0.0,
+    "G_all_eq_a2ii_p10_p11_max_rel": 1.3825083258737095e-14,
+    "G_min_a2ii_minus_a2iia2i": 0.0,
+    "G_complement_inside_R200c_max": 0.0,
+    "count_hb_equals_J0_max_abs": 0.0,
+    "count_cb_le_hb": true,
+    "J0_P_a2ii_equals_cache": 0.0,
+    "J0_E_a2ii_equals_cache": 0.0,
+    "J0_E_hb_equals_cache": 0.0,
+    "J0_E_all_equals_cache": 0.0,
+    "r200m_gt_r200c": true
+   }
+  },
+  "G1_stacks": {
+   "passed": true,
+   "value_max_rel": 7.298865727803355e-15,
+   "bootstrap_rows_exact": true,
+   "groups_equal_J": true
+  },
+  "G2_fractions": {
+   "passed": true,
+   "failures": []
+  },
+  "G3_rule_functions": {
+   "passed": true,
+   "errors": {
+    "crossing_0.5": 3.211863651642055e-05,
+    "cumulative_0.5": 4.440892098500626e-16,
+    "budget": 0.0,
+    "cumulative_at": 0.0,
+    "powerlaw_slope": 9.769962616701378e-15,
+    "steepest": 2.4980018054066022e-15,
+    "zero_cross": 1.805146408815552e-05
+   },
+   "tolerances": {
+    "crossing_0.5": 0.005,
+    "cumulative_0.5": 1e-12,
+    "budget": 1e-12,
+    "cumulative_at": 1e-09,
+    "powerlaw_slope": 1e-09,
+    "steepest": 0.01,
+    "zero_cross": 0.01
+   }
+  },
+  "G4_primary_rule": {
+   "passed": true,
+   "failures": []
+  },
+  "G5_additive_terms": {
+   "passed": true,
+   "max_rel_dev": 2.220446049250313e-16,
+   "T_at_4R_minus_1": 0.0
+  },
+  "G6_codex_inputs": {
+   "passed": true,
+   "detail": {
+    "tsz_shell_matrix_sum_over_full_max_dev": 6.276361208534809e-09,
+    "tsz_additive_fractions_vs_csv_max_abs": 3.0865449085482055e-10,
+    "ksz_shell_matrix_sum_over_full_max_dev": 8.00848531934406e-09,
+    "ksz_additive_fractions_vs_csv_max_abs": 2.951996980193883e-11,
+    "dm_shell_matrix_sum_over_full_max_dev": 9.009182067032384e-09,
+    "pilot_L1_m9_cumulative_reproduced_max_abs": 2.220446049250313e-16,
+    "pilot_L2p8_m9_cumulative_reproduced_max_abs": 2.220446049250313e-16
+   }
+  },
+  "G7_smoke_vs_full": {
+   "passed": true,
+   "max_abs_dev": 0.0,
+   "compared": 115
+  },
+  "G8_report_numbers": {
+   "passed": true,
+   "n": 6901,
+   "failures": []
+  },
+  "G9_read_only": {
+   "passed": true,
+   "modified_after_inputs": []
+  },
+  "G10_observable_optimal": {
+   "passed": true,
+   "n_optima": 9,
+   "failures": [],
+   "own_at_vec_vs_own_at_max_rel": 0.0
+  },
+  "G11_extrapolated_region": {
+   "passed": true,
+   "failures": [],
+   "detail": {
+    "P_published_shell_avg_vs_engine_quadrature_max_rel": 1.1102230246251565e-14,
+    "E_published_shell_avg_vs_engine_quadrature_max_rel": 1.0769163338864018e-14,
+    "shares_at_R4_max_abs": 0.0,
+    "D3_fallback_plus_own_at_4R_vs_trunc_all_rel": 2.220446049250313e-16,
+    "lower_between_D3_and_D0": true
+   },
+   "s_recomputed_max_rel": 0.0,
+   "ordering_violations": 0
+  },
+  "G12_report_tables": {
+   "n_tables": 7,
+   "n_rows": 55,
+   "regeneration_mismatches": [],
+   "report_text_checked": true,
+   "report_text_sha256": "1c4161b9c8af81bc1e8f48853a904eaffc8aa061d5a4d3cc706e37cf0def4133",
+   "report_text_chars": 36433,
+   "rows_missing_from_report": [],
+   "n_rows_missing": 0,
+   "passed": true
+  }
+ },
+ "definitions": "L1 gates -> verification.json (verification_smoke.json in smoke mode).\n\nG0  inputs: partition closure all = a2ii + p10 + p11 (<= 1e-12 relative), the library's A2-ii equals the cache\n    exactly, no A2-ii complement inside R200c, streamed host-bound counts equal Test J's J0 export exactly, J0 profile\n    arrays equal the cache, R200m > R200c for every halo\nG1  stacks: row 0 equals stackcore.stack_bin (<= 1e-12 relative) and the bootstrap rows equal stack_bin's replicates\n    exactly (paired draws); merged groups in 12.7-13.5 equal Test J's stored groups\nG2  fractions: inside R200c every fraction definition with the A2-ii or all-gas denominator coincides (a2ii = all\n    there); nested bracket lo <= hi <= hb/a2ii; cb <= hb; 0 <= f <= 1 (+1e-12) in every shell and bootstrap row\nG3  rule functions on synthetic profiles with known answers: crossing_down, cumulative_radius, budget_radius,\n    local slope of a power law (exact for a quadratic in ln x), steepest point of a known minimum, zero crossing\nG4  primary rule: B32 has a crossing (not censored) in every bin and both fields; B50 <= B32 in every bin\nG5  additive terms: fallback + sum of Test J's per-bin own curves at 4R equals J's trunc_all at 4R (<= 1e-12), and\n    T = 1 when every bin is cut at 4R\nG6  Codex inputs: shell cross matrices sum to the full spectra, our band fractions reproduce the published CSV tables,\n    the pilot's cumulative fractions are reproduced from its shell components\nG7  smoke vs full: central values (row 0) of every rule in the smoke bins equal the full run's (full mode only, if the\n    smoke results exist)\nG8  report-number registry: every entry of results/report_numbers.json re-resolved from its source field.  This is a\n    consistency check of the registry against the result files only; it does NOT parse the report prose or tables\n    (that is G12 for the tables; clarified 2026-10-16 after review round 2)\nG9  read-only: no file of the earlier tests or of the stacking cache was modified after this test's inputs were built\nG10 observable-optimal single cut (full mode; added 2026-10-16 after review): every optimum lies strictly inside the\n    search grid, its RMS is not above the RMS at the signal-weighted radius (+1e-5 for the 1e-4 grid step), and the\n    vectorised own-curve interpolation equals the scalar one (own_at) at 200 random radii in [0, 4] (<= 1e-14 relative)\nG11 extrapolated region (added 2026-10-16 after the user's clarification that R_t is the fit range and the law is still\n    painted to 4 R200c): the published B12/B16 shell averages (closed-form cumulative) equal a 48-point quadrature of\n    the engine's published_profile (<= 1e-10 relative); every share is 0 at R = 4 R200c; Test J's D3 fallback + own\n    curves at 4R equal its trunc_all (<= 1e-12); the mean-DM lower reference lies between D3 and D0 (full mode);\n    s_a2ii and s_hb of every bin recomputed from results/stacks_L.npz (row 0) with l_common.cumulative_at\n    (<= 1e-10 relative); ordering s_hb <= s_all and s_a2ii <= s_all in every bin, field and bootstrap row\nG12 report tables vs files (full mode; added 2026-10-16 after review round 2, which found two mis-rounded cells that G8\n    could not catch): (a) every numeric table of the report is re-formatted here from the JSON by code independent of\n    l_numbers.report_tables (3 decimals) and must equal tables/L1_report_tables.json row by row; (b) if the environment\n    variable L_REPORT_TEXT names the report text, every row of every table must occur verbatim (leading whitespace\n    stripped) as a line of that text; its SHA256 is recorded.  Without L_REPORT_TEXT only (a) runs and the gate says so.\n"
+}

@@ -1,0 +1,95 @@
+{
+ "purpose": "Test L2: truths and sensitivity of the halo component with the fit range cut at R_t (STRW maas)",
+ "driver": "run_test_l.py --l2 -> run_test_l2.py (stages prep, basis, fallback, truth, mecke, sens; l2_maas.py)",
+ "TESTS_entry": "cluster_tests.py TESTS['L'] = ('L_halo_truncation', 'run_test_l.py')",
+ "inputs": [
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/L_halo_truncation/inputs/l2_config.json"
+  },
+  {
+   "path": "/home/cbllover/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012/L_halo_truncation/inputs/l2_extra.npz"
+  }
+ ],
+ "reads_test_J_F_G_modules": "J_halo_dm_lowmass/j_*.py, F_observables/f_*.py, G_physical_outer/g_*.py and their inputs (Test J's CLUSTER_RUN.json inputs), read-only",
+ "smoke_command": "python -B run_test_l.py --l2 --smoke (local, 1 worker; results_l2_smoke/)",
+ "l2_maas_runs": [
+  {
+   "test": "L2",
+   "host": "maas.strw.leidenuniv.nl",
+   "launched_local": "2026-10-16 17:50:48 EEST",
+   "launch_command": "python -B cluster_tests.py run L --workers 8 --rss-stop 32 --driver-args=\"--l2 --results L_halo_truncation/results_l2 --scratch /tmp/nagainis_halfdome_testL\"",
+   "wrapper_command": [
+    "/home/nagainis/HalfDome/flamingo_pressure_calibration/profile_test_L1_m9_0077_20261007/venv/bin/python",
+    "-B",
+    "L_halo_truncation/run_test_l.py",
+    "--full",
+    "--workers",
+    "8",
+    "--l2",
+    "--results",
+    "L_halo_truncation/results_l2",
+    "--scratch",
+    "/tmp/nagainis_halfdome_testL"
+   ],
+   "workdir": "/home/nagainis/HalfDome_runtime/overlap_covariance_tests/HalfDome/flamingo_pressure_calibration/overlap_covariance_L1_m9_0077_20261012",
+   "workers": 8,
+   "nice": 19,
+   "ionice": "best-effort 7",
+   "rss_stop_GiB": 32.0,
+   "free_memory_floor_GiB": 22.554277038574217,
+   "load_at_start": [
+    24.43,
+    24.21,
+    24.13
+   ],
+   "available_GiB_at_start": 176.54166412353516,
+   "returncode": 0,
+   "wall_seconds": 5716.510817050934,
+   "peak_tree_rss_GiB": 23.699016571044922,
+   "min_machine_available_GiB": 161.96449661254883,
+   "stages": {
+    "prep": {
+     "wall_seconds": 5.5,
+     "peak_rss_self_GiB": 0.22,
+     "peak_rss_largest_child_GiB": 0.11,
+     "status": "ok"
+    },
+    "basis": {
+     "wall_seconds": 409.3,
+     "peak_rss_self_GiB": 6.18,
+     "peak_rss_largest_child_GiB": 2.34,
+     "status": "ok"
+    },
+    "fallback": {
+     "wall_seconds": 217.7,
+     "peak_rss_self_GiB": 6.18,
+     "peak_rss_largest_child_GiB": 2.34,
+     "status": "ok"
+    },
+    "truth": {
+     "wall_seconds": 3908.7,
+     "peak_rss_self_GiB": 6.18,
+     "peak_rss_largest_child_GiB": 2.74,
+     "status": "ok"
+    },
+    "mecke": {
+     "wall_seconds": 1110.6,
+     "peak_rss_self_GiB": 6.18,
+     "peak_rss_largest_child_GiB": 2.74,
+     "status": "ok"
+    },
+    "sens": {
+     "wall_seconds": 61.6,
+     "peak_rss_self_GiB": 6.18,
+     "peak_rss_largest_child_GiB": 2.74,
+     "status": "ok"
+    }
+   },
+   "scratch": "/tmp/nagainis_halfdome_testL (bases basis_LA.npz, basis_LA10.npz, fallback_j.npz)",
+   "scratch_deleted": "2026-10-16 21:20:21 EEST (2,078,600,790 bytes; l2_cluster.py cleanup, after the final fetch)",
+   "upload": "post_l2/upload_L2.json (targeted SHA256-checked upload of 6 files); pre-launch remote check post_l2/remote_check_prelaunch.json (all L2 and Test J compute files equal; only J's local report tools j_report.py, j_sums.py differ, not imported)",
+   "fetch": "l2_cluster.py fetch -> results_l2/ (15 files, 21.71 MiB, SHA256 checked; work/ not fetched)",
+   "results_SHA256SUMS": "results_l2/SHA256SUMS (written on maas)"
+  }
+ ]
+}

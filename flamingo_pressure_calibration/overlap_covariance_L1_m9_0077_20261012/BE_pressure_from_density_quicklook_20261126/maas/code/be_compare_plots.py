@@ -15,6 +15,12 @@ OUT = Path(os.environ['BE_OUT'])
 FIG = OUT.parent/'figures'
 FIG.mkdir(exist_ok=True)
 CMP = json.loads(os.environ.get('BE_CMP', '{"ref": "existing_B6", "alt": "existing_A6", "temp": "joint_T7x_rout6"}'))
+SRC_JSON = os.environ.get('BE_CMP_JSON', 'be_compare.json')
+SRC_ROWS = os.environ.get('BE_CMP_ROWS', 'be_compare_rows.npz')
+TAG = os.environ.get('BE_CMP_TAG', '')
+TITLE = os.environ.get('BE_CMP_TITLE', 'Both with the same 2-halo term, amplitude A_2h(z) free, fitted on the shells beyond the cut to 6 R200c '
+                       '(dotted line: cut B32)')
+OUTER_TITLE = os.environ.get('BE_CMP_OUTER_TITLE', 'Beyond the cut (shells of all bins with >= 100 haloes)')
 LABEL = {'existing_B6': 'pressure fit, free 2-halo amplitude (constant alpha; existing BD fit)',
          'existing_B4': 'pressure fit, free 2-halo amplitude to 4 R200c (constant alpha; existing)',
          'existing_A6': 'pressure fit, free 2-halo amplitude (alpha(z) of record; existing BD fit)',
@@ -23,7 +29,14 @@ LABEL = {'existing_B6': 'pressure fit, free 2-halo amplitude (constant alpha; ex
          'joint_T7x_rout6': 'electron law x temperature law + 2-halo (fitted together)',
          'joint_T7_rout6': 'electron law x temperature law + 2-halo (fitted together)',
          'sep_T7x_rout6': 'electron law x temperature law + 2-halo (separate)',
-         'joint_H6_xout6_rout6': 'hydrostatic + core term + 2-halo (fitted together)'}
+         'joint_H6_xout6_rout6': 'hydrostatic + core term + 2-halo (fitted together)',
+         'plaw_const_4R': 'pressure law (constant alpha) + 2-halo, fitted to 4 R200c',
+         'plaw_held_4R': 'pressure law (alpha(z) of record) + 2-halo, fitted to 4 R200c',
+         'plaw_massbreak_4R': 'pressure law with mass break (16 parameters) + 2-halo, fitted to 4 R200c',
+         'joint_T7x_4R': 'electron law x temperature law + 2-halo, fitted to 4 R200c',
+         'joint_T7_4R': 'electron law x temperature law (T7) + 2-halo, fitted to 4 R200c',
+         'sep_T7x_4R': 'electron law x temperature law + 2-halo, separate, fitted to 4 R200c',
+         'joint_H6_xout6_4R': 'hydrostatic + core term + 2-halo, fitted to 4 R200c'}
 COL = {'ref': '#222222', 'alt': '#9a9a9a', 'temp': '#1f77b4'}
 GROUPS = (('small', '10^12.7-13.1'), ('groups', '10^13.1-13.5'), ('mid', '10^13.5-14.3'), ('clusters', '>= 10^14.3'))
 
@@ -35,8 +48,8 @@ def save(fig, name):
 
 
 def main():
-    C = json.loads((OUT/'be_compare.json').read_text())['results']
-    R = np.load(OUT/'be_compare_rows.npz')
+    C = json.loads((OUT/SRC_JSON).read_text())['results']
+    R = np.load(OUT/SRC_ROWS)
     M = np.load(OUT/'be_fits_rows.npz')
     block, lo, hi, region, shell, Mh, z, b32, d = (M[k] for k in ('block', 'lo', 'hi', 'region', 'shell', 'M', 'z', 'b32', 'd_P'))
     Pa, Ph = M['P_a2ii'], M['P_hb']
@@ -78,9 +91,8 @@ def main():
             axr.set_ylabel('model / stack')
     h, l = axes[0, 0].get_legend_handles_labels()
     fig.legend(h, l, loc='lower center', ncol=3, fontsize=8.5, frameon=False, bbox_to_anchor=(.5, -.08))
-    fig.suptitle('Both with the same 2-halo term, amplitude A_2h(z) free, fitted on the shells beyond the cut to 6 R200c '
-                 '(dotted line: cut B32)', fontsize=10)
-    save(fig, 'compare_profiles_2h')
+    fig.suptitle(TITLE, fontsize=10)
+    save(fig, f'compare_profiles_2h{TAG}')
 
     # ---------------- RMS inside (by mass) and beyond the cut (by radius)
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.2))
@@ -100,12 +112,12 @@ def main():
     axes[0].set_title('Inside the cut (all fitted residuals, bins with >= 100 haloes)', fontsize=9)
     axes[1].set_xticks(range(len(bands)))
     axes[1].set_xticklabels([b.replace('4.01', '4').replace('6.01', '6')+' R200c' for b in bands], fontsize=8)
-    axes[1].set_title('Beyond the cut (shells of all bins with >= 100 haloes)', fontsize=9)
+    axes[1].set_title(OUTER_TITLE, fontsize=9)
     for a in axes:
         a.set_ylabel('RMS of ln(model / stack)')
         a.set_ylim(0, a.get_ylim()[1]*1.55)
-        a.legend(fontsize=7.5, frameon=False, loc='upper left')
-    save(fig, 'compare_rms_2h')
+        a.legend(fontsize=7, frameon=False, loc='upper left')
+    save(fig, f'compare_rms_2h{TAG}')
 
     # ---------------- amplitude
     fig, ax = plt.subplots(figsize=(7, 4))
@@ -118,7 +130,7 @@ def main():
     ax.set_ylabel('2-halo amplitude A_2h(z)')
     ax.set_yscale('log')
     ax.legend(fontsize=7.5, frameon=False)
-    save(fig, 'compare_amplitude')
+    save(fig, f'compare_amplitude{TAG}')
     print('figures written', sorted(p.name for p in FIG.glob('compare_*.png')))
 
 

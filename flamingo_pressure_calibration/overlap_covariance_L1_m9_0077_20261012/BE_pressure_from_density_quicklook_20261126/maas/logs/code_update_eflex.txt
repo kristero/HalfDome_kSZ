@@ -1,0 +1,8 @@
+2026-11-26T09:30:45Z
+Electron-law tail test: ELaw.point gains optional free x_c or inner slope (ev); Composite gains ev (default None = unchanged); be_fit4r.py gains --set eflex.
+old:
+3301e732496c32235d3163d3650474202838ae3860f9312792d4decb7ec2fe29  be_fit.py
+a6d33eb2b19857709422ab5157fcb0f350bee660246ace285c0173ad5726df6c  be_fit4r.py
+new:
+66b0673e2859f10e33748c7d3ca037759690c59a9cf61703cb678a10350de5f5  be_fit.py
+a963afbcb33bd6cf8c482261495493891dec925a1a6d45d906a5e6637839cd81  be_fit4r.py

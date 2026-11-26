@@ -1,0 +1,8 @@
+2026-11-26T09:26:48Z
+Flex step (user chose parity weights): be_fit.py gains kinds T8xm/T8xz/T9x (additive); be_fit4r.py gains --set flex (default main unchanged).
+old:
+39326d2fd18234bec3d2bf7b82a5b47fccb3138836274d12194194e9a13d9bc0  be_fit.py
+490679b4edf43141e693baac6650950eb719c2400c9177dfae6d1b47890af40d  be_fit4r.py
+new:
+3301e732496c32235d3163d3650474202838ae3860f9312792d4decb7ec2fe29  be_fit.py
+a6d33eb2b19857709422ab5157fcb0f350bee660246ace285c0173ad5726df6c  be_fit4r.py

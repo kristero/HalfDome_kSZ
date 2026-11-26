@@ -1,0 +1,61 @@
+check1 {
+ "mu_xgp": 1.2632313926501406,
+ "C_T": 428.21403140682736,
+ "K_HSE": 0.00899568869943655,
+ "K_HSE_if_rho_gas_includes_m_e": 0.009000000000000001,
+ "PE_FRAC": 0.5176470588235295,
+ "study": {
+  "C_T": 428.21403140682736,
+  "K_HSE": 0.00899568869943655,
+  "PE_FRAC": 0.5176470588235295,
+  "h": 0.681,
+  "MU_XGP": 1.2632313926501406
+ },
+ "rel_mu": 0.0,
+ "rel_C_T": 0.0,
+ "rel_K": 0.0,
+ "rel_PE": 0.0,
+ "rel_K_me_convention": 0.00047926297891121017,
+ "P_eq_Etau_over_CT_rel": 0.0,
+ "dPdx_rel": 1.1102230246251565e-16,
+ "g_rho_gas_over_E": 0.8995688699436549
+}
+rows {'n_region0': 1494, 'M_vs_10node_maxrel': 2.220446049250313e-16, 'z_vs_block_maxabs': 0.0, 'block_equal_BD': True, 'lo_equal_BD': 0.0, 'hi_equal_BD': 0.0, 'kind_equal_BD': True, 'wP_vs_BD_weight_maxrel': 0.0, 'dP_vs_BD_target_maxrel': 0.0007856243468820079, 'sum_wP': 2700.9999999999995, 'sum_wE': 2700.9999999999995}
+vector self-test 3.3306690738754696e-16
+check1 {
+ "n_selected_x4": 1025,
+ "n_region1": 1025,
+ "region1_geometry_matches": true,
+ "region0_equals_wP": true,
+ "sum_w_region0": 2700.9999999999995,
+ "sum_w_region1_record": 44.99058226938062,
+ "sum_w_region1_parity": 1853.095716198126,
+ "parity_expected": 1853.095716198126,
+ "record_study_sum_region0": 2700.9999999999995,
+ "record_study_sum_region1": 44.99058226938062,
+ "record_rel_region1": 0.0,
+ "record_rel_region0": 0.0,
+ "record_share_region1": 0.01638409926089363,
+ "record_template_same_as_compare": true,
+ "parity_study_sum_region0": 2700.9999999999995,
+ "parity_study_sum_region1": 1853.0957161981255,
+ "parity_rel_region1": 2.220446049250313e-16,
+ "parity_rel_region0": 0.0,
+ "parity_share_region1": 0.406907502977372,
+ "parity_template_same_as_compare": true
+}
+record plaw_const_4R {"mine": {"L_4R": 15.206281033667015, "L_4R_region1": 0.7489492307241136, "L_P": 14.457331802942901, "L_out6": 1720.5609431644116}, "study": {"L_4R": 15.206248292474317, "L_4R_region1": 0.7489492307241133, "L_P": 14.457299061750206, "L_out6": 1720.560943164412}, "rel": {"L_4R": 2.1531407397024083e-06, "L_4R_region1": 2.220446049250313e-16, "L_P": 2.2646825355021605e-06, "L_out6": 2.220446049250313e-16}, "one_rows": {"max": 2.4685125550316656e-06, "max_shell": 8.215650382226158e-15, "max_integral": 2.4685125550316656e-06}, "full_rows_max": 2.441076776937834e-06, "outer_bands_max_absdiff": 2.7755575615628914e-17, "outer_bands_n_equal": true}
+record plaw_massbreak_4R {"mine": {"L_4R": 2.7050079955537787, "L_4R_region1": 0.5638037696479054, "L_P": 2.1412042259058732, "L_out6": 2953.9454985005214}, "study": {"L_4R": 2.7050064052111686, "L_4R_region1": 0.5638037696479051, "L_P": 2.1412026355632636, "L_out6": 2953.9454985005214}, "rel": {"L_4R": 5.879256355090234e-07, "L_4R_region1": 4.440892098500626e-16, "L_P": 7.427333514886669e-07, "L_out6": 0.0}, "one_rows": {"max": 2.9870519402397377e-06, "max_shell": 8.104628079763643e-15, "max_integral": 2.9870519402397377e-06}, "full_rows_max": 2.937664326463363e-06, "outer_bands_max_absdiff": 1.1102230246251565e-16, "outer_bands_n_equal": true}
+record joint_T7x_4R {"mine": {"L_4R": 9.094423763524095, "L_4R_region1": 1.6678796551211912, "L_P": 7.426544108402904, "L_out6": 8671.487698687488, "L_E": 16.26039978799438}, "study": {"L_4R": 9.094425088210466, "L_4R_region1": 1.6678796551211914, "L_P": 7.426545433089274, "L_out6": 8671.487698687488, "L_E": 16.260229599139542}, "rel": {"L_4R": 1.4565916572895077e-07, "L_4R_region1": 1.1102230246251565e-16, "L_P": 1.7837181254254375e-07, "L_out6": 0.0, "L_E": 1.0466571446654527e-05}, "one_rows": {"max": 2.0001056330043454e-06, "max_shell": 7.66053886991358e-15, "max_integral": 2.0001056330043454e-06}, "full_rows_max": 1.9605251043719463e-06, "E_rows_max": 9.251565022294628e-06, "outer_bands_max_absdiff": 5.551115123125783e-17, "outer_bands_n_equal": true}
+parity plaw_const_4R {"mine": {"L_4R": 35.83677710177817, "L_4R_region1": 19.080089063872407, "L_P": 16.756688037905764, "L_out6": 1448.1495899136276}, "study": {"L_4R": 35.83675368657833, "L_4R_region1": 19.0800890638724, "L_P": 16.756664622705923, "L_out6": 1448.1495899136276}, "rel": {"L_4R": 6.533850707146627e-07, "L_4R_region1": 4.440892098500626e-16, "L_P": 1.397366383271148e-06, "L_out6": 0.0}, "one_rows": {"max": 1.927529917900017e-06, "max_shell": 8.215650382226158e-15, "max_integral": 1.927529917900017e-06}, "full_rows_max": 1.925673299041364e-06, "outer_bands_max_absdiff": 4.163336342344337e-17, "outer_bands_n_equal": true}
+parity plaw_massbreak_4R {"mine": {"L_4R": 19.61054130712411, "L_4R_region1": 15.354997754934436, "L_P": 4.255543552189674, "L_out6": 1431.1034571559385}, "study": {"L_4R": 19.610539859405257, "L_4R_region1": 15.354997754934434, "L_P": 4.255542104470826, "L_out6": 1431.1034571559385}, "rel": {"L_4R": 7.382350819540306e-08, "L_4R_region1": 2.220446049250313e-16, "L_P": 3.401961048421498e-07, "L_out6": 0.0}, "one_rows": {"max": 3.6419295952327957e-06, "max_shell": 7.771561172376096e-15, "max_integral": 3.6419295952327957e-06}, "full_rows_max": 3.59185863030298e-06, "outer_bands_max_absdiff": 1.3877787807814457e-17, "outer_bands_n_equal": true}
+parity joint_T7x_4R {"mine": {"L_4R": 39.86151946566823, "L_4R_region1": 32.004497365680024, "L_P": 7.857022099988208, "L_out6": 1948.1498784611845, "L_E": 27.68383993828973}, "study": {"L_4R": 39.86151889009628, "L_4R_region1": 32.004497365680024, "L_P": 7.857021524416256, "L_out6": 1948.1498784611847, "L_E": 27.683532636481967}, "rel": {"L_4R": 1.4439287987499938e-08, "L_4R_region1": 0.0, "L_P": 7.325574324923423e-08, "L_out6": 1.1102230246251565e-16, "L_E": 1.1100527226748369e-05}, "one_rows": {"max": 2.050333705594376e-06, "max_shell": 8.215650382226158e-15, "max_integral": 2.050333705594376e-06}, "full_rows_max": 2.0199684042099264e-06, "E_rows_max": 9.894737662996533e-06, "outer_bands_max_absdiff": 2.7755575615628914e-17, "outer_bands_n_equal": true}
+check3 record plaw_const_4R {"objective_mine_at_reported": 15.206281033667015, "objective_study": 15.206248292474317, "local_LS_objective": 15.206281033572584, "local_LS_decrease": 9.443112958251731e-11, "local_LS_max_param_change": 4.816584721289985e-06, "local_LS_nfev": 4, "local_seconds": 1.908674716949463, "nelder_mead_decrease": 3.9763747849974607e-11, "nelder_mead_nfev": 600, "random_best_objective": 15.206281033572504, "random_best_minus_reported_mine": -9.451106564029033e-11, "n_random_lower_by_more_than_1e-3": 0, "seconds": 132.1941680908203}
+   starts [(436.1513, 15.206281, 30), (130.0629, 15.206281, 28), (57.025, 15.206281, 24), (90.2677, 15.206281, 29), (112.588, 15.206281, 29), (1449.2192, 15.206281, 25), (841.4533, 15.206281, 32), (84.3553, 15.206281, 24), (38.287, 15.206281, 30), (1101.4736, 15.206281, 27)]
+check3 record joint_T7x_4R {"objective_mine_at_reported": 25.35482355151848, "objective_study": 25.354654687350006, "local_LS_objective": 25.35482353787897, "local_LS_decrease": 1.3639507301377307e-08, "local_LS_max_param_change": 5.28020783141514e-06, "local_LS_nfev": 4, "local_seconds": 6.541468143463135, "nelder_mead_decrease": 0.0, "nelder_mead_nfev": 600, "random_best_objective": 25.35482353788572, "random_best_minus_reported_mine": -1.3632757145387586e-08, "n_random_lower_by_more_than_1e-3": 0, "seconds": 465.4257667064667}
+   starts [(1056.4309, 25.354824, 22), (893.7417, 25.354824, 27), (663.7253, 25.354824, 27), (266.3016, 25.354824, 25), (4584.5906, 25.354824, 24), (1867.1702, 25.354824, 25), (1179.2062, 25.354824, 23), (240.8223, 25.354824, 28), (1022.7491, 25.354824, 26), (1272.6265, 25.354824, 27)]
+check3 parity plaw_const_4R {"objective_mine_at_reported": 35.83677710177817, "objective_study": 35.83675368657833, "local_LS_objective": 35.8367771017095, "local_LS_decrease": 6.866684998385608e-11, "local_LS_max_param_change": 1.0020888840944764e-06, "local_LS_nfev": 4, "local_seconds": 1.1355376243591309, "nelder_mead_decrease": 8.604672530054813e-12, "nelder_mead_nfev": 600, "random_best_objective": 35.8367771017099, "random_best_minus_reported_mine": -6.826894605183043e-11, "n_random_lower_by_more_than_1e-3": 0, "seconds": 76.38403558731079}
+   starts [(708.4363, 35.836777, 14), (407.9382, 35.836777, 14), (770.9564, 35.836777, 13), (626.8317, 35.836777, 13), (177.9998, 35.836777, 13), (1790.9308, 35.836777, 13), (787.4601, 35.836777, 14), (136.1617, 35.836777, 13), (1764.2876, 35.836777, 14), (332.3649, 35.836777, 14)]
+check3 parity joint_T7x_4R {"objective_mine_at_reported": 67.54535940395796, "objective_study": 67.54505152657825, "local_LS_objective": 67.54535939554928, "local_LS_decrease": 8.408676421822747e-09, "local_LS_max_param_change": 4.644105439766122e-06, "local_LS_nfev": 4, "local_seconds": 6.56968355178833, "nelder_mead_decrease": 0.0, "nelder_mead_nfev": 600, "random_best_objective": 67.54535939555471, "random_best_minus_reported_mine": -8.40324787532154e-09, "n_random_lower_by_more_than_1e-3": 0, "seconds": 325.83136010169983}
+   starts [(292.7339, 67.545359, 17), (385.9602, 67.545359, 16), (225.8561, 67.545359, 17), (1109.2813, 67.545359, 17), (579.5421, 67.545359, 15), (1843.3922, 67.545359, 18), (915.9625, 67.545359, 17), (603.8042, 67.545359, 18), (1457.8282, 67.545359, 18), (363.973, 67.545359, 15)]
+done 1001.1802787780762

@@ -1,0 +1,6 @@
+2026-11-26T09:05:34Z
+be_fit4r.py gains --outer record|parity (default record = the run already done).
+old:
+9527bd90b171720edba349464fc5f4a40e2cfedf291290e630c8d5caece31b8e  be_fit4r.py
+new:
+490679b4edf43141e693baac6650950eb719c2400c9177dfae6d1b47890af40d  be_fit4r.py

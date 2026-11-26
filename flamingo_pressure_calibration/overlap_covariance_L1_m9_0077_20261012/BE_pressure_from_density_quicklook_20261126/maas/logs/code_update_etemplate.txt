@@ -1,0 +1,8 @@
+2026-11-26T09:37:11Z
+Electrons to 4 R200c (user, 26 Nov): new be_twohalo_e.py, be_etemplate.py.
+045709a0c05b28a140e4f0087d8f20abfcb1bd8d5b3825253fde0152a0714c58  be_twohalo_e.py
+abf423ccbbd95cbc1a93ad77487e44b188849485ad9614cbfbdf538adefcf232  be_etemplate.py
+2026-11-26T09:39:02Z
+Electrons to 4 R200c: new be_fit4r_e.py, be_eplots.py.
+c0c5972b8489abf0e0861eff1288f8d323757935d6b9fd9109c94586614ac2df  be_fit4r_e.py
+a180d58fcb9e01bd943e1187c9bf2236f5d8c89b1a3467a4da543b18edf609b7  be_eplots.py

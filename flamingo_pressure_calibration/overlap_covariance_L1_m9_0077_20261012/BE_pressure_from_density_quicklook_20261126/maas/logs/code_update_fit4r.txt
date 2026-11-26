@@ -1,0 +1,7 @@
+2026-11-26T09:01:22Z
+Step 4 (one-loss 1h+2h fits to 4 R200c): new be_fit4r.py; be_compare_plots.py takes input/tag/titles from env (defaults unchanged).
+old:
+ec30181628c689f2de06845d7972a672ca2b7183053ab9790589c91ee5bd76c9  be_compare_plots.py
+new:
+9527bd90b171720edba349464fc5f4a40e2cfedf291290e630c8d5caece31b8e  be_fit4r.py
+ca0af12c0da08b779b8029a5632b07ae44f8552adc2fb21d7ed391fd01a8b4a6  be_compare_plots.py

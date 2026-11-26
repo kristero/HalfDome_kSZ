@@ -21,6 +21,7 @@ Laws (all coefficients of a quantity Q: ln Q = lnA_Q + am_Q lm + az_Q lz):
   temperature T7          T5 + ln[(x/x_cc)^2 / (1 + (x/x_cc)^2)],  ln x_cc = c0 + bm lm         (7 par; cool-core / multiphase dip)
   temperature T8          T7 with ln x_cc = c0 + bm lm + bz lz                                  (8 par)
   temperature T7x         T7 with the outer decline exp[-(x/x_e)^c_e] instead of (1 + x/x_t)^-c   (7 par; added 26 Nov)
+  temperature T8xm/T8xz/T9x  T7x with ln x_e = ln x_e0 + em lm (T8xm), + ez lz (T8xz), or both (T9x)  (8 / 8 / 9 par)
   hydrostatic H3          P = 0.5176 (1 - f_nth) P_tot,  P_tot(x) = K int_x^x_out E(s) m(s) / s^2 ds,  K = 0.01 rho_gas/(E rho_crit f_b)
                           = 0.01 (2/1.76) m_p / mu_XGP; m(s) = M(<s R200c)/M200c of an NFW halo with Duffy+08 c200c(M, z)
                           (h = 0.681); P_tot(x_out) = 0, x_out = 4; f_nth = a (1+z)^b x^n, capped at 0.95  (3 par)
@@ -144,24 +145,35 @@ class ELaw:
     lo = np.array([np.log(1e-2), -3., -4., np.log(.05), -2., -3., np.log(.3), -2., -3.])
     hi = np.array([np.log(1e6), 3., 4., np.log(20.), 2., 3., np.log(60.), 2., 3.])
 
+    EXTRA = {None: [], 'c': ['ln_xc_e'], 'g': ['gamma_e']}
+    EXTRA_LO = {'ln_xc_e': np.log(.05), 'gamma_e': -1.5}
+    EXTRA_HI = {'ln_xc_e': np.log(5.), 'gamma_e': 1.}
+    EXTRA_START = {'ln_xc_e': np.log(.5), 'gamma_e': -.2}
+
     @staticmethod
-    def point(p, x, lm, lz):
+    def point(p, x, lm, lz, ev=None):
+        """Production form n0 q^g (1 + q^a_e)^(-(beta_e + g)/a_e), q = x/x_c; x_c = 0.5, g = -0.2 unless ev frees one constant:
+        ev = 'c': x_c = exp(p[9]); ev = 'g': g = p[9] (added 26 Nov, electron-law tail test)."""
         n0, ae, be = (np.exp(p[3*k]+p[3*k+1]*lm+p[3*k+2]*lz) for k in range(3))
-        q = x/.5
-        return n0*q**-.2*(1+q**ae)**(-(be-.2)/ae)
+        xc, g = (np.exp(p[9]), -.2) if ev == 'c' else ((.5, p[9]) if ev == 'g' else (.5, -.2))
+        q = x/xc
+        return n0*q**g*(1+q**ae)**(-(be+g)/ae)
 
 
 TNAMES = {'T5': ['lnT0', 'am_T', 'az_T', 'ln_xt', 'c_out'],
           'T7': ['lnT0', 'am_T', 'az_T', 'ln_xt', 'c_out', 'lnxcc0', 'bm_cc'],
           'T8': ['lnT0', 'am_T', 'az_T', 'ln_xt', 'c_out', 'lnxcc0', 'bm_cc', 'bz_cc'],
           'T7x': ['lnT0', 'am_T', 'az_T', 'ln_xe', 'c_e', 'lnxcc0', 'bm_cc'],
+          'T8xm': ['lnT0', 'am_T', 'az_T', 'ln_xe', 'c_e', 'lnxcc0', 'bm_cc', 'em_xe'],
+          'T8xz': ['lnT0', 'am_T', 'az_T', 'ln_xe', 'c_e', 'lnxcc0', 'bm_cc', 'ez_xe'],
+          'T9x': ['lnT0', 'am_T', 'az_T', 'ln_xe', 'c_e', 'lnxcc0', 'bm_cc', 'em_xe', 'ez_xe'],
           'H3': ['a_nth', 'b_nth', 'n_nth'], 'H3c': ['a_nth', 'b_nth', 'n_nth', 'ln_cnorm'],
           'H6': ['a_nth', 'b_nth', 'n_nth', 'lnxcc0', 'bm_cc', 'bz_cc'],
           'H3e': ['a_nth', 'b_nth', 'n_nth'], 'H6e': ['a_nth', 'b_nth', 'n_nth', 'lnxcc0', 'bm_cc', 'bz_cc']}
 TRANGE = {'lnT0': (np.log(.05), np.log(50.), np.log(2.5)), 'am_T': (-2., 2., -.15), 'az_T': (-3., 3., -.3),
           'ln_xt': (np.log(.01), np.log(50.), np.log(.5)), 'c_out': (0., 10., 1.3),
           'lnxcc0': (np.log(1e-4), np.log(5.), np.log(.05)), 'bm_cc': (-4., 4., -.7), 'bz_cc': (-4., 4., .2),
-          'ln_xe': (np.log(.05), np.log(20.), np.log(.8)), 'c_e': (.2, 6., 1.),
+          'ln_xe': (np.log(.05), np.log(20.), np.log(.8)), 'c_e': (.2, 6., 1.), 'em_xe': (-3., 3., 0.), 'ez_xe': (-3., 3., 0.),
           'a_nth': (0., 2., .15), 'b_nth': (-3., 3., .3), 'n_nth': (0., 4., .9), 'ln_cnorm': (np.log(.2), np.log(5.), 0.)}
 
 
@@ -177,13 +189,15 @@ def duffy(M, z):
 class Composite:
     """Pressure model for every row; parameters p = [electron 9] + [temperature / hydrostatic k]."""
 
-    def __init__(self, B, kind, xout=4.):
-        self.B, self.kind, self.xout = B, kind, xout
+    def __init__(self, B, kind, xout=4., ev=None):
+        self.B, self.kind, self.xout, self.ev = B, kind, xout, ev
         D = B.D
         self.tn = TNAMES[kind]
-        self.names = ELaw.names+self.tn
-        self.lo = np.r_[ELaw.lo, [TRANGE[n][0] for n in self.tn]]
-        self.hi = np.r_[ELaw.hi, [TRANGE[n][1] for n in self.tn]]
+        ex = ELaw.EXTRA[ev]
+        self.ne = 9+len(ex)
+        self.names = ELaw.names+ex+self.tn
+        self.lo = np.r_[ELaw.lo, [ELaw.EXTRA_LO[n] for n in ex], [TRANGE[n][0] for n in self.tn]]
+        self.hi = np.r_[ELaw.hi, [ELaw.EXTRA_HI[n] for n in ex], [TRANGE[n][1] for n in self.tn]]
         self.tstart = np.array([TRANGE[n][2] for n in self.tn])
         ub = np.unique(D.block)
         self.ub = ub
@@ -197,7 +211,7 @@ class Composite:
 
     def electrons(self, pE, rows=slice(None)):
         D = self.B.D
-        return np.sum(D.wq[rows]*ELaw.point(pE, D.xq[rows], D.lm[rows][:, None], D.lz[rows][:, None]), axis=1)
+        return np.sum(D.wq[rows]*ELaw.point(pE, D.xq[rows], D.lm[rows][:, None], D.lz[rows][:, None], self.ev), axis=1)
 
     def p_tot_nodes(self, pE, x, bpos, cnorm=1.):
         """P_tot / P200c at nodes x (rows x nodes) of blocks bpos, hydrostatic integral of the electron law to x_out."""
@@ -206,7 +220,7 @@ class Composite:
         c = (self.cb*cnorm)[:, None]
         mu = lambda y: np.log1p(y)-y/(1+y)  # noqa: E731
         m = mu(c*g[None, :])/mu(c)
-        f = K_HSE*ELaw.point(pE, g[None, :], lmb, lzb)*m/g[None, :]**2*g[None, :]            # integrand x d ln x
+        f = K_HSE*ELaw.point(pE, g[None, :], lmb, lzb, self.ev)*m/g[None, :]**2*g[None, :]   # integrand x d ln x
         lg = np.log(g)
         seg = .5*(f[:, 1:]+f[:, :-1])*np.diff(lg)[None, :]
         I = np.c_[np.cumsum(seg[:, ::-1], axis=1)[:, ::-1], np.zeros(len(lmb))]             # int_g^x_out
@@ -219,19 +233,20 @@ class Composite:
 
     def pressure_nodes(self, p, rows=slice(None), x=None, bpos=None):
         D = self.B.D
-        pE, pT = p[:9], p[9:]
+        pE, pT = p[:self.ne], p[self.ne:]
         if x is None:
             x = D.xq[rows]
             bpos = self.bpos[rows]
         lm, lz, z = self.lmb[bpos][:, None], self.lzb[bpos][:, None], self.zb[bpos][:, None]
         k = self.kind
         if k.startswith('T'):
-            if k == 'T7x':
-                lt = pT[0]+pT[1]*lm+pT[2]*lz-(x/np.exp(pT[3]))**pT[4]
+            if k in ('T7x', 'T8xm', 'T8xz', 'T9x'):
+                lxe = pT[3]+(pT[7]*lm if k in ('T8xm', 'T9x') else 0.)+(pT[-1]*lz if k in ('T8xz', 'T9x') else 0.)
+                lt = pT[0]+pT[1]*lm+pT[2]*lz-(x/np.exp(lxe))**pT[4]
             else:
                 lt = pT[0]+pT[1]*lm+pT[2]*lz-pT[4]*np.log1p(x/np.exp(pT[3]))
-            P = ELaw.point(pE, x, lm, lz)*np.exp(lt)/C_T
-            if k in ('T7', 'T8', 'T7x'):
+            P = ELaw.point(pE, x, lm, lz, self.ev)*np.exp(lt)/C_T
+            if k in ('T7', 'T8', 'T7x', 'T8xm', 'T8xz', 'T9x'):
                 lx = pT[5]+pT[6]*lm+(pT[7]*lz if k == 'T8' else 0.)
                 P = P*cool_core(x, lx)
             return P

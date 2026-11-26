@@ -10,6 +10,24 @@ Two parts:
 2. The quick look of the morning (top-level `look.py`, `tests.py`, `hse_hybrid.py`; measured electron stacks, unweighted).
 
 Independent verification of part 1: PASSED (`maas/verify_independent/VERIFY.md`; details at the end of this file).
+Step 5 (section 000): independent check PASSED (`maas/verify_independent/step5/VERIFY_STEP5.md`).
+- An independently written electron 2-halo template matches the one used to <= 1.8e-4 on 22 rows, within the coarser
+  quadrature of the study.
+- All four weight sums rebuild to 2e-16.
+- L_4R,P, L_4R,E and the inside losses of the electron law + 2-halo, the separate laws and joint T7x agree to <= 7.9e-6.
+- Joint T7x (22 parameters) and the electron law + 2-halo (12) are minima: 5 random starts each converge back.
+- Not checked: the template without the mean term, the mass-break split, the fixed-electron T7x, T9x and H6.
+Step 4 flexibility tests: independent check PASSED (`maas/verify_independent/step4b/VERIFY_STEP4B.md`).
+- The models agree to <= 1.4e-7 (L_4R) and the joint fits are minima.
+- The free electron inner slope is held only by its bound (+1, a hollow core inside 0.02 R200c), so those variants are
+  unphysical. The free-x_c variants have no active bounds.
+Step 4 (section 00): independent check PASSED (`maas/verify_independent/step4/VERIFY_STEP4.md`) in both weightings.
+- The weights rebuild exactly: region 1 sums to 44.99 (record) and 1853.10 (parity).
+- L_4R, L_P and L_E of the constant-alpha pressure law, the mass-break law and the joint T7x model agree to <= 2.2e-6
+  (L_E to 1.1e-5).
+- All six fits are minima: least squares + Nelder-Mead lower the loss by <= 1.4e-8, and 40 random starts converge back
+  to the reported solutions.
+- Not checked: alpha(z) held, T7, separate T7x and H6 at 4 R200c, and the Y200 / extension / physicality blocks.
 Step 3 (section 0): independent check PASSED (`maas/verify_independent/step3/VERIFY_STEP3.md`). The verifier wrote its own
 code from the docstrings and ran it on maas.
 - The existing fits' L_P, L_out4 and L_out6 agree to <= 2.5e-6 relative with this study and with the losses saved in the
@@ -19,6 +37,130 @@ code from the docstrings and ran it on maas.
   by 7.8e-8, and refitting the law lowers L_P + L_E by 1.3e-8.
 - The parameter counts are confirmed.
 - Not checked: RMS inside B32 by group, the extension ratios, the physicality numbers and the hydrostatic 2-halo fits.
+
+## 000. Step 5: pressure AND electrons fitted to 4 R200c, each with its own 2-halo term (26 Nov, latest)
+User: "Yes, fit electrons". The electron tail beyond B32 is now constrained by electron data. This changes decision D4
+(electrons stop at B32) for fitting only; painting is not decided here.
+
+- Code: `maas/code/be_twohalo_e.py`, `be_etemplate.py`, `be_fit4r_e.py`, `be_eplots.py`.
+- Electron 2-halo template: the BD halo-model form with exclusion 0.75. The neighbours follow the Battaglia+16 AGN gas
+  law in the production electron units (n0 = 4e3, a = 0.88, b = 3.83 with their mass and redshift slopes; x_c = 0.5;
+  slope -0.2). The normalisation ratio is 1, since the electron unit does not scale with halo mass.
+  - The copied template code reproduces the BD pressure template exactly for field 'P' (`out/etemplate_check.json`).
+  - With the uncorrelated mean term the template fits slightly better (L_4R,E 52.11 vs 53.23), so it is used.
+- Weights (parity rule for both fields): inside B32 the step-2 weights; beyond B32 the mean inner weight times the
+  fold-error shape. Each field has 2701 + 1853.1.
+- Joint models fit electron law + temperature law + A_P(z) + A_E(z) in one loss, L_4R,P + L_4R,E.
+
+| model | parameters (law + amplitudes) | L_4R,P | L_4R,E | total | electron loss inside B32 |
+|---|---|---|---|---|---|
+| separate laws: constant-alpha pressure law + electron law, each + 2-halo | 19 + 6 = 25 | 35.84 | 52.11 | 87.95 | 35.16 |
+| separate laws with the mass-break pressure law | 25 + 6 = 31 | 19.61 | 52.11 | 71.72 | 35.16 |
+| electron law (+ 2-halo) fixed, temperature law T7x + pressure 2-halo | 16 + 6 = 22 | 62.12 | 52.11 | 114.23 | 35.16 |
+| electron law x temperature law T7x, joint | 16 + 6 = 22 | 38.33 | 60.62 | 98.95 | 44.27 |
+| electron law x temperature law T9x, joint | 18 + 6 = 24 | 38.37 | 59.49 | 97.86 | 43.05 |
+| hydrostatic + core term, joint | 15 + 6 = 21 | 47.85 | 55.72 | 103.57 | 41.14 |
+
+Source: `maas/out/be_fit4r_e.json: results[name]`; all columns (RMS inside B32 by mass group and beyond B32 by band, for
+both fields) are in `maas/tables_step5.md`.
+
+Reading:
+- The electron law itself cannot describe the electrons inside B32 and out to 4 R200c at once.
+  - Fitted alone with its 2-halo term, its inside-B32 loss rises from 15.15 (fitted inside B32 only) to 35.2.
+  - Groups are 30-50 % too high at small radius (figure `electrons_profiles_4R`).
+  - Beyond B32 it is good: RMS 0.08-0.10 at 1.5-4 R200c and 0.11 at the unfitted 4-6 R200c.
+- With electron data constraining the tail, the joint temperature model's extra cost is much smaller than in step 4:
+  - pressure +7 % (38.3 vs 35.8);
+  - electrons +16 % (60.6 vs 52.1), against +83 % before.
+- It still loses to the separate laws in total: 98.95 vs 87.95, with 3 fewer parameters (22 vs 25).
+- Inside B32 it remains better for pressure (L_P 12.0 vs 16.8) and worse for electrons (44.3 vs 35.2).
+- Beyond B32 it is comparable:
+  - pressure RMS 0.08 / 0.12 / 0.12 vs 0.08 / 0.09 / 0.10 at 1.5-2 / 2-3 / 3-4 R200c;
+  - electrons 0.09 / 0.09 / 0.07 vs 0.08 / 0.10 / 0.08.
+- Freeing the outer temperature radius (T9x) or using the hydrostatic model does not change the ranking.
+- Both 1-halo laws decline monotonically in all 109 bins: pressure log slope -4.8 and electrons -3.2 at 3-4 R200c.
+- Figures: `maas/figures/electrons_profiles_4R`, `both_fields_outer_rms_4R`, `compare_profiles_2h_4R_both` (pressure),
+  `compare_rms_2h_4R_both`, `compare_amplitude_4R_both`.
+
+## User decision, 26 Nov 2026
+"Parity (41 %)". For the 1-halo + 2-halo fits to 4 R200c, the shells beyond B32 get parity weights: the mean B32-set
+weight times the fold-error shape, v / <v>. Region 1 then carries 1,853 of 4,554 weight. Record weights (1.6 %) remain
+a comparison only.
+
+## 00. Step 4: law + 2-halo amplitude fitted together out to 4 R200c (26 Nov, latest)
+User: "But with 2-halo you can fit further than B32, it should around 4r200c." For the 1-halo + 2-halo fits this
+replaces the split procedure of step 3 and the 16 Nov rule of judging inside B32. Electrons still stop at B32 (D4), so
+the electron loss stays on the B32 set.
+
+- Code: `maas/code/be_fit4r.py`. One least-squares loss over the 1,494 B32 residuals and the 1,025 shells beyond B32 to
+  4 R200c; the law and the three amplitude parameters are fitted together. Joint electron-law models add the electron
+  loss inside B32. Starts: the step-3 solutions and perturbations. 4-6 R200c is not fitted and serves as a prediction
+  check.
+- Model: law + A_2h(z) t with the same template and amplitude form as step 3.
+- The weight of the shells beyond B32 decides the result, so both choices were run:
+  - record weights (the existing formula of the 4 R200c set): the shells beyond B32 carry 45 of 2,746 = 1.6 % of the
+    weight;
+  - parity weights: each shell beyond B32 gets the mean inner weight times its fold-error shape, v / <v>, so the
+    region carries 1,853 of 4,554 = 41 %.
+
+| fitted to 4 R200c | parameters | record weights: L_4R / RMS at 3-4 R200c / L_E | parity weights: L_4R / RMS at 1.5-2, 2-3, 3-4 (4-6 not fitted) R200c / L_E |
+|---|---|---|---|
+| pressure law, constant alpha | 9 + 10 + 3 = 22 | 15.21 / 0.118 / 15.15 | 35.84 / 0.078, 0.085, 0.103 (0.152) / 15.15 |
+| pressure law, alpha(z) of record | 9 + 9 + 3 = 21 | 13.21 / 0.180 / 15.15 | 37.12 / 0.083, 0.107, 0.114 (0.176) / 15.15 |
+| pressure law with mass break | 9 + 16 + 3 = 28 | 2.71 / 0.187 / 15.15 | 19.61 / 0.069, 0.088, 0.106 (0.175) / 15.15 |
+| electron law x temperature law T7x, joint | 9 + 7 + 3 = 19 | 9.09 / 0.348 / 16.26 | 39.86 / 0.103, 0.129, 0.127 (0.133) / 27.68 |
+| same, electron law fixed | 9 + 7 + 3 = 19 | 11.68 / 0.363 / 15.15 | 83.50 / 0.165, 0.162, 0.156 (0.155) / 15.15 |
+| hydrostatic + core term, joint | 9 + 6 + 3 = 18 | 10.22 / 0.510 / 17.12 | 51.08 / 0.132, 0.139, 0.138 (0.195) / 29.63 |
+
+Sources: `maas/out/be_fit4r.json` and `maas/out/be_fit4r_parity.json`: results[name].{L_4R, outer_all_masses, L_E};
+all columns are in `maas/tables_step4.md`.
+
+Reading:
+- With record weights, the outskirts hardly enter the loss (1.6 %).
+  - The temperature model has the lowest L_4R among the models with <= 22 parameters (9.09 vs 13.2-15.2).
+  - But it overshoots beyond 3 R200c: RMS 0.35 at 3-4 R200c, mean +0.26, A_2h(0) = 1.11.
+  - The pressure laws stay at 0.12-0.19 there.
+- With parity weights, every model follows the outskirts.
+  - The constant-alpha pressure law: 0.08-0.10 at 1.5-4 R200c.
+  - The temperature model: 0.10-0.13, and the best 4-6 R200c prediction (0.133 vs 0.152).
+  - Inside B32 the temperature model stays far better than the 9/10-parameter pressure laws (L_P 7.86 vs 14.5-16.8;
+    groups 0.27 vs 0.45-0.55 below 10^13.1).
+  - In total it is slightly worse (L_4R 39.9 vs 35.8 / 37.1), and the joint fit bends the electron law to do this:
+    L_E rises 83 % (27.7 vs 15.15).
+  - With the electron law fixed, the temperature law cannot follow the outskirts (L_4R 83.5). Beyond B32 the electron
+    law is constrained only by the pressure shells.
+- The mass-break pressure law is the best fit in both weightings (2.71 / 19.61), at 28 parameters in total.
+- Figures: `maas/figures/compare_profiles_2h_4R{,_parity}`, `compare_rms_2h_4R{,_parity}`, `compare_amplitude_4R{,_parity}`.
+
+### Can the electron cost of the joint fit be removed? (parity weights, after the user's choice)
+Tests (`maas/tables_step4.md`, last table; `maas/out/be_fit4r_parity_flex.json`, `be_fit4r_parity_eflex.json`):
+- (a) A more flexible outer temperature decline: the decline radius x_e depends on mass (T8xm), on redshift (T8xz) or
+  on both (T9x). That is +1 or +2 parameters.
+- (b) One more free constant in the electron law: its scale radius x_c (production 0.5) or its inner slope
+  (production -0.2), with T7x or T8xm.
+
+| model, fitted to 4 R200c with parity weights | law parameters | L_4R | L_E | L_4R + L_E |
+|---|---|---|---|---|
+| constant-alpha pressure law + electron law fitted alone (the existing split) | 10 + 9 = 19 | 35.84 | 15.15 | 50.99 |
+| mass-break pressure law + electron law fitted alone | 16 + 9 = 25 | 19.61 | 15.15 | 34.76 |
+| electron law x T7x, joint | 16 | 39.86 | 27.68 | 67.55 |
+| electron law x T9x (x_e depends on mass and z), joint | 18 | 39.68 | 24.56 | 64.23 |
+| electron law x T9x, electron law held fixed | 18 | 67.62 | 15.15 | 82.77 |
+| electron law with free x_c x T8xm, joint | 18 | 39.50 | 25.05 | 64.55 |
+| electron law with free inner slope x T7x, joint | 17 | 41.00 | 22.67 | 63.67 |
+
+Reading:
+- Neither test removes the cost: the joint fits keep L_E at 22.7-28.0, while the electron law alone has 13.5-15.2.
+- The free inner slope runs to its bound (+1.0, unphysical).
+- With the electron law held fixed, even the 9-parameter temperature law cannot follow the pressure beyond B32.
+- The limit is therefore the electron law's tail beyond B32. No electron data constrain it there (electrons stop at
+  B32), and its single smooth form cannot match both the electrons inside B32 and the shape the pressure outskirts need.
+- With the 4 R200c parity fit adopted, the temperature route does not save parameters at no cost:
+  - the split constant-alpha pressure law + electron law (19 law parameters) has a combined loss of 51.0;
+  - every temperature-law model (16-18) lands at 63-68.
+- The temperature route wins only inside B32: L_P 7.0-7.9 vs 14.5-16.8, mostly in groups.
+- A remaining option is to fit the electrons to 4 R200c as well, with their own 2-halo term, so that electron data
+  constrain the tail. That changes decision D4 (electrons stop at B32) for fitting, not necessarily for painting.
 
 ## 0. Step 3: against the existing pressure fit with a free 2-halo amplitude (26 Nov, later)
 User: "Have to be compared to best pressure fit (with A_2h free amplitude). Also include 2-halo for temperature. Use the

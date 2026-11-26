@@ -1,0 +1,18 @@
+{
+ "joint_H6": {
+  "n_region1": 1025,
+  "n_kink": 109,
+  "kink_maxrel": 0.005298226811119466,
+  "nonkink_maxrel": 0.00041534947978816295,
+  "nonkink_maxrel_x_lt_3p5": 0.00014087323331091195,
+  "gl12_unsplit_vs_study_on_kink_rows_maxrel": 0.00011056567149703156
+ },
+ "joint_H6_xout6": {
+  "n_region1": 1025,
+  "n_kink": 109,
+  "kink_maxrel": 0.0024830961559710873,
+  "nonkink_maxrel": 0.00014522355977486523,
+  "nonkink_maxrel_x_lt_3p5": 0.00012935900717025994,
+  "gl12_unsplit_vs_study_on_kink_rows_maxrel": 0.00010926421568069333
+ }
+}

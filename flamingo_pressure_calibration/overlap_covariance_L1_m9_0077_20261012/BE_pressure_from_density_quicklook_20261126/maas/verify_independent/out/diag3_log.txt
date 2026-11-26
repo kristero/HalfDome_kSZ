@@ -1,0 +1,41 @@
+check1 {
+ "mu_xgp": 1.2632313926501406,
+ "C_T": 428.21403140682736,
+ "K_HSE": 0.00899568869943655,
+ "K_HSE_if_rho_gas_includes_m_e": 0.009000000000000001,
+ "PE_FRAC": 0.5176470588235295,
+ "study": {
+  "C_T": 428.21403140682736,
+  "K_HSE": 0.00899568869943655,
+  "PE_FRAC": 0.5176470588235295,
+  "h": 0.681,
+  "MU_XGP": 1.2632313926501406
+ },
+ "rel_mu": 0.0,
+ "rel_C_T": 0.0,
+ "rel_K": 0.0,
+ "rel_PE": 0.0,
+ "rel_K_me_convention": 0.00047926297891121017,
+ "P_eq_Etau_over_CT_rel": 0.0,
+ "dPdx_rel": 1.1102230246251565e-16,
+ "g_rho_gas_over_E": 0.8995688699436549
+}
+rows {'n_region0': 1494, 'M_vs_10node_maxrel': 2.220446049250313e-16, 'z_vs_block_maxabs': 0.0, 'block_equal_BD': True, 'lo_equal_BD': 0.0, 'hi_equal_BD': 0.0, 'kind_equal_BD': True, 'wP_vs_BD_weight_maxrel': 0.0, 'dP_vs_BD_target_maxrel': 0.0007856243468820079, 'sum_wP': 2700.9999999999995, 'sum_wE': 2700.9999999999995}
+{
+ "joint_H6": {
+  "n_region1": 1025,
+  "n_kink": 109,
+  "kink_maxrel": 0.005298226811119466,
+  "nonkink_maxrel": 0.00041534947978816295,
+  "nonkink_maxrel_x_lt_3p5": 0.00014087323331091195,
+  "gl12_unsplit_vs_study_on_kink_rows_maxrel": 0.00011056567149703156
+ },
+ "joint_H6_xout6": {
+  "n_region1": 1025,
+  "n_kink": 109,
+  "kink_maxrel": 0.0024830961559710873,
+  "nonkink_maxrel": 0.00014522355977486523,
+  "nonkink_maxrel_x_lt_3p5": 0.00012935900717025994,
+  "gl12_unsplit_vs_study_on_kink_rows_maxrel": 0.00010926421568069333
+ }
+}

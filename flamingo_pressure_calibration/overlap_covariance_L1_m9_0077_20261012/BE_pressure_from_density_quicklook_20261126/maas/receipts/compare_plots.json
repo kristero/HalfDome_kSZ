@@ -1,0 +1,51 @@
+{
+ "job": "compare_plots",
+ "script": "be_compare_plots.py",
+ "arguments": "",
+ "host": "maas.strw.leidenuniv.nl",
+ "start_utc": "2026-11-26T08:50:15Z",
+ "end_utc": "2026-11-26T08:50:31Z",
+ "exit_status": 0,
+ "peak_rss_gib": 0.137969970703125,
+ "log": "/net/schelde/data2/nagainis/HalfDome_runtime/BE_pressure_from_density_20261126/logs/compare_plots.log",
+ "env": {
+  "BD_ROOT": "/net/schelde/data2/nagainis/HalfDome_runtime/BD_halfdome_flamingo_exact_shells_20261118",
+  "BD_CODE": "/net/schelde/data2/nagainis/HalfDome_runtime/BD_halfdome_flamingo_exact_shells_20261118/code",
+  "BE_OUT": "/net/schelde/data2/nagainis/HalfDome_runtime/BE_pressure_from_density_20261126/out",
+  "BE_SUMS": "/net/schelde/data2/nagainis/HalfDome_runtime/BE_pressure_from_density_20261126/out/be_sums.npz",
+  "BE_MEM_GIB": "6",
+  "OMP_NUM_THREADS": "1"
+ },
+ "nice": 19,
+ "ionice": "idle (-c3)",
+ "code_sha256": {
+  "be_compare.py": "34712124fa79d04e939a8547cf20eae1ee0fa49a63727d0aea58c14273c70699",
+  "be_compare_plots.py": "ec30181628c689f2de06845d7972a672ca2b7183053ab9790589c91ee5bd76c9",
+  "be_fit.py": "39326d2fd18234bec3d2bf7b82a5b47fccb3138836274d12194194e9a13d9bc0",
+  "be_plots.py": "ff368546337616731d41ddf6e4d61ffd08e9b6a1e0b764eb058f9e1b1e2edb5d",
+  "be_sums.py": "7361e92a90c0d9df8f75f2c27507400abbf706a1398e21be84e7c3735a8be6dc",
+  "launch_chain.sh": "71db6c8e477b872f9d4d604d5c01e40b21c0a137ce1a8179f0a3d229e9341d79",
+  "run_job.sh": "bef3e68f3dc934fc94c34c10ff43a94076adb5594e15f1675b187927333d5b8a"
+ },
+ "bd_code_sha256_read_only": {
+  "bd_explore.py": "a797244e40b159830d1699d319a73696eb6376701e0f73dc45f976623f0862b8",
+  "bd_explore2.py": "b16ff85ab699849f2d64e24f79a20c10af5824cc68aef017e46a72b2065f5f5e",
+  "bd_explore3.py": "3662c329e95aaa9f00aa8c149a0f9cbd2ee6c75868882a7ba5184f10f3baf00d",
+  "bd_explore_run.py": "1075cffd9971f4124aa61bbed5d9088b49d31b7ae5b0a56a73b06afbdeddcc18",
+  "bd_mass.py": "4fc1219589a4cb35ec6b4ec4bc3b1634fff695347168a8f1ad6cd408410d6e18",
+  "bd_twohalo.py": "fcfbf65f91dfc081f142c8fe3252a3d8decda47f03807df0850734de675f07a4"
+ },
+ "outputs_sha256": {
+  "out/be_compare.json": "2a2e20f7f553daf981ad5936b79b60d5206a6c29527f81e88a0a4b1e8a64fa9e",
+  "out/be_compare_rows.npz": "98f34b45eb11b84b53d1984f9f4068f03c5137faddf0f40c478c97c89f762c63",
+  "out/be_fits.json": "532dfe10d1fea9b2d4c11c0d7895a4b9588f6bc2f7b17ccc566d21b9d2058192",
+  "out/be_fits2.json": "e7d075f6429efcbe17d893f8d05908cc0c64adbe99af6046c5ed05095972af6a",
+  "out/be_fits2_rows.npz": "226489a8690433290da786739146c06ebfe64d7c9bdd69f09b8fdb23e0c69219",
+  "out/be_fits_rows.npz": "e082afd5e96fff26a428ffe1eb5430764a881638e7e10505ebea7be4e172047a",
+  "out/be_heldout.json": "66320773a933c2e18cfdc657f16794385a362bcf41ac17d5c5c3d7ea4835ae03",
+  "out/be_sums.json": "a178fd0d205d644fc37d90029ff56a26e6fda92edfe181b225011e598bb93d9f",
+  "out/be_sums.npz": "94827024b1e7da46fa032970b583a089a606f492528ed8cac7867599dd7c6e5e",
+  "out/be_twohalo.json": "eb44ea4e46fdad599b53df69321f4a2a0b9f55687a866a39544c8813f2a1e414",
+  "out/be_twohalo_rows.npz": "432e9b342a05f6c36d9dc76d0f6a7f26c7651cfc70397186df49d9e19e677ae9"
+ }
+}

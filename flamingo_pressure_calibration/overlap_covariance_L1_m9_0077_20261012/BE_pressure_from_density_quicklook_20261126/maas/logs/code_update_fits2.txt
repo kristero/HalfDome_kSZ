@@ -1,0 +1,7 @@
+2026-11-26T08:12:10Z
+be_fit.py replaced while heldout/twohalo were running (they had already imported the old version).
+Change is additive: kinds H3e/H6e and task fits2; existing code paths unchanged.
+old:
+e0bf9862132d766d7cb7cb23ef496b6d5d3e003358a6963e2524113951e49908  be_fit.py
+new:
+9756fb100ba896db991f06e2b1446878fbfccd69c098d2b06f5e676e72276bc0  be_fit.py

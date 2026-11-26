@@ -1,0 +1,652 @@
+check1 {
+ "mu_xgp": 1.2632313926501406,
+ "C_T": 428.21403140682736,
+ "K_HSE": 0.00899568869943655,
+ "K_HSE_if_rho_gas_includes_m_e": 0.009000000000000001,
+ "PE_FRAC": 0.5176470588235295,
+ "study": {
+  "C_T": 428.21403140682736,
+  "K_HSE": 0.00899568869943655,
+  "PE_FRAC": 0.5176470588235295,
+  "h": 0.681,
+  "MU_XGP": 1.2632313926501406
+ },
+ "rel_mu": 0.0,
+ "rel_C_T": 0.0,
+ "rel_K": 0.0,
+ "rel_PE": 0.0,
+ "rel_K_me_convention": 0.00047926297891121017,
+ "P_eq_Etau_over_CT_rel": 0.0,
+ "dPdx_rel": 1.1102230246251565e-16,
+ "g_rho_gas_over_E": 0.8995688699436549
+}
+rows {'n_region0': 1494, 'M_vs_10node_maxrel': 2.220446049250313e-16, 'z_vs_block_maxabs': 0.0, 'block_equal_BD': True, 'lo_equal_BD': 0.0, 'hi_equal_BD': 0.0, 'kind_equal_BD': True, 'wP_vs_BD_weight_maxrel': 0.0, 'dP_vs_BD_target_maxrel': 0.0007856243468820079, 'sum_wP': 2700.9999999999995, 'sum_wE': 2700.9999999999995}
+existing_B6 {
+ "mine": {
+  "L_P": 14.327135379972225,
+  "L_out4": 1506.4447670395762,
+  "L_out6": 1868.809275119017
+ },
+ "study": {
+  "L_P": 14.327101957640991,
+  "L_out4": 1506.4447670395762,
+  "L_out6": 1868.809275119017
+ },
+ "rel": {
+  "L_P": 2.3328047313864175e-06,
+  "L_out4": 0.0,
+  "L_out6": 0.0
+ },
+ "one_rows": {
+  "max": 2.572107254739109e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 7.66053886991358e-15,
+  "max_integral": 2.572107254739109e-06
+ },
+ "full_rows": {
+  "max": 2.541745082851321e-06,
+  "median": 2.220446049250313e-16
+ },
+ "outer_bands_max_rms_absdiff": 2.7755575615628914e-17,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 5.551115123125783e-16,
+ "counts": {
+  "electron_law": 9,
+  "pressure_law": 10,
+  "amplitude": 3,
+  "total_with_electrons": 22
+ },
+ "params_equal_study_json": true,
+ "BD_saved_L_in": 14.327101957640991,
+ "BD_saved_L_out": 1868.8097050522676,
+ "rel_L_P_vs_BD_L_in": 2.3328047313864175e-06,
+ "rel_L_out_vs_BD_L_out": 2.3005726557112638e-07,
+ "L_P_with_exact_PE": 14.327157678043358
+}
+existing_B4 {
+ "mine": {
+  "L_P": 14.326445824440913,
+  "L_out4": 1471.6771057101594,
+  "L_out6": 1936.8959459790922
+ },
+ "study": {
+  "L_P": 14.32641240439347,
+  "L_out4": 1471.6771057101591,
+  "L_out6": 1936.8959459790922
+ },
+ "rel": {
+  "L_P": 2.332757601974933e-06,
+  "L_out4": 2.220446049250313e-16,
+  "L_out6": 0.0
+ },
+ "one_rows": {
+  "max": 2.571878446655518e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 7.882583474838611e-15,
+  "max_integral": 2.571878446655518e-06
+ },
+ "full_rows": {
+  "max": 2.5437511912418387e-06,
+  "median": 2.220446049250313e-16
+ },
+ "outer_bands_max_rms_absdiff": 2.7755575615628914e-17,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 6.661338147750939e-16,
+ "counts": {
+  "electron_law": 9,
+  "pressure_law": 10,
+  "amplitude": 3,
+  "total_with_electrons": 22
+ },
+ "params_equal_study_json": true,
+ "BD_saved_L_in": 14.32641240439347,
+ "BD_saved_L_out": 1471.674808680167,
+ "rel_L_P_vs_BD_L_in": 2.332757601974933e-06,
+ "rel_L_out_vs_BD_L_out": 1.56082714664052e-06,
+ "L_P_with_exact_PE": 14.326468121891034
+}
+existing_A6 {
+ "mine": {
+  "L_P": 12.335350284941091,
+  "L_out4": 2904.8627553523124,
+  "L_out6": 3735.759520018644
+ },
+ "study": {
+  "L_P": 12.335319270538957,
+  "L_out4": 2904.862755352313,
+  "L_out6": 3735.7595200186443
+ },
+ "rel": {
+  "L_P": 2.5142764004115747e-06,
+  "L_out4": 1.1102230246251565e-16,
+  "L_out6": 1.1102230246251565e-16
+ },
+ "one_rows": {
+  "max": 3.989228768430664e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 7.66053886991358e-15,
+  "max_integral": 3.989228768430664e-06
+ },
+ "full_rows": {
+  "max": 3.942462778017131e-06,
+  "median": 2.220446049250313e-16
+ },
+ "outer_bands_max_rms_absdiff": 5.551115123125783e-17,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 6.661338147750939e-16,
+ "counts": {
+  "electron_law": 9,
+  "pressure_law": 9,
+  "amplitude": 3,
+  "total_with_electrons": 21
+ },
+ "params_equal_study_json": true,
+ "BD_saved_L_in": 12.335319270538958,
+ "BD_saved_L_out": 3735.7596117028506,
+ "rel_L_P_vs_BD_L_in": 2.5142764004115747e-06,
+ "rel_L_out_vs_BD_L_out": 2.4542319732034912e-08,
+ "L_P_with_exact_PE": 12.335372580501598
+}
+existing_A4 {
+ "mine": {
+  "L_P": 12.337326906924844,
+  "L_out4": 2635.6841623732516,
+  "L_out6": 4193.553605055383
+ },
+ "study": {
+  "L_P": 12.337295872364773,
+  "L_out4": 2635.684162373252,
+  "L_out6": 4193.553605055383
+ },
+ "rel": {
+  "L_P": 2.5155074816485268e-06,
+  "L_out4": 2.220446049250313e-16,
+  "L_out6": 0.0
+ },
+ "one_rows": {
+  "max": 3.9879462170322455e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 8.326672684688674e-15,
+  "max_integral": 3.9879462170322455e-06
+ },
+ "full_rows": {
+  "max": 3.94471373743599e-06,
+  "median": 2.220446049250313e-16
+ },
+ "outer_bands_max_rms_absdiff": 2.7755575615628914e-17,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 5.551115123125783e-16,
+ "counts": {
+  "electron_law": 9,
+  "pressure_law": 9,
+  "amplitude": 3,
+  "total_with_electrons": 21
+ },
+ "params_equal_study_json": true,
+ "BD_saved_L_in": 12.337295872364773,
+ "BD_saved_L_out": 2635.683704581854,
+ "rel_L_P_vs_BD_L_in": 2.5155074816485268e-06,
+ "rel_L_out_vs_BD_L_out": 1.7368980853582627e-07,
+ "L_P_with_exact_PE": 12.337349200711376
+}
+existing_MB4 {
+ "mine": {
+  "L_P": 1.9992515633144916,
+  "L_out4": 2700.7692049222137,
+  "L_out6": 4119.057382707103
+ },
+ "study": {
+  "L_P": 1.9992497763612462,
+  "L_out4": 2700.7692049222132,
+  "L_out6": 4119.057382707103
+ },
+ "rel": {
+  "L_P": 8.938119020474034e-07,
+  "L_out4": 2.220446049250313e-16,
+  "L_out6": 0.0
+ },
+ "one_rows": {
+  "max": 2.514023022426315e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 8.104628079763643e-15,
+  "max_integral": 2.514023022426315e-06
+ },
+ "full_rows": {
+  "max": 2.4821841528854804e-06,
+  "median": 2.220446049250313e-16
+ },
+ "outer_bands_max_rms_absdiff": 5.551115123125783e-17,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 4.440892098500626e-16,
+ "counts": {
+  "electron_law": 9,
+  "pressure_law": 16,
+  "amplitude": 3,
+  "total_with_electrons": 28
+ },
+ "params_equal_study_json": true,
+ "BD_saved_L_in": 1.9992497763612467,
+ "BD_saved_L_out": 2700.771282054889,
+ "rel_L_P_vs_BD_L_in": 8.938119018253587e-07,
+ "rel_L_out_vs_BD_L_out": 7.6908870039194e-07,
+ "L_P_with_exact_PE": 1.999273854892281,
+ "MB_reference_points_maxrel": {
+  "13|0": 0.0,
+  "14|0": 0.0,
+  "15|0": 0.0,
+  "13|1": 0.0,
+  "14|1": 0.0,
+  "13|2": 0.0
+ }
+}
+templates {'explore2h/run/templates/flamingo_B32_full_hm_ex0.75.npy': {'shape': [1494], 'vs_region0_maxrel': 0.0}, 'explore2h/run/templates/flamingo_x4_full_hm_ex0.75.npy': {'shape': [2391], 'region1_matched': 1025, 'vs_region1_maxrel': 0.0}, 'explore2h/mass_weights/templates/far_hm_ex0p75.npy': {'shape': [327], 'vs_region2_maxrel': 0.0}}
+joint_T7x_rout6 {
+ "mine": {
+  "L_P": 7.676276179008168,
+  "L_out4": 3911.776177590061,
+  "L_out6": 4278.865261118838,
+  "L_E": 15.816678354439482
+ },
+ "study": {
+  "L_P": 7.676276612645815,
+  "L_out4": 3911.7761775900603,
+  "L_out6": 4278.865261118839,
+  "L_E": 15.81651284961719
+ },
+ "rel": {
+  "L_P": 5.649062284618367e-08,
+  "L_out4": 2.220446049250313e-16,
+  "L_out6": 2.220446049250313e-16,
+  "L_E": 1.0464052592640272e-05
+ },
+ "one_rows": {
+  "max": 1.9479765190899556e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 7.993605777301127e-15,
+  "max_integral": 1.9479765190899556e-06
+ },
+ "full_rows": {
+  "max": 1.9226901203373004e-06,
+  "median": 2.220446049250313e-16
+ },
+ "E_rows": {
+  "max": 9.287361506515879e-06,
+  "median": 4.440892098500626e-16
+ },
+ "outer_bands_max_rms_absdiff": 5.551115123125783e-17,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 4.440892098500626e-16,
+ "counts": {
+  "electron_law": 9,
+  "temperature_or_hydrostatic": 7,
+  "amplitude": 3,
+  "total_with_electrons": 19
+ }
+}
+joint_T7_rout6 {
+ "mine": {
+  "L_P": 7.7386020065876835,
+  "L_out4": 4171.550714006397,
+  "L_out6": 4558.728653388807,
+  "L_E": 15.834260572505567
+ },
+ "study": {
+  "L_P": 7.738602621538764,
+  "L_out4": 4171.550714006397,
+  "L_out6": 4558.728653388806,
+  "L_E": 15.834094367485703
+ },
+ "rel": {
+  "L_P": 7.94653906011078e-08,
+  "L_out4": 0.0,
+  "L_out6": 2.220446049250313e-16,
+  "L_E": 1.0496654624381208e-05
+ },
+ "one_rows": {
+  "max": 1.979090667791894e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 7.993605777301127e-15,
+  "max_integral": 1.979090667791894e-06
+ },
+ "full_rows": {
+  "max": 1.954266483084055e-06,
+  "median": 2.220446049250313e-16
+ },
+ "E_rows": {
+  "max": 9.292676802497013e-06,
+  "median": 4.440892098500626e-16
+ },
+ "outer_bands_max_rms_absdiff": 8.326672684688674e-17,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 4.440892098500626e-16,
+ "counts": {
+  "electron_law": 9,
+  "temperature_or_hydrostatic": 7,
+  "amplitude": 3,
+  "total_with_electrons": 19
+ }
+}
+joint_T7x_rout4 {
+ "mine": {
+  "L_P": 7.672675129268834,
+  "L_out4": 3878.1836353578774,
+  "L_out6": 4342.581828536059,
+  "L_E": 15.816176053449595
+ },
+ "study": {
+  "L_P": 7.6726755716276465,
+  "L_out4": 3878.1836353578774,
+  "L_out6": 4342.581828536058,
+  "L_E": 15.816010509007448
+ },
+ "rel": {
+  "L_P": 5.765378829902801e-08,
+  "L_out4": 0.0,
+  "L_out6": 2.220446049250313e-16,
+  "L_E": 1.0466889994287243e-05
+ },
+ "one_rows": {
+  "max": 1.948695509845777e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 7.993605777301127e-15,
+  "max_integral": 1.948695509845777e-06
+ },
+ "full_rows": {
+  "max": 1.922546746357945e-06,
+  "median": 2.220446049250313e-16
+ },
+ "E_rows": {
+  "max": 9.28835842883835e-06,
+  "median": 4.440892098500626e-16
+ },
+ "outer_bands_max_rms_absdiff": 2.7755575615628914e-17,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 4.440892098500626e-16,
+ "counts": {
+  "electron_law": 9,
+  "temperature_or_hydrostatic": 7,
+  "amplitude": 3,
+  "total_with_electrons": 19
+ }
+}
+joint_T7_rout4 {
+ "mine": {
+  "L_P": 7.735962069131878,
+  "L_out4": 4129.604210582758,
+  "L_out6": 4668.835689933869,
+  "L_E": 15.833624631423714
+ },
+ "study": {
+  "L_P": 7.735962693210098,
+  "L_out4": 4129.604210582758,
+  "L_out6": 4668.835689933869,
+  "L_E": 15.833458399769755
+ },
+ "rel": {
+  "L_P": 8.06723410295973e-08,
+  "L_out4": 0.0,
+  "L_out6": 0.0,
+  "L_E": 1.0498758373556072e-05
+ },
+ "one_rows": {
+  "max": 1.9792194499990146e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 7.771561172376096e-15,
+  "max_integral": 1.9792194499990146e-06
+ },
+ "full_rows": {
+  "max": 1.953993475689586e-06,
+  "median": 2.220446049250313e-16
+ },
+ "E_rows": {
+  "max": 9.29283332151698e-06,
+  "median": 4.440892098500626e-16
+ },
+ "outer_bands_max_rms_absdiff": 8.326672684688674e-17,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 4.440892098500626e-16,
+ "counts": {
+  "electron_law": 9,
+  "temperature_or_hydrostatic": 7,
+  "amplitude": 3,
+  "total_with_electrons": 19
+ }
+}
+sep_T7x_rout6 {
+ "mine": {
+  "L_P": 9.085509348375169,
+  "L_out4": 6269.801068622554,
+  "L_out6": 6814.829634961929,
+  "L_E": 15.153338666761119
+ },
+ "study": {
+  "L_P": 9.085509915275487,
+  "L_out4": 6269.801068622554,
+  "L_out6": 6814.829634961929,
+  "L_E": 15.153193414907467
+ },
+ "rel": {
+  "L_P": 6.239609262603807e-08,
+  "L_out4": 0.0,
+  "L_out6": 0.0,
+  "L_E": 9.585560592828557e-06
+ },
+ "one_rows": {
+  "max": 1.8649630808553752e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 8.104628079763643e-15,
+  "max_integral": 1.8649630808553752e-06
+ },
+ "full_rows": {
+  "max": 1.8427781239838126e-06,
+  "median": 2.220446049250313e-16
+ },
+ "E_rows": {
+  "max": 1.0030682727979467e-05,
+  "median": 4.440892098500626e-16
+ },
+ "outer_bands_max_rms_absdiff": 1.3877787807814457e-16,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 4.440892098500626e-16,
+ "counts": {
+  "electron_law": 9,
+  "temperature_or_hydrostatic": 7,
+  "amplitude": 3,
+  "total_with_electrons": 19
+ }
+}
+sep_T7_rout6 {
+ "mine": {
+  "L_P": 9.39644080306731,
+  "L_out4": 5695.048789780983,
+  "L_out6": 6220.671609612868,
+  "L_E": 15.153338666761119
+ },
+ "study": {
+  "L_P": 9.396443745121669,
+  "L_out4": 5695.0487897809835,
+  "L_out6": 6220.6716096128675,
+  "L_E": 15.153193414907467
+ },
+ "rel": {
+  "L_P": 3.1310296089159806e-07,
+  "L_out4": 1.1102230246251565e-16,
+  "L_out6": 2.220446049250313e-16,
+  "L_E": 9.585560592828557e-06
+ },
+ "one_rows": {
+  "max": 3.723972779701157e-06,
+  "median": 4.440892098500626e-16,
+  "max_shell": 7.771561172376096e-15,
+  "max_integral": 3.723972779701157e-06
+ },
+ "full_rows": {
+  "max": 3.6620080192673043e-06,
+  "median": 2.220446049250313e-16
+ },
+ "E_rows": {
+  "max": 1.0030682727979467e-05,
+  "median": 4.440892098500626e-16
+ },
+ "outer_bands_max_rms_absdiff": 1.6653345369377348e-16,
+ "outer_bands_n_equal": true,
+ "amp_by_z_maxrel": 4.440892098500626e-16,
+ "counts": {
+  "electron_law": 9,
+  "temperature_or_hydrostatic": 7,
+  "amplitude": 3,
+  "total_with_electrons": 19
+ }
+}
+check3 {
+ "amp_reported": [
+  -0.49686116193983915,
+  1.8724078783200264,
+  -0.6502364782721991
+ ],
+ "amp_refit": [
+  -0.4968610951133118,
+  1.8724077999974602,
+  -0.6502364035829039
+ ],
+ "amp_max_abs_change": 7.832256621043143e-08,
+ "L_out6_at_reported": 4278.865261118838,
+ "L_out6_refit": 4278.865261118699,
+ "L_out6_decrease": 1.3915268937125802e-10,
+ "A2h_by_z_max_relchange": 1.0178718845565982e-07,
+ "law_LP_plus_LE_at_reported": 23.492954533447644,
+ "law_LP_plus_LE_after_LS": 23.49295452056662,
+ "law_decrease": 1.2881024247235473e-08,
+ "law_max_abs_param_change": 4.86717983427809e-06,
+ "law_param_change": [
+  -4.86717983427809e-06,
+  5.160861872854916e-07,
+  2.724645564611272e-06,
+  3.7967420529749774e-07,
+  6.916391578903891e-07,
+  5.110153764587011e-07,
+  -7.075376864396077e-07,
+  2.737732389956893e-07,
+  1.0130018874843216e-06,
+  3.223717533362702e-06,
+  -7.45475730618006e-07,
+  -3.8078527755947e-07,
+  -2.1041205686134212e-06,
+  -3.3386288856851465e-06,
+  -2.9167659905127152e-06,
+  7.222360326464283e-07
+ ],
+ "law_LS_nfev": 4,
+ "law_LS_status": 2,
+ "law_LS_seconds": 33.12661075592041,
+ "random_perturbations_1e-3_min_change": 0.0,
+ "study_L_P_plus_L_E": 23.492789462263005
+}
+check4 {
+ "existing_B6": {
+  "total_with_electrons": 22,
+  "expected": 22,
+  "sum_of_parts": 22,
+  "n_saved_parameters_plus_electron": 22,
+  "ok": true
+ },
+ "existing_B4": {
+  "total_with_electrons": 22,
+  "expected": 22,
+  "sum_of_parts": 22,
+  "n_saved_parameters_plus_electron": 22,
+  "ok": true
+ },
+ "existing_A6": {
+  "total_with_electrons": 21,
+  "expected": 21,
+  "sum_of_parts": 21,
+  "n_saved_parameters_plus_electron": 21,
+  "ok": true
+ },
+ "existing_A4": {
+  "total_with_electrons": 21,
+  "expected": 21,
+  "sum_of_parts": 21,
+  "n_saved_parameters_plus_electron": 21,
+  "ok": true
+ },
+ "existing_MB4": {
+  "total_with_electrons": 28,
+  "expected": 28,
+  "sum_of_parts": 28,
+  "n_saved_parameters_plus_electron": 28,
+  "ok": true
+ },
+ "joint_T7x_rout6": {
+  "total_with_electrons": 19,
+  "expected": 19,
+  "sum_of_parts": 19,
+  "n_saved_parameters_plus_electron": 19,
+  "ok": true
+ },
+ "joint_T7x_rout4": {
+  "total_with_electrons": 19,
+  "expected": 19,
+  "sum_of_parts": 19,
+  "n_saved_parameters_plus_electron": 19,
+  "ok": true
+ },
+ "sep_T7x_rout6": {
+  "total_with_electrons": 19,
+  "expected": 19,
+  "sum_of_parts": 19,
+  "n_saved_parameters_plus_electron": 19,
+  "ok": true
+ },
+ "sep_T7x_rout4": {
+  "total_with_electrons": 19,
+  "expected": 19,
+  "sum_of_parts": 19,
+  "n_saved_parameters_plus_electron": 19,
+  "ok": true
+ },
+ "joint_T7_rout6": {
+  "total_with_electrons": 19,
+  "expected": 19,
+  "sum_of_parts": 19,
+  "n_saved_parameters_plus_electron": 19,
+  "ok": true
+ },
+ "joint_T7_rout4": {
+  "total_with_electrons": 19,
+  "expected": 19,
+  "sum_of_parts": 19,
+  "n_saved_parameters_plus_electron": 19,
+  "ok": true
+ },
+ "sep_T7_rout6": {
+  "total_with_electrons": 19,
+  "expected": 19,
+  "sum_of_parts": 19,
+  "n_saved_parameters_plus_electron": 19,
+  "ok": true
+ },
+ "sep_T7_rout4": {
+  "total_with_electrons": 19,
+  "expected": 19,
+  "sum_of_parts": 19,
+  "n_saved_parameters_plus_electron": 19,
+  "ok": true
+ },
+ "joint_H6_xout6_rout6": {
+  "total_with_electrons": 18,
+  "expected": 18,
+  "sum_of_parts": 18,
+  "n_saved_parameters_plus_electron": 18,
+  "ok": true
+ },
+ "joint_H6_xout6_rout4": {
+  "total_with_electrons": 18,
+  "expected": 18,
+  "sum_of_parts": 18,
+  "n_saved_parameters_plus_electron": 18,
+  "ok": true
+ }
+}
+done 55.502450942993164

@@ -1,0 +1,33 @@
+=== Test 1: P = n_e(measured) x T(model); RMS of ln(P_pred/P_stack) inside [resolution edge, B32], bins n>=50
+T law: universal                                     k= 3 | groups <13.5: 0.582 | 13.5-14.3: 0.302 | >=14.3: 0.319 | all x>=0.3: 0.218
+    params [ 0.949 33.078 10.   ]
+T law: selfsim_scaled                                k= 5 | groups <13.5: 0.544 | 13.5-14.3: 0.276 | >=14.3: 0.310 | all x>=0.3: 0.313
+    params [ 1.0390e+00  2.2500e-01 -1.2000e-02  3.1011e+01  1.0000e+01]
+T law: coolcore7                                     k= 7 | groups <13.5: 0.127 | 13.5-14.3: 0.039 | >=14.3: 0.057 | all x>=0.3: 0.049
+    params [ 2.586 -0.359 -0.3    0.486  1.268 -3.062 -1.596]
+T law: coolcore8                                     k= 8 | groups <13.5: 0.124 | 13.5-14.3: 0.032 | >=14.3: 0.050 | all x>=0.3: 0.052
+    params [ 2.51  -0.35  -0.232  0.492  1.27  -3.101 -1.578  0.126]
+T law: coolcore9                                     k= 9 | groups <13.5: 0.121 | 13.5-14.3: 0.031 | >=14.3: 0.045 | all x>=0.3: 0.048
+    params [ 2.537 -0.323 -0.221  0.377  1.098 -3.12  -1.512  0.155  2.167]
+
+=== Test 2: hydrostatic P_e from measured n_e and NFW mass (no fitted parameters unless stated)
+HSE, halo-component n_e, P=0 at 4 R200c, f_nth=0     k= 0 | groups <13.5: 0.725 | 13.5-14.3: 0.099 | >=14.3: 0.094 | all x>=0.3: 0.221
+HSE, halo-component n_e, P=0 at 4 R200c, Shaw+10 f_nth (fixed) k= 0 | groups <13.5: 0.677 | 13.5-14.3: 0.078 | >=14.3: 0.078 | all x>=0.3: 0.140
+    implied 1-P/P_HSE at x=0.30   z=0: +0.06 [+0.04,+0.62] ; z=1: +0.13 [-0.02,+0.52] ; z=3: +0.20 [-0.01,+0.39]
+    implied 1-P/P_HSE at x=0.50   z=0: +0.08 [+0.06,+0.36] ; z=1: +0.12 [-0.01,+0.32] ; z=3: +0.20 [+0.04,+0.30]
+    implied 1-P/P_HSE at x=0.99   z=0: +0.14 [+0.08,+0.18] ; z=1: +0.19 [+0.18,+0.23] ; z=3: -
+HSE, halo-component n_e, P=0 at 4 R200c, fitted f_nth = a(1+z)^b x^n k= 3 | groups <13.5: 0.518 | 13.5-14.3: 0.242 | >=14.3: 0.284 | all x>=0.3: 0.185
+    a,b,n = [0.251 0.115 0.   ]
+HSE, all-gas n_e, P=0 at 6 R200c, f_nth=0            k= 0 | groups <13.5: 0.732 | 13.5-14.3: 0.117 | >=14.3: 0.112 | all x>=0.3: 0.241
+HSE, all-gas n_e, P=0 at 6 R200c, Shaw+10 f_nth (fixed) k= 0 | groups <13.5: 0.680 | 13.5-14.3: 0.066 | >=14.3: 0.076 | all x>=0.3: 0.142
+    implied 1-P/P_HSE at x=0.30   z=0: +0.06 [+0.04,+0.62] ; z=1: +0.14 [-0.02,+0.52] ; z=3: +0.21 [-0.01,+0.40]
+    implied 1-P/P_HSE at x=0.50   z=0: +0.08 [+0.06,+0.37] ; z=1: +0.13 [+0.00,+0.34] ; z=3: +0.21 [+0.05,+0.30]
+    implied 1-P/P_HSE at x=0.99   z=0: +0.16 [+0.10,+0.22] ; z=1: +0.24 [+0.23,+0.28] ; z=3: -
+HSE, all-gas n_e, P=0 at 6 R200c, fitted f_nth = a(1+z)^b x^n k= 3 | groups <13.5: 0.512 | 13.5-14.3: 0.245 | >=14.3: 0.292 | all x>=0.3: 0.183
+    a,b,n = [0.261 0.107 0.   ]
+HSE + f_nth=a(1+z)^b x^n fitted on >=10^13.5         k= 3 | groups <13.5: 0.707 | 13.5-14.3: 0.045 | >=14.3: 0.049 | all x>=0.3: 0.163
+    a,b,n = [0.123 0.675 1.542]
+  + cool-core factor (x/xc)^2/(1+(x/xc)^2), xc(M,z)  k= 6 | groups <13.5: 0.190 | 13.5-14.3: 0.047 | >=14.3: 0.060 | all x>=0.3: 0.072
+    ln xc0, b_m, b_z = [-3.483 -1.479  0.218]
+  joint refit of both (6 parameters)                 k= 6 | groups <13.5: 0.182 | 13.5-14.3: 0.060 | >=14.3: 0.072 | all x>=0.3: 0.067
+    params [ 0.152  0.26   0.876 -3.517 -1.491  0.211]

@@ -1,0 +1,23 @@
+e7d075f6429efcbe17d893f8d05908cc0c64adbe99af6046c5ed05095972af6a  be_fits2.json
+226489a8690433290da786739146c06ebfe64d7c9bdd69f09b8fdb23e0c69219  be_fits2_rows.npz
+532dfe10d1fea9b2d4c11c0d7895a4b9588f6bc2f7b17ccc566d21b9d2058192  be_fits.json
+e082afd5e96fff26a428ffe1eb5430764a881638e7e10505ebea7be4e172047a  be_fits_rows.npz
+66320773a933c2e18cfdc657f16794385a362bcf41ac17d5c5c3d7ea4835ae03  be_heldout.json
+a178fd0d205d644fc37d90029ff56a26e6fda92edfe181b225011e598bb93d9f  be_sums.json
+94827024b1e7da46fa032970b583a089a606f492528ed8cac7867599dd7c6e5e  be_sums.npz
+eb44ea4e46fdad599b53df69321f4a2a0b9f55687a866a39544c8813f2a1e414  be_twohalo.json
+432e9b342a05f6c36d9dc76d0f6a7f26c7651cfc70397186df49d9e19e677ae9  be_twohalo_rows.npz
+total 6304
+drwx------ 2 nagainis users    4096 Nov 26 09:22 .
+drwx------ 9 nagainis users    4096 Nov 26 09:23 ..
+-rw------- 1 nagainis users   69775 Nov 26 09:16 be_fits2.json
+-rw------- 1 nagainis users  211579 Nov 26 09:16 be_fits2_rows.npz
+-rw------- 1 nagainis users  186511 Nov 26 09:10 be_fits.json
+-rw------- 1 nagainis users  804486 Nov 26 09:10 be_fits_rows.npz
+-rw------- 1 nagainis users    9276 Nov 26 09:22 be_heldout.json
+-rw------- 1 nagainis users    3151 Nov 26 09:04 be_sums.json
+-rw------- 1 nagainis users 4492457 Nov 26 09:04 be_sums.npz
+-rw------- 1 nagainis users  112429 Nov 26 09:12 be_twohalo.json
+-rw------- 1 nagainis users  539338 Nov 26 09:12 be_twohalo_rows.npz
+2a2e20f7f553daf981ad5936b79b60d5206a6c29527f81e88a0a4b1e8a64fa9e  /net/schelde/data2/nagainis/HalfDome_runtime/BE_pressure_from_density_20261126/out/be_compare.json
+98f34b45eb11b84b53d1984f9f4068f03c5137faddf0f40c478c97c89f762c63  /net/schelde/data2/nagainis/HalfDome_runtime/BE_pressure_from_density_20261126/out/be_compare_rows.npz

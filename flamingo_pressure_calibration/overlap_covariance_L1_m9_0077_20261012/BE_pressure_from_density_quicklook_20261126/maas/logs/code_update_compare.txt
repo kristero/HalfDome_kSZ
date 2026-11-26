@@ -1,0 +1,8 @@
+2026-11-26T08:48:21Z
+Step 3 (compare with existing pressure fits + 2-halo): be_fit.py gains kind T7x (additive; existing kinds unchanged); new be_compare.py, be_compare_plots.py.
+old:
+9756fb100ba896db991f06e2b1446878fbfccd69c098d2b06f5e676e72276bc0  be_fit.py
+new:
+39326d2fd18234bec3d2bf7b82a5b47fccb3138836274d12194194e9a13d9bc0  be_fit.py
+34712124fa79d04e939a8547cf20eae1ee0fa49a63727d0aea58c14273c70699  be_compare.py
+ec30181628c689f2de06845d7972a672ca2b7183053ab9790589c91ee5bd76c9  be_compare_plots.py
